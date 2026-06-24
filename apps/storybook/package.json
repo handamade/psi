@@ -1,0 +1,21 @@
+{
+  "name": "storybook",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "storybook dev -p 6006",
+    "build": "storybook build"
+  },
+  "dependencies": {
+    "@dku/tokens": "workspace:*",
+    "@dku/react": "workspace:*",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "storybook": "^10.4.0",
+    "@storybook/react-vite": "^10.4.0",
+    "@storybook/addon-a11y": "^10.4.0",
+    "vite": "^6.0.0"
+  }
+}
