@@ -1,0 +1,70 @@
+/* ── Base ─────────────────────────────────────────────────────── */
+
+.input {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--ds-border-neutral);
+  border-radius: var(--ds-radius-8);
+  background: var(--ds-bg-primary);
+  color: var(--ds-fg-primary);
+  font-family: var(--ds-font-sans);
+  padding-inline: var(--ds-space-8);
+  transition:
+    border-color 0.15s ease,
+    outline 0.15s ease;
+}
+
+.input::placeholder {
+  color: var(--ds-fg-tertiary);
+}
+
+.input:hover:not(:disabled):not(:focus) {
+  border-color: var(--ds-border-strong);
+}
+
+.input:focus {
+  outline: 2px solid var(--ds-border-focus);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Sizes ────────────────────────────────────────────────────── */
+
+.size24 {
+  height: var(--ds-size-24);
+  font-size: var(--ds-text-xs-size);
+  line-height: var(--ds-text-xs-line);
+}
+
+.size32 {
+  height: var(--ds-size-32);
+  font-size: var(--ds-text-sm-size);
+  line-height: var(--ds-text-sm-line);
+}
+
+.size40 {
+  height: var(--ds-size-40);
+  font-size: var(--ds-text-base-size);
+  line-height: var(--ds-text-base-line);
+}
+
+.size48 {
+  height: var(--ds-size-48);
+  font-size: var(--ds-text-lg-size);
+  line-height: var(--ds-text-lg-line);
+}
+
+/* ── Error ────────────────────────────────────────────────────── */
+
+.error {
+  border-color: var(--ds-fg-danger);
+}
+
+.error:hover:not(:disabled):not(:focus) {
+  border-color: var(--ds-fg-danger);
+}
