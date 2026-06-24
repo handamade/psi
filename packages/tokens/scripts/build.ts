@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
+import { darkTheme } from "../src/themes/dark.js";
 import { validate } from "../src/dsl/validator.js";
 import { resolve } from "../src/dsl/resolver.js";
 
@@ -15,6 +16,7 @@ import { emitTokenTypes } from "./emit-types.js";
 
 const themes: Record<string, typeof lightTheme> = {
   light: lightTheme,
+  dark: darkTheme,
 };
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
