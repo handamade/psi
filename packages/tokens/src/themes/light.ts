@@ -12,10 +12,10 @@ export const lightTheme: ThemeDef = {
   fgPrimaryInverted: token({ from: slot.canvas }),
   fgStaticWhite: token({ from: slot.canvas, l: set(1.0), c: set(0) }),
 
-  fgAccent: token({ from: slot.accent, l: set(0.65), c: cap(0.23) }),
-  fgSuccess: token({ from: slot.success, l: set(0.65), c: cap(0.23) }),
-  fgWarning: token({ from: slot.warning, l: set(0.65), c: cap(0.23) }),
-  fgDanger: token({ from: slot.danger, l: set(0.65), c: cap(0.23) }),
+  fgAccent: token({ from: slot.accent, l: set(0.48), c: cap(0.23) }),
+  fgSuccess: token({ from: slot.success, l: set(0.48), c: cap(0.23) }),
+  fgWarning: token({ from: slot.warning, l: set(0.48), c: cap(0.23) }),
+  fgDanger: token({ from: slot.danger, l: set(0.48), c: cap(0.23) }),
 
   fillNeutral1: token({ from: slot.canvas, l: delta(+0.016), c: delta(-0.001) }),
   fillNeutral2: token({ from: slot.canvas }),
