@@ -1,0 +1,124 @@
+import type { Meta, StoryObj } from "storybook";
+import {
+  IconPlus,
+  IconMinus,
+  IconClose,
+  IconCheck,
+  IconChevronDown,
+  IconChevronRight,
+  IconSearch,
+  IconSettings,
+  IconUser,
+  IconEdit,
+  IconTrash,
+  IconCopy,
+  IconExternalLink,
+  IconEye,
+  IconEyeOff,
+  IconLoader,
+} from "./index.js";
+
+const icons = [
+  { name: "IconPlus", Component: IconPlus },
+  { name: "IconMinus", Component: IconMinus },
+  { name: "IconClose", Component: IconClose },
+  { name: "IconCheck", Component: IconCheck },
+  { name: "IconChevronDown", Component: IconChevronDown },
+  { name: "IconChevronRight", Component: IconChevronRight },
+  { name: "IconSearch", Component: IconSearch },
+  { name: "IconSettings", Component: IconSettings },
+  { name: "IconUser", Component: IconUser },
+  { name: "IconEdit", Component: IconEdit },
+  { name: "IconTrash", Component: IconTrash },
+  { name: "IconCopy", Component: IconCopy },
+  { name: "IconExternalLink", Component: IconExternalLink },
+  { name: "IconEye", Component: IconEye },
+  { name: "IconEyeOff", Component: IconEyeOff },
+  { name: "IconLoader", Component: IconLoader },
+];
+
+const meta: Meta = {
+  title: "Icons/Gallery",
+};
+
+export default meta;
+type Story = StoryObj;
+
+const IconCell = ({
+  name,
+  Component,
+  size,
+}: {
+  name: string;
+  Component: React.ComponentType<{ size?: number }>;
+  size: number;
+}) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "var(--ds-space-4)",
+      padding: "var(--ds-space-8)",
+    }}
+  >
+    <Component size={size} />
+    <span
+      style={{
+        fontSize: "var(--ds-text-xs-size)",
+        color: "var(--ds-fg-secondary)",
+      }}
+    >
+      {name}
+    </span>
+  </div>
+);
+
+export const Size16: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+      {icons.map(({ name, Component }) => (
+        <IconCell key={name} name={name} Component={Component} size={16} />
+      ))}
+    </div>
+  ),
+};
+
+export const Size20: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+      {icons.map(({ name, Component }) => (
+        <IconCell key={name} name={name} Component={Component} size={20} />
+      ))}
+    </div>
+  ),
+};
+
+export const Size24: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+      {icons.map(({ name, Component }) => (
+        <IconCell key={name} name={name} Component={Component} size={24} />
+      ))}
+    </div>
+  ),
+};
+
+export const AllSizes: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-24)" }}>
+      {[16, 20, 24].map((size) => (
+        <div key={size}>
+          <h3 style={{ margin: "0 0 var(--ds-space-8)", fontSize: "var(--ds-text-sm-size)", color: "var(--ds-fg-secondary)" }}>
+            Size {size}
+          </h3>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+            {icons.map(({ name, Component }) => (
+              <IconCell key={name} name={name} Component={Component} size={size} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
+};
