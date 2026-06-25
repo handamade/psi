@@ -1,3 +1,4 @@
+import React from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Input } from "./Input.js";
 

@@ -1,3 +1,4 @@
+import React from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Tag } from "./Tag.js";
 
