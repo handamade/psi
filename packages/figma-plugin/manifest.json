@@ -1,0 +1,8 @@
+{
+  "name": "DS Token Sync",
+  "id": "ds-token-sync",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma"]
+}
