@@ -22,8 +22,8 @@ export const lightTheme: ThemeDef = {
   fillNeutral2: token({ from: slot.canvas }),
   fillNeutral3: token({ from: slot.canvas, l: delta(-0.017), c: delta(+0.001) }),
   fillNeutral4: token({ from: slot.canvas, l: delta(-0.034), c: delta(+0.002) }),
-  fillNeutral5: token({ from: slot.canvas, l: delta(-0.052), c: delta(+0.003) }),
-  fillNeutral6: token({ from: slot.canvas, l: delta(-0.068), c: delta(+0.004) }),
+  fillNeutral5: token({ from: slot.canvas, l: delta(-0.032), c: delta(+0.003) }),
+  fillNeutral6: token({ from: slot.canvas, l: delta(-0.048), c: delta(+0.004) }),
 
   fillAccent: token({ from: slot.accent }),
   fillSuccess: token({ from: slot.success }),

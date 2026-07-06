@@ -3,7 +3,7 @@ import { resolve } from "../src/dsl/resolver.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
-import { checkContrast, wcagAAPairs, componentLabelPairs } from "../src/contrast-matrix.js";
+import { checkContrast, wcagAAPairs, componentLabelPairs, compositeHex } from "../src/contrast-matrix.js";
 import { acmePalette, acmeSlots } from "../src/themes/customers/acme.js";
 import type { ContrastResult } from "../src/contrast-matrix.js";
 
@@ -18,6 +18,10 @@ function formatFailures(results: ContrastResult[]): string {
 }
 
 describe("contrast matrix", () => {
+  it("composites in sRGB: 50% black on white = #808080", () => {
+    expect(compositeHex("#000000", 0.5, "#ffffff")).toBe("#808080");
+  });
+
   describe("light theme", () => {
     const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
     const results = checkContrast(resolved, wcagAAPairs);
