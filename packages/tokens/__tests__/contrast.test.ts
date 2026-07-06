@@ -18,8 +18,26 @@ function formatFailures(results: ContrastResult[]): string {
 }
 
 describe("contrast matrix", () => {
-  it("composites in sRGB: 50% black on white = #808080", () => {
-    expect(compositeHex("#000000", 0.5, "#ffffff")).toBe("#808080");
+  describe("compositeHex", () => {
+    it("composites in sRGB: 50% black on white = #808080", () => {
+      expect(compositeHex("#000000", 0.5, "#ffffff")).toBe("#808080");
+    });
+
+    it("alpha 0: returns background color", () => {
+      expect(compositeHex("#000000", 0, "#ffffff")).toBe("#ffffff");
+    });
+
+    it("alpha 1: returns foreground color", () => {
+      expect(compositeHex("#123456", 1, "#ffffff")).toBe("#123456");
+    });
+
+    it("unparseable foreground color throws with input named", () => {
+      expect(() => compositeHex("nope", 0.5, "#ffffff")).toThrow(/nope/);
+    });
+
+    it("unparseable background color throws with input named", () => {
+      expect(() => compositeHex("#123456", 0.5, "nope")).toThrow(/nope/);
+    });
   });
 
   describe("light theme", () => {

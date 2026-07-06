@@ -23,8 +23,10 @@ export interface ContrastResult extends ContrastPair {
  * Returns an opaque hex color matching browser rendering.
  */
 export function compositeHex(fgHex: string, alpha: number, bgHex: string): string {
-  const f = rgb(fgHex)!;
-  const b = rgb(bgHex)!;
+  const f = rgb(fgHex);
+  const b = rgb(bgHex);
+  if (!f) throw new Error(`compositeHex: unparseable color "${fgHex}"`);
+  if (!b) throw new Error(`compositeHex: unparseable color "${bgHex}"`);
   return formatHex({
     mode: "rgb",
     r: f.r * alpha + b.r * (1 - alpha),
