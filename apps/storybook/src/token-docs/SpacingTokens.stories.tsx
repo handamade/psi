@@ -16,9 +16,7 @@ export const Scale: Story = {
     <div className="ds-p-24" style={{ maxWidth: 700 }}>
       <h1
         style={{
-          fontSize: "var(--ds-text-2xl-size)",
-          lineHeight: "var(--ds-text-2xl-line)",
-          fontWeight: "var(--ds-text-2xl-weight)",
+          font: "var(--ds-text-24-32-medium)",
           color: "var(--ds-fg-primary)",
           marginBottom: "var(--ds-space-24)",
         }}
@@ -48,8 +46,8 @@ export const Scale: Story = {
             >
               <code
                 style={{
+                  font: "var(--ds-text-12-16-regular)",
                   fontFamily: "monospace",
-                  fontSize: "var(--ds-text-xs-size)",
                   color: "var(--ds-fg-secondary)",
                   width: 140,
                   flexShrink: 0,
@@ -59,7 +57,7 @@ export const Scale: Story = {
               </code>
               <span
                 style={{
-                  fontSize: "var(--ds-text-xs-size)",
+                  font: "var(--ds-text-12-16-regular)",
                   color: "var(--ds-fg-tertiary)",
                   width: 50,
                   flexShrink: 0,

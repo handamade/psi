@@ -6,9 +6,7 @@
   gap: var(--ds-space-8);
   cursor: pointer;
   user-select: none;
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-sm-size);
-  line-height: var(--ds-text-sm-line);
+  font: var(--ds-text-14-20-regular);
   color: var(--ds-checkbox-fg);
 }
 

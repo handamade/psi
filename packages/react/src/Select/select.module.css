@@ -39,26 +39,22 @@
 
 .size24 {
   height: var(--ds-size-24);
-  font-size: var(--ds-text-xs-size);
-  line-height: var(--ds-text-xs-line);
+  font: var(--ds-text-12-16-regular);
 }
 
 .size32 {
   height: var(--ds-size-32);
-  font-size: var(--ds-text-sm-size);
-  line-height: var(--ds-text-sm-line);
+  font: var(--ds-text-14-20-regular);
 }
 
 .size40 {
   height: var(--ds-size-40);
-  font-size: var(--ds-text-base-size);
-  line-height: var(--ds-text-base-line);
+  font: var(--ds-text-16-24-regular);
 }
 
 .size48 {
   height: var(--ds-size-48);
-  font-size: var(--ds-text-lg-size);
-  line-height: var(--ds-text-lg-line);
+  font: var(--ds-text-18-28-medium);
 }
 
 /* ── Error ────────────────────────────────────────────────────── */

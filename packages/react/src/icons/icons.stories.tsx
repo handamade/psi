@@ -66,7 +66,7 @@ const IconCell = ({
     <Component size={size} />
     <span
       style={{
-        fontSize: "var(--ds-text-xs-size)",
+        font: "var(--ds-text-12-16-regular)",
         color: "var(--ds-fg-secondary)",
       }}
     >
@@ -110,7 +110,7 @@ export const AllSizes: Story = {
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-24)" }}>
       {[16, 20, 24].map((size) => (
         <div key={size}>
-          <h3 style={{ margin: "0 0 var(--ds-space-8)", fontSize: "var(--ds-text-sm-size)", color: "var(--ds-fg-secondary)" }}>
+          <h3 style={{ margin: "0 0 var(--ds-space-8)", font: "var(--ds-text-14-20-regular)", color: "var(--ds-fg-secondary)" }}>
             Size {size}
           </h3>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>

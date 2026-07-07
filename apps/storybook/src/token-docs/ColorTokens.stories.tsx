@@ -18,8 +18,7 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
       style={{
         width: "100%",
         borderCollapse: "collapse",
-        fontSize: "var(--ds-text-sm-size)",
-        lineHeight: "var(--ds-text-sm-line)",
+        font: "var(--ds-text-14-20-regular)",
       }}
     >
       <thead>
@@ -55,8 +54,8 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
             <td style={{ padding: "8px 12px" }}>
               <code
                 style={{
+                  font: "var(--ds-text-12-16-regular)",
                   fontFamily: "monospace",
-                  fontSize: "var(--ds-text-xs-size)",
                   color: "var(--ds-fg-primary)",
                 }}
               >
@@ -66,8 +65,8 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
             <td style={{ padding: "8px 12px" }}>
               <code
                 style={{
+                  font: "var(--ds-text-12-16-regular)",
                   fontFamily: "monospace",
-                  fontSize: "var(--ds-text-xs-size)",
                   color: "var(--ds-fg-secondary)",
                 }}
               >
@@ -93,9 +92,7 @@ export const AllColorTokens: Story = {
     <div className="ds-p-24" style={{ maxWidth: 900 }}>
       <h1
         style={{
-          fontSize: "var(--ds-text-2xl-size)",
-          lineHeight: "var(--ds-text-2xl-line)",
-          fontWeight: "var(--ds-text-2xl-weight)",
+          font: "var(--ds-text-24-32-medium)",
           color: "var(--ds-fg-primary)",
           marginBottom: "var(--ds-space-24)",
         }}
@@ -118,8 +115,7 @@ export const AllColorTokens: Story = {
           <section key={prefix} style={{ marginBottom: "var(--ds-space-32)" }}>
             <h2
               style={{
-                fontSize: "var(--ds-text-lg-size)",
-                fontWeight: "var(--ds-text-lg-weight)",
+                font: "var(--ds-text-18-28-medium)",
                 color: "var(--ds-fg-primary)",
                 marginBottom: "var(--ds-space-12)",
                 textTransform: "capitalize",

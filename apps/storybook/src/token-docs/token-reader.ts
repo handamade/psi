@@ -27,6 +27,16 @@ function formatOklch(o: {
   return o.alpha != null ? `${base} / ${o.alpha})` : `${base})`;
 }
 
+export interface DocTypographyCombo {
+  /** Combo name, e.g. `16-24-regular` */
+  name: string;
+  fontSize: number;
+  lineHeight: number;
+  weight: "regular" | "medium" | "semibold" | "bold";
+  /** Numeric CSS font-weight value, e.g. 400 */
+  cssWeight: number;
+}
+
 const resolved = resolvedLight as {
   theme: string;
   tokens: Record<
@@ -38,6 +48,7 @@ const resolved = resolvedLight as {
       formula: string;
     }
   >;
+  typography: DocTypographyCombo[];
 };
 
 export const docTokens: DocToken[] = Object.values(resolved.tokens).map(
@@ -49,6 +60,8 @@ export const docTokens: DocToken[] = Object.values(resolved.tokens).map(
     oklch: formatOklch(t.oklch),
   }),
 );
+
+export const docTypography: DocTypographyCombo[] = resolved.typography;
 
 /** Group tokens by their prefix (bg, fg, fill, border). */
 export function groupByPrefix(

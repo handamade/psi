@@ -7,10 +7,7 @@
   height: 24px;
   padding-inline: var(--ds-space-8);
   border-radius: var(--ds-radius-full);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-xs-size);
-  line-height: var(--ds-text-xs-line);
-  font-weight: 500;
+  font: var(--ds-text-12-16-medium);
   white-space: nowrap;
   user-select: none;
 }
