@@ -5,7 +5,7 @@ import type { ThemeDef } from "../src/dsl/types.js";
  */
 export function emitTokenTypes(
   themes: Record<string, ThemeDef>,
-  sizes: string[] = [],
+  sizes: (number | string)[] = [],
   variants: string[] = [],
 ): string {
   // Collect all unique token names across themes
@@ -40,12 +40,12 @@ export function emitTokenTypes(
   });
   lines.push("");
 
-  // Size union
+  // Size union (numbers unquoted)
   if (sizes.length > 0) {
     lines.push("export type Size =");
-    sizes.forEach((name, i) => {
+    sizes.forEach((size, i) => {
       const sep = i < sizes.length - 1 ? "" : ";";
-      lines.push(`  | "${name}"${sep}`);
+      lines.push(`  | ${size}${sep}`);
     });
   } else {
     lines.push("export type Size = string;");

@@ -1,3 +1,16 @@
+/** Button component variants */
+export const BUTTON_VARIANTS = [
+  "accent",
+  "accent-subtle",
+  "neutral",
+  "neutral-subtle",
+  "ghost",
+  "danger",
+  "danger-subtle",
+] as const;
+
+export type ButtonVariant = (typeof BUTTON_VARIANTS)[number];
+
 /** Button component tokens (--ds-button-*). Values may reference semantic
  * tokens and the component's own tokens; hover/active derive from the
  * component's own bg so one override retunes all states (principle 3). */
@@ -39,12 +52,3 @@ export const buttonVars: Record<string, string> = {
 
   "focus-ring": "var(--ds-border-focus)",
 };
-
-export type ButtonVariant =
-  | "accent"
-  | "accent-subtle"
-  | "neutral"
-  | "neutral-subtle"
-  | "ghost"
-  | "danger"
-  | "danger-subtle";

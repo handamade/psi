@@ -16,7 +16,8 @@ import { emitTokenTypes } from "./emit-types.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "./emit-utilities.js";
 import { emitComponentVarsCSS } from "./emit-components.js";
 import { gamutWarnings } from "../src/gamut.js";
-import { buttonVars } from "../src/components/button.js";
+import { buttonVars, BUTTON_VARIANTS } from "../src/components/button.js";
+import { sizeScale } from "../src/scales/sizes.js";
 import { inputVars } from "../src/components/input.js";
 import { selectVars } from "../src/components/select.js";
 import { checkboxVars } from "../src/components/checkbox.js";
@@ -114,9 +115,11 @@ function build(): void {
   const themeDefs = Object.fromEntries(
     Object.entries(themes).map(([name, config]) => [name, config.theme]),
   );
-  const types = emitTokenTypes(themeDefs);
-  writeFileSync(join(typesDir, "index.ts"), types);
-  console.log("  wrote dist/types/index.ts");
+  const types = emitTokenTypes(themeDefs, [...sizeScale], [...BUTTON_VARIANTS]);
+  writeFileSync(join(typesDir, "index.d.ts"), types);
+  console.log("  wrote dist/types/index.d.ts");
+  writeFileSync(join(typesDir, "index.js"), "export {};\n");
+  console.log("  wrote dist/types/index.js");
 
   // 4. Emit utility classes
   const utilitiesCSS = emitUtilitiesCSS();
