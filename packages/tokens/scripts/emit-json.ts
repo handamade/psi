@@ -1,4 +1,7 @@
 import type { ResolvedTheme } from "../src/dsl/resolver.js";
+import { spacingScale } from "../src/scales/spacing.js";
+import { sizeScale } from "../src/scales/sizes.js";
+import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES } from "../src/scales/typography.js";
 
 /**
@@ -13,6 +16,11 @@ export function emitResolvedJSON(
     {
       theme: themeName,
       tokens: resolved,
+      scales: {
+        space: [...spacingScale],
+        size: [...sizeScale],
+        radius: [...radiusScale],
+      },
       typography: typographyCombos.map((c) => ({
         name: comboName(c),
         ...c,
