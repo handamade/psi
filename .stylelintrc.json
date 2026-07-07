@@ -1,8 +1,4 @@
 {
   "plugins": ["./tools/stylelint-plugin-ds-tokens.mjs"],
-  "rules": { "ds/component-tokens-only": true },
-  "ignoreFiles": [
-    "packages/react/src/Tag/tag.module.css",
-    "packages/react/src/Tooltip/tooltip.module.css"
-  ]
+  "rules": { "ds/component-tokens-only": true }
 }

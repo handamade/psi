@@ -12,8 +12,8 @@
   z-index: 1000;
   padding: var(--ds-space-4) var(--ds-space-8);
   border-radius: var(--ds-radius-6);
-  background: var(--ds-fg-primary);
-  color: var(--ds-bg-primary);
+  background: var(--ds-tooltip-bg);
+  color: var(--ds-tooltip-fg);
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-xs-size);
   line-height: var(--ds-text-xs-line);

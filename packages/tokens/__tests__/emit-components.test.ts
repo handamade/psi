@@ -5,6 +5,8 @@ import { inputVars } from "../src/components/input.js";
 import { selectVars } from "../src/components/select.js";
 import { checkboxVars } from "../src/components/checkbox.js";
 import { switchVars } from "../src/components/switch.js";
+import { tagVars } from "../src/components/tag.js";
+import { tooltipVars } from "../src/components/tooltip.js";
 
 describe("emitComponentVarsCSS", () => {
   it("emits ds.components layer with prefixed vars", () => {
@@ -42,6 +44,20 @@ describe("emitComponentVarsCSS", () => {
     const css = emitComponentVarsCSS("switch", switchVars);
     for (const key of Object.keys(switchVars)) {
       expect(css).toContain(`--ds-switch-${key}: ${switchVars[key]};`);
+    }
+  });
+
+  it("emits every tagVars key as a prefixed --ds-tag-* declaration", () => {
+    const css = emitComponentVarsCSS("tag", tagVars);
+    for (const key of Object.keys(tagVars)) {
+      expect(css).toContain(`--ds-tag-${key}: ${tagVars[key]};`);
+    }
+  });
+
+  it("emits every tooltipVars key as a prefixed --ds-tooltip-* declaration", () => {
+    const css = emitComponentVarsCSS("tooltip", tooltipVars);
+    for (const key of Object.keys(tooltipVars)) {
+      expect(css).toContain(`--ds-tooltip-${key}: ${tooltipVars[key]};`);
     }
   });
 });

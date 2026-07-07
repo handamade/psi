@@ -21,6 +21,8 @@ import { inputVars } from "../src/components/input.js";
 import { selectVars } from "../src/components/select.js";
 import { checkboxVars } from "../src/components/checkbox.js";
 import { switchVars } from "../src/components/switch.js";
+import { tagVars } from "../src/components/tag.js";
+import { tooltipVars } from "../src/components/tooltip.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
 
@@ -128,6 +130,8 @@ function build(): void {
     select: selectVars,
     checkbox: checkboxVars,
     switch: switchVars,
+    tag: tagVars,
+    tooltip: tooltipVars,
   };
   const componentsDir = join(distDir, "components");
   mkdirSync(componentsDir, { recursive: true });
