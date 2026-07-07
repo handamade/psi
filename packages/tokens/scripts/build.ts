@@ -24,6 +24,7 @@ import { checkboxVars } from "../src/components/checkbox.js";
 import { switchVars } from "../src/components/switch.js";
 import { tagVars } from "../src/components/tag.js";
 import { tooltipVars } from "../src/components/tooltip.js";
+import { guidance } from "../src/guidance.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
 
@@ -143,6 +144,10 @@ function build(): void {
   }
   writeFileSync(join(distDir, "components.css"), aggregate.join("\n"));
   console.log("  wrote dist/components.css");
+
+  // 6. Emit guidance.json
+  writeFileSync(join(distDir, "guidance.json"), JSON.stringify(guidance, null, 2));
+  console.log("  wrote dist/guidance.json");
 
   console.log("[tokens] Build complete.");
 }

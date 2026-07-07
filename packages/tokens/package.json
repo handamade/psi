@@ -9,7 +9,8 @@
     "./types": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/types/index.js"
-    }
+    },
+    "./guidance.json": "./dist/guidance.json"
   },
   "files": ["dist", "README.md", "llms.txt"],
   "scripts": {
