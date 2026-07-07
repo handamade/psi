@@ -6,13 +6,15 @@
     "build": "pnpm -r run build",
     "dev": "pnpm run --filter @dku/tokens --filter storybook dev --parallel",
     "test": "vitest run",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:css": "stylelint 'packages/react/src/**/*.module.css'"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
-    "vitest": "^3.2.0",
+    "@changesets/cli": "^2.27.0",
+    "stylelint": "^17.14.0",
     "tsx": "^4.19.0",
-    "@changesets/cli": "^2.27.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0"
   },
   "engines": {
     "node": ">=20",
