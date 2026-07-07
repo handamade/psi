@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Tooltip } from "./Tooltip.js";
 
@@ -96,5 +96,63 @@ describe("Tooltip", () => {
     );
     await user.tab();
     expect(focused).toBe(true);
+  });
+
+  it("closes on Escape while visible (WCAG 1.4.13)", async () => {
+    const user = userEvent.setup();
+    render(
+      <Tooltip content="tip">
+        <button>t</button>
+      </Tooltip>,
+    );
+    await user.tab(); // focus shows immediately
+    expect(await screen.findByRole("tooltip")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+
+  it("delays open on hover but not on focus", () => {
+    vi.useFakeTimers();
+    try {
+      const { container: hoverContainer } = render(
+        <Tooltip content="tip">
+          <button>hover-trigger</button>
+        </Tooltip>,
+      );
+      const hoverScope = within(hoverContainer);
+      const hoverTrigger = hoverScope.getByRole("button", {
+        name: "hover-trigger",
+      });
+
+      fireEvent.mouseEnter(hoverTrigger);
+      expect(hoverScope.queryByRole("tooltip")).not.toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+      expect(hoverScope.queryByRole("tooltip")).not.toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(50); // total 150ms
+      });
+      expect(hoverScope.getByRole("tooltip")).toHaveTextContent("tip");
+
+      // Focus shows immediately, no delay, on a fresh render.
+      const { container: focusContainer } = render(
+        <Tooltip content="focus-tip">
+          <button>focus-trigger</button>
+        </Tooltip>,
+      );
+      const focusScope = within(focusContainer);
+      const focusTrigger = focusScope.getByRole("button", {
+        name: "focus-trigger",
+      });
+      act(() => {
+        fireEvent.focus(focusTrigger);
+      });
+      expect(focusScope.getByRole("tooltip")).toHaveTextContent("focus-tip");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
