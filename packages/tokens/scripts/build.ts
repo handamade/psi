@@ -14,6 +14,7 @@ import { emitBaseCSS, emitThemeCSS } from "./emit-css.js";
 import { emitResolvedJSON } from "./emit-json.js";
 import { emitTokenTypes } from "./emit-types.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "./emit-utilities.js";
+import { gamutWarnings } from "../src/gamut.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
 
@@ -72,6 +73,11 @@ function build(): void {
 
     // Resolve (static values for JSON)
     const resolved = resolve(themeDef, palette, slots);
+
+    // Check gamut warnings (non-fatal)
+    for (const w of gamutWarnings(resolved, themeDef, palette, slots)) {
+      console.warn(`  GAMUT WARNING [${themeName}] ${w}`);
+    }
 
     // Check contrast
     const contrastResults = checkContrast(resolved, [...wcagAAPairs, ...componentLabelPairs]);
