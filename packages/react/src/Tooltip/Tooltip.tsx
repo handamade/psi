@@ -1,6 +1,8 @@
 import {
   cloneElement,
+  useEffect,
   useId,
+  useRef,
   useState,
   useCallback,
   type ReactElement,
@@ -26,6 +28,9 @@ const placementClass: Record<Placement, string> = {
   right: styles.right,
 };
 
+/** Hover must not open the tooltip on incidental mouse-over (WCAG 1.4.13). */
+const HOVER_DELAY_MS = 150;
+
 export function Tooltip({
   content,
   children,
@@ -33,20 +38,45 @@ export function Tooltip({
 }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const id = useId();
+  const timerRef = useRef<number | undefined>(undefined);
+
+  const clearTimer = useCallback(() => {
+    if (timerRef.current !== undefined) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = undefined;
+    }
+  }, []);
 
   const show = useCallback(() => setVisible(true), []);
   const hide = useCallback(() => setVisible(false), []);
 
+  // Clear any pending open timer on unmount.
+  useEffect(() => clearTimer, [clearTimer]);
+
+  // Escape dismisses the tooltip while it is visible (WCAG 1.4.13).
+  useEffect(() => {
+    if (!visible) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        hide();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [visible, hide]);
+
   const trigger = cloneElement(children, {
     "aria-describedby": visible ? id : undefined,
     onMouseEnter: (e: React.MouseEvent) => {
-      show();
+      clearTimer();
+      timerRef.current = window.setTimeout(show, HOVER_DELAY_MS);
       const childOnMouseEnter = children.props.onMouseEnter as
         | ((e: React.MouseEvent) => void)
         | undefined;
       childOnMouseEnter?.(e);
     },
     onMouseLeave: (e: React.MouseEvent) => {
+      clearTimer();
       hide();
       const childOnMouseLeave = children.props.onMouseLeave as
         | ((e: React.MouseEvent) => void)
@@ -61,6 +91,7 @@ export function Tooltip({
       childOnFocus?.(e);
     },
     onBlur: (e: React.FocusEvent) => {
+      clearTimer();
       hide();
       const childOnBlur = children.props.onBlur as
         | ((e: React.FocusEvent) => void)

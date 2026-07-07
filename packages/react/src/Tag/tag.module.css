@@ -7,10 +7,7 @@
   height: 24px;
   padding-inline: var(--ds-space-8);
   border-radius: var(--ds-radius-full);
-  font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-xs-size);
-  line-height: var(--ds-text-xs-line);
-  font-weight: 500;
+  font: var(--ds-text-12-16-medium);
   white-space: nowrap;
   user-select: none;
 }
@@ -37,60 +34,60 @@
 }
 
 .dismiss:focus-visible {
-  outline: 2px solid var(--ds-border-focus);
+  outline: 2px solid var(--ds-tag-focus-ring);
   outline-offset: 2px;
 }
 
 /* ── Solid variants ──────────────────────────────────────────── */
 
 .neutral {
-  background: var(--ds-fill-neutral3);
-  color: var(--ds-fg-primary);
+  background: var(--ds-tag-neutral-bg);
+  color: var(--ds-tag-neutral-fg);
 }
 
 .accent {
-  background: var(--ds-fill-accent);
-  color: var(--ds-fg-static-white);
+  background: var(--ds-tag-accent-bg);
+  color: var(--ds-tag-accent-fg);
 }
 
 .success {
-  background: var(--ds-fill-success);
-  color: var(--ds-fg-static-white);
+  background: var(--ds-tag-success-bg);
+  color: var(--ds-tag-success-fg);
 }
 
 .warning {
-  background: var(--ds-fill-warning);
-  color: var(--ds-fg-primary);
+  background: var(--ds-tag-warning-bg);
+  color: var(--ds-tag-warning-fg);
 }
 
 .danger {
-  background: var(--ds-fill-danger);
-  color: var(--ds-fg-static-white);
+  background: var(--ds-tag-danger-bg);
+  color: var(--ds-tag-danger-fg);
 }
 
 /* ── Subtle variants ─────────────────────────────────────────── */
 
 .neutralSubtle {
-  background: var(--ds-fill-neutral2);
-  color: var(--ds-fg-secondary);
+  background: var(--ds-tag-neutral-subtle-bg);
+  color: var(--ds-tag-neutral-subtle-fg);
 }
 
 .accentSubtle {
-  background: var(--ds-fill-tint-accent);
-  color: var(--ds-fg-accent);
+  background: var(--ds-tag-accent-subtle-bg);
+  color: var(--ds-tag-accent-subtle-fg);
 }
 
 .successSubtle {
-  background: var(--ds-fill-tint-success);
-  color: var(--ds-fg-success);
+  background: var(--ds-tag-success-subtle-bg);
+  color: var(--ds-tag-success-subtle-fg);
 }
 
 .warningSubtle {
-  background: var(--ds-fill-tint-warning);
-  color: var(--ds-fg-warning);
+  background: var(--ds-tag-warning-subtle-bg);
+  color: var(--ds-tag-warning-subtle-fg);
 }
 
 .dangerSubtle {
-  background: var(--ds-fill-tint-danger);
-  color: var(--ds-fg-danger);
+  background: var(--ds-tag-danger-subtle-bg);
+  color: var(--ds-tag-danger-subtle-fg);
 }

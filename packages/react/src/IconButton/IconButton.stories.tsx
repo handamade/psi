@@ -104,7 +104,7 @@ export const VariantSizeMatrix: Story = {
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-12)" }}>
         {variants.map((variant) => (
           <div key={variant} style={{ display: "flex", alignItems: "center", gap: "var(--ds-space-12)" }}>
-            <span style={{ width: 60, fontSize: "var(--ds-text-xs-size)", color: "var(--ds-fg-secondary)" }}>
+            <span style={{ width: 60, font: "var(--ds-text-12-16-regular)", color: "var(--ds-fg-secondary)" }}>
               {variant}
             </span>
             {sizes.map((size) => (

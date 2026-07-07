@@ -1,0 +1,4 @@
+{
+  "plugins": ["./tools/stylelint-plugin-ds-tokens.mjs"],
+  "rules": { "ds/component-tokens-only": true }
+}

@@ -7,11 +7,43 @@ interface ResolvedToken {
   formula: string;
 }
 
+interface ScaleSet {
+  space: number[];
+  size: number[];
+  radius: number[];
+}
+
+type TypographyWeight = "regular" | "medium" | "semibold" | "bold";
+
+interface TypographyCombo {
+  name: string;
+  fontSize: number;
+  lineHeight: number;
+  weight: TypographyWeight;
+  cssWeight: number;
+}
+
 interface SyncMessage {
   type: "sync";
   theme: string;
   tokens: ResolvedToken[];
+  scales?: ScaleSet;
+  typography?: TypographyCombo[];
   dryRun: boolean;
+}
+
+interface VariableSyncResult {
+  created: number;
+  updated: number;
+  unchanged: number;
+  orphanedNames: string[];
+}
+
+interface TextStyleSyncResult {
+  created: number;
+  updated: number;
+  unchanged: number;
+  failed: string[];
 }
 
 interface SyncResult {
@@ -20,7 +52,8 @@ interface SyncResult {
   created: number;
   updated: number;
   unchanged: number;
-  orphaned: number;
+  orphanedNames: string[];
+  textStyles: TextStyleSyncResult;
   dryRun: boolean;
 }
 
@@ -32,6 +65,14 @@ interface ErrorResult {
 // ── Constants ────────────────────────────────────────────────────────
 
 const COLLECTION_NAME = "DS Tokens";
+const FONT_FAMILY = "Inter";
+
+const WEIGHT_TO_FONT_STYLE: Record<TypographyWeight, string> = {
+  regular: "Regular",
+  medium: "Medium",
+  semibold: "Semi Bold",
+  bold: "Bold",
+};
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -94,11 +135,39 @@ function tokenToVariableName(name: string): string {
   return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
-// ── Main sync logic ──────────────────────────────────────────────────
+/**
+ * Build the Figma variable name for a scale value, e.g. ("space", 8) → "space/8".
+ * Scales are theme-independent, unlike color tokens.
+ */
+function scaleVariableName(prefix: "space" | "size" | "radius", px: number): string {
+  return `${prefix}/${px}`;
+}
 
-async function syncTokens(msg: SyncMessage): Promise<SyncResult> {
-  const { theme, tokens, dryRun } = msg;
+/**
+ * Build the Figma text style name for a typography combo, e.g. "16-24-regular" → "DS/16-24-regular".
+ */
+function textStyleName(comboName: string): string {
+  return `DS/${comboName}`;
+}
 
+function fontNamesEqual(a: FontName, b: FontName): boolean {
+  return a.family === b.family && a.style === b.style;
+}
+
+function lineHeightsEqual(a: LineHeight, b: LineHeight): boolean {
+  if (a.unit === "AUTO" && b.unit === "AUTO") return true;
+  if (a.unit === "AUTO" || b.unit === "AUTO") return false;
+  return a.unit === b.unit && Math.abs(a.value - b.value) < 0.01;
+}
+
+// ── Variable sync (colors + number scales) ──────────────────────────
+
+async function syncVariables(
+  theme: string,
+  tokens: ResolvedToken[],
+  scales: ScaleSet,
+  dryRun: boolean,
+): Promise<VariableSyncResult> {
   // 1. Find or create the variable collection
   const collections =
     await figma.variables.getLocalVariableCollectionsAsync();
@@ -110,14 +179,13 @@ async function syncTokens(msg: SyncMessage): Promise<SyncResult> {
 
   // In dry-run without an existing collection, simulate from scratch
   if (!collection) {
+    const scaleCount =
+      scales.space.length + scales.size.length + scales.radius.length;
     return {
-      type: "result",
-      theme,
-      created: tokens.length,
+      created: tokens.length + scaleCount,
       updated: 0,
       unchanged: 0,
-      orphaned: 0,
-      dryRun: true,
+      orphanedNames: [],
     };
   }
 
@@ -143,27 +211,37 @@ async function syncTokens(msg: SyncMessage): Promise<SyncResult> {
     modeId = collection.modes[0]?.modeId ?? "";
   }
 
-  // 3. Build a map of existing variables in this collection
+  // 3. Build a map of existing variables (colors + number scales) in this collection
   const existingVars = new Map<string, Variable>();
-  const allVars = await figma.variables.getLocalVariablesAsync("COLOR");
-  for (const v of allVars) {
+  const [colorVars, floatVars] = await Promise.all([
+    figma.variables.getLocalVariablesAsync("COLOR"),
+    figma.variables.getLocalVariablesAsync("FLOAT"),
+  ]);
+  for (const v of [...colorVars, ...floatVars]) {
     if (v.variableCollectionId === collection.id) {
       existingVars.set(v.name, v);
     }
   }
 
-  // 4. Track the set of token names we process
+  // 4. Track the set of variable names we process
   const processedNames = new Set<string>();
   let created = 0;
   let updated = 0;
   let unchanged = 0;
 
-  // 5. Process each token
+  // 5. Process each color token
   for (const token of tokens) {
     const varName = tokenToVariableName(token.name);
     processedNames.add(varName);
 
-    const newColor = hexToFigmaRGB(token.hex);
+    // Build color from hex + resolved alpha
+    const base = hexToFigmaRGB(token.hex);
+    const newColor: RGBA = {
+      r: base.r,
+      g: base.g,
+      b: base.b,
+      a: token.oklch.alpha ?? 1,
+    };
     const existingVar = existingVars.get(varName);
 
     if (existingVar) {
@@ -202,21 +280,157 @@ async function syncTokens(msg: SyncMessage): Promise<SyncResult> {
     }
   }
 
-  // 6. Find orphaned variables (in collection but not in token set)
-  let orphaned = 0;
-  for (const [name] of existingVars) {
-    if (!processedNames.has(name)) {
-      orphaned++;
+  // 6. Process each number scale (space/size/radius) — theme-independent,
+  // so the value is written for every mode in the collection.
+  const scaleEntries: Array<{ prefix: "space" | "size" | "radius"; px: number }> = [
+    ...scales.space.map((px) => ({ prefix: "space" as const, px })),
+    ...scales.size.map((px) => ({ prefix: "size" as const, px })),
+    ...scales.radius.map((px) => ({ prefix: "radius" as const, px })),
+  ];
+  const modeIds = collection.modes.map((m) => m.modeId);
+
+  for (const { prefix, px } of scaleEntries) {
+    const varName = scaleVariableName(prefix, px);
+    processedNames.add(varName);
+
+    const existingVar = existingVars.get(varName);
+
+    if (existingVar) {
+      const alreadyCorrect = modeIds.every((id) => {
+        const value = existingVar.valuesByMode[id];
+        return typeof value === "number" && Math.abs(value - px) < 0.001;
+      });
+
+      if (alreadyCorrect) {
+        unchanged++;
+        continue;
+      }
+
+      if (!dryRun) {
+        for (const id of modeIds) {
+          existingVar.setValueForMode(id, px);
+        }
+      }
+      updated++;
+    } else {
+      if (!dryRun) {
+        const newVar = figma.variables.createVariable(
+          varName,
+          collection,
+          "FLOAT",
+        );
+        for (const id of modeIds) {
+          newVar.setValueForMode(id, px);
+        }
+      }
+      created++;
     }
   }
+
+  // 7. Find orphaned variables (in collection but not in the incoming set)
+  const orphanedNames: string[] = [];
+  for (const [name] of existingVars) {
+    if (!processedNames.has(name)) {
+      orphanedNames.push(name);
+    }
+  }
+
+  return { created, updated, unchanged, orphanedNames };
+}
+
+// ── Text style sync (typography combos) ─────────────────────────────
+
+async function syncTextStyles(
+  typography: TypographyCombo[],
+  dryRun: boolean,
+): Promise<TextStyleSyncResult> {
+  const existingStyles = await figma.getLocalTextStylesAsync();
+  const existingByName = new Map<string, TextStyle>();
+  for (const style of existingStyles) {
+    existingByName.set(style.name, style);
+  }
+
+  let created = 0;
+  let updated = 0;
+  let unchanged = 0;
+  const failed: string[] = [];
+
+  for (const combo of typography) {
+    const styleName = textStyleName(combo.name);
+    const desiredFont: FontName = {
+      family: FONT_FAMILY,
+      style: WEIGHT_TO_FONT_STYLE[combo.weight],
+    };
+    const desiredLineHeight: LineHeight = {
+      unit: "PIXELS",
+      value: combo.lineHeight,
+    };
+
+    const existing = existingByName.get(styleName);
+
+    if (existing) {
+      const alreadyCorrect =
+        fontNamesEqual(existing.fontName, desiredFont) &&
+        Math.abs(existing.fontSize - combo.fontSize) < 0.01 &&
+        lineHeightsEqual(existing.lineHeight, desiredLineHeight);
+
+      if (alreadyCorrect) {
+        unchanged++;
+        continue;
+      }
+    }
+
+    // Creating or updating a text style's font requires the font to be
+    // loaded first. Don't let a missing font family crash the whole sync.
+    try {
+      await figma.loadFontAsync(desiredFont);
+    } catch (err) {
+      failed.push(
+        `${styleName} (${err instanceof Error ? err.message : String(err)})`,
+      );
+      continue;
+    }
+
+    if (existing) {
+      if (!dryRun) {
+        existing.fontName = desiredFont;
+        existing.fontSize = combo.fontSize;
+        existing.lineHeight = desiredLineHeight;
+      }
+      updated++;
+    } else {
+      if (!dryRun) {
+        const newStyle = figma.createTextStyle();
+        newStyle.name = styleName;
+        newStyle.fontName = desiredFont;
+        newStyle.fontSize = combo.fontSize;
+        newStyle.lineHeight = desiredLineHeight;
+      }
+      created++;
+    }
+  }
+
+  return { created, updated, unchanged, failed };
+}
+
+// ── Main sync logic ──────────────────────────────────────────────────
+
+async function syncTokens(msg: SyncMessage): Promise<SyncResult> {
+  const { theme, tokens, dryRun } = msg;
+  const scales: ScaleSet = msg.scales ?? { space: [], size: [], radius: [] };
+  const typography: TypographyCombo[] = msg.typography ?? [];
+
+  const variableResult = await syncVariables(theme, tokens, scales, dryRun);
+  const textStyleResult = await syncTextStyles(typography, dryRun);
 
   return {
     type: "result",
     theme,
-    created,
-    updated,
-    unchanged,
-    orphaned,
+    created: variableResult.created,
+    updated: variableResult.updated,
+    unchanged: variableResult.unchanged,
+    orphanedNames: variableResult.orphanedNames,
+    textStyles: textStyleResult,
     dryRun,
   };
 }

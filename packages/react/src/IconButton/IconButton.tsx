@@ -10,6 +10,7 @@ export interface IconButtonProps
   variant?: Variant;
   /** Square size in px (24 | 32 | 40 | 48). @default 32 */
   size?: Size;
+  /** Forwarded ref to the underlying `<button>` element. */
   ref?: Ref<HTMLButtonElement>;
 }
 

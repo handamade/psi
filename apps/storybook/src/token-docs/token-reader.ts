@@ -1,4 +1,8 @@
 import resolvedLight from "@dku/tokens/resolved/light.json";
+import resolvedDark from "@dku/tokens/resolved/dark.json";
+import resolvedAcme from "@dku/tokens/resolved/acme.json";
+
+export type ThemeName = "light" | "dark" | "acme";
 
 export interface DocToken {
   /** Original camelCase name from the theme definition */
@@ -27,7 +31,17 @@ function formatOklch(o: {
   return o.alpha != null ? `${base} / ${o.alpha})` : `${base})`;
 }
 
-const resolved = resolvedLight as {
+export interface DocTypographyCombo {
+  /** Combo name, e.g. `16-24-regular` */
+  name: string;
+  fontSize: number;
+  lineHeight: number;
+  weight: "regular" | "medium" | "semibold" | "bold";
+  /** Numeric CSS font-weight value, e.g. 400 */
+  cssWeight: number;
+}
+
+interface ResolvedTheme {
   theme: string;
   tokens: Record<
     string,
@@ -38,17 +52,39 @@ const resolved = resolvedLight as {
       formula: string;
     }
   >;
+  typography: DocTypographyCombo[];
+}
+
+const RESOLVED: Record<ThemeName, ResolvedTheme> = {
+  light: resolvedLight as ResolvedTheme,
+  dark: resolvedDark as ResolvedTheme,
+  acme: resolvedAcme as ResolvedTheme,
 };
 
-export const docTokens: DocToken[] = Object.values(resolved.tokens).map(
-  (t) => ({
+function buildDocTokens(resolved: ResolvedTheme): DocToken[] {
+  return Object.values(resolved.tokens).map((t) => ({
     name: t.name,
     cssVar: `--ds-${camelToKebab(t.name)}`,
     hex: t.hex,
     formula: t.formula,
     oklch: formatOklch(t.oklch),
-  }),
-);
+  }));
+}
+
+/**
+ * Resolved color tokens for a given theme. Defaults to `light` when the
+ * theme is unknown (e.g. before Storybook globals have initialized).
+ */
+export function getTokens(theme: ThemeName = "light"): DocToken[] {
+  return buildDocTokens(RESOLVED[theme] ?? RESOLVED.light);
+}
+
+/**
+ * Typography combos are theme-independent (only color tokens vary by
+ * theme), so this remains a static export sourced from the light theme's
+ * resolution.
+ */
+export const docTypography: DocTypographyCombo[] = RESOLVED.light.typography;
 
 /** Group tokens by their prefix (bg, fg, fill, border). */
 export function groupByPrefix(

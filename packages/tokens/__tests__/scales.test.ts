@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
-import { typographyScale } from "../src/scales/typography.js";
+import { comboName } from "../src/scales/typography.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
 
 describe("scales", () => {
@@ -36,29 +36,18 @@ describe("scales", () => {
     });
   });
 
-  describe("typography", () => {
-    it("has named steps", () => {
-      const names = typographyScale.map((s) => s.name);
-      expect(names).toContain("xs");
-      expect(names).toContain("sm");
-      expect(names).toContain("base");
-      expect(names).toContain("lg");
-      expect(names).toContain("xl");
+  describe("typography combos", () => {
+    it("names are pixel-true", () => {
+      expect(comboName({ fontSize: 16, lineHeight: 24, weight: "regular" })).toBe("16-24-regular");
     });
-
-    it("font sizes are monotonically increasing", () => {
-      for (let i = 1; i < typographyScale.length; i++) {
-        expect(typographyScale[i].fontSize).toBeGreaterThan(
-          typographyScale[i - 1].fontSize,
-        );
-      }
+    it("emits one font-shorthand var per combo", () => {
+      const css = emitScaleVarsCSS();
+      expect(css).toContain("--ds-text-16-24-regular: 400 1rem/1.5rem var(--ds-font-sans);");
+      expect(css).not.toContain("--ds-text-xs");
     });
-
-    it("each step has valid cssWeight", () => {
-      for (const step of typographyScale) {
-        expect(step.cssWeight).toBeGreaterThanOrEqual(100);
-        expect(step.cssWeight).toBeLessThanOrEqual(900);
-      }
+    it("emits one utility class per combo", () => {
+      const css = emitUtilitiesCSS();
+      expect(css).toContain(".ds-text-16-24-regular { font: var(--ds-text-16-24-regular); }");
     });
   });
 });
@@ -85,9 +74,7 @@ describe("emitScaleVarsCSS", () => {
   });
 
   it("emits typography vars", () => {
-    expect(css).toContain("--ds-text-base-size: 1rem;");
-    expect(css).toContain("--ds-text-base-line: 1.5rem;");
-    expect(css).toContain("--ds-text-base-weight: 400;");
+    expect(css).toContain("--ds-text-16-24-regular: 400 1rem/1.5rem var(--ds-font-sans);");
   });
 
   it("emits font stacks", () => {
@@ -129,9 +116,6 @@ describe("emitUtilitiesCSS", () => {
   });
 
   it("emits typography classes", () => {
-    expect(css).toContain(".ds-text-base {");
-    expect(css).toContain("font-size: var(--ds-text-base-size);");
-    expect(css).toContain("line-height: var(--ds-text-base-line);");
-    expect(css).toContain("font-weight: var(--ds-text-base-weight);");
+    expect(css).toContain(".ds-text-16-24-regular { font: var(--ds-text-16-24-regular); }");
   });
 });

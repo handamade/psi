@@ -14,9 +14,7 @@ export const Introduction: Story = {
     <div className="ds-p-24" style={{ maxWidth: 640 }}>
       <h1
         style={{
-          fontSize: "var(--ds-text-3xl-size)",
-          lineHeight: "var(--ds-text-3xl-line)",
-          fontWeight: "var(--ds-text-3xl-weight)",
+          font: "var(--ds-text-30-36-bold)",
           color: "var(--ds-fg-primary)",
           marginBottom: "var(--ds-space-16)",
         }}
@@ -25,8 +23,7 @@ export const Introduction: Story = {
       </h1>
       <p
         style={{
-          fontSize: "var(--ds-text-base-size)",
-          lineHeight: "var(--ds-text-base-line)",
+          font: "var(--ds-text-16-24-regular)",
           color: "var(--ds-fg-secondary)",
           marginBottom: "var(--ds-space-24)",
         }}
@@ -47,8 +44,7 @@ export const Introduction: Story = {
               alignItems: "center",
               justifyContent: "center",
               color: "var(--ds-fg-static-white)",
-              fontSize: "var(--ds-text-xs-size)",
-              fontWeight: "var(--ds-text-xs-weight)",
+              font: "var(--ds-text-12-16-regular)",
             }}
           >
             {name}

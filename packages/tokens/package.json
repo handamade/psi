@@ -3,15 +3,17 @@
   "version": "0.0.1",
   "type": "module",
   "exports": {
-    "./base.css": "./dist/base.css",
-    "./light.css": "./dist/light.css",
-    "./dark.css": "./dist/dark.css",
-    "./acme.css": "./dist/acme.css",
-    "./utilities.css": "./dist/utilities.css",
+    "./*.css": "./dist/*.css",
     "./components/*": "./dist/components/*",
     "./resolved/*": "./dist/resolved/*",
-    "./types": "./dist/types/index.js"
+    "./dtcg/*": "./dist/dtcg/*",
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    },
+    "./guidance.json": "./dist/guidance.json"
   },
+  "files": ["dist", "README.md", "llms.txt"],
   "scripts": {
     "build": "tsx scripts/build.ts",
     "dev": "tsx --watch scripts/build.ts --watch",

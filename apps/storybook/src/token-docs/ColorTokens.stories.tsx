@@ -1,6 +1,11 @@
 import React from "react";
 import type { Meta, StoryObj } from "storybook";
-import { docTokens, groupByPrefix, type DocToken } from "./token-reader";
+import {
+  getTokens,
+  groupByPrefix,
+  type DocToken,
+  type ThemeName,
+} from "./token-reader";
 
 const meta: Meta = {
   title: "Tokens and Assets/Color Tokens",
@@ -18,8 +23,7 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
       style={{
         width: "100%",
         borderCollapse: "collapse",
-        fontSize: "var(--ds-text-sm-size)",
-        lineHeight: "var(--ds-text-sm-line)",
+        font: "var(--ds-text-14-20-regular)",
       }}
     >
       <thead>
@@ -55,8 +59,8 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
             <td style={{ padding: "8px 12px" }}>
               <code
                 style={{
+                  font: "var(--ds-text-12-16-regular)",
                   fontFamily: "monospace",
-                  fontSize: "var(--ds-text-xs-size)",
                   color: "var(--ds-fg-primary)",
                 }}
               >
@@ -66,8 +70,8 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
             <td style={{ padding: "8px 12px" }}>
               <code
                 style={{
+                  font: "var(--ds-text-12-16-regular)",
                   fontFamily: "monospace",
-                  fontSize: "var(--ds-text-xs-size)",
                   color: "var(--ds-fg-secondary)",
                 }}
               >
@@ -86,51 +90,54 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
   );
 }
 
-const groups = groupByPrefix(docTokens);
-
 export const AllColorTokens: Story = {
-  render: () => (
-    <div className="ds-p-24" style={{ maxWidth: 900 }}>
-      <h1
-        style={{
-          fontSize: "var(--ds-text-2xl-size)",
-          lineHeight: "var(--ds-text-2xl-line)",
-          fontWeight: "var(--ds-text-2xl-weight)",
-          color: "var(--ds-fg-primary)",
-          marginBottom: "var(--ds-space-24)",
-        }}
-      >
-        Color Tokens
-      </h1>
-      <p
-        style={{
-          color: "var(--ds-fg-secondary)",
-          marginBottom: "var(--ds-space-32)",
-        }}
-      >
-        Semantic color tokens resolved from the light theme. Toggle the theme
-        toolbar to see dark values.
-      </p>
-      {COLOR_PREFIXES.map((prefix) => {
-        const tokens = groups[prefix];
-        if (!tokens?.length) return null;
-        return (
-          <section key={prefix} style={{ marginBottom: "var(--ds-space-32)" }}>
-            <h2
-              style={{
-                fontSize: "var(--ds-text-lg-size)",
-                fontWeight: "var(--ds-text-lg-weight)",
-                color: "var(--ds-fg-primary)",
-                marginBottom: "var(--ds-space-12)",
-                textTransform: "capitalize",
-              }}
+  render: (_args, { globals }) => {
+    const theme = (globals.theme as ThemeName | undefined) ?? "light";
+    const groups = groupByPrefix(getTokens(theme));
+    return (
+      <div className="ds-p-24" style={{ maxWidth: 900 }}>
+        <h1
+          style={{
+            font: "var(--ds-text-24-32-medium)",
+            color: "var(--ds-fg-primary)",
+            marginBottom: "var(--ds-space-24)",
+          }}
+        >
+          Color Tokens
+        </h1>
+        <p
+          style={{
+            color: "var(--ds-fg-secondary)",
+            marginBottom: "var(--ds-space-32)",
+          }}
+        >
+          Semantic color tokens resolved for the active{" "}
+          <strong>{theme}</strong> theme. Use the toolbar above to switch
+          themes and see the swatches and hex values update.
+        </p>
+        {COLOR_PREFIXES.map((prefix) => {
+          const tokens = groups[prefix];
+          if (!tokens?.length) return null;
+          return (
+            <section
+              key={prefix}
+              style={{ marginBottom: "var(--ds-space-32)" }}
             >
-              {prefix}
-            </h2>
-            <TokenTable tokens={tokens} />
-          </section>
-        );
-      })}
-    </div>
-  ),
+              <h2
+                style={{
+                  font: "var(--ds-text-18-28-medium)",
+                  color: "var(--ds-fg-primary)",
+                  marginBottom: "var(--ds-space-12)",
+                  textTransform: "capitalize",
+                }}
+              >
+                {prefix}
+              </h2>
+              <TokenTable tokens={tokens} />
+            </section>
+          );
+        })}
+      </div>
+    );
+  },
 };

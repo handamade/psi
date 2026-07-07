@@ -17,6 +17,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   /** Height in px (24 | 32 | 40 | 48). @default 32 */
   size?: Size;
+  /** Forwarded ref to the underlying `<button>` element. */
   ref?: Ref<HTMLButtonElement>;
 }
 

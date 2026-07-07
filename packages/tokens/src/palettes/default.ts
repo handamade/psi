@@ -6,7 +6,7 @@ export const defaultPalette: Palette = {
   sapphire: { l: 0.55, c: 0.21, h: 260 },
   ruby: { l: 0.55, c: 0.22, h: 25 },
   amber: { l: 0.75, c: 0.18, h: 75 },
-  emerald: { l: 0.6, c: 0.19, h: 155 },
+  emerald: { l: 0.52, c: 0.19, h: 155 },
   white: { l: 1.0, c: 0, h: 0 },
   black: { l: 0.0, c: 0, h: 0 },
 };

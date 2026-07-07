@@ -10,6 +10,7 @@ export interface TagProps extends HTMLAttributes<HTMLSpanElement> {
   subtle?: boolean;
   /** When provided, renders a dismiss button that calls this handler. */
   onDismiss?: () => void;
+  /** Forwarded ref to the underlying `<span>` element. */
   ref?: Ref<HTMLSpanElement>;
 }
 

@@ -5,6 +5,7 @@ export interface SwitchProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "role"> {
   /** Label text. */
   children?: React.ReactNode;
+  /** Forwarded ref to the underlying `<input type="checkbox" role="switch">` element. */
   ref?: Ref<HTMLInputElement>;
 }
 

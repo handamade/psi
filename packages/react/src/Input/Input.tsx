@@ -8,6 +8,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   size?: Size;
   /** Show error styling. @default false */
   error?: boolean;
+  /** Forwarded ref to the underlying `<input>` element. */
   ref?: Ref<HTMLInputElement>;
 }
 

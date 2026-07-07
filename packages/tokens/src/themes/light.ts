@@ -11,6 +11,7 @@ export const lightTheme: ThemeDef = {
   fgQuaternary: token({ from: ref.fgPrimary, alpha: 0.3 }),
   fgPrimaryInverted: token({ from: slot.canvas }),
   fgStaticWhite: token({ from: slot.canvas, l: set(1.0), c: set(0) }),
+  fgStaticBlack: token({ from: slot.ink, l: set(0.25), c: cap(0.03) }),
 
   fgAccent: token({ from: slot.accent, l: set(0.48), c: cap(0.23) }),
   fgSuccess: token({ from: slot.success, l: set(0.48), c: cap(0.23) }),
@@ -21,8 +22,8 @@ export const lightTheme: ThemeDef = {
   fillNeutral2: token({ from: slot.canvas }),
   fillNeutral3: token({ from: slot.canvas, l: delta(-0.017), c: delta(+0.001) }),
   fillNeutral4: token({ from: slot.canvas, l: delta(-0.034), c: delta(+0.002) }),
-  fillNeutral5: token({ from: slot.canvas, l: delta(-0.052), c: delta(+0.003) }),
-  fillNeutral6: token({ from: slot.canvas, l: delta(-0.068), c: delta(+0.004) }),
+  fillNeutral5: token({ from: slot.canvas, l: delta(-0.032), c: delta(+0.003) }),
+  fillNeutral6: token({ from: slot.canvas, l: delta(-0.048), c: delta(+0.004) }),
 
   fillAccent: token({ from: slot.accent }),
   fillSuccess: token({ from: slot.success }),

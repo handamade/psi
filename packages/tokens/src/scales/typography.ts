@@ -1,23 +1,21 @@
-export interface TypographyStep {
-  /** CSS custom property suffix, e.g. "sm", "base", "lg" */
-  name: string;
-  /** Font size in px */
-  fontSize: number;
-  /** Line height in px */
-  lineHeight: number;
-  /** Semantic weight name */
-  weight: "regular" | "medium" | "semibold" | "bold";
-  /** CSS font-weight numeric value */
-  cssWeight: number;
-}
+export type Weight = "regular" | "medium" | "semibold" | "bold";
+export const WEIGHT_VALUES: Record<Weight, number> = {
+  regular: 400, medium: 500, semibold: 600, bold: 700,
+};
+export interface TypographyCombo { fontSize: number; lineHeight: number; weight: Weight; }
+export const comboName = (c: TypographyCombo) => `${c.fontSize}-${c.lineHeight}-${c.weight}`;
 
-export const typographyScale: TypographyStep[] = [
-  { name: "xs", fontSize: 12, lineHeight: 16, weight: "regular", cssWeight: 400 },
-  { name: "sm", fontSize: 14, lineHeight: 20, weight: "regular", cssWeight: 400 },
-  { name: "base", fontSize: 16, lineHeight: 24, weight: "regular", cssWeight: 400 },
-  { name: "lg", fontSize: 18, lineHeight: 28, weight: "medium", cssWeight: 500 },
-  { name: "xl", fontSize: 20, lineHeight: 28, weight: "semibold", cssWeight: 600 },
-  { name: "2xl", fontSize: 24, lineHeight: 32, weight: "semibold", cssWeight: 600 },
-  { name: "3xl", fontSize: 30, lineHeight: 36, weight: "bold", cssWeight: 700 },
-  { name: "4xl", fontSize: 36, lineHeight: 40, weight: "bold", cssWeight: 700 },
+/** Explicit combo list (spec principle 2/4): adding a combo is one line, never a rename. */
+export const typographyCombos: TypographyCombo[] = [
+  { fontSize: 12, lineHeight: 16, weight: "regular" },
+  { fontSize: 12, lineHeight: 16, weight: "medium" },
+  { fontSize: 14, lineHeight: 20, weight: "regular" },
+  { fontSize: 14, lineHeight: 20, weight: "medium" },
+  { fontSize: 16, lineHeight: 20, weight: "regular" },
+  { fontSize: 16, lineHeight: 24, weight: "regular" },
+  { fontSize: 16, lineHeight: 24, weight: "medium" },
+  { fontSize: 18, lineHeight: 28, weight: "medium" },
+  { fontSize: 20, lineHeight: 28, weight: "semibold" },
+  { fontSize: 24, lineHeight: 32, weight: "medium" },
+  { fontSize: 30, lineHeight: 36, weight: "bold" },
 ];

@@ -5,6 +5,7 @@ export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   /** Label text. */
   children?: React.ReactNode;
+  /** Forwarded ref to the underlying `<input type="checkbox">` element. */
   ref?: Ref<HTMLInputElement>;
 }
 

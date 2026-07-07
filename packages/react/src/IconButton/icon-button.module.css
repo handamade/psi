@@ -15,7 +15,7 @@
 }
 
 .iconButton:focus-visible {
-  outline: 2px solid var(--ds-border-focus);
+  outline: 2px solid var(--ds-button-focus-ring);
   outline-offset: 2px;
 }
 
@@ -50,56 +50,48 @@
 
 /* Accent */
 .accent {
-  background: var(--ds-fill-accent);
-  color: var(--ds-fg-static-white);
+  background: var(--ds-button-accent-bg);
+  color: var(--ds-button-accent-fg);
 }
 .accent:hover:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-accent-bg, var(--ds-fill-accent)) calc(l - 0.04) c h
-  );
+  background: var(--ds-button-accent-bg-hover);
 }
 .accent:active:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-accent-bg, var(--ds-fill-accent)) calc(l - 0.08) c h
-  );
+  background: var(--ds-button-accent-bg-active);
 }
 
 /* Neutral */
 .neutral {
-  background: var(--ds-fill-neutral3);
-  color: var(--ds-fg-primary);
+  background: var(--ds-button-neutral-bg);
+  color: var(--ds-button-neutral-fg);
 }
 .neutral:hover:not(:disabled) {
-  background: var(--ds-fill-neutral4);
+  background: var(--ds-button-neutral-bg-hover);
 }
 .neutral:active:not(:disabled) {
-  background: var(--ds-fill-neutral5);
+  background: var(--ds-button-neutral-bg-active);
 }
 
 /* Ghost */
 .ghost {
-  background: transparent;
-  color: var(--ds-fg-primary);
+  background: var(--ds-button-ghost-bg);
+  color: var(--ds-button-ghost-fg);
 }
 .ghost:hover:not(:disabled) {
-  background: var(--ds-fill-neutral3);
+  background: var(--ds-button-ghost-bg-hover);
 }
 .ghost:active:not(:disabled) {
-  background: var(--ds-fill-neutral4);
+  background: var(--ds-button-ghost-bg-active);
 }
 
 /* Danger */
 .danger {
-  background: var(--ds-fill-danger);
-  color: var(--ds-fg-static-white);
+  background: var(--ds-button-danger-bg);
+  color: var(--ds-button-danger-fg);
 }
 .danger:hover:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-danger-bg, var(--ds-fill-danger)) calc(l - 0.04) c h
-  );
+  background: var(--ds-button-danger-bg-hover);
 }
 .danger:active:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-danger-bg, var(--ds-fill-danger)) calc(l - 0.08) c h
-  );
+  background: var(--ds-button-danger-bg-active);
 }

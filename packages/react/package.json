@@ -9,10 +9,17 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./styles": "./dist/styles.css"
+    "./styles": "./dist/styles.css",
+    "./manifest.json": "./dist/manifest.json"
   },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "llms.txt"
+  ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc -p tsconfig.build.json && tsx scripts/emit-manifest.ts && tsx scripts/emit-docs.ts",
     "dev": "vite build --watch"
   },
   "peerDependencies": {
@@ -25,10 +32,14 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.0",
     "jsdom": "^29.1.1",
     "react": "^19.2.0",
+    "react-docgen-typescript": "^2.4.0",
     "react-dom": "^19.2.0",
+    "tsx": "^4.22.4",
     "vite": "^6.0.0",
     "vitest": "^3.2.6"
   }

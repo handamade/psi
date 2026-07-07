@@ -1,7 +1,6 @@
 import type {
   ChannelOp,
   Palette,
-  PaletteEntry,
   SlotMap,
   ThemeDef,
   TokenDef,
@@ -122,6 +121,15 @@ export function emitThemeCSS(
 
   lines.push("@layer ds.theme {");
   lines.push(`  ${selector} {`);
+
+  // Scope this theme's own palette vars inside its selector block so a
+  // customer brand's colors ship only with that theme, and two customers
+  // that happen to reuse an anchor name can't collide in a shared :root.
+  for (const [name, entry] of Object.entries(palette)) {
+    lines.push(
+      `    ${paletteVar(name)}: oklch(${entry.l} ${entry.c} ${entry.h});`,
+    );
+  }
 
   for (const [name, def] of Object.entries(theme)) {
     const cssVar = tokenVar(name);

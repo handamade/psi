@@ -17,7 +17,7 @@
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--ds-border-focus);
+  outline: 2px solid var(--ds-button-focus-ring);
   outline-offset: 2px;
 }
 
@@ -31,153 +31,109 @@
 .size24 {
   height: var(--ds-size-24);
   padding-inline: var(--ds-space-8);
-  font-size: var(--ds-text-xs-size);
-  line-height: var(--ds-text-xs-line);
-  font-weight: 500;
+  font: var(--ds-text-12-16-medium);
 }
 
 .size32 {
   height: var(--ds-size-32);
   padding-inline: var(--ds-space-12);
-  font-size: var(--ds-text-sm-size);
-  line-height: var(--ds-text-sm-line);
-  font-weight: 500;
+  font: var(--ds-text-14-20-medium);
 }
 
 .size40 {
   height: var(--ds-size-40);
   padding-inline: var(--ds-space-16);
-  font-size: var(--ds-text-base-size);
-  line-height: var(--ds-text-base-line);
-  font-weight: 500;
+  font: var(--ds-text-16-24-medium);
 }
 
 .size48 {
   height: var(--ds-size-48);
   padding-inline: var(--ds-space-20);
-  font-size: var(--ds-text-lg-size);
-  line-height: var(--ds-text-lg-line);
-  font-weight: 500;
+  font: var(--ds-text-18-28-medium);
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */
 
 /* Accent */
 .accent {
-  background: var(--ds-fill-accent);
-  color: var(--ds-fg-static-white);
+  background: var(--ds-button-accent-bg);
+  color: var(--ds-button-accent-fg);
 }
 .accent:hover:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-accent-bg, var(--ds-fill-accent)) calc(l - 0.04) c h
-  );
+  background: var(--ds-button-accent-bg-hover);
 }
 .accent:active:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-accent-bg, var(--ds-fill-accent)) calc(l - 0.08) c h
-  );
+  background: var(--ds-button-accent-bg-active);
 }
 
 /* Accent Subtle */
 .accentSubtle {
-  background: var(--ds-fill-tint-accent);
-  color: var(--ds-fg-accent);
+  background: var(--ds-button-accent-subtle-bg);
+  color: var(--ds-button-accent-subtle-fg);
 }
 .accentSubtle:hover:not(:disabled) {
-  background: oklch(
-    from
-      var(--ds-button-accent-subtle-bg, var(--ds-fill-tint-accent))
-      l
-      c
-      h
-      / 0.18
-  );
+  background: var(--ds-button-accent-subtle-bg-hover);
 }
 .accentSubtle:active:not(:disabled) {
-  background: oklch(
-    from
-      var(--ds-button-accent-subtle-bg, var(--ds-fill-tint-accent))
-      l
-      c
-      h
-      / 0.24
-  );
+  background: var(--ds-button-accent-subtle-bg-active);
 }
 
 /* Neutral */
 .neutral {
-  background: var(--ds-fill-neutral3);
-  color: var(--ds-fg-primary);
+  background: var(--ds-button-neutral-bg);
+  color: var(--ds-button-neutral-fg);
 }
 .neutral:hover:not(:disabled) {
-  background: var(--ds-fill-neutral4);
+  background: var(--ds-button-neutral-bg-hover);
 }
 .neutral:active:not(:disabled) {
-  background: var(--ds-fill-neutral5);
+  background: var(--ds-button-neutral-bg-active);
 }
 
 /* Neutral Subtle */
 .neutralSubtle {
-  background: var(--ds-fill-neutral1);
-  color: var(--ds-fg-primary);
+  background: var(--ds-button-neutral-subtle-bg);
+  color: var(--ds-button-neutral-subtle-fg);
 }
 .neutralSubtle:hover:not(:disabled) {
-  background: var(--ds-fill-neutral3);
+  background: var(--ds-button-neutral-subtle-bg-hover);
 }
 .neutralSubtle:active:not(:disabled) {
-  background: var(--ds-fill-neutral4);
+  background: var(--ds-button-neutral-subtle-bg-active);
 }
 
 /* Ghost */
 .ghost {
-  background: transparent;
-  color: var(--ds-fg-primary);
+  background: var(--ds-button-ghost-bg);
+  color: var(--ds-button-ghost-fg);
 }
 .ghost:hover:not(:disabled) {
-  background: var(--ds-fill-neutral3);
+  background: var(--ds-button-ghost-bg-hover);
 }
 .ghost:active:not(:disabled) {
-  background: var(--ds-fill-neutral4);
+  background: var(--ds-button-ghost-bg-active);
 }
 
 /* Danger */
 .danger {
-  background: var(--ds-fill-danger);
-  color: var(--ds-fg-static-white);
+  background: var(--ds-button-danger-bg);
+  color: var(--ds-button-danger-fg);
 }
 .danger:hover:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-danger-bg, var(--ds-fill-danger)) calc(l - 0.04) c h
-  );
+  background: var(--ds-button-danger-bg-hover);
 }
 .danger:active:not(:disabled) {
-  background: oklch(
-    from var(--ds-button-danger-bg, var(--ds-fill-danger)) calc(l - 0.08) c h
-  );
+  background: var(--ds-button-danger-bg-active);
 }
 
 /* Danger Subtle */
 .dangerSubtle {
-  background: var(--ds-fill-tint-danger);
-  color: var(--ds-fg-danger);
+  background: var(--ds-button-danger-subtle-bg);
+  color: var(--ds-button-danger-subtle-fg);
 }
 .dangerSubtle:hover:not(:disabled) {
-  background: oklch(
-    from
-      var(--ds-button-danger-subtle-bg, var(--ds-fill-tint-danger))
-      l
-      c
-      h
-      / 0.18
-  );
+  background: var(--ds-button-danger-subtle-bg-hover);
 }
 .dangerSubtle:active:not(:disabled) {
-  background: oklch(
-    from
-      var(--ds-button-danger-subtle-bg, var(--ds-fill-tint-danger))
-      l
-      c
-      h
-      / 0.24
-  );
+  background: var(--ds-button-danger-subtle-bg-active);
 }

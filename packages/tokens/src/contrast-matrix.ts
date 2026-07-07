@@ -1,4 +1,4 @@
-import { wcagContrast, clampChroma, formatHex } from "culori";
+import { wcagContrast, formatHex, rgb } from "culori";
 import type { ResolvedToken } from "./dsl/types.js";
 import type { ResolvedTheme } from "./dsl/resolver.js";
 
@@ -18,9 +18,26 @@ export interface ContrastResult extends ContrastPair {
 // ── Alpha compositing ─────────────────────────────────────────────
 
 /**
+ * Composite a foreground hex color with alpha onto an opaque background hex.
+ * Uses sRGB blending (gamma-encoded): mixed = fg * alpha + bg * (1 - alpha).
+ * Returns an opaque hex color matching browser rendering.
+ */
+export function compositeHex(fgHex: string, alpha: number, bgHex: string): string {
+  const f = rgb(fgHex);
+  const b = rgb(bgHex);
+  if (!f) throw new Error(`compositeHex: unparseable color "${fgHex}"`);
+  if (!b) throw new Error(`compositeHex: unparseable color "${bgHex}"`);
+  return formatHex({
+    mode: "rgb",
+    r: f.r * alpha + b.r * (1 - alpha),
+    g: f.g * alpha + b.g * (1 - alpha),
+    b: f.b * alpha + b.b * (1 - alpha),
+  });
+}
+
+/**
  * Composite a foreground color with alpha onto an opaque background.
- * Uses OKLCH linear blending: mixed = fg * alpha + bg * (1 - alpha).
- * Returns an opaque hex color.
+ * Delegates to compositeHex for sRGB blending.
  */
 function compositeOnBackground(
   fg: ResolvedToken,
@@ -32,17 +49,7 @@ function compositeOnBackground(
     return fg.hex;
   }
 
-  const mixedL = fg.oklch.l * alpha + bg.oklch.l * (1 - alpha);
-  const mixedC = fg.oklch.c * alpha + bg.oklch.c * (1 - alpha);
-  const mixedH = fg.oklch.h;
-
-  const clamped = clampChroma(
-    { mode: "oklch" as const, l: mixedL, c: mixedC, h: mixedH },
-    "oklch",
-    "rgb",
-  );
-
-  return formatHex(clamped) ?? "#000000";
+  return compositeHex(fg.hex, alpha, bg.hex);
 }
 
 // ── Contrast checker ──────────────────────────────────────────────
@@ -134,4 +141,14 @@ export const wcagAAPairs: ContrastPair[] = [
   { fg: "fgSuccess", bg: "fillTintSuccess", minRatio: 4.5 },
   { fg: "fgWarning", bg: "fillTintWarning", minRatio: 4.5 },
   { fg: "fgDanger", bg: "fillTintDanger", minRatio: 4.5 },
+];
+
+/** Solid component-variant labels on their variant backgrounds (spec: "every
+ * button/tag label on its variant background ≥ 4.5"). Tint-variant labels are
+ * already covered by the fg-on-tint pairs in wcagAAPairs. */
+export const componentLabelPairs: ContrastPair[] = [
+  { fg: "fgStaticWhite", bg: "fillAccent", minRatio: 4.5 },  // Button/IconButton/Tag accent, Checkbox/Switch checked
+  { fg: "fgStaticWhite", bg: "fillDanger", minRatio: 4.5 },  // Button/IconButton/Tag danger
+  { fg: "fgStaticWhite", bg: "fillSuccess", minRatio: 4.5 }, // Tag success
+  { fg: "fgStaticBlack", bg: "fillWarning", minRatio: 4.5 }, // Tag warning (D22)
 ];
