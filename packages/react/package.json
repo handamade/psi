@@ -11,8 +11,14 @@
     },
     "./styles": "./dist/styles.css"
   },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "llms.txt"
+  ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "dev": "vite build --watch"
   },
   "peerDependencies": {
@@ -25,6 +31,8 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.0",
     "jsdom": "^29.1.1",
     "react": "^19.2.0",
