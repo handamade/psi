@@ -8,6 +8,7 @@
     "./dark.css": "./dist/dark.css",
     "./acme.css": "./dist/acme.css",
     "./utilities.css": "./dist/utilities.css",
+    "./components.css": "./dist/components.css",
     "./components/*": "./dist/components/*",
     "./resolved/*": "./dist/resolved/*",
     "./types": "./dist/types/index.js"

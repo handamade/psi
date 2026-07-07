@@ -14,7 +14,9 @@ import { emitBaseCSS, emitThemeCSS } from "./emit-css.js";
 import { emitResolvedJSON } from "./emit-json.js";
 import { emitTokenTypes } from "./emit-types.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "./emit-utilities.js";
+import { emitComponentVarsCSS } from "./emit-components.js";
 import { gamutWarnings } from "../src/gamut.js";
+import { buttonVars } from "../src/components/button.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
 
@@ -114,6 +116,20 @@ function build(): void {
   const utilitiesCSS = emitUtilitiesCSS();
   writeFileSync(join(distDir, "utilities.css"), utilitiesCSS);
   console.log("  wrote dist/utilities.css");
+
+  // 5. Emit component vars
+  const componentVars: Record<string, Record<string, string>> = { button: buttonVars };
+  const componentsDir = join(distDir, "components");
+  mkdirSync(componentsDir, { recursive: true });
+  const aggregate: string[] = [];
+  for (const [name, vars] of Object.entries(componentVars)) {
+    const css = emitComponentVarsCSS(name, vars);
+    writeFileSync(join(componentsDir, `${name}.vars.css`), css);
+    aggregate.push(css);
+    console.log(`  wrote dist/components/${name}.vars.css`);
+  }
+  writeFileSync(join(distDir, "components.css"), aggregate.join("\n"));
+  console.log("  wrote dist/components.css");
 
   console.log("[tokens] Build complete.");
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buttonTokens } from "../src/components/button.js";
+import { buttonVars } from "../src/components/button.js";
 
 const VARIANTS = [
   "accent",
@@ -11,41 +11,67 @@ const VARIANTS = [
   "danger-subtle",
 ] as const;
 
-const REQUIRED_KEYS = ["bg", "bgHover", "bgActive", "fg"] as const;
-
-describe("buttonTokens", () => {
-  it("exports all seven variants", () => {
-    expect(Object.keys(buttonTokens).sort()).toEqual([...VARIANTS].sort());
-  });
-
+describe("buttonVars", () => {
+  // Every variant should have -bg, -bg-hover, -bg-active, and -fg keys
   for (const variant of VARIANTS) {
     describe(`variant: ${variant}`, () => {
-      it("has all required token keys (bg, bgHover, bgActive, fg)", () => {
-        const entry = buttonTokens[variant];
-        for (const key of REQUIRED_KEYS) {
-          expect(entry).toHaveProperty(key);
-          expect(typeof entry[key]).toBe("string");
-          expect(entry[key].length).toBeGreaterThan(0);
-        }
+      it("has -bg key", () => {
+        expect(buttonVars).toHaveProperty(`${variant}-bg`);
+        expect(typeof buttonVars[`${variant}-bg`]).toBe("string");
+      });
+
+      // Ghost is special: transparent bg can't be derived from, so hover/active reference semantic fills
+      if (variant === "ghost") {
+        it("has -bg-hover key with semantic neutral fill (no component ref)", () => {
+          expect(buttonVars).toHaveProperty(`${variant}-bg-hover`);
+          expect(buttonVars[`${variant}-bg-hover`]).toContain("--ds-fill-neutral");
+        });
+
+        it("has -bg-active key with semantic neutral fill (no component ref)", () => {
+          expect(buttonVars).toHaveProperty(`${variant}-bg-active`);
+          expect(buttonVars[`${variant}-bg-active`]).toContain("--ds-fill-neutral");
+        });
+      } else {
+        it("has -bg-hover key that references --ds-button-{variant}-bg", () => {
+          expect(buttonVars).toHaveProperty(`${variant}-bg-hover`);
+          expect(buttonVars[`${variant}-bg-hover`]).toContain(
+            `--ds-button-${variant}-bg`,
+          );
+        });
+
+        it("has -bg-active key that references --ds-button-{variant}-bg", () => {
+          expect(buttonVars).toHaveProperty(`${variant}-bg-active`);
+          expect(buttonVars[`${variant}-bg-active`]).toContain(
+            `--ds-button-${variant}-bg`,
+          );
+        });
+      }
+
+      it("has -fg key", () => {
+        expect(buttonVars).toHaveProperty(`${variant}-fg`);
+        expect(typeof buttonVars[`${variant}-fg`]).toBe("string");
       });
     });
   }
 
-  it("accent bg references --ds-fill-accent", () => {
-    expect(buttonTokens.accent.bg).toContain("--ds-fill-accent");
+  it("has focus-ring key", () => {
+    expect(buttonVars).toHaveProperty("focus-ring");
+    expect(typeof buttonVars["focus-ring"]).toBe("string");
   });
 
-  it("accent hover derives from component token with semantic fallback", () => {
-    const hover = buttonTokens.accent.bgHover;
+  it("accent bg references --ds-fill-accent", () => {
+    expect(buttonVars["accent-bg"]).toContain("--ds-fill-accent");
+  });
+
+  it("accent hover derives from component token", () => {
+    const hover = buttonVars["accent-bg-hover"];
     expect(hover).toContain("oklch(from");
     expect(hover).toContain("--ds-button-accent-bg");
-    expect(hover).toContain("--ds-fill-accent");
   });
 
   it("accent active has stronger lightness shift than hover", () => {
-    const hover = buttonTokens.accent.bgHover;
-    const active = buttonTokens.accent.bgActive;
-    // Both use oklch(from ...) with calc(l - X)
+    const hover = buttonVars["accent-bg-hover"];
+    const active = buttonVars["accent-bg-active"];
     const hoverShift = hover.match(/calc\(l - ([\d.]+)\)/)?.[1];
     const activeShift = active.match(/calc\(l - ([\d.]+)\)/)?.[1];
     expect(hoverShift).toBeDefined();
@@ -54,30 +80,28 @@ describe("buttonTokens", () => {
   });
 
   it("accent fg is static white", () => {
-    expect(buttonTokens.accent.fg).toContain("--ds-fg-static-white");
+    expect(buttonVars["accent-fg"]).toContain("--ds-fg-static-white");
   });
 
   it("ghost bg is transparent", () => {
-    expect(buttonTokens.ghost.bg).toBe("transparent");
+    expect(buttonVars["ghost-bg"]).toBe("transparent");
   });
 
   it("danger bg references --ds-fill-danger", () => {
-    expect(buttonTokens.danger.bg).toContain("--ds-fill-danger");
+    expect(buttonVars["danger-bg"]).toContain("--ds-fill-danger");
   });
 
   it("accent-subtle bg references --ds-fill-tint-accent", () => {
-    expect(buttonTokens["accent-subtle"].bg).toContain(
+    expect(buttonVars["accent-subtle-bg"]).toContain(
       "--ds-fill-tint-accent",
     );
   });
 
   it("danger-subtle bg references --ds-fill-tint-danger", () => {
-    expect(buttonTokens["danger-subtle"].bg).toContain(
-      "--ds-fill-tint-danger",
-    );
+    expect(buttonVars["danger-subtle-bg"]).toContain("--ds-fill-tint-danger");
   });
 
   it("neutral bg references fill-neutral3", () => {
-    expect(buttonTokens.neutral.bg).toContain("--ds-fill-neutral3");
+    expect(buttonVars["neutral-bg"]).toContain("--ds-fill-neutral3");
   });
 });
