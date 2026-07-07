@@ -9,7 +9,7 @@
   font-family: var(--ds-font-sans);
   font-size: var(--ds-text-sm-size);
   line-height: var(--ds-text-sm-line);
-  color: var(--ds-fg-primary);
+  color: var(--ds-switch-fg);
 }
 
 .disabled {
@@ -41,17 +41,17 @@
   height: 20px;
   flex-shrink: 0;
   border-radius: var(--ds-radius-full);
-  background: var(--ds-fill-neutral4);
+  background: var(--ds-switch-track-bg);
   transition: background-color 0.15s ease;
 }
 
 .input:checked + .track {
-  background: var(--ds-fill-accent);
+  background: var(--ds-switch-track-bg-checked);
 }
 
 /* Focus visible */
 .input:focus-visible + .track {
-  outline: 2px solid var(--ds-border-focus);
+  outline: 2px solid var(--ds-switch-focus-ring);
   outline-offset: 2px;
 }
 
@@ -62,7 +62,7 @@
   width: 16px;
   height: 16px;
   border-radius: var(--ds-radius-full);
-  background: white;
+  background: var(--ds-switch-thumb-bg);
   left: 2px;
   transition: left 0.15s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
@@ -75,5 +75,5 @@
 /* ── Label text ──────────────────────────────────────────────── */
 
 .text {
-  color: var(--ds-fg-primary);
+  color: var(--ds-switch-fg);
 }

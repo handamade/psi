@@ -17,6 +17,10 @@ import { emitScaleVarsCSS, emitUtilitiesCSS } from "./emit-utilities.js";
 import { emitComponentVarsCSS } from "./emit-components.js";
 import { gamutWarnings } from "../src/gamut.js";
 import { buttonVars } from "../src/components/button.js";
+import { inputVars } from "../src/components/input.js";
+import { selectVars } from "../src/components/select.js";
+import { checkboxVars } from "../src/components/checkbox.js";
+import { switchVars } from "../src/components/switch.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
 
@@ -118,7 +122,13 @@ function build(): void {
   console.log("  wrote dist/utilities.css");
 
   // 5. Emit component vars
-  const componentVars: Record<string, Record<string, string>> = { button: buttonVars };
+  const componentVars: Record<string, Record<string, string>> = {
+    button: buttonVars,
+    input: inputVars,
+    select: selectVars,
+    checkbox: checkboxVars,
+    switch: switchVars,
+  };
   const componentsDir = join(distDir, "components");
   mkdirSync(componentsDir, { recursive: true });
   const aggregate: string[] = [];
