@@ -1,0 +1,6 @@
+# ds — AI-readable design system
+
+See `packages/tokens/llms.txt` and `packages/react/llms.txt` for per-package machine-readable artifacts and authoring rules.
+
+**Spec** (principles, architecture, decisions): `docs/superpowers/specs/2026-06-12-design-system-design.md`
+**Implementation plan**: `docs/superpowers/plans/2026-07-06-remediation-and-ai-readability-plan.md`

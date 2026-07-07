@@ -1,0 +1,15 @@
+# @dku/tokens
+
+OKLCH formula-based design tokens. Code is the source of truth; all artifacts generated.
+
+## Machine-readable artifacts
+- dist/resolved/{light,dark,acme}.json: every token with OKLCH, hex, and derivation formula
+- dist/guidance.json: variant intent, usage rules, state derivation, typography defaults
+- dist/dtcg/{theme}.json: W3C DTCG format export
+- dist/components/{name}.vars.css: component-token declarations (--ds-{component}-*)
+
+## Rules for generated code
+- Use semantic tokens (--ds-bg-*, --ds-fg-*, --ds-fill-*, --ds-border-*) in app CSS.
+- Override --ds-{component}-* tokens for one-off component theming; never fork semantic tokens.
+- Scales are pixel-true: --ds-space-8 is 8px (0.5rem). Typography: --ds-text-{size}-{lh}-{weight}.
+- Themes: import base.css + {theme}.css + components.css; set data-ds-theme="{name}".
