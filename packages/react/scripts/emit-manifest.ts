@@ -55,10 +55,15 @@ function typeToString(p: { type: { name: string; value?: { value: string }[] } }
 
 const manifest = COMPONENTS.map((name) => {
   const [doc] = parser.parse(join(root, "src", name, `${name}.tsx`));
+  if (!doc || Object.keys(doc.props ?? {}).length === 0) {
+    throw new Error(
+      `emit-manifest: no props extracted for ${name} — file moved/renamed or docgen parse failure`,
+    );
+  }
   return {
     name,
-    description: doc?.description ?? "",
-    props: Object.values(doc?.props ?? {}).map((p) => ({
+    description: doc.description ?? "",
+    props: Object.values(doc.props ?? {}).map((p) => ({
       name: p.name,
       type: typeToString(p),
       required: p.required,
