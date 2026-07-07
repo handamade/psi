@@ -4,10 +4,16 @@ import styles from "./select.module.css";
 type Size = 24 | 32 | 40 | 48;
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  /** Height in px (24 | 32 | 40 | 48). @default 32 */
+  /**
+   * Height in px (24 | 32 | 40 | 48). Replaces the native `size` attribute
+   * (which sets the visible option-row count on a listbox-style `<select>`)
+   * with the design system's control height in pixels.
+   * @default 32
+   */
   size?: Size;
   /** Show error styling. @default false */
   error?: boolean;
+  /** Forwarded ref to the underlying `<select>` element. */
   ref?: Ref<HTMLSelectElement>;
 }
 
