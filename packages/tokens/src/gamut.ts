@@ -21,6 +21,10 @@ export function gamutWarnings(
   const warnings: string[] = [];
   const raw = new Map<string, { l: number; c: number; h: number }>();
 
+  // Recomputes pre-clamp OKLCH values by replaying token operations WITHOUT sRGB clamping.
+  // Unlike the resolver (which clamps at each step), this intentionally propagates unclamped values
+  // through ref chains so the warning reflects cumulative drift from authored intent. Do not "fix" this
+  // to match the resolver's clamping behavior — the unclamped result is required to diagnose palette issues.
   function rawOf(name: string): { l: number; c: number; h: number } {
     const hit = raw.get(name);
     if (hit) return hit;

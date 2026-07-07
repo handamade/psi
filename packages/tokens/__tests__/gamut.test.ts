@@ -24,7 +24,12 @@ describe("gamutWarnings", () => {
     expect(warnings[0]).toMatch(/hot/);
   });
 
-  it("default light theme gamut warnings for out-of-gamut anchors", () => {
+  // KNOWN STATE (2026-07): default palette anchors exceed sRGB gamut — delete this test when anchors are retuned.
+  // The palette anchors for emerald, amber, and ruby were darkened in commit 126fcab for D20-D22 contrast
+  // compliance, but this created out-of-gamut colors. This test pins the current bad state to prevent
+  // accidental regressions. When the design team retunes the anchors to be in-gamut (see target contract below),
+  // this test should be deleted and the target contract test should be unskipped.
+  it("KNOWN STATE (2026-07): default palette anchors exceed sRGB gamut — delete when anchors are retuned", () => {
     const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
     const warnings = gamutWarnings(resolved, lightTheme, defaultPalette, defaultSlots);
     // Current palette anchors have out-of-gamut colors that need to be adjusted
@@ -33,5 +38,11 @@ describe("gamutWarnings", () => {
     expect(warnings.some((w) => w.includes("fgSuccess"))).toBe(true);
     expect(warnings.some((w) => w.includes("fgWarning"))).toBe(true);
     expect(warnings.some((w) => w.includes("fgDanger"))).toBe(true);
+  });
+
+  // Target contract per spec decision D19 — unskip when palette anchors are retuned in-gamut.
+  it.skip("default light theme produces no gamut warnings (target contract)", () => {
+    const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
+    expect(gamutWarnings(resolved, lightTheme, defaultPalette, defaultSlots)).toEqual([]);
   });
 });
