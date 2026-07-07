@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validate, ValidationError } from "../src/dsl/validator.js";
-import { token, set, delta, slot, ref } from "../src/dsl/builders.js";
+import { token, set, slot, ref } from "../src/dsl/builders.js";
 import type { SlotMap, ThemeDef } from "../src/dsl/types.js";
 
 const slots: SlotMap = {

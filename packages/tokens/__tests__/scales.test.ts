@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
-import { typographyCombos, comboName, WEIGHT_VALUES } from "../src/scales/typography.js";
+import { comboName } from "../src/scales/typography.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
 
 describe("scales", () => {

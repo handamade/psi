@@ -1,7 +1,6 @@
 import type {
   ChannelOp,
   Palette,
-  PaletteEntry,
   SlotMap,
   ThemeDef,
   TokenDef,
