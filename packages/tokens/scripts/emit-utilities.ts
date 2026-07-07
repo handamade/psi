@@ -1,7 +1,7 @@
 import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
-import { typographyScale } from "../src/scales/typography.js";
+import { typographyCombos, comboName, WEIGHT_VALUES } from "../src/scales/typography.js";
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -42,16 +42,8 @@ export function emitScaleVarsCSS(): string {
   lines.push("");
 
   // Typography
-  for (const step of typographyScale) {
-    lines.push(
-      `    --ds-text-${step.name}-size: ${pxToRem(step.fontSize)};`,
-    );
-    lines.push(
-      `    --ds-text-${step.name}-line: ${pxToRem(step.lineHeight)};`,
-    );
-    lines.push(
-      `    --ds-text-${step.name}-weight: ${step.cssWeight};`,
-    );
+  for (const c of typographyCombos) {
+    lines.push(`    --ds-text-${comboName(c)}: ${WEIGHT_VALUES[c.weight]} ${pxToRem(c.fontSize)}/${pxToRem(c.lineHeight)} var(--ds-font-sans);`);
   }
 
   lines.push("");
@@ -112,20 +104,8 @@ export function emitUtilitiesCSS(): string {
   lines.push("");
 
   // Typography utilities
-  for (const step of typographyScale) {
-    lines.push(
-      `  .ds-text-${step.name} {`,
-    );
-    lines.push(
-      `    font-size: var(--ds-text-${step.name}-size);`,
-    );
-    lines.push(
-      `    line-height: var(--ds-text-${step.name}-line);`,
-    );
-    lines.push(
-      `    font-weight: var(--ds-text-${step.name}-weight);`,
-    );
-    lines.push(`  }`);
+  for (const c of typographyCombos) {
+    lines.push(`  .ds-text-${comboName(c)} { font: var(--ds-text-${comboName(c)}); }`);
   }
 
   lines.push("}");
