@@ -7,9 +7,7 @@
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
-| `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Height in px (24 \| 32 \| 40 \| 48). Replaces the native `size` attribute
-(which sets the visible option-row count on a listbox-style `<select>`)
-with the design system's control height in pixels. |
+| `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Height in px (24 \| 32 \| 40 \| 48). Replaces the native `size` attribute (which sets the visible option-row count on a listbox-style `<select>`) with the design system's control height in pixels. |
 | `error` | `boolean` | false | no | Show error styling. |
 | `ref` | `Ref<HTMLSelectElement>` | — | no | Forwarded ref to the underlying `<select>` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |

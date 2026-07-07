@@ -42,9 +42,11 @@ try {
   process.exit(1);
 }
 
-// Escape pipes in markdown table cells
-function escapePipes(text: string): string {
-  return String(text).replace(/\|/g, "\\|");
+// Escape and sanitize markdown table cells (collapse newlines and escape pipes)
+function escapeCell(text: string | number | null): string {
+  return String(text ?? "—")
+    .replace(/\s*\n\s*/g, " ")
+    .replace(/\|/g, "\\|");
 }
 
 // Convert camelCase to kebab-case
@@ -59,7 +61,7 @@ for (const c of components) {
   const props = c.props
     .map(
       (p) =>
-        `| \`${escapePipes(p.name)}\` | \`${escapePipes(p.type)}\` | ${p.default ?? "—"} | ${p.required ? "yes" : "no"} | ${escapePipes(p.description)} |`
+        `| \`${escapeCell(p.name)}\` | \`${escapeCell(p.type)}\` | ${escapeCell(p.default)} | ${p.required ? "yes" : "no"} | ${escapeCell(p.description)} |`
     )
     .join("\n");
 
