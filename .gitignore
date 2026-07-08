@@ -1,5 +1,8 @@
 node_modules
 dist
+site-dist
+storybook-static
+.vercel
 *.tsbuildinfo
 .turbo
 .superpowers/

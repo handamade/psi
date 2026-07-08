@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r run build",
+    "build:web": "pnpm -r run build && node tools/assemble-site.mjs",
     "dev": "pnpm run --filter @dku/tokens --filter storybook dev --parallel",
+    "dev:web": "pnpm run --filter @dku/tokens --filter promo --filter storybook dev --parallel",
     "test": "vitest run",
     "lint": "eslint . && stylelint 'packages/react/src/**/*.module.css'",
     "lint:css": "stylelint 'packages/react/src/**/*.module.css'"

@@ -13,6 +13,7 @@ OKLCH-based design system for web applications, built on four core principles:
 - **packages/react** — 8 React 19 components (Button, Input, Select, Checkbox, Switch, Tag, IconButton, Tooltip)
 - **packages/figma-plugin** — In-repo Figma plugin syncing resolved tokens
 - **apps/storybook** — Workbench and generated component documentation
+- **apps/promo** — Public website (promo one-pager + update feed), built with DS itself
 
 ## Quick start
 
@@ -27,6 +28,17 @@ pnpm dev
 - `pnpm build` — Build all packages
 - `pnpm test` — Run vitest across the workspace
 - `pnpm dev` — Start tokens watcher + Storybook dev server
+
+## Website
+
+The public site (promo page at `/` + Storybook at `/storybook/`) deploys to
+Vercel from this repo:
+
+- `pnpm build:web` — build all packages, then assemble `site-dist/` (promo + storybook)
+- `pnpm dev:web` — tokens watcher + promo (5199) + storybook (6006) dev servers
+- **Publish an update:** add an entry to `apps/promo/src/content/updates.ts`,
+  merge to `main` — the Vercel Git integration rebuilds and deploys the site.
+- Vercel config lives in `vercel.json` (build command, output `site-dist/`).
 
 ## Documentation
 

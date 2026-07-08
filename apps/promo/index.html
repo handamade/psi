@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-ds-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="DS — a themeable design system where every semantic color is an OKLCH formula. Brand anchors in, a contrast-validated multi-theme token set out."
+    />
+    <title>DS — Color isn't picked. It's computed.</title>
+    <script>
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("ds-theme");
+        } catch (_) {
+          /* storage unavailable */
+        }
+        var theme =
+          stored ||
+          (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.dataset.dsTheme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

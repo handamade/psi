@@ -9,6 +9,8 @@ import "@dku/tokens/utilities.css";
 import "@dku/tokens/components.css";
 
 const preview: Preview = {
+  // Generated docs page per component — public link targets for the website
+  tags: ["autodocs"],
   globalTypes: {
     theme: {
       description: "Design system theme",
