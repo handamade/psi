@@ -3,7 +3,5 @@
   "buildCommand": "pnpm build:web",
   "outputDirectory": "site-dist",
   "installCommand": "pnpm install --frozen-lockfile",
-  "framework": null,
-  "cleanUrls": true,
-  "trailingSlash": true
+  "framework": null
 }
