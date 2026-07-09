@@ -65,11 +65,13 @@ for (const c of components) {
     )
     .join("\n");
 
-  // Determine token name (special case for IconButton)
-  const tokenName =
-    c.name === "IconButton"
-      ? "--ds-button-*"
-      : `--ds-${toKebabCase(c.name)}-*`;
+  // Determine token name (special cases where the component's PascalCase
+  // name doesn't kebab-case to its actual --ds-{component}-* token prefix)
+  const TOKEN_NAME_OVERRIDES: Record<string, string> = {
+    IconButton: "button",
+    NavBar: "navbar",
+  };
+  const tokenName = `--ds-${TOKEN_NAME_OVERRIDES[c.name] ?? toKebabCase(c.name)}-*`;
 
   // Check if component has variant prop
   const hasVariant = c.props.some((p) => p.name === "variant");

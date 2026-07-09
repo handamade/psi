@@ -28,6 +28,7 @@ import { switchVars } from "../src/components/switch.js";
 import { tagVars } from "../src/components/tag.js";
 import { tooltipVars } from "../src/components/tooltip.js";
 import { cardVars } from "../src/components/card.js";
+import { navbarVars } from "../src/components/navbar.js";
 import { guidance } from "../src/guidance.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
@@ -149,6 +150,7 @@ function build(): void {
     tag: tagVars,
     tooltip: tooltipVars,
     card: cardVars,
+    navbar: navbarVars,
   };
   const componentsDir = join(distDir, "components");
   mkdirSync(componentsDir, { recursive: true });

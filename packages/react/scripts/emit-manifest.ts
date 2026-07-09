@@ -14,6 +14,7 @@ const COMPONENTS = [
   "Switch",
   "Tag",
   "Tooltip",
+  "NavBar",
 ];
 
 // Keep a prop when it is declared on the component's own props interface
