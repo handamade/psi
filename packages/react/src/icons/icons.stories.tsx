@@ -17,6 +17,12 @@ import {
   IconEye,
   IconEyeOff,
   IconLoader,
+  IconArrowDown,
+  IconArrowUpRight,
+  IconLinkedIn,
+  IconGitHub,
+  IconX,
+  IconInstagram,
 } from "./index.js";
 
 const icons = [
@@ -36,6 +42,12 @@ const icons = [
   { name: "IconEye", Component: IconEye },
   { name: "IconEyeOff", Component: IconEyeOff },
   { name: "IconLoader", Component: IconLoader },
+  { name: "IconArrowDown", Component: IconArrowDown },
+  { name: "IconArrowUpRight", Component: IconArrowUpRight },
+  { name: "IconLinkedIn", Component: IconLinkedIn },
+  { name: "IconGitHub", Component: IconGitHub },
+  { name: "IconX", Component: IconX },
+  { name: "IconInstagram", Component: IconInstagram },
 ];
 
 const meta: Meta = {

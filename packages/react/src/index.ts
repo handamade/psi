@@ -37,4 +37,10 @@ export {
   IconEye,
   IconEyeOff,
   IconLoader,
+  IconArrowDown,
+  IconArrowUpRight,
+  IconLinkedIn,
+  IconGitHub,
+  IconX,
+  IconInstagram,
 } from "./icons/index.js";
