@@ -1,7 +1,7 @@
 import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
-import { typographyCombos, comboName, comboFontVar, WEIGHT_VALUES } from "../src/scales/typography.js";
+import { typographyCombos, comboName, comboFontVar, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -44,6 +44,14 @@ export function emitScaleVarsCSS(): string {
   // Typography
   for (const c of typographyCombos) {
     lines.push(`    --ds-text-${comboName(c)}: ${WEIGHT_VALUES[c.weight]} ${pxToRem(c.fontSize)}/${pxToRem(c.lineHeight)} var(${comboFontVar(c)});`);
+  }
+
+  lines.push("");
+
+  // Display (D28) — fluid clamp() sizes, pixel-true at both endpoints
+  for (const d of displayCombos) {
+    const size = d.min === d.max ? pxToRem(d.min) : `clamp(${pxToRem(d.min)}, ${d.vw}vw, ${pxToRem(d.max)})`;
+    lines.push(`    --ds-display-${displayName(d)}: ${WEIGHT_VALUES[d.weight]} ${size}/${d.lineHeight} var(--ds-font-display);`);
   }
 
   lines.push("");
@@ -108,6 +116,13 @@ export function emitUtilitiesCSS(): string {
   // Typography utilities
   for (const c of typographyCombos) {
     lines.push(`  .ds-text-${comboName(c)} { font: var(--ds-text-${comboName(c)}); }`);
+  }
+
+  lines.push("");
+
+  // Display utilities (D28) — tracking + uppercase, since font shorthand can't carry them
+  for (const d of displayCombos) {
+    lines.push(`  .ds-display-${displayName(d)} { font: var(--ds-display-${displayName(d)}); letter-spacing: ${d.tracking}em; text-transform: uppercase; }`);
   }
 
   lines.push("}");

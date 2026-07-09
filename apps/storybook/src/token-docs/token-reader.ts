@@ -54,6 +54,7 @@ interface ResolvedTheme {
     }
   >;
   typography: DocTypographyCombo[];
+  display: { name: string; min: number; max: number; vw: number; lineHeight: number; weight: string; tracking: number; cssWeight: number }[];
 }
 
 const RESOLVED: Record<ThemeName, ResolvedTheme> = {
@@ -87,6 +88,12 @@ export function getTokens(theme: ThemeName = "light"): DocToken[] {
  * resolution.
  */
 export const docTypography: DocTypographyCombo[] = RESOLVED.light.typography;
+
+/**
+ * Display combos are theme-independent (only color tokens vary by theme),
+ * so this remains a static export sourced from the light theme's resolution.
+ */
+export const docDisplay = RESOLVED.light.display;
 
 /** Group tokens by their prefix (bg, fg, fill, border). */
 export function groupByPrefix(

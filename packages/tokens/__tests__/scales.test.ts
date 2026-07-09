@@ -64,6 +64,19 @@ describe("scales", () => {
       expect(css).toContain("--ds-text-mono-13-20-regular: 400 0.8125rem/1.25rem var(--ds-font-mono);");
       expect(emitUtilitiesCSS()).toContain(".ds-text-mono-15-24-medium { font: var(--ds-text-mono-15-24-medium); }");
     });
+
+    it("emits display combos pixel-true at both clamp endpoints (D28)", () => {
+      const css = emitScaleVarsCSS();
+      expect(css).toContain("--ds-display-56-128-black: 900 clamp(3.5rem, 9vw, 8rem)/0.95 var(--ds-font-display);");
+      expect(css).toContain("--ds-display-36-64-black: 900 clamp(2.25rem, 5vw, 4rem)/1.05 var(--ds-font-display);");
+      expect(css).toContain("--ds-display-32-32-extrabold: 800 2rem/1.1 var(--ds-font-display);");
+    });
+
+    it("display utilities carry tracking and uppercase (D28)", () => {
+      const css = emitUtilitiesCSS();
+      expect(css).toContain(".ds-display-56-128-black { font: var(--ds-display-56-128-black); letter-spacing: -0.02em; text-transform: uppercase; }");
+      expect(css).toContain(".ds-display-32-32-extrabold { font: var(--ds-display-32-32-extrabold); letter-spacing: -0.01em; text-transform: uppercase; }");
+    });
   });
 });
 

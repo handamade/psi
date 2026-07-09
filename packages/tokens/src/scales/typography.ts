@@ -8,6 +8,17 @@ export const comboName = (c: TypographyCombo) =>
   `${c.role && c.role !== "sans" ? `${c.role}-` : ""}${c.fontSize}-${c.lineHeight}-${c.weight}`;
 export const comboFontVar = (c: TypographyCombo) => `--ds-font-${c.role ?? "sans"}`;
 
+export interface DisplayCombo { min: number; max: number; vw: number; lineHeight: number; weight: Weight; tracking: number; }
+/** Fluid display tier (D28): --ds-display-{min}-{max}-{weight}, pixel-true at
+ * both clamp endpoints. Tracking/uppercase live in the .ds-display-* utilities
+ * because the font shorthand can't carry them. */
+export const displayCombos: DisplayCombo[] = [
+  { min: 56, max: 128, vw: 9, lineHeight: 0.95, weight: "black", tracking: -0.02 },
+  { min: 36, max: 64, vw: 5, lineHeight: 1.05, weight: "black", tracking: -0.02 },
+  { min: 32, max: 32, vw: 0, lineHeight: 1.1, weight: "extrabold", tracking: -0.01 },
+];
+export const displayName = (d: DisplayCombo) => `${d.min}-${d.max}-${d.weight}`;
+
 /** Explicit combo list (spec principle 2/4): adding a combo is one line, never a rename. */
 export const typographyCombos: TypographyCombo[] = [
   { fontSize: 12, lineHeight: 16, weight: "regular" },

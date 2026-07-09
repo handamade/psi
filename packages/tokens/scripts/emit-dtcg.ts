@@ -3,7 +3,7 @@ import { camelToKebab } from "./emit-css.js";
 import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
-import { typographyCombos, comboName, WEIGHT_VALUES } from "../src/scales/typography.js";
+import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
 
 const GROUPS = ["bg", "fg", "fill", "border"] as const;
 
@@ -33,6 +33,10 @@ export function emitDTCG(themeName: string, resolved: ResolvedTheme): string {
     typography: Object.fromEntries(typographyCombos.map((c) => [comboName(c), {
       $type: "typography",
       $value: { fontFamily: `{fontFamily.${c.role ?? "sans"}}`, fontSize: `${c.fontSize}px`, lineHeight: `${c.lineHeight}px`, fontWeight: WEIGHT_VALUES[c.weight] },
+    }])),
+    display: Object.fromEntries(displayCombos.map((d) => [displayName(d), {
+      $type: "typography",
+      $value: { fontFamily: "{fontFamily.display}", fontSize: d.min === d.max ? `${d.min}px` : `clamp(${d.min}px, ${d.vw}vw, ${d.max}px)`, lineHeight: d.lineHeight, fontWeight: WEIGHT_VALUES[d.weight], letterSpacing: `${d.tracking}em` },
     }])),
     fontFamily: {
       sans: { $type: "fontFamily", $value: ["ui-sans-serif", "system-ui", "sans-serif"] },
