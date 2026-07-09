@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
-import { customerThemes } from "../src/themes/customers/index.js";
+import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
 import { validate } from "../src/dsl/validator.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { checkContrast, wcagAAPairs, componentLabelPairs } from "../src/contrast-matrix.js";
@@ -41,7 +41,7 @@ const themes: Record<string, ThemeConfig> = {
   light: { theme: lightTheme, palette: defaultPalette, slots: defaultSlots },
   dark: { theme: darkTheme, palette: defaultPalette, slots: defaultSlots },
   ...Object.fromEntries(Object.entries(customerThemes).map(([name, c]) => [
-    name, { theme: { ...lightTheme, ...c.overrides }, palette: c.palette, slots: c.slots },
+    name, { theme: assembleCustomerTheme(c), palette: c.palette, slots: c.slots },
   ])),
 };
 
