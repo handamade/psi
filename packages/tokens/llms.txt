@@ -12,7 +12,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - Use semantic tokens (--ds-bg-*, --ds-fg-*, --ds-fill-*, --ds-border-*) in app CSS.
 - Override --ds-{component}-* tokens for one-off component theming; never fork semantic tokens.
 - Scales are pixel-true: --ds-space-8 is 8px (0.5rem). Typography: --ds-text-{size}-{lh}-{weight}.
-- Themes: import base.css + {theme}.css + components.css; set data-ds-theme="{name}" ({light,dark,acme,ember}).
+- Themes: import base.css + {theme}.css + components.css + utilities.css; set data-ds-theme="{name}" ({light,dark,acme,ember}).
 
 ## Motion (--ds-duration-*, --ds-ease-*)
 - Durations: 150/200/350/450/600ms. Easings: --ds-ease-standard, --ds-ease-in-out, --ds-ease-soft.
@@ -43,4 +43,4 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - Brand font stacks fully apply when data-ds-theme is set on the root <html> element. In nested subtree theming, --ds-text-*/--ds-display-* combos keep the default stacks, since unregistered custom properties only substitute at :root.
 
 ## Component overrides (D34)
-- A brand's theme file may declare `componentOverrides: Record<string, string>` (e.g. ember: button-font → mono, card-radius → 0, media-tint → its filter chain), emitted at [data-ds-theme="{brand}"] in components.css. Prefer this over forking a component's CSS Module for brand-specific token values.
+- A brand's theme file may declare `componentOverrides: Record<string, string>` (e.g. ember: button-font → mono, card-radius → 0, media-tint → its filter chain), emitted in the brand's own theme file (e.g. dist/ember.css) inside `@layer ds.components`. Prefer this over forking a component's CSS Module for brand-specific token values.

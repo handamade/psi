@@ -8,7 +8,7 @@
 
 ## Rules for generated code
 - import { Button } from "@dku/react"; import "@dku/react/styles";
-- Also import from @dku/tokens: base.css, a theme css, components.css.
+- Also import from @dku/tokens: base.css, a theme css, components.css, utilities.css.
 - size is a px number (24|32|40|48), never "sm"/"md"/"lg".
 - variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline.
 - One accent per visual group. danger only for destructive actions.
