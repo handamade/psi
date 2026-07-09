@@ -6,6 +6,8 @@ export { Card } from "./Card/Card.js";
 export type { CardProps } from "./Card/Card.js";
 export { NavBar } from "./NavBar/NavBar.js";
 export type { NavBarProps } from "./NavBar/NavBar.js";
+export { AspectRatio } from "./AspectRatio/AspectRatio.js";
+export type { AspectRatioProps } from "./AspectRatio/AspectRatio.js";
 export { Input } from "./Input/Input.js";
 export type { InputProps } from "./Input/Input.js";
 export { Select } from "./Select/Select.js";

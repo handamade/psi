@@ -15,6 +15,7 @@ const COMPONENTS = [
   "Tag",
   "Tooltip",
   "NavBar",
+  "AspectRatio",
 ];
 
 // Keep a prop when it is declared on the component's own props interface
