@@ -1,7 +1,7 @@
 # Site-Scale & Portfolio Readiness — Design Spec
 
 **Date:** 2026-07-09
-**Status:** Approved for planning
+**Status:** Implemented (2026-07-09, branch site-scale-portfolio-readiness; plan: ../plans/2026-07-09-site-scale-and-portfolio-readiness-plan.md)
 **Predecessors:** `2026-06-12-design-system-design.md` (core spec, decisions D1–D26), `2026-07-06-remediation-and-ai-readability-plan.md` (fully landed)
 
 ## Context
@@ -225,6 +225,7 @@ New component (`packages/react/src/navbar/`):
 - **D34** Brands may override *component* tokens (e.g. `--ds-card-radius: 0`, `--ds-button-font`) via their `overrides`/emitted theme block — component tokens are part of the themeable surface.
 - **D35** Media tint is a token + utility recipe, not a component; the filter chain is brand-defined.
 - **D36** Social icons (LinkedIn/GitHub/X/Instagram) ship as ordinary monochrome icon components.
+- **D37** (added at plan review, user-approved) Solid accent labels bind to semantic `fgOnAccent` (default: alias of fg-static-white; ember: fg-static-black's formula). The gate pair follows the binding — white on `#ff7847` is 2.62:1, and "adjusting emberAccent L minimally" would have required 0.724 → ~0.58, destroying the brand color for a pairing the brand never renders (its CTA hover is dark-on-ember, 6.12:1). The outline variant's hover label reuses the accent binding because the literal canvas-on-accent fails AA in default light (4.35) and dark (3.92). Switch `thumb-bg` stays fg-static-white (the thumb also sits on the unchecked neutral track; not a text label).
 
 ## Quality gates (all must pass per milestone)
 

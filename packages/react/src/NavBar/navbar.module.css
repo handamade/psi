@@ -1,0 +1,25 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--ds-z-nav);
+  background: var(--ds-navbar-bg);
+  backdrop-filter: blur(var(--ds-navbar-blur));
+  -webkit-backdrop-filter: blur(var(--ds-navbar-blur));
+  border-bottom: 1px solid var(--ds-navbar-border);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-24);
+  height: var(--ds-navbar-height);
+}
+
+.brand { display: flex; align-items: center; }
+.links {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-20);
+  margin-inline-start: auto;
+}
+.actions { display: flex; align-items: center; gap: var(--ds-space-8); }

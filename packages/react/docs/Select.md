@@ -25,3 +25,4 @@ Override `--ds-select-*` custom properties at any scope; interactive states deri
 - Sizes are px numbers (24|32|40|48), never S/M/L.
 - Typography tokens are --ds-text-{size}-{lineHeight}-{weight}.
 - Override component tokens (--ds-{component}-*), not semantic tokens, for one-off theming.
+- --ds-button-font overrides button typography across all sizes (documented D34 override; ember → mono).

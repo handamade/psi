@@ -147,7 +147,7 @@ export const wcagAAPairs: ContrastPair[] = [
  * button/tag label on its variant background ≥ 4.5"). Tint-variant labels are
  * already covered by the fg-on-tint pairs in wcagAAPairs. */
 export const componentLabelPairs: ContrastPair[] = [
-  { fg: "fgStaticWhite", bg: "fillAccent", minRatio: 4.5 },  // Button/IconButton/Tag accent, Checkbox/Switch checked
+  { fg: "fgOnAccent", bg: "fillAccent", minRatio: 4.5 },     // Button/IconButton/Tag accent label, Checkbox check, outline hover (D37)
   { fg: "fgStaticWhite", bg: "fillDanger", minRatio: 4.5 },  // Button/IconButton/Tag danger
   { fg: "fgStaticWhite", bg: "fillSuccess", minRatio: 4.5 }, // Tag success
   { fg: "fgStaticBlack", bg: "fillWarning", minRatio: 4.5 }, // Tag warning (D22)

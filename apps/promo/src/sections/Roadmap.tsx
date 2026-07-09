@@ -1,8 +1,8 @@
 import { IconCheck, IconChevronRight } from "@dku/react";
 
 const SHIPPED = [
-  ["8 atoms, 16 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip"],
-  ["3 themes", "light, dark and an example customer brand — plus `pnpm new-theme`"],
+  ["11 atoms, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, NavBar, AspectRatio"],
+  ["4 themes", "light, dark and two customer brands (acme, ember) — plus `pnpm new-theme --base dark`"],
   ["Contrast gate", "WCAG AA validated per theme, at build time"],
   ["Figma sync", "DS Token Sync plugin — code → Figma variables"],
   ["AI artifacts", "llms.txt, manifest.json, guidance.json, DTCG export"],

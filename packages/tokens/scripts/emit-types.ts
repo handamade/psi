@@ -7,6 +7,7 @@ export function emitTokenTypes(
   themes: Record<string, ThemeDef>,
   sizes: number[] = [],
   variants: string[] = [],
+  bps: Record<string, number> = {},
 ): string {
   // Collect all unique token names across themes
   const tokenNames = new Set<string>();
@@ -63,6 +64,14 @@ export function emitTokenTypes(
     lines.push("export type Variant = string;");
   }
   lines.push("");
+
+  // Breakpoints (D31) — literal constants, not a CSS-driven type
+  if (Object.keys(bps).length > 0) {
+    lines.push("export declare const breakpoints: {");
+    for (const [k, v] of Object.entries(bps)) lines.push(`  readonly ${k}: ${v};`);
+    lines.push("};");
+    lines.push("");
+  }
 
   return lines.join("\n");
 }

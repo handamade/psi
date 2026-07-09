@@ -83,13 +83,25 @@ describe("contrast matrix", () => {
       ]),
     ).toThrow("Unknown foreground token");
   });
+
+  it("fgOnAccent passes on fillAccent in light, dark, and acme", () => {
+    const themes = [
+      resolve(lightTheme, defaultPalette, defaultSlots),
+      resolve(darkTheme, defaultPalette, defaultSlots),
+      resolve({ ...lightTheme }, acmePalette, acmeSlots),
+    ];
+    for (const resolved of themes) {
+      const [r] = checkContrast(resolved, [{ fg: "fgOnAccent", bg: "fillAccent", minRatio: 4.5 }]);
+      expect(r.pass, `ratio ${r.ratio}`).toBe(true);
+    }
+  });
 });
 
 describe("component label pairs", () => {
   it("includes solid-variant label pairs", () => {
     const key = (p: { fg: string; bg: string }) => `${p.fg}/${p.bg}`;
     const keys = componentLabelPairs.map(key);
-    expect(keys).toContain("fgStaticWhite/fillAccent");
+    expect(keys).toContain("fgOnAccent/fillAccent");
     expect(keys).toContain("fgStaticWhite/fillDanger");
     expect(keys).toContain("fgStaticWhite/fillSuccess");
     expect(keys).toContain("fgStaticBlack/fillWarning");

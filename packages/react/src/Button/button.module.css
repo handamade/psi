@@ -10,10 +10,11 @@
   cursor: pointer;
   font-family: var(--ds-font-sans);
   white-space: nowrap;
+  text-decoration: none;
   user-select: none;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+    background-color var(--ds-duration-150) var(--ds-ease-standard),
+    color var(--ds-duration-150) var(--ds-ease-standard);
 }
 
 .button:focus-visible {
@@ -26,30 +27,37 @@
   cursor: not-allowed;
 }
 
+/* Disabled-as-anchor (D33): no href (non-focusable) + no pointer events. */
+.button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* ── Sizes ────────────────────────────────────────────────────── */
 
 .size24 {
   height: var(--ds-size-24);
   padding-inline: var(--ds-space-8);
-  font: var(--ds-text-12-16-medium);
+  font: var(--ds-button-font, var(--ds-text-12-16-medium));
 }
 
 .size32 {
   height: var(--ds-size-32);
   padding-inline: var(--ds-space-12);
-  font: var(--ds-text-14-20-medium);
+  font: var(--ds-button-font, var(--ds-text-14-20-medium));
 }
 
 .size40 {
   height: var(--ds-size-40);
   padding-inline: var(--ds-space-16);
-  font: var(--ds-text-16-24-medium);
+  font: var(--ds-button-font, var(--ds-text-16-24-medium));
 }
 
 .size48 {
   height: var(--ds-size-48);
   padding-inline: var(--ds-space-20);
-  font: var(--ds-text-18-28-medium);
+  font: var(--ds-button-font, var(--ds-text-18-28-medium));
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */
@@ -59,10 +67,10 @@
   background: var(--ds-button-accent-bg);
   color: var(--ds-button-accent-fg);
 }
-.accent:hover:not(:disabled) {
+.accent:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-accent-bg-hover);
 }
-.accent:active:not(:disabled) {
+.accent:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-accent-bg-active);
 }
 
@@ -71,10 +79,10 @@
   background: var(--ds-button-accent-subtle-bg);
   color: var(--ds-button-accent-subtle-fg);
 }
-.accentSubtle:hover:not(:disabled) {
+.accentSubtle:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-accent-subtle-bg-hover);
 }
-.accentSubtle:active:not(:disabled) {
+.accentSubtle:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-accent-subtle-bg-active);
 }
 
@@ -83,10 +91,10 @@
   background: var(--ds-button-neutral-bg);
   color: var(--ds-button-neutral-fg);
 }
-.neutral:hover:not(:disabled) {
+.neutral:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-neutral-bg-hover);
 }
-.neutral:active:not(:disabled) {
+.neutral:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-neutral-bg-active);
 }
 
@@ -95,10 +103,10 @@
   background: var(--ds-button-neutral-subtle-bg);
   color: var(--ds-button-neutral-subtle-fg);
 }
-.neutralSubtle:hover:not(:disabled) {
+.neutralSubtle:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-neutral-subtle-bg-hover);
 }
-.neutralSubtle:active:not(:disabled) {
+.neutralSubtle:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-neutral-subtle-bg-active);
 }
 
@@ -107,10 +115,10 @@
   background: var(--ds-button-ghost-bg);
   color: var(--ds-button-ghost-fg);
 }
-.ghost:hover:not(:disabled) {
+.ghost:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-ghost-bg-hover);
 }
-.ghost:active:not(:disabled) {
+.ghost:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-ghost-bg-active);
 }
 
@@ -119,10 +127,10 @@
   background: var(--ds-button-danger-bg);
   color: var(--ds-button-danger-fg);
 }
-.danger:hover:not(:disabled) {
+.danger:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-danger-bg-hover);
 }
-.danger:active:not(:disabled) {
+.danger:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-danger-bg-active);
 }
 
@@ -131,9 +139,24 @@
   background: var(--ds-button-danger-subtle-bg);
   color: var(--ds-button-danger-subtle-fg);
 }
-.dangerSubtle:hover:not(:disabled) {
+.dangerSubtle:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-danger-subtle-bg-hover);
 }
-.dangerSubtle:active:not(:disabled) {
+.dangerSubtle:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-danger-subtle-bg-active);
+}
+
+/* Outline — ghost-bordered CTA (WS5). Hover fills accent. */
+.outline {
+  background: var(--ds-button-outline-bg);
+  color: var(--ds-button-outline-fg);
+  border: 1px solid var(--ds-button-outline-border);
+}
+.outline:hover:not(:disabled):not(.disabled) {
+  background: var(--ds-button-outline-bg-hover);
+  color: var(--ds-button-outline-fg-hover);
+  border-color: transparent;
+}
+.outline:active:not(:disabled):not(.disabled) {
+  background: var(--ds-button-outline-bg-active);
 }

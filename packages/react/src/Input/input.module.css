@@ -10,8 +10,8 @@
   font-family: var(--ds-font-sans);
   padding-inline: var(--ds-space-8);
   transition:
-    border-color 0.15s ease,
-    outline 0.15s ease;
+    border-color var(--ds-duration-150) var(--ds-ease-standard),
+    outline var(--ds-duration-150) var(--ds-ease-standard);
 }
 
 .input::placeholder {

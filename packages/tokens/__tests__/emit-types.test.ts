@@ -35,4 +35,11 @@ describe("emitTokenTypes", () => {
     expect(output).toContain("export type Size = string;");
     expect(output).toContain("export type Variant = string;");
   });
+
+  it("emits breakpoints as literal constants (D31)", () => {
+    const out = emitTokenTypes({ light: lightTheme }, [24], ["accent"], { sm: 560, md: 960 });
+    expect(out).toContain("export declare const breakpoints: {");
+    expect(out).toContain("readonly sm: 560;");
+    expect(out).toContain("readonly md: 960;");
+  });
 });

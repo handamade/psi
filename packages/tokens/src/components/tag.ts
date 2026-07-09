@@ -6,7 +6,7 @@ export const tagVars: Record<string, string> = {
   "neutral-fg": "var(--ds-fg-primary)",
 
   "accent-bg": "var(--ds-fill-accent)",
-  "accent-fg": "var(--ds-fg-static-white)",
+  "accent-fg": "var(--ds-fg-on-accent)",
 
   "success-bg": "var(--ds-fill-success)",
   "success-fg": "var(--ds-fg-static-white)",

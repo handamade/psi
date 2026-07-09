@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { token, ref } from "../src/dsl/builders.js";
 import { validate } from "../src/dsl/validator.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
@@ -20,6 +21,7 @@ describe("light theme", () => {
     expect(names).toContain("fgQuaternary");
     expect(names).toContain("fgPrimaryInverted");
     expect(names).toContain("fgStaticWhite");
+    expect(names).toContain("fgOnAccent");
     expect(names).toContain("fgAccent");
     expect(names).toContain("fgSuccess");
     expect(names).toContain("fgWarning");
@@ -31,6 +33,10 @@ describe("light theme", () => {
     expect(names).toContain("borderNeutral");
     expect(names).toContain("borderStrong");
     expect(names).toContain("borderFocus");
+    expect(names).toContain("borderFaint");
+    expect(names).toContain("scrimSoft");
+    expect(names).toContain("scrimMedium");
+    expect(names).toContain("scrimHeavy");
   });
 
   it("fgPrimary has low lightness (dark text on light bg)", () => {
@@ -51,5 +57,12 @@ describe("light theme", () => {
   it("fillTintAccent has alpha 0.12", () => {
     const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
     expect(resolved.fillTintAccent.oklch.alpha).toBeCloseTo(0.12, 2);
+  });
+
+  it("defines hairline and scrim alphas (WS4, D32)", () => {
+    expect(lightTheme.borderFaint).toEqual(token({ from: ref.fgPrimary, alpha: 0.08 }));
+    expect(lightTheme.scrimSoft).toEqual(token({ from: ref.bgPrimary, alpha: 0.25 }));
+    expect(lightTheme.scrimMedium).toEqual(token({ from: ref.bgPrimary, alpha: 0.35 }));
+    expect(lightTheme.scrimHeavy).toEqual(token({ from: ref.bgPrimary, alpha: 0.82 }));
   });
 });

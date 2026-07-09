@@ -9,7 +9,7 @@
 
 .tooltip {
   position: absolute;
-  z-index: 1000;
+  z-index: var(--ds-z-tooltip);
   padding: var(--ds-space-4) var(--ds-space-8);
   border-radius: var(--ds-radius-6);
   background: var(--ds-tooltip-bg);

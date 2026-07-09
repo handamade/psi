@@ -7,6 +7,7 @@ export const BUTTON_VARIANTS = [
   "ghost",
   "danger",
   "danger-subtle",
+  "outline",
 ] as const;
 
 export type ButtonVariant = (typeof BUTTON_VARIANTS)[number];
@@ -18,7 +19,7 @@ export const buttonVars: Record<string, string> = {
   "accent-bg": "var(--ds-fill-accent)",
   "accent-bg-hover": "oklch(from var(--ds-button-accent-bg) calc(l - 0.04) c h)",
   "accent-bg-active": "oklch(from var(--ds-button-accent-bg) calc(l - 0.08) c h)",
-  "accent-fg": "var(--ds-fg-static-white)",
+  "accent-fg": "var(--ds-fg-on-accent)",
 
   "accent-subtle-bg": "var(--ds-fill-tint-accent)",
   "accent-subtle-bg-hover": "oklch(from var(--ds-button-accent-subtle-bg) l c h / 0.18)",
@@ -49,6 +50,15 @@ export const buttonVars: Record<string, string> = {
   "danger-subtle-bg-hover": "oklch(from var(--ds-button-danger-subtle-bg) l c h / 0.18)",
   "danger-subtle-bg-active": "oklch(from var(--ds-button-danger-subtle-bg) l c h / 0.24)",
   "danger-subtle-fg": "var(--ds-fg-danger)",
+
+  "outline-bg": "transparent",
+  "outline-bg-hover": "var(--ds-fill-accent)",
+  "outline-bg-active": "oklch(from var(--ds-fill-accent) calc(l - 0.04) c h)",
+  "outline-fg": "var(--ds-fg-primary)",
+  // Hover fills accent; label follows the accent variant's binding (fgOnAccent,
+  // D37) — the literal "canvas label" fails AA in default light/dark.
+  "outline-fg-hover": "var(--ds-button-accent-fg)",
+  "outline-border": "var(--ds-border-strong)",
 
   "focus-ring": "var(--ds-border-focus)",
 };

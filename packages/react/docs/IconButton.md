@@ -9,7 +9,10 @@
 |---|---|---|---|---|
 | `variant` | `"accent" \| "neutral" \| "ghost" \| "danger"` | neutral | no | Visual variant. |
 | `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Square size in px (24 \| 32 \| 40 \| 48). |
-| `ref` | `Ref<HTMLButtonElement>` | — | no | Forwarded ref to the underlying `<button>` element. |
+| `href` | `string` | — | no | Render as an anchor with this href (D33). disabled → aria-disabled, no href attribute, pointer-events: none. |
+| `target` | `string` | — | no | Anchor target; only used with href. |
+| `rel` | `string` | — | no | Anchor rel; only used with href. |
+| `ref` | `Ref<HTMLButtonElement \| HTMLAnchorElement>` | — | no | Forwarded ref to the underlying element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
 ## Theming
@@ -23,6 +26,7 @@ Override `--ds-button-*` custom properties at any scope; interactive states deri
 - **neutral** — Default, structurally present. Secondary actions, toolbar buttons.
 - **neutral-subtle** — Minimal chrome. Inline actions, table row actions.
 - **ghost** — No visible container until hover. Icon-only triggers, compact toolbars.
+- **outline** — Bordered ghost — visible structure, no fill until hover. Marketing CTA, download button; hover fills accent.
 - **danger** — Destructive action. Delete, remove, disconnect.
 - **danger-subtle** — Destructive context, low urgency. Warning badges, soft destructive hints.
 - **success | warning** — Status communication (Tag only). Status badges, labels.
@@ -34,3 +38,4 @@ Override `--ds-button-*` custom properties at any scope; interactive states deri
 - Sizes are px numbers (24|32|40|48), never S/M/L.
 - Typography tokens are --ds-text-{size}-{lineHeight}-{weight}.
 - Override component tokens (--ds-{component}-*), not semantic tokens, for one-off theming.
+- --ds-button-font overrides button typography across all sizes (documented D34 override; ember → mono).

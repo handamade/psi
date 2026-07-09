@@ -1,8 +1,9 @@
 import resolvedLight from "@dku/tokens/resolved/light.json";
 import resolvedDark from "@dku/tokens/resolved/dark.json";
 import resolvedAcme from "@dku/tokens/resolved/acme.json";
+import resolvedEmber from "@dku/tokens/resolved/ember.json";
 
-export type ThemeName = "light" | "dark" | "acme";
+export type ThemeName = "light" | "dark" | "acme" | "ember";
 
 export interface DocToken {
   /** Original camelCase name from the theme definition */
@@ -53,12 +54,21 @@ interface ResolvedTheme {
     }
   >;
   typography: DocTypographyCombo[];
+  display: { name: string; min: number; max: number; vw: number; lineHeight: number; weight: string; tracking: number; cssWeight: number }[];
+  scales: {
+    space: number[];
+    size: number[];
+    radius: number[];
+    motion: { durations: number[]; easings: Record<string, string> };
+    layout: { breakpoints: Record<string, number>; container: Record<string, number>; zIndex: Record<string, number> };
+  };
 }
 
 const RESOLVED: Record<ThemeName, ResolvedTheme> = {
   light: resolvedLight as ResolvedTheme,
   dark: resolvedDark as ResolvedTheme,
   acme: resolvedAcme as ResolvedTheme,
+  ember: resolvedEmber as ResolvedTheme,
 };
 
 function buildDocTokens(resolved: ResolvedTheme): DocToken[] {
@@ -85,6 +95,24 @@ export function getTokens(theme: ThemeName = "light"): DocToken[] {
  * resolution.
  */
 export const docTypography: DocTypographyCombo[] = RESOLVED.light.typography;
+
+/**
+ * Display combos are theme-independent (only color tokens vary by theme),
+ * so this remains a static export sourced from the light theme's resolution.
+ */
+export const docDisplay = RESOLVED.light.display;
+
+/**
+ * Motion tokens (durations + easings) are theme-independent, so this
+ * remains a static export sourced from the light theme's resolution.
+ */
+export const docMotion = RESOLVED.light.scales.motion;
+
+/**
+ * Layout tokens (breakpoints, container, z-index) are theme-independent,
+ * so this remains a static export sourced from the light theme's resolution.
+ */
+export const docLayout = RESOLVED.light.scales.layout;
 
 /** Group tokens by their prefix (bg, fg, fill, border). */
 export function groupByPrefix(
