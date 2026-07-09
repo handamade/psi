@@ -16,8 +16,8 @@
   padding-inline-end: var(--ds-space-24);
   cursor: pointer;
   transition:
-    border-color 0.15s ease,
-    outline 0.15s ease;
+    border-color var(--ds-duration-150) var(--ds-ease-standard),
+    outline var(--ds-duration-150) var(--ds-ease-standard);
 }
 
 .select:hover:not(:disabled):not(:focus) {

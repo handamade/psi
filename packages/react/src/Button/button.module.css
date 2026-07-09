@@ -12,8 +12,8 @@
   white-space: nowrap;
   user-select: none;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+    background-color var(--ds-duration-150) var(--ds-ease-standard),
+    color var(--ds-duration-150) var(--ds-ease-standard);
 }
 
 .button:focus-visible {
