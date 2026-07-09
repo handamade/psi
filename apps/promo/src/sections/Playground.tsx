@@ -21,6 +21,7 @@ const VARIANTS = [
   "accent-subtle",
   "neutral",
   "neutral-subtle",
+  "outline",
   "ghost",
   "danger",
   "danger-subtle",
@@ -56,7 +57,7 @@ export function Playground() {
         <div className="playground">
           <div className="card pg-buttons">
             <h3>
-              Button · 7 variants × 4 sizes
+              Button · 8 variants × 4 sizes
               <a className="sb-link" href={storybookDocs("Components/Button")}>
                 storybook →
               </a>
