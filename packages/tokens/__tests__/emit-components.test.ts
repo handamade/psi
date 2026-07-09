@@ -12,7 +12,7 @@ describe("emitComponentVarsCSS", () => {
   it("emits ds.components layer with prefixed vars", () => {
     const css = emitComponentVarsCSS("button", buttonVars);
     expect(css).toContain("@layer ds.components");
-    expect(css).toContain(":root, [data-ds-theme]");
+    expect(css).toContain(":where(:root, [data-ds-theme])");
     expect(css).toContain("--ds-button-accent-bg: var(--ds-fill-accent);");
     expect(css).toContain(
       "--ds-button-accent-bg-hover: oklch(from var(--ds-button-accent-bg) calc(l - 0.04) c h);",

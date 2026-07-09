@@ -111,7 +111,7 @@ export function emitThemeCSS(
   theme: ThemeDef,
   palette: Palette,
   slots: SlotMap,
-  opts?: { fonts?: BrandFonts },
+  opts?: { fonts?: BrandFonts; componentOverrides?: Record<string, string> },
 ): string {
   const lines: string[] = [];
 
@@ -147,6 +147,16 @@ export function emitThemeCSS(
 
   lines.push("  }");
   lines.push("}");
+
+  if (opts?.componentOverrides && Object.keys(opts.componentOverrides).length > 0) {
+    lines.push("@layer ds.components {");
+    lines.push(`  [data-ds-theme="${themeName}"] {`);
+    for (const [name, value] of Object.entries(opts.componentOverrides)) {
+      lines.push(`    --ds-${name}: ${value};`);
+    }
+    lines.push("  }");
+    lines.push("}");
+  }
 
   return lines.join("\n") + "\n";
 }

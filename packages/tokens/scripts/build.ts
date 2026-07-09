@@ -38,13 +38,14 @@ interface ThemeConfig {
   palette: Palette;
   slots: SlotMap;
   fonts?: BrandFonts;
+  componentOverrides?: Record<string, string>;
 }
 
 const themes: Record<string, ThemeConfig> = {
   light: { theme: lightTheme, palette: defaultPalette, slots: defaultSlots },
   dark: { theme: darkTheme, palette: defaultPalette, slots: defaultSlots },
   ...Object.fromEntries(Object.entries(customerThemes).map(([name, c]) => [
-    name, { theme: assembleCustomerTheme(c), palette: c.palette, slots: c.slots, fonts: c.fonts },
+    name, { theme: assembleCustomerTheme(c), palette: c.palette, slots: c.slots, fonts: c.fonts, componentOverrides: c.componentOverrides },
   ])),
 };
 
@@ -104,7 +105,10 @@ function build(): void {
     console.log(`  contrast check passed for ${themeName}`);
 
     // Emit theme CSS (live oklch formulas)
-    const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots, { fonts: config.fonts });
+    const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots, {
+      fonts: config.fonts,
+      componentOverrides: config.componentOverrides,
+    });
     writeFileSync(join(distDir, `${themeName}.css`), themeCSS);
     console.log(`  wrote dist/${themeName}.css`);
 

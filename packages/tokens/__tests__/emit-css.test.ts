@@ -67,6 +67,16 @@ describe("emitThemeCSS", () => {
     expect(css).toContain(`--ds-font-mono: "IBM Plex Mono", "Courier New", monospace;`);
     expect(css).toContain(`[data-ds-theme="ember"]`);
   });
+
+  it("emits brand component-token overrides into the components layer (D34)", () => {
+    const css = emitThemeCSS("ember", { bgPrimary: token({ from: slot.canvas }) },
+      { emberCanvas: { l: 0.147, c: 0.004, h: 49 } },
+      { ink: "emberCanvas", canvas: "emberCanvas", accent: "emberCanvas", success: "emberCanvas", warning: "emberCanvas", danger: "emberCanvas" },
+      { componentOverrides: { "card-radius": "0", "button-font": "var(--ds-text-mono-15-24-regular)" } });
+    expect(css).toContain(`@layer ds.components {\n  [data-ds-theme="ember"] {`);
+    expect(css).toContain("--ds-card-radius: 0;");
+    expect(css).toContain("--ds-button-font: var(--ds-text-mono-15-24-regular);");
+  });
 });
 
 describe("base.css assembly no longer bundles customer palettes", () => {
