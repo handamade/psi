@@ -108,6 +108,12 @@ export const docDisplay = RESOLVED.light.display;
  */
 export const docMotion = RESOLVED.light.scales.motion;
 
+/**
+ * Layout tokens (breakpoints, container, z-index) are theme-independent,
+ * so this remains a static export sourced from the light theme's resolution.
+ */
+export const docLayout = RESOLVED.light.scales.layout;
+
 /** Group tokens by their prefix (bg, fg, fill, border). */
 export function groupByPrefix(
   tokens: DocToken[],

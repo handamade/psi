@@ -28,6 +28,12 @@ const rule = (enabled) => (root, result) => {
         message: `literal duration in "${decl.prop}" — use var(--ds-duration-*) (ds/component-tokens-only)`,
       });
     }
+    if (decl.prop === "z-index" && /^\d+$/.test(decl.value.trim())) {
+      stylelint.utils.report({
+        ruleName, result, node: decl,
+        message: `literal z-index — use var(--ds-z-*) (ds/component-tokens-only)`,
+      });
+    }
   });
 };
 rule.ruleName = ruleName;
