@@ -16,6 +16,7 @@ export const guidance = {
     "Sizes are px numbers (24|32|40|48), never S/M/L.",
     "Typography tokens are --ds-text-{size}-{lineHeight}-{weight}.",
     "Override component tokens (--ds-{component}-*), not semantic tokens, for one-off theming.",
+    "--ds-button-font overrides button typography across all sizes (documented D34 override; ember → mono).",
   ],
   states: { hover: "L - 0.04", active: "L - 0.08", disabled: "element opacity 0.4 (keeps hue)", focus: "2px ring var(--ds-{component}-focus-ring)" },
   typographyDefaults: { body: "16-24-regular", compactUI: "14-20-regular", heading: "24-32-medium", caption: "12-16-regular" },

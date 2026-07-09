@@ -39,25 +39,25 @@
 .size24 {
   height: var(--ds-size-24);
   padding-inline: var(--ds-space-8);
-  font: var(--ds-text-12-16-medium);
+  font: var(--ds-button-font, var(--ds-text-12-16-medium));
 }
 
 .size32 {
   height: var(--ds-size-32);
   padding-inline: var(--ds-space-12);
-  font: var(--ds-text-14-20-medium);
+  font: var(--ds-button-font, var(--ds-text-14-20-medium));
 }
 
 .size40 {
   height: var(--ds-size-40);
   padding-inline: var(--ds-space-16);
-  font: var(--ds-text-16-24-medium);
+  font: var(--ds-button-font, var(--ds-text-16-24-medium));
 }
 
 .size48 {
   height: var(--ds-size-48);
   padding-inline: var(--ds-space-20);
-  font: var(--ds-text-18-28-medium);
+  font: var(--ds-button-font, var(--ds-text-18-28-medium));
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */

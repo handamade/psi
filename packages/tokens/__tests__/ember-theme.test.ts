@@ -32,4 +32,8 @@ describe("ember brand (WS1)", () => {
     expect(onAccent.pass).toBe(true);
     expect(white.pass).toBe(false);
   });
+
+  it("ember restyles button typography to mono via component override (D34)", () => {
+    expect(customerThemes.ember.componentOverrides?.["button-font"]).toBe("var(--ds-text-mono-15-24-regular)");
+  });
 });

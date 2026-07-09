@@ -34,6 +34,11 @@ export const emberFonts: BrandFonts = {
   display: '"Archivo", system-ui, sans-serif',
 };
 
+/** D34 component-token overrides — emitted at [data-ds-theme="ember"] in ds.components. */
+export const emberComponentOverrides: Record<string, string> = {
+  "button-font": "var(--ds-text-mono-15-24-regular)",
+};
+
 export const emberOverrides: ThemeDef = {
   // Inherited dark formulas land off-target (#0e0b07 / #1a150f / #eee6e2);
   // canvas/ink-anchor overrides hit the shipped hexes exactly.
