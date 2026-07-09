@@ -73,6 +73,25 @@ export const Disabled: Story = {
   args: { variant: "accent", children: "Disabled", disabled: true },
 };
 
+export const AsLink: Story = {
+  args: {
+    variant: "accent",
+    children: "As Link",
+    href: "https://example.com",
+    target: "_blank",
+    rel: "noreferrer",
+  },
+};
+
+export const DisabledLink: Story = {
+  args: {
+    variant: "accent",
+    children: "Disabled Link",
+    href: "https://example.com",
+    disabled: true,
+  },
+};
+
 export const AllSizes: Story = {
   render: () => (
     <div style={{ display: "flex", alignItems: "center", gap: "var(--ds-space-12)" }}>

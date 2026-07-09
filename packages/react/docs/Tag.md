@@ -24,6 +24,7 @@ Override `--ds-tag-*` custom properties at any scope; interactive states derive 
 - **neutral** — Default, structurally present. Secondary actions, toolbar buttons.
 - **neutral-subtle** — Minimal chrome. Inline actions, table row actions.
 - **ghost** — No visible container until hover. Icon-only triggers, compact toolbars.
+- **outline** — Bordered ghost — visible structure, no fill until hover. Marketing CTA, download button; hover fills accent.
 - **danger** — Destructive action. Delete, remove, disconnect.
 - **danger-subtle** — Destructive context, low urgency. Warning badges, soft destructive hints.
 - **success | warning** — Status communication (Tag only). Status badges, labels.

@@ -8,6 +8,7 @@
   border-radius: var(--ds-radius-8);
   cursor: pointer;
   padding: 0;
+  text-decoration: none;
   user-select: none;
   transition:
     background-color var(--ds-duration-150) var(--ds-ease-standard),
@@ -22,6 +23,13 @@
 .iconButton:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* Disabled-as-anchor (D33): no href (non-focusable) + no pointer events. */
+.iconButton.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* ── Sizes (square: width = height) ──────────────────────────── */
@@ -53,10 +61,10 @@
   background: var(--ds-button-accent-bg);
   color: var(--ds-button-accent-fg);
 }
-.accent:hover:not(:disabled) {
+.accent:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-accent-bg-hover);
 }
-.accent:active:not(:disabled) {
+.accent:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-accent-bg-active);
 }
 
@@ -65,10 +73,10 @@
   background: var(--ds-button-neutral-bg);
   color: var(--ds-button-neutral-fg);
 }
-.neutral:hover:not(:disabled) {
+.neutral:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-neutral-bg-hover);
 }
-.neutral:active:not(:disabled) {
+.neutral:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-neutral-bg-active);
 }
 
@@ -77,10 +85,10 @@
   background: var(--ds-button-ghost-bg);
   color: var(--ds-button-ghost-fg);
 }
-.ghost:hover:not(:disabled) {
+.ghost:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-ghost-bg-hover);
 }
-.ghost:active:not(:disabled) {
+.ghost:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-ghost-bg-active);
 }
 
@@ -89,9 +97,9 @@
   background: var(--ds-button-danger-bg);
   color: var(--ds-button-danger-fg);
 }
-.danger:hover:not(:disabled) {
+.danger:hover:not(:disabled):not(.disabled) {
   background: var(--ds-button-danger-bg-hover);
 }
-.danger:active:not(:disabled) {
+.danger:active:not(:disabled):not(.disabled) {
   background: var(--ds-button-danger-bg-active);
 }

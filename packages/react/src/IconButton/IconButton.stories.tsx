@@ -58,6 +58,17 @@ export const Disabled: Story = {
   },
 };
 
+export const AsLink: Story = {
+  args: {
+    variant: "accent",
+    "aria-label": "Open in new tab",
+    href: "https://example.com",
+    target: "_blank",
+    rel: "noreferrer",
+    children: <StarIcon />,
+  },
+};
+
 export const AllSizes: Story = {
   render: () => (
     <div style={{ display: "flex", alignItems: "center", gap: "var(--ds-space-12)" }}>
