@@ -1,9 +1,16 @@
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const name = process.argv[2];
+const args = process.argv.slice(2);
+const name = args.find((a) => !a.startsWith("--"));
+const baseIdx = args.indexOf("--base");
+const base = baseIdx !== -1 ? args[baseIdx + 1] : "light";
 if (!name) {
-  console.error("Usage: pnpm new-theme <name>");
+  console.error("Usage: pnpm new-theme <name> [--base dark]");
+  process.exit(1);
+}
+if (base !== "light" && base !== "dark") {
+  console.error(`--base must be "light" or "dark", got "${base}"`);
   process.exit(1);
 }
 
@@ -35,13 +42,22 @@ if (!registrySource.includes(REGISTER_MARKER)) {
 
 mkdirSync(dir, { recursive: true });
 
+const anchors = base === "dark"
+  ? `  // Dark-first brand (D27): formulas build on darkTheme.
+  // ink = the brand's LIGHT text anchor, canvas = the DARK page anchor —
+  // dark formulas force L per token, so hue/chroma carry the brand.
+  ${name}Ink: { l: 0.95, c: 0.01, h: 250 },
+  ${name}Canvas: { l: 0.15, c: 0.005, h: 250 },
+  ${name}Brand: { l: 0.7, c: 0.18, h: 260 },`
+  : `  // Base theme: light (D27). Replace with brand OKLCH anchors.
+  ${name}Ink: { l: 0.25, c: 0.02, h: 250 },
+  ${name}Canvas: { l: 0.95, c: 0.005, h: 250 },
+  ${name}Brand: { l: 0.55, c: 0.21, h: 260 },`;
+
 const template = `import type { Palette, SlotMap } from "../../dsl/types.js";
 
 export const ${name}Palette: Palette = {
-  // Replace with brand OKLCH anchors
-  ${name}Ink: { l: 0.25, c: 0.02, h: 250 },
-  ${name}Canvas: { l: 0.95, c: 0.005, h: 250 },
-  ${name}Brand: { l: 0.55, c: 0.21, h: 260 },
+${anchors}
   // Semantic anchors — safe starting points, tune to taste. success/warning
   // need to stay distinct from each other and from ${name}Brand: warning in
   // particular must stay light enough to carry black label text at 4.5:1.
@@ -69,7 +85,7 @@ console.log(`Created ${file}`);
 // and insert the entry into customerThemes as a new line just before the
 // marker's own line (so the marker's existing indentation is untouched).
 const importLine = `import { ${name}Palette, ${name}Slots } from "./${name}.js";\n`;
-const registrationLine = `  ${name}: { palette: ${name}Palette, slots: ${name}Slots },\n`;
+const registrationLine = `  ${name}: { palette: ${name}Palette, slots: ${name}Slots${base === "dark" ? ', base: "dark"' : ""} },\n`;
 
 const markerIndex = registrySource.indexOf(REGISTER_MARKER);
 const markerLineStart = registrySource.lastIndexOf("\n", markerIndex) + 1;
