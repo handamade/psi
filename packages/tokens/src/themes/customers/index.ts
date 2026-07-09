@@ -2,6 +2,7 @@ import type { Palette, SlotMap, ThemeDef } from "../../dsl/types.js";
 import { lightTheme } from "../light.js";
 import { darkTheme } from "../dark.js";
 import { acmePalette, acmeSlots } from "./acme.js";
+import { emberPalette, emberSlots, emberOverrides } from "./ember.js";
 
 export interface CustomerTheme {
   palette: Palette;
@@ -20,5 +21,6 @@ export function assembleCustomerTheme(c: CustomerTheme): ThemeDef {
 
 export const customerThemes: Record<string, CustomerTheme> = {
   acme: { palette: acmePalette, slots: acmeSlots },
+  ember: { palette: emberPalette, slots: emberSlots, base: "dark", overrides: emberOverrides },
   // <ds:register — new-theme inserts here, do not remove>
 };

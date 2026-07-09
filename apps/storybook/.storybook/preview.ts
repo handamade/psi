@@ -5,6 +5,7 @@ import "@dku/tokens/base.css";
 import "@dku/tokens/light.css";
 import "@dku/tokens/dark.css";
 import "@dku/tokens/acme.css";
+import "@dku/tokens/ember.css";
 import "@dku/tokens/utilities.css";
 import "@dku/tokens/components.css";
 
@@ -21,6 +22,7 @@ const preview: Preview = {
           { value: "light", title: "Light", icon: "sun" },
           { value: "dark", title: "Dark", icon: "moon" },
           { value: "acme", title: "Acme", icon: "paintbrush" },
+          { value: "ember", title: "Ember", icon: "circlehollow" },
         ],
         dynamicTitle: true,
       },

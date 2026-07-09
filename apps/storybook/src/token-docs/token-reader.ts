@@ -1,8 +1,9 @@
 import resolvedLight from "@dku/tokens/resolved/light.json";
 import resolvedDark from "@dku/tokens/resolved/dark.json";
 import resolvedAcme from "@dku/tokens/resolved/acme.json";
+import resolvedEmber from "@dku/tokens/resolved/ember.json";
 
-export type ThemeName = "light" | "dark" | "acme";
+export type ThemeName = "light" | "dark" | "acme" | "ember";
 
 export interface DocToken {
   /** Original camelCase name from the theme definition */
@@ -59,6 +60,7 @@ const RESOLVED: Record<ThemeName, ResolvedTheme> = {
   light: resolvedLight as ResolvedTheme,
   dark: resolvedDark as ResolvedTheme,
   acme: resolvedAcme as ResolvedTheme,
+  ember: resolvedEmber as ResolvedTheme,
 };
 
 function buildDocTokens(resolved: ResolvedTheme): DocToken[] {
