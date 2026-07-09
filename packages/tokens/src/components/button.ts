@@ -18,7 +18,7 @@ export const buttonVars: Record<string, string> = {
   "accent-bg": "var(--ds-fill-accent)",
   "accent-bg-hover": "oklch(from var(--ds-button-accent-bg) calc(l - 0.04) c h)",
   "accent-bg-active": "oklch(from var(--ds-button-accent-bg) calc(l - 0.08) c h)",
-  "accent-fg": "var(--ds-fg-static-white)",
+  "accent-fg": "var(--ds-fg-on-accent)",
 
   "accent-subtle-bg": "var(--ds-fill-tint-accent)",
   "accent-subtle-bg-hover": "oklch(from var(--ds-button-accent-subtle-bg) l c h / 0.18)",

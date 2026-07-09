@@ -20,6 +20,7 @@ describe("dark theme", () => {
     expect(names).toContain("fgQuaternary");
     expect(names).toContain("fgPrimaryInverted");
     expect(names).toContain("fgStaticWhite");
+    expect(names).toContain("fgOnAccent");
     expect(names).toContain("fgAccent");
     expect(names).toContain("fgSuccess");
     expect(names).toContain("fgWarning");

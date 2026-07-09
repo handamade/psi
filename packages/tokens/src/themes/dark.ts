@@ -13,6 +13,11 @@ export const darkTheme: ThemeDef = {
   fgStaticWhite: token({ from: slot.canvas, l: set(1.0), c: set(0) }),
   fgStaticBlack: token({ from: slot.ink, l: set(0.25), c: cap(0.03) }),
 
+  /** Label ink on fillAccent (D37). Brands whose accent can't carry white
+   * (e.g. ember #ff7847, white = 2.62:1) override this instead of mangling
+   * their anchor. */
+  fgOnAccent: token({ from: ref.fgStaticWhite }),
+
   fgAccent: token({ from: slot.accent, l: set(0.75), c: cap(0.23) }),
   fgSuccess: token({ from: slot.success, l: set(0.75), c: cap(0.23) }),
   fgWarning: token({ from: slot.warning, l: set(0.75), c: cap(0.23) }),

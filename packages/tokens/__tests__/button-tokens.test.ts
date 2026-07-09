@@ -79,8 +79,8 @@ describe("buttonVars", () => {
     expect(Number(activeShift)).toBeGreaterThan(Number(hoverShift));
   });
 
-  it("accent fg is static white", () => {
-    expect(buttonVars["accent-fg"]).toContain("--ds-fg-static-white");
+  it("accent fg is on-accent label token", () => {
+    expect(buttonVars["accent-fg"]).toContain("--ds-fg-on-accent");
   });
 
   it("ghost bg is transparent", () => {
