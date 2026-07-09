@@ -85,6 +85,11 @@ describe("emitScaleVarsCSS", () => {
     expect(css).toContain("--ds-font-sans:");
     expect(css).toContain("--ds-font-mono:");
   });
+
+  it("emits serif and display font roles (WS2, D29)", () => {
+    expect(css).toContain(`--ds-font-serif: Georgia, "Times New Roman", Times, serif;`);
+    expect(css).toContain(`--ds-font-display: var(--ds-font-sans);`);
+  });
 });
 
 describe("emitUtilitiesCSS", () => {

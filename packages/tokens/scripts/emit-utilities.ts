@@ -55,6 +55,8 @@ export function emitScaleVarsCSS(): string {
   lines.push(
     `    --ds-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;`,
   );
+  lines.push(`    --ds-font-serif: Georgia, "Times New Roman", Times, serif;`);
+  lines.push(`    --ds-font-display: var(--ds-font-sans);`);
 
   return lines.join("\n");
 }
