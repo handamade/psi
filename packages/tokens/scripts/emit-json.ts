@@ -3,6 +3,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
+import { durationScale, easings } from "../src/scales/motion.js";
 
 /**
  * Emit a JSON string containing the resolved theme tokens.
@@ -20,6 +21,7 @@ export function emitResolvedJSON(
         space: [...spacingScale],
         size: [...sizeScale],
         radius: [...radiusScale],
+        motion: { durations: [...durationScale], easings },
       },
       typography: typographyCombos.map((c) => ({
         name: comboName(c),

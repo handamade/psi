@@ -2,6 +2,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, comboFontVar, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
+import { durationScale, easings } from "../src/scales/motion.js";
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -53,6 +54,12 @@ export function emitScaleVarsCSS(): string {
     const size = d.min === d.max ? pxToRem(d.min) : `clamp(${pxToRem(d.min)}, ${d.vw}vw, ${pxToRem(d.max)})`;
     lines.push(`    --ds-display-${displayName(d)}: ${WEIGHT_VALUES[d.weight]} ${size}/${d.lineHeight} var(--ds-font-display);`);
   }
+
+  lines.push("");
+
+  // Motion (WS3) — durations + named easing curves; see guidance.ts for reduced-motion policy
+  for (const ms of durationScale) lines.push(`    --ds-duration-${ms}: ${ms}ms;`);
+  for (const [name, curve] of Object.entries(easings)) lines.push(`    --ds-ease-${name}: ${curve};`);
 
   lines.push("");
 

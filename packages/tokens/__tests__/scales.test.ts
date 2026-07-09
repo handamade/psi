@@ -3,6 +3,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { comboName, WEIGHT_VALUES } from "../src/scales/typography.js";
+import { durationScale, easings } from "../src/scales/motion.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
 
 describe("scales", () => {
@@ -33,6 +34,22 @@ describe("scales", () => {
   describe("radius", () => {
     it("has expected values", () => {
       expect([...radiusScale]).toEqual([4, 6, 8, 12]);
+    });
+  });
+
+  describe("motion", () => {
+    it("motion scale matches spec (WS3)", () => {
+      expect([...durationScale]).toEqual([150, 200, 350, 450, 600]);
+      expect(easings.soft).toBe("cubic-bezier(0.2, 0.6, 0.2, 1)");
+    });
+
+    it("emits duration and easing vars", () => {
+      const css = emitScaleVarsCSS();
+      expect(css).toContain("--ds-duration-150: 150ms;");
+      expect(css).toContain("--ds-duration-600: 600ms;");
+      expect(css).toContain("--ds-ease-standard: ease;");
+      expect(css).toContain("--ds-ease-in-out: ease-in-out;");
+      expect(css).toContain("--ds-ease-soft: cubic-bezier(0.2, 0.6, 0.2, 1);");
     });
   });
 

@@ -4,6 +4,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
+import { durationScale } from "../src/scales/motion.js";
 
 const GROUPS = ["bg", "fg", "fill", "border"] as const;
 
@@ -38,6 +39,12 @@ export function emitDTCG(themeName: string, resolved: ResolvedTheme): string {
       $type: "typography",
       $value: { fontFamily: "{fontFamily.display}", fontSize: d.min === d.max ? `${d.min}px` : `clamp(${d.min}px, ${d.vw}vw, ${d.max}px)`, lineHeight: d.lineHeight, fontWeight: WEIGHT_VALUES[d.weight], letterSpacing: `${d.tracking}em` },
     }])),
+    duration: Object.fromEntries(durationScale.map((ms) => [String(ms), { $type: "duration", $value: `${ms}ms` }])),
+    cubicBezier: {
+      standard: { $type: "cubicBezier", $value: [0.25, 0.1, 0.25, 1] },
+      "in-out": { $type: "cubicBezier", $value: [0.42, 0, 0.58, 1] },
+      soft: { $type: "cubicBezier", $value: [0.2, 0.6, 0.2, 1] },
+    },
     fontFamily: {
       sans: { $type: "fontFamily", $value: ["ui-sans-serif", "system-ui", "sans-serif"] },
       serif: { $type: "fontFamily", $value: ["Georgia", "Times New Roman", "serif"] },

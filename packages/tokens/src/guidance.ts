@@ -23,4 +23,12 @@ export const guidance = {
     note: "Font roles are brand-level (D29). The DS ships no font files: consumers load each brand's webfonts themselves.",
     brands: { ember: { archivo: "800,900 (display/sans)", ibmPlexSerif: "400 (serif)", ibmPlexMono: "400,500 (mono)" } },
   },
+  motion: {
+    durations: [150, 200, 350, 450, 600],
+    easings: { standard: "ease", "in-out": "ease-in-out", soft: "cubic-bezier(0.2, 0.6, 0.2, 1)" },
+    reducedMotion: "All --ds-duration-* zero under prefers-reduced-motion (D30). Always drive transitions/animations with duration tokens; never hardcode times.",
+    recipes: {
+      pulseDown: "App-level keyframe (the DS ships none): @keyframes pulse-down { 0%,100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(6px); opacity: 1; } } — drive with var(--ds-ease-in-out).",
+    },
+  },
 } as const;
