@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
-import { customerThemes } from "../src/themes/customers/index.js";
+import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
+import type { BrandFonts } from "../src/themes/customers/index.js";
 import { validate } from "../src/dsl/validator.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { checkContrast, wcagAAPairs, componentLabelPairs } from "../src/contrast-matrix.js";
@@ -19,12 +20,16 @@ import { emitDTCG } from "./emit-dtcg.js";
 import { gamutWarnings } from "../src/gamut.js";
 import { buttonVars, BUTTON_VARIANTS } from "../src/components/button.js";
 import { sizeScale } from "../src/scales/sizes.js";
+import { breakpoints } from "../src/scales/layout.js";
 import { inputVars } from "../src/components/input.js";
 import { selectVars } from "../src/components/select.js";
 import { checkboxVars } from "../src/components/checkbox.js";
 import { switchVars } from "../src/components/switch.js";
 import { tagVars } from "../src/components/tag.js";
 import { tooltipVars } from "../src/components/tooltip.js";
+import { cardVars } from "../src/components/card.js";
+import { navbarVars } from "../src/components/navbar.js";
+import { mediaVars } from "../src/components/media.js";
 import { guidance } from "../src/guidance.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
@@ -35,13 +40,15 @@ interface ThemeConfig {
   theme: typeof lightTheme;
   palette: Palette;
   slots: SlotMap;
+  fonts?: BrandFonts;
+  componentOverrides?: Record<string, string>;
 }
 
 const themes: Record<string, ThemeConfig> = {
   light: { theme: lightTheme, palette: defaultPalette, slots: defaultSlots },
   dark: { theme: darkTheme, palette: defaultPalette, slots: defaultSlots },
   ...Object.fromEntries(Object.entries(customerThemes).map(([name, c]) => [
-    name, { theme: { ...lightTheme, ...c.overrides }, palette: c.palette, slots: c.slots },
+    name, { theme: assembleCustomerTheme(c), palette: c.palette, slots: c.slots, fonts: c.fonts, componentOverrides: c.componentOverrides },
   ])),
 };
 
@@ -101,7 +108,10 @@ function build(): void {
     console.log(`  contrast check passed for ${themeName}`);
 
     // Emit theme CSS (live oklch formulas)
-    const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots);
+    const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots, {
+      fonts: config.fonts,
+      componentOverrides: config.componentOverrides,
+    });
     writeFileSync(join(distDir, `${themeName}.css`), themeCSS);
     console.log(`  wrote dist/${themeName}.css`);
 
@@ -120,10 +130,10 @@ function build(): void {
   const themeDefs = Object.fromEntries(
     Object.entries(themes).map(([name, config]) => [name, config.theme]),
   );
-  const types = emitTokenTypes(themeDefs, [...sizeScale], [...BUTTON_VARIANTS]);
+  const types = emitTokenTypes(themeDefs, [...sizeScale], [...BUTTON_VARIANTS], breakpoints);
   writeFileSync(join(typesDir, "index.d.ts"), types);
   console.log("  wrote dist/types/index.d.ts");
-  writeFileSync(join(typesDir, "index.js"), "export {};\n");
+  writeFileSync(join(typesDir, "index.js"), `export const breakpoints = ${JSON.stringify(breakpoints)};\n`);
   console.log("  wrote dist/types/index.js");
 
   // 4. Emit utility classes
@@ -140,6 +150,9 @@ function build(): void {
     switch: switchVars,
     tag: tagVars,
     tooltip: tooltipVars,
+    card: cardVars,
+    navbar: navbarVars,
+    media: mediaVars,
   };
   const componentsDir = join(distDir, "components");
   mkdirSync(componentsDir, { recursive: true });

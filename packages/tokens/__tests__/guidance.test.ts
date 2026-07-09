@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { guidance } from "../src/guidance.js";
 
 describe("guidance", () => {
-  it("has 8 variant entries", () => {
-    expect(guidance.variants).toHaveLength(8);
+  it("has 9 variant entries", () => {
+    expect(guidance.variants).toHaveLength(9);
   });
 
   it("includes accent variant with non-empty intent", () => {

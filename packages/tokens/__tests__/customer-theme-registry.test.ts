@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { customerThemes } from "../src/themes/customers/index.js";
+import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
+import { acmePalette, acmeSlots } from "../src/themes/customers/acme.js";
+import { lightTheme } from "../src/themes/light.js";
+import { darkTheme } from "../src/themes/dark.js";
+import { token, slot } from "../src/dsl/builders.js";
 
 describe("customer theme registry", () => {
   it("has an acme entry with a palette and slots", () => {
@@ -21,5 +25,25 @@ describe("customer theme registry", () => {
         );
       }
     }
+  });
+});
+
+describe("dark-first customer themes (D27)", () => {
+  it("assembles over lightTheme by default", () => {
+    const def = assembleCustomerTheme({ palette: acmePalette, slots: acmeSlots });
+    expect(def.bgPrimary).toEqual(lightTheme.bgPrimary);
+  });
+
+  it("assembles over darkTheme when base is 'dark'", () => {
+    const def = assembleCustomerTheme({ palette: acmePalette, slots: acmeSlots, base: "dark" });
+    expect(def.bgPrimary).toEqual(darkTheme.bgPrimary);
+    expect(def.fgPrimary).toEqual(darkTheme.fgPrimary);
+  });
+
+  it("merges overrides over the dark base", () => {
+    const overrides = { bgPrimary: token({ from: slot.canvas }) };
+    const def = assembleCustomerTheme({ palette: acmePalette, slots: acmeSlots, base: "dark", overrides });
+    expect(def.bgPrimary).toEqual(overrides.bgPrimary);
+    expect(def.bgSecondary).toEqual(darkTheme.bgSecondary);
   });
 });

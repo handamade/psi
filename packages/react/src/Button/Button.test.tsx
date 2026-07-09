@@ -91,4 +91,27 @@ describe("Button", () => {
       unmount();
     }
   });
+
+  it("renders the outline variant", () => {
+    render(<Button variant="outline">Ghost CTA</Button>);
+    expect(screen.getByRole("button", { name: "Ghost CTA" }).className).toMatch(/outline/);
+  });
+
+  it("renders an anchor when href is provided", () => {
+    render(<Button href="/docs" variant="accent">Docs</Button>);
+    const a = screen.getByRole("link", { name: "Docs" });
+    expect(a).toHaveAttribute("href", "/docs");
+  });
+
+  it("disabled anchor is non-focusable and suppresses activation (D33)", async () => {
+    const onClick = vi.fn();
+    render(<Button href="/docs" disabled onClick={onClick}>Docs</Button>);
+    const a = screen.getByText("Docs");
+    expect(a).not.toHaveAttribute("href");
+    expect(a).toHaveAttribute("aria-disabled", "true");
+    a.focus();
+    expect(a).not.toHaveFocus();
+    await userEvent.click(a).catch(() => {});
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });

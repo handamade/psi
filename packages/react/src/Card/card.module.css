@@ -1,0 +1,32 @@
+.card {
+  background: var(--ds-card-bg);
+  border: 1px solid var(--ds-card-border);
+  border-radius: var(--ds-card-radius);
+  overflow: hidden;
+}
+
+.stacked { display: flex; flex-direction: column; gap: var(--ds-card-gap); }
+
+.featured {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--ds-card-gap);
+  align-items: start;
+}
+
+/* breakpoints.md = 960 (D31: build-time constant, baked). */
+@media (max-width: 960px) {
+  .featured { grid-template-columns: 1fr; }
+}
+
+.media { min-width: 0; }
+.body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-card-gap);
+  padding: var(--ds-card-gap);
+}
+
+.hoverLift { transition: transform var(--ds-duration-350) var(--ds-ease-standard); }
+.hoverLift:hover { transform: translateY(-6px); }

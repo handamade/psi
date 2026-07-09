@@ -16,8 +16,6 @@ Import tokens in your app's stylesheet:
 @import "@dku/tokens/base.css";
 @import "@dku/tokens/light.css"; /* or dark.css, acme.css */
 @import "@dku/tokens/components.css";
-
-/* Optional: utilities */
 @import "@dku/tokens/utilities.css";
 ```
 
@@ -30,6 +28,8 @@ Then set the theme on your root element:
 ```
 
 All tokens are CSS custom properties: `--ds-bg-primary`, `--ds-fg-secondary`, `--ds-space-12`, etc.
+
+**utilities.css is required**: it carries `.ds-container`, `.ds-text-*`, `.ds-display-*` utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
 
 ## Creating a custom theme
 

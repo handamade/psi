@@ -7,12 +7,15 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const COMPONENTS = [
   "Button",
   "IconButton",
+  "Card",
   "Input",
   "Select",
   "Checkbox",
   "Switch",
   "Tag",
   "Tooltip",
+  "NavBar",
+  "AspectRatio",
 ];
 
 // Keep a prop when it is declared on the component's own props interface

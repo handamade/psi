@@ -3,6 +3,12 @@ import { render } from "@testing-library/react";
 import { IconPlus } from "./IconPlus.js";
 import { IconClose } from "./IconClose.js";
 import { IconSearch } from "./IconSearch.js";
+import { IconArrowDown } from "./IconArrowDown.js";
+import { IconArrowUpRight } from "./IconArrowUpRight.js";
+import { IconLinkedIn } from "./IconLinkedIn.js";
+import { IconGitHub } from "./IconGitHub.js";
+import { IconX } from "./IconX.js";
+import { IconInstagram } from "./IconInstagram.js";
 
 describe("Icons", () => {
   it("renders with aria-hidden by default", () => {
@@ -49,5 +55,23 @@ describe("Icons", () => {
     const { container } = render(<IconPlus aria-hidden="false" />);
     const svg = container.querySelector("svg")!;
     expect(svg).toHaveAttribute("aria-hidden", "false");
+  });
+
+  it("renders new arrow and social icons", () => {
+    const icons = [
+      <IconArrowDown key="arrow-down" />,
+      <IconArrowUpRight key="arrow-up-right" />,
+      <IconLinkedIn key="linkedin" />,
+      <IconGitHub key="github" />,
+      <IconX key="x" />,
+      <IconInstagram key="instagram" />,
+    ];
+    icons.forEach((icon) => {
+      const { container } = render(icon);
+      const svg = container.querySelector("svg")!;
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg).toHaveAttribute("width", "20");
+      expect(svg).toHaveAttribute("height", "20");
+    });
   });
 });

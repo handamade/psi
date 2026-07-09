@@ -6,17 +6,13 @@
  */
 
 :root {
-  --promo-container: 1120px;
   --promo-pad-x: clamp(20px, 5vw, 48px);
   --promo-section-gap: clamp(72px, 12vh, 136px);
-  --promo-display: clamp(2.625rem, 1.2rem + 6vw, 4.75rem);
-  --promo-h2: clamp(1.625rem, 1.1rem + 2.4vw, 2.375rem);
   --promo-hairline: color-mix(in oklab, var(--ds-fg-primary) 12%, transparent);
   --promo-hairline-faint: color-mix(in oklab, var(--ds-fg-primary) 6%, transparent);
   --promo-shadow-1:
     0 1px 2px color-mix(in oklab, var(--ds-fg-primary) 7%, transparent),
     0 12px 32px color-mix(in oklab, var(--ds-fg-primary) 7%, transparent);
-  --promo-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -33,7 +29,7 @@ body {
   color: var(--ds-fg-primary);
   font: var(--ds-text-16-24-regular);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.25s var(--promo-ease);
+  transition: background-color var(--ds-duration-200) var(--ds-ease-soft);
 }
 
 h1,
@@ -64,7 +60,7 @@ section {
 }
 
 .container {
-  max-width: var(--promo-container);
+  max-width: var(--ds-container-max);
   margin-inline: auto;
   padding-inline: var(--promo-pad-x);
 }
@@ -86,11 +82,11 @@ section {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: var(--ds-z-nav);
   border-bottom: 1px solid var(--promo-hairline-faint);
-  background: color-mix(in oklab, var(--ds-bg-primary) 82%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--ds-scrim-heavy);
+  backdrop-filter: blur(var(--ds-navbar-blur));
+  -webkit-backdrop-filter: blur(var(--ds-navbar-blur));
 }
 
 .site-header .container {
@@ -211,10 +207,8 @@ section {
 }
 
 .hero h1 {
-  font-size: var(--promo-display);
-  line-height: 1.02;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font: var(--ds-display-36-64-black);
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -355,10 +349,8 @@ section {
 }
 
 .section-head h2 {
-  font-size: var(--promo-h2);
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font: var(--ds-display-32-32-extrabold);
+  letter-spacing: -0.01em;
   text-wrap: balance;
 }
 
@@ -774,7 +766,7 @@ section {
 }
 
 .rise {
-  animation: promo-rise 0.7s var(--promo-ease) both;
+  animation: promo-rise var(--ds-duration-600) var(--ds-ease-soft) both;
   animation-delay: var(--rise, 0s);
 }
 

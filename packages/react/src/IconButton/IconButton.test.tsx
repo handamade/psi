@@ -128,4 +128,30 @@ describe("IconButton", () => {
       unmount();
     }
   });
+
+  it("renders an anchor when href is provided", () => {
+    render(
+      <IconButton href="/docs" variant="accent" aria-label="Docs">
+        <StarIcon />
+      </IconButton>,
+    );
+    const a = screen.getByRole("link", { name: "Docs" });
+    expect(a).toHaveAttribute("href", "/docs");
+  });
+
+  it("disabled anchor is non-focusable and suppresses activation (D33)", async () => {
+    const onClick = vi.fn();
+    render(
+      <IconButton href="/docs" disabled aria-label="Docs" onClick={onClick}>
+        <StarIcon />
+      </IconButton>,
+    );
+    const a = screen.getByLabelText("Docs");
+    expect(a).not.toHaveAttribute("href");
+    expect(a).toHaveAttribute("aria-disabled", "true");
+    a.focus();
+    expect(a).not.toHaveFocus();
+    await userEvent.click(a).catch(() => {});
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });

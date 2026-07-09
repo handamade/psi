@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buttonVars } from "../src/components/button.js";
+import { buttonVars, BUTTON_VARIANTS } from "../src/components/button.js";
 
 const VARIANTS = [
   "accent",
@@ -79,8 +79,8 @@ describe("buttonVars", () => {
     expect(Number(activeShift)).toBeGreaterThan(Number(hoverShift));
   });
 
-  it("accent fg is static white", () => {
-    expect(buttonVars["accent-fg"]).toContain("--ds-fg-static-white");
+  it("accent fg is on-accent label token", () => {
+    expect(buttonVars["accent-fg"]).toContain("--ds-fg-on-accent");
   });
 
   it("ghost bg is transparent", () => {
@@ -103,5 +103,11 @@ describe("buttonVars", () => {
 
   it("neutral bg references fill-neutral3", () => {
     expect(buttonVars["neutral-bg"]).toContain("--ds-fill-neutral3");
+  });
+
+  it("outline hover label reuses the accent label binding (D37)", () => {
+    expect(buttonVars["outline-fg-hover"]).toBe("var(--ds-button-accent-fg)");
+    expect(buttonVars["outline-border"]).toBe("var(--ds-border-strong)");
+    expect(BUTTON_VARIANTS).toContain("outline");
   });
 });

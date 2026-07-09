@@ -42,8 +42,8 @@
   border-radius: var(--ds-radius-4);
   background: var(--ds-checkbox-box-bg);
   transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease;
+    background-color var(--ds-duration-150) var(--ds-ease-standard),
+    border-color var(--ds-duration-150) var(--ds-ease-standard);
 }
 
 /* Checked state */

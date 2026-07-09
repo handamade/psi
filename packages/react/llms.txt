@@ -1,6 +1,6 @@
 # @dku/react
 
-8 React 19 components consuming @dku/tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+11 React 19 components consuming @dku/tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -8,7 +8,24 @@
 
 ## Rules for generated code
 - import { Button } from "@dku/react"; import "@dku/react/styles";
-- Also import from @dku/tokens: base.css, a theme css, components.css.
+- Also import from @dku/tokens: base.css, a theme css, components.css, utilities.css.
 - size is a px number (24|32|40|48), never "sm"/"md"/"lg".
-- variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle.
+- variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline.
 - One accent per visual group. danger only for destructive actions.
+
+## Button: href + outline (D33/D34)
+- Button renders as an <a> when given `href` (plus optional `target`/`rel`); disabled anchors get aria-disabled, no href attribute, and pointer-events: none instead of the disabled attribute.
+- `outline` is a bordered-ghost variant: visible structure, no fill until hover — good for marketing CTAs and download buttons.
+- --ds-button-font overrides button typography across all sizes in one declaration; brands can set it via componentOverrides (ember → mono).
+
+## Card
+- <Card variant="stacked" | "featured" media={...} hoverLift>: stacked places media above the body, featured places media beside it (~1.6fr/1fr, stacks under the md breakpoint). hoverLift lifts the card translateY(-6px) over --ds-duration-350. Border uses --ds-border-faint.
+
+## NavBar
+- <NavBar brand={...} actions={...}>{links}</NavBar>: brand slot leading, nav links centered/inline, actions slot trailing (theme switch, CTA). Renders inside .ds-container. Background defaults to --ds-scrim-heavy so content can scroll underneath; border uses --ds-border-faint.
+
+## AspectRatio
+- <AspectRatio ratio={16/10}>{children}</AspectRatio>: a frame div with CSS aspect-ratio set from the numeric ratio prop — wrap images/media to reserve layout space before load. Combine with the .ds-media-tint utility for the brand media-tint treatment.
+
+## Icons (22)
+- Full icon set: IconPlus, IconMinus, IconCheck, IconClose, IconChevronDown, IconChevronRight, IconSearch, IconSettings, IconUser, IconEye, IconEyeOff, IconEdit, IconCopy, IconTrash, IconLoader, IconExternalLink, plus D36 additions — arrows IconArrowDown and IconArrowUpRight, and social glyphs IconLinkedIn, IconGitHub, IconX, IconInstagram.

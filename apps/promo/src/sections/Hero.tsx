@@ -2,9 +2,9 @@ import { useState, type CSSProperties } from "react";
 import { Button } from "@dku/react";
 
 const STATS = [
-  "8 components",
-  "16 icons",
-  "3 themes",
+  "11 components",
+  "22 icons",
+  "4 themes",
   "0 runtime deps",
   "AA enforced at build",
 ];

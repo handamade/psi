@@ -21,6 +21,7 @@ const VARIANTS = [
   "accent-subtle",
   "neutral",
   "neutral-subtle",
+  "outline",
   "ghost",
   "danger",
   "danger-subtle",
@@ -45,7 +46,7 @@ export function Playground() {
       <div className="container">
         <div className="section-head">
           <span className="annot annot--accent">02 · Components</span>
-          <h2>Eight production atoms. All live — try them.</h2>
+          <h2>Eleven production atoms. All live — try them.</h2>
           <p className="lede">
             React 19, zero runtime dependencies, CSS Modules over
             component-level tokens. Every prop below ships in a
@@ -56,7 +57,7 @@ export function Playground() {
         <div className="playground">
           <div className="card pg-buttons">
             <h3>
-              Button · 7 variants × 4 sizes
+              Button · 8 variants × 4 sizes
               <a className="sb-link" href={storybookDocs("Components/Button")}>
                 storybook →
               </a>
