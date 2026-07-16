@@ -16,7 +16,7 @@
 - Pixel-true names, rem values (D13): `--ds-space-96` = 6rem; display combos named by clamp endpoints `--ds-display-{min}-{max}-{weight}` (D28).
 - The DS ships **no font files** (D29) and **no keyframes** (WS3 non-goal). Roles, durations, easings only.
 - Reduced motion = zero `--ds-duration-*` under `prefers-reduced-motion: reduce` in `utilities.css` (D30).
-- Breakpoints are build-time constants exported from `@dku/tokens`, baked into emitted media queries (D31).
+- Breakpoints are build-time constants exported from `@handamade/tokens`, baked into emitted media queries (D31).
 - Scrim tokens are surfaces, exempt from the AA text gate (D32) — they are simply never declared as text pairs.
 - D33 guardrail: disabled anchors must be **non-focusable** and must **suppress activation** (`aria-disabled="true"`, no `href` attribute, `pointer-events: none`).
 - D34 guardrail: only documented component tokens are overrideable; overrides must not break accessibility, sizing contracts, or interaction states.
@@ -68,7 +68,7 @@ docs/superpowers/plans/assets/2026-07-09-site-scale/  ▸ screenshots
 Verification commands used throughout (run from `~/Projects/dku/ds`):
 
 ```bash
-pnpm --filter @dku/tokens build      # codegen + contrast gate (throws on failure)
+pnpm --filter @handamade/tokens build      # codegen + contrast gate (throws on failure)
 pnpm test                            # vitest workspace
 pnpm lint:css                        # stylelint token rule
 pnpm build                           # full workspace build
@@ -152,7 +152,7 @@ In `build.ts`, import `assembleCustomerTheme` from `../src/themes/customers/inde
   ])),
 ```
 
-- [ ] **Step 4: Verify** — rerun the test file → PASS; `pnpm --filter @dku/tokens build` → green (acme unchanged).
+- [ ] **Step 4: Verify** — rerun the test file → PASS; `pnpm --filter @handamade/tokens build` → green (acme unchanged).
 - [ ] **Step 5: Commit** — `git add -A && git commit -m "feat(tokens): customer themes declare base light|dark (D27)"`
 
 ### Task 2: `new-theme --base dark` scaffolder
@@ -257,7 +257,7 @@ In `contrast-matrix.ts`, replace the first `componentLabelPairs` entry:
 
 Rebind in component token files: `button.ts` `"accent-fg": "var(--ds-fg-on-accent)"`; `tag.ts` `"accent-fg": "var(--ds-fg-on-accent)"`; `checkbox.ts` `"check-fg": "var(--ds-fg-on-accent)"`. **Leave `switch.ts thumb-bg` as `fgStaticWhite`** — the thumb also sits on the unchecked neutral track (not a label; a dark thumb vanishes on dark tracks).
 
-- [ ] **Step 4: Fix ripple + verify.** Update token-name expectations in `light-theme.test.ts` / `dark-theme.test.ts` (add `fgOnAccent` wherever the token list is asserted) and the `accent-fg` value in `button-tokens.test.ts`. Then `pnpm vitest run packages/tokens && pnpm --filter @dku/tokens build` → all PASS, gate green.
+- [ ] **Step 4: Fix ripple + verify.** Update token-name expectations in `light-theme.test.ts` / `dark-theme.test.ts` (add `fgOnAccent` wherever the token list is asserted) and the `accent-fg` value in `button-tokens.test.ts`. Then `pnpm vitest run packages/tokens && pnpm --filter @handamade/tokens build` → all PASS, gate green.
 - [ ] **Step 5: Commit** — `git commit -am "feat(tokens): fgOnAccent semantic label token; gate follows actual bindings (D37)"`
 
 ### Task 4: The ember brand
@@ -357,9 +357,9 @@ import { emberPalette, emberSlots, emberOverrides } from "./ember.js";
   ember: { palette: emberPalette, slots: emberSlots, base: "dark", overrides: emberOverrides },
 ```
 
-- [ ] **Step 4: Verify** — `pnpm vitest run packages/tokens/__tests__/ember-theme.test.ts` → PASS. `pnpm --filter @dku/tokens build` → `contrast check passed for ember`, `wrote dist/ember.css`. If any pair fails, the build prints the pair and actual ratio — fix formula, don't relax the gate.
+- [ ] **Step 4: Verify** — `pnpm vitest run packages/tokens/__tests__/ember-theme.test.ts` → PASS. `pnpm --filter @handamade/tokens build` → `contrast check passed for ember`, `wrote dist/ember.css`. If any pair fails, the build prints the pair and actual ratio — fix formula, don't relax the gate.
 
-- [ ] **Step 5: Storybook wiring.** `preview.ts`: add `import "@dku/tokens/ember.css";` and toolbar item `{ value: "ember", title: "Ember", icon: "flame" }`. `token-reader.ts`: add `import resolvedEmber from "@dku/tokens/resolved/ember.json";`, extend `ThemeName` with `"ember"`, add `ember: resolvedEmber as ResolvedTheme` to `RESOLVED`.
+- [ ] **Step 5: Storybook wiring.** `preview.ts`: add `import "@handamade/tokens/ember.css";` and toolbar item `{ value: "ember", title: "Ember", icon: "flame" }`. `token-reader.ts`: add `import resolvedEmber from "@handamade/tokens/resolved/ember.json";`, extend `ThemeName` with `"ember"`, add `ember: resolvedEmber as ResolvedTheme` to `RESOLVED`.
 
 - [ ] **Step 6: Verify + commit** — `pnpm build && pnpm test` green; `git commit -am "feat(tokens): ember dark-first brand, gated (WS1, D27, D37)"`
 
@@ -560,7 +560,7 @@ In `emitUtilitiesCSS` after the typography utilities:
 ```
 
 - [ ] **Step 4: Storybook.** `token-reader.ts`: add `display` to the `ResolvedTheme` interface (`display: { name: string; min: number; max: number; vw: number; lineHeight: number; weight: string; tracking: number; cssWeight: number }[]`) and export `export const docDisplay = RESOLVED.light.display;`. Note: rebuild tokens first so the JSON carries the field. Create `DisplayTokens.stories.tsx` (mirror TypographyTokens structure, title `"Tokens and Assets/Display"`, iterate `docDisplay`, specimen `<span className={"ds-display-" + d.name}>Aa Ember Field</span>` plus a code label `display-{d.name}`).
-- [ ] **Step 5: Verify** — `pnpm --filter @dku/tokens build && pnpm test` green; `pnpm --filter storybook build` compiles.
+- [ ] **Step 5: Verify** — `pnpm --filter @handamade/tokens build && pnpm test` green; `pnpm --filter storybook build` compiles.
 - [ ] **Step 6: Commit** `feat(tokens): fluid display tier --ds-display-{min}-{max}-{weight} (D28)`.
 
 ### Task 9: Brand font assignment (D29) + ember fonts
@@ -792,7 +792,7 @@ Same pattern for icon-button (background-color, color), input/select (border-col
 **Files:** Create `apps/storybook/src/token-docs/MotionTokens.stories.tsx`; modify `token-reader.ts`
 
 - [ ] **Step 1: Implement.** `token-reader.ts`: extend `ResolvedTheme` with `scales` (add `motion: { durations: number[]; easings: Record<string, string> }` to the existing scales shape — the interface currently omits `scales`; add `scales: { space: number[]; size: number[]; radius: number[]; motion: { durations: number[]; easings: Record<string, string> }; layout?: unknown }`) and export `export const docMotion = RESOLVED.light.scales.motion;`. New story (title `"Tokens and Assets/Motion"`): table of `--ds-duration-*` / `--ds-ease-*` rows (name, value) and a hover-demo square per easing using `transition: transform var(--ds-duration-350) var(--ds-ease-<name>)`, plus a note paragraph quoting D30.
-- [ ] **Step 2: Verify** — `pnpm --filter @dku/tokens build && pnpm --filter storybook build` green.
+- [ ] **Step 2: Verify** — `pnpm --filter @handamade/tokens build && pnpm --filter storybook build` green.
 - [ ] **Step 3: Commit** `docs(storybook): motion token page (WS3)`.
 
 **Milestone 3 gate:** `pnpm build` · `pnpm test` · `pnpm lint` (incl. new literal-duration rule) · Storybook builds.
@@ -924,7 +924,7 @@ In `emitUtilitiesCSS` before the reduced-motion block:
 ```ts
   layout: {
     breakpoints: { sm: 560, md: 960 },
-    note: "Breakpoints are build-time constants (D31): import { breakpoints } from '@dku/tokens/types'. CSS vars cannot drive @media.",
+    note: "Breakpoints are build-time constants (D31): import { breakpoints } from '@handamade/tokens/types'. CSS vars cannot drive @media.",
     container: "Use .ds-container — max-width 1312px, gutter 40px stepping to 24px under md.",
     zIndex: { nav: 100, overlay: 1000, tooltip: 1100 },
   },
@@ -1764,14 +1764,14 @@ cp ~/Projects/dku/ds/packages/tokens/dist/{base,utilities,ember}.css vendor/dku-
 - [ ] **Step 4: AGENTS.md** — amend the "single-file" working rule to note the vendored-tokens exception; add:
 
 ```markdown
-- **Design tokens** are vendored from `@dku/tokens` (`vendor/dku-tokens/`:
+- **Design tokens** are vendored from `@handamade/tokens` (`vendor/dku-tokens/`:
   base.css, ember.css, utilities.css; `<html data-ds-theme="ember">`). Resync:
   `cp ~/Projects/dku/ds/packages/tokens/dist/{base,utilities,ember}.css vendor/dku-tokens/`
   Never hand-edit vendored files.
 - **Browser floor** (OKLCH relative color): Chrome/Edge 119+, Safari 18+, Firefox 128+.
 ```
 
-- [ ] **Step 5: Verify + commit** — page still renders identically (tokens loaded but unused); commit `Vendor @dku/tokens CSS (ember theme) + agent rules`.
+- [ ] **Step 5: Verify + commit** — page still renders identically (tokens loaded but unused); commit `Vendor @handamade/tokens CSS (ember theme) + agent rules`.
 
 ### Task 31: Portfolio — normalization to DS tokens
 
@@ -1848,7 +1848,7 @@ grep -nE "transition[^;]*[0-9]\.[0-9]+s" index.html # expect: no matches
 grep -n "#ff7847\|#f3ede6\|#100d0b" index.html      # expect: only JS canvas / meta lines
 ```
 
-- [ ] **Step 6: Commit** `Adopt @dku/tokens: normalize colors, type, motion, layout to --ds-* (ember)`.
+- [ ] **Step 6: Commit** `Adopt @handamade/tokens: normalize colors, type, motion, layout to --ds-* (ember)`.
 
 ### Task 32: Portfolio verification + activity log
 
@@ -1859,7 +1859,7 @@ grep -n "#ff7847\|#f3ede6\|#100d0b" index.html      # expect: only JS canvas / m
 
 ```markdown
 ### 2026-07-09 — DS tokens pilot (branch `ds-tokens-pilot`)
-- Adopted `@dku/tokens` (ember theme, CSS-only, no build step): vendored
+- Adopted `@handamade/tokens` (ember theme, CSS-only, no build step): vendored
   base/ember/utilities CSS, `data-ds-theme="ember"`, replaced hand-rolled
   `:root` vars with `--ds-*` (colors, hairlines, scrims, serif/mono/display
   type, durations/easings, container/gutter, section rhythm, media tint).
@@ -1912,8 +1912,8 @@ ls packages/react/docs | grep -i -E "card|navbar|aspect"     # expect three doc 
 
 ```markdown
 ---
-"@dku/tokens": minor
-"@dku/react": minor
+"@handamade/tokens": minor
+"@handamade/react": minor
 ---
 
 Site-scale & portfolio readiness (D27–D37): dark-first customer brands + ember

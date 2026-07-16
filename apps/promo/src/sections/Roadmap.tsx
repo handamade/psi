@@ -1,4 +1,4 @@
-import { IconCheck, IconChevronRight } from "@dku/react";
+import { IconCheck, IconChevronRight } from "@handamade/react";
 
 const SHIPPED = [
   ["11 atoms, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, NavBar, AspectRatio"],
@@ -11,7 +11,7 @@ const SHIPPED = [
 const NEXT = [
   ["Custom listbox Select", "v1 ships a styled native <select>; a fully custom listbox is v2"],
   ["Tooltip on the Popover API", "native anchor positioning once support settles"],
-  ["@dku/mcp", "tokens and guidance as queryable tools for agents"],
+  ["@handamade/mcp", "tokens and guidance as queryable tools for agents"],
   ["Visual regression", "screenshot testing across all themes"],
 ] as const;
 

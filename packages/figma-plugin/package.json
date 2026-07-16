@@ -1,5 +1,5 @@
 {
-  "name": "@dku/figma-plugin",
+  "name": "@handamade/figma-plugin",
   "private": true,
   "type": "module",
   "scripts": {

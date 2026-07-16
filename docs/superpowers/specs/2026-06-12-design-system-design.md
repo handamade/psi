@@ -27,7 +27,7 @@ A themeable design system (Figma + code) for Dmytro's own projects and customer 
 | 8 | Intra-layer references | Allowed, cycle-checked by codegen | Enables fg-derived tints and self-derived hover states (principle 3) |
 | 9 | Palette → theme indirection | Slot mapping `{ink, canvas, accent, …}` | Customer brands keep their own color names; formulas never change |
 | 10 | Figma sync mechanism | In-repo Figma plugin; MCP for bootstrap only | Works on any Figma plan (REST write is Enterprise-only); no AI-session dependency in the team workflow |
-| 11 | Token definition home | All tiers live in `@dku/tokens` | React consumes generated artifacts only; Figma sync is complete from one source |
+| 11 | Token definition home | All tiers live in `@handamade/tokens` | React consumes generated artifacts only; Figma sync is complete from one source |
 | 12 | Emitted CSS structure | Cascade layers `ds.base → ds.theme → ds.components → ds.utilities` | Consumer overrides win predictably |
 | 13 | Scale naming | Pixel-true names, rem values | `ds-gap-8` = visual 8px; `size={32}`; new entries are additive forever |
 | 14 | Variant naming | Flat: `accent / neutral / danger` + `-subtle` / `ghost` | No primary/secondary hierarchy (principle 4) |
@@ -59,19 +59,19 @@ A themeable design system (Figma + code) for Dmytro's own projects and customer 
 pnpm-workspace monorepo `ds/`:
 
 ```
-packages/tokens       @dku/tokens   — formula DSL, ALL token definitions (palette,
+packages/tokens       @handamade/tokens   — formula DSL, ALL token definitions (palette,
                                       themes, scales, component tokens), codegen,
                                       emitted CSS + resolved JSON + TS types
-packages/react        @dku/react    — 8 components, CSS Modules, peer React 19;
-                                      consumes ONLY generated artifacts from @dku/tokens
+packages/react        @handamade/react    — 8 components, CSS Modules, peer React 19;
+                                      consumes ONLY generated artifacts from @handamade/tokens
 packages/figma-plugin private       — in-repo Figma plugin that upserts variables
                                       from resolved JSON (works on any Figma plan)
 apps/storybook        not published — docs, generated token tables, workbench
 ```
 
-- CSS prefix: `--ds-`; class prefix `ds-`. npm scope: `@dku`.
+- CSS prefix: `--ds-`; class prefix `ds-`. npm scope: `@handamade`.
 - Two published packages so CSS-only consumers (e.g. the portfolio) can use
-  `@dku/tokens` without React.
+  `@handamade/tokens` without React.
 - Versioning: changesets, semver. Consuming repos install from the registry;
   during development, `pnpm pack`/file deps.
 
@@ -221,7 +221,7 @@ compositions belong to consuming apps, keeping this a system, not a UI kit.
    - `components/{name}.vars.css` — component token blocks (ds.components)
    - `utilities.css` — generated utility classes (ds.utilities)
 5. **Emit types** — token-name unions, `ThemeConfig`, size/variant literal types
-   consumed by `@dku/react` props.
+   consumed by `@handamade/react` props.
 
 Key property: the live CSS keeps the `oklch(from var(…) calc(…))` form (runtime
 palette swap continues to cascade), while resolved JSON carries the identical
@@ -249,10 +249,10 @@ Root `pnpm dev` = tokens watch + Storybook.
   Figma library recolors.
 - Future (out of scope v1): Tokens Studio–compatible export from resolved JSON.
 
-## Components (`@dku/react`)
+## Components (`@handamade/react`)
 
 Per-component folder: `Button.tsx`, `button.module.css`, `Button.stories.tsx`,
-`Button.test.tsx` (token definitions live in `@dku/tokens/src/components/button.ts`).
+`Button.test.tsx` (token definitions live in `@handamade/tokens/src/components/button.ts`).
 
 Conventions:
 
@@ -376,7 +376,7 @@ motion, semantic HTML) — those are covered by component tests and addon-a11y.
 2. Build emits `themes/acme.css` + resolved JSON; contrast matrix runs against
    the customer's colors automatically.
 3. Figma plugin sync adds an "Acme" mode to the variable collection.
-4. Customer app: `import '@dku/tokens/themes/acme.css'` +
+4. Customer app: `import '@handamade/tokens/themes/acme.css'` +
    `<html data-ds-theme="acme">`.
 
 ## AI consumption (added 2026-07-06)
@@ -390,11 +390,11 @@ and therefore unable to drift.
 | Artifact | Location | Source |
 |---|---|---|
 | `llms.txt` | each package root | hand-written index (short, stable) |
-| Resolved tokens + formulas | `@dku/tokens/resolved/{theme}.json` | resolver (exists) |
-| DTCG export | `@dku/tokens/dtcg/{theme}.json` | new emitter over resolved data (decision 24) |
-| Usage guidance as data | `@dku/tokens/guidance.json` | `src/guidance.ts` — variant intent, state derivation, typography selection |
-| Component manifest | `@dku/react/manifest.json` | react-docgen-typescript over component sources |
-| Per-component docs | `@dku/react/docs/*.md` | generated from manifest + guidance |
+| Resolved tokens + formulas | `@handamade/tokens/resolved/{theme}.json` | resolver (exists) |
+| DTCG export | `@handamade/tokens/dtcg/{theme}.json` | new emitter over resolved data (decision 24) |
+| Usage guidance as data | `@handamade/tokens/guidance.json` | `src/guidance.ts` — variant intent, state derivation, typography selection |
+| Component manifest | `@handamade/react/manifest.json` | react-docgen-typescript over component sources |
+| Per-component docs | `@handamade/react/docs/*.md` | generated from manifest + guidance |
 | Package READMEs | each package root | hand-written intro linking the above |
 
 Rules:
@@ -404,7 +404,7 @@ Rules:
 - The variant-intent table and state-derivation chain in this spec move to
   `src/guidance.ts` as the canonical machine-readable copy; the spec's "Usage
   guidance" section remains the human narrative.
-- v2 candidate: `@dku/mcp` server exposing the same artifacts as queryable
+- v2 candidate: `@handamade/mcp` server exposing the same artifacts as queryable
   tools (decision 25).
 
 ## Error handling summary

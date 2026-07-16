@@ -1,5 +1,5 @@
 {
-  "name": "@dku/react",
+  "name": "@handamade/react",
   "version": "0.2.0",
   "type": "module",
   "main": "dist/index.js",
@@ -23,12 +23,12 @@
     "dev": "vite build --watch"
   },
   "peerDependencies": {
-    "@dku/tokens": ">=0.2.0 <1.0.0",
+    "@handamade/tokens": ">=0.2.0 <1.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@dku/tokens": "workspace:*",
+    "@handamade/tokens": "workspace:*",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",

@@ -15,7 +15,7 @@ Process requirements:
 5. Quality gates are listed at the end of the spec — treat every one as blocking. The contrast gate must pass for light, dark, acme, AND the new ember theme; the stylelint token rule must stay green after tokenizing transitions/z-index.
 6. WS6 crosses repos: the portfolio pilot edits `~/Projects/dku/portfolio` (branch `ds-tokens-pilot` there; read its `AGENTS.md` first and append an activity-log entry per its rules). Vendor the generated CSS — do not add a build step to the portfolio.
 7. Visual verification: use the preview tooling for promo and portfolio at 1440px and 375px; archive before/after screenshots referenced from the plan doc. The WS6 normalization table in the spec defines which small pixel shifts are intentional.
-8. When all workstreams pass: update the spec status to Implemented, add the changeset (minor bump for @dku/tokens and @dku/react), regenerate all AI artifacts (guidance.json, DTCG, manifest, docs, llms.txt), then use superpowers:finishing-a-development-branch and stop for my review before any merge or PR.
+8. When all workstreams pass: update the spec status to Implemented, add the changeset (minor bump for @handamade/tokens and @handamade/react), regenerate all AI artifacts (guidance.json, DTCG, manifest, docs, llms.txt), then use superpowers:finishing-a-development-branch and stop for my review before any merge or PR.
 
 Constraints and reminders:
 

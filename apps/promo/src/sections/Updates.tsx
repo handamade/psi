@@ -1,4 +1,4 @@
-import { Tag, type TagProps } from "@dku/react";
+import { Tag, type TagProps } from "@handamade/react";
 
 import { UPDATES, type UpdateEntry } from "../content/updates";
 

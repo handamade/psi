@@ -1,4 +1,4 @@
-# @dku/tokens
+# @handamade/tokens
 
 OKLCH formula-based design tokens. Code is the source of truth; all artifacts generated.
 
@@ -22,7 +22,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 ## Layout (--ds-container-max, --ds-gutter, --ds-z-*)
 - .ds-container: max-width 1312px, gutter 40px stepping to 24px under the md breakpoint.
 - --ds-z-nav (100), --ds-z-overlay (1000), --ds-z-tooltip (1100).
-- Breakpoints (sm 560 / md 960) are build-time constants (D31), not CSS vars: `import { breakpoints } from "@dku/tokens/types"` for any @media-driven JS/CSS-in-JS.
+- Breakpoints (sm 560 / md 960) are build-time constants (D31), not CSS vars: `import { breakpoints } from "@handamade/tokens/types"` for any @media-driven JS/CSS-in-JS.
 
 ## Typography: display, serif, mono
 - Fluid display tier: --ds-display-{min}-{max}-{weight} (e.g. --ds-display-56-128-black), clamp-based and pixel-true at both endpoints; pair with the matching .ds-display-* utility class for tracking/uppercase.

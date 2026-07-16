@@ -35,10 +35,10 @@ importers:
 
   apps/promo:
     dependencies:
-      '@dku/react':
+      '@handamade/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@dku/tokens':
+      '@handamade/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       react:
@@ -66,10 +66,10 @@ importers:
 
   apps/storybook:
     dependencies:
-      '@dku/react':
+      '@handamade/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@dku/tokens':
+      '@handamade/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       react:
@@ -106,7 +106,7 @@ importers:
 
   packages/react:
     devDependencies:
-      '@dku/tokens':
+      '@handamade/tokens':
         specifier: workspace:*
         version: link:../tokens
       '@testing-library/jest-dom':

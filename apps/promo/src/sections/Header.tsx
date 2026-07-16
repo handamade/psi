@@ -1,4 +1,4 @@
-import { Button } from "@dku/react";
+import { Button } from "@handamade/react";
 
 import { STORYBOOK_BASE } from "../lib/storybook";
 import { THEMES, type ThemeName } from "../theme";

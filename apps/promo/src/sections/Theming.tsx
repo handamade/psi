@@ -1,4 +1,4 @@
-import { Button, IconCheck, Switch, Tag } from "@dku/react";
+import { Button, IconCheck, Switch, Tag } from "@handamade/react";
 
 import type { ThemeName } from "../theme";
 

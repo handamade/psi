@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from "react";
-import { Button } from "@dku/react";
+import { Button } from "@handamade/react";
 
 const STATS = [
   "11 components",
@@ -19,7 +19,7 @@ export function Hero() {
       <div className="container">
         <div>
           <p className="hero-eyebrow annot annot--accent rise">
-            @dku · OKLCH design system
+            @handamade · OKLCH design system
           </p>
           <h1 className="rise" style={{ "--rise": "0.05s" } as CSSProperties}>
             Color isn&apos;t picked.

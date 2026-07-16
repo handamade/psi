@@ -1,13 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import "@dku/tokens/base.css";
-import "@dku/tokens/light.css";
-import "@dku/tokens/dark.css";
-import "@dku/tokens/acme.css";
-import "@dku/tokens/components.css";
-import "@dku/tokens/utilities.css";
-import "@dku/react/styles";
+import "@handamade/tokens/base.css";
+import "@handamade/tokens/light.css";
+import "@handamade/tokens/dark.css";
+import "@handamade/tokens/acme.css";
+import "@handamade/tokens/components.css";
+import "@handamade/tokens/utilities.css";
+import "@handamade/react/styles";
 import "./promo.css";
 
 import { App } from "./App";

@@ -1,15 +1,15 @@
-# @dku/react
+# @handamade/react
 
-11 React 19 components consuming @dku/tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
+11 React 19 components consuming @handamade/tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
 
 ## Installation
 
-**Peer dependencies:** `react@^19.0.0`, `react-dom@^19.0.0`, `@dku/tokens@workspace:*`
+**Peer dependencies:** `react@^19.0.0`, `react-dom@^19.0.0`, `@handamade/tokens@workspace:*`
 
 **In workspace:** already installed. **External:** install from the private registry.
 
 ```bash
-pnpm add react react-dom @dku/tokens
+pnpm add react react-dom @handamade/tokens
 ```
 
 ## Usage
@@ -17,13 +17,13 @@ pnpm add react react-dom @dku/tokens
 Import components and their styles:
 
 ```tsx
-import { Button } from "@dku/react";
-import "@dku/react/styles";
+import { Button } from "@handamade/react";
+import "@handamade/react/styles";
 
 // Also import token styles in your app root
-import "@dku/tokens/base.css";
-import "@dku/tokens/light.css"; // or dark.css
-import "@dku/tokens/components.css";
+import "@handamade/tokens/base.css";
+import "@handamade/tokens/light.css"; // or dark.css
+import "@handamade/tokens/components.css";
 
 export default function App() {
   return <Button size={32} variant="accent">Click me</Button>;

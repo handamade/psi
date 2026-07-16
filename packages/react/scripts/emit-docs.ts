@@ -31,14 +31,14 @@ let guidance: Guidance;
 try {
   components = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8")).components;
 } catch {
-  console.error("[react] ERROR: dist/manifest.json not found. Run `pnpm --filter @dku/tokens build` and `pnpm --filter @dku/react build` first.");
+  console.error("[react] ERROR: dist/manifest.json not found. Run `pnpm --filter @handamade/tokens build` and `pnpm --filter @handamade/react build` first.");
   process.exit(1);
 }
 
 try {
   guidance = JSON.parse(readFileSync(join(root, "../tokens/dist/guidance.json"), "utf8"));
 } catch {
-  console.error("[react] ERROR: ../tokens/dist/guidance.json not found. Run `pnpm --filter @dku/tokens build` first.");
+  console.error("[react] ERROR: ../tokens/dist/guidance.json not found. Run `pnpm --filter @handamade/tokens build` first.");
   process.exit(1);
 }
 

@@ -18,7 +18,7 @@ export const UPDATES: UpdateEntry[] = [
     date: "2026-07-08",
     tag: "site",
     title: "The design system gets a public home",
-    body: "This website — built with DS itself — plus the full Storybook, published side by side. The page you are reading is a consumer app of @dku/tokens and @dku/react.",
+    body: "This website — built with DS itself — plus the full Storybook, published side by side. The page you are reading is a consumer app of @handamade/tokens and @handamade/react.",
     link: { label: "Browse the Storybook", href: "/storybook/" },
   },
   {

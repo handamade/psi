@@ -17,7 +17,7 @@ The tell: `apps/promo/src/promo.css:1-6` hand-rolls `--promo-container`, sticky 
 3. Typography supports **font roles** (sans/serif/mono/display, brand-assignable) and a **fluid display tier**.
 4. New token categories: **motion** (durations, easings, reduced-motion convention), **layout/viewport** (container, gutter, breakpoints, z-index), **hairline/scrim alphas**.
 5. New components: **Button `href` polymorphism + `outline` variant, Card, NavBar, AspectRatio**; new icons (arrows + social).
-6. **Consumer pilot:** portfolio adopts `@dku/tokens` (CSS-only, stays no-build); promo migrates duplicated `--promo-*` primitives to DS tokens.
+6. **Consumer pilot:** portfolio adopts `@handamade/tokens` (CSS-only, stays no-build); promo migrates duplicated `--promo-*` primitives to DS tokens.
 
 ## Non-goals (v1.2)
 
@@ -140,7 +140,7 @@ export const container = { max: 1312, gutter: 40, gutterNarrow: 24 };
 export const zIndex = { nav: 100, overlay: 1000, tooltip: 1100 };
 ```
 
-- CSS vars can't drive `@media`, so breakpoints are **constants**: exported from `@dku/tokens` (JS + `./types`), included in `guidance.json` and DTCG, and baked into emitted utility media queries (D31).
+- CSS vars can't drive `@media`, so breakpoints are **constants**: exported from `@handamade/tokens` (JS + `./types`), included in `guidance.json` and DTCG, and baked into emitted utility media queries (D31).
 - Emit `--ds-container-max`, `--ds-gutter` (40px, drops to 24px under `md` via media query in utilities), `--ds-z-*`.
 - New utility: `.ds-container` (`max-width: var(--ds-container-max); margin-inline: auto; padding-inline: var(--ds-gutter)`).
 - `tooltip.module.css` migrates `z-index: 1000` → `var(--ds-z-tooltip)`.
@@ -151,7 +151,7 @@ export const zIndex = { nav: 100, overlay: 1000, tooltip: 1100 };
 - Semantic layer (`themes/light.ts` + `dark.ts`): add `borderFaint` (ink @ alpha 0.08) alongside existing `borderNeutral` 0.15 / `borderStrong` 0.3.
 - New scrim tokens (canvas-derived): `scrimSoft` (alpha 0.25), `scrimMedium` (0.35), `scrimHeavy` (0.82) — the DSL's `alpha` field already supports this. Add to AA-exempt list if the gate flags non-text surfaces (scrims are not text pairs).
 
-## WS5 — Components & icons (`@dku/react`)
+## WS5 — Components & icons (`@handamade/react`)
 
 ### Button: `href` + `outline` variant
 
@@ -219,12 +219,13 @@ New component (`packages/react/src/navbar/`):
 - **D28** Display combos are named pixel-true at both clamp endpoints (`--ds-display-{min}-{max}-{weight}`); tracking and uppercase live in `.ds-display-*` utilities because `font:` shorthand can't carry them.
 - **D29** Font roles (sans/serif/mono/display) are brand-level (`CustomerTheme.fonts`), not theme-level; the DS never ships font files.
 - **D30** Reduced motion is implemented by zeroing `--ds-duration-*` under `prefers-reduced-motion: reduce` in `utilities.css`; components/consumers get compliance for free by using duration tokens.
-- **D31** Breakpoints are build-time constants exported from `@dku/tokens` (not CSS vars — `@media` can't consume vars); emitted utilities bake the media queries.
+- **D31** Breakpoints are build-time constants exported from `@handamade/tokens` (not CSS vars — `@media` can't consume vars); emitted utilities bake the media queries.
 - **D32** Scrim tokens are canvas-alpha semantic tokens and are exempt from the AA text-contrast gate (they are surfaces, not text pairs).
 - **D33** `Button`/`IconButton` render `<a>` when `href` is present; anchor "disabled" = `aria-disabled` + `pointer-events: none`. No separate LinkButton component.
 - **D34** Brands may override *component* tokens (e.g. `--ds-card-radius: 0`, `--ds-button-font`) via their `overrides`/emitted theme block — component tokens are part of the themeable surface.
 - **D35** Media tint is a token + utility recipe, not a component; the filter chain is brand-defined.
 - **D36** Social icons (LinkedIn/GitHub/X/Instagram) ship as ordinary monochrome icon components.
+- **D38** (2026-07-16, user-approved) npm scope is `@handamade`, not `@dku`: the org name `dku` is unavailable on npmjs.com, while `@handamade` is the maintainer's username scope (no org required) and matches the GitHub org, keeping GitHub Packages open as a fallback registry. CSS prefixes (`--ds-`, `.ds-`) and the repo/folder names are unchanged — only the package scope moved.
 - **D37** (added at plan review, user-approved) Solid accent labels bind to semantic `fgOnAccent` (default: alias of fg-static-white; ember: fg-static-black's formula). The gate pair follows the binding — white on `#ff7847` is 2.62:1, and "adjusting emberAccent L minimally" would have required 0.724 → ~0.58, destroying the brand color for a pairing the brand never renders (its CTA hover is dark-on-ember, 6.12:1). The outline variant's hover label reuses the accent binding because the literal canvas-on-accent fails AA in default light (4.35) and dark (3.92). Switch `thumb-bg` stays fg-static-white (the thumb also sits on the unchecked neutral track; not a text label).
 
 ## Quality gates (all must pass per milestone)

@@ -4,11 +4,11 @@ const QUICK_START = `pnpm install
 pnpm build     # tokens + components + docs
 pnpm dev       # tokens watcher + storybook`;
 
-const USAGE = `import { Button } from "@dku/react";
-import "@dku/react/styles";
-import "@dku/tokens/base.css";
-import "@dku/tokens/light.css";
-import "@dku/tokens/components.css";
+const USAGE = `import { Button } from "@handamade/react";
+import "@handamade/react/styles";
+import "@handamade/tokens/base.css";
+import "@handamade/tokens/light.css";
+import "@handamade/tokens/components.css";
 
 <html data-ds-theme="light">`;
 
@@ -40,7 +40,7 @@ export function Footer() {
         </nav>
         <div className="footer-note">
           <span className="annot">
-            DS · @dku — docs in packages/*/README.md and the design spec
+            DS · @handamade — docs in packages/*/README.md and the design spec
           </span>
           <span className="annot">
             Built with DS itself (apps/promo) — flip the theme and watch every

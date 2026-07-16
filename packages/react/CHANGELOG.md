@@ -1,4 +1,4 @@
-# @dku/react
+# @handamade/react
 
 ## 0.2.0
 
@@ -14,7 +14,7 @@
 ### Patch Changes
 
 - Updated dependencies [fe67817]
-  - @dku/tokens@0.2.0
+  - @handamade/tokens@0.2.0
 
 ## 0.1.0
 
@@ -22,7 +22,7 @@
 
 - 8c10d4b: AI-readability remediation: component-token layer, pixel-true typography, contrast gate hardening, palette scoping/theme registry, Figma parity, and AI-facing artifacts.
 
-  **@dku/tokens**
+  **@handamade/tokens**
 
   - Added a component-token layer (`dist/components/*.vars.css` + `dist/components.css`) providing per-component CSS custom properties (button, input, select, checkbox, switch, tag, tooltip) derived from the semantic token layer.
   - Typography combos are now pixel-true, single-property `font` shorthands named `{size}-{lineHeight}-{weight}`. **Migration:** the old `--ds-text-{xs|sm|base|lg|...}-*` variables are replaced by `--ds-text-{size}-{lh}-{weight}` (e.g. `--ds-text-14-20-regular`). Update any consumers referencing the old scale names.
@@ -33,7 +33,7 @@
   - Added palette scoping and a customer theme registry so per-customer themes (e.g. `acme`) can be layered without leaking into the base semantic palette.
   - New AI-facing build artifacts: `guidance.json` (machine-readable usage guidance), DTCG-format token exports (`dist/dtcg/*.json`), a component `manifest.json`, generated per-component `docs/*.md`, and `llms.txt` files at the repo and package roots.
 
-  **@dku/react**
+  **@handamade/react**
 
   - Consumes the new component-token layer and pixel-true typography variables.
   - Tooltip accessibility fixes (keyboard/focus and ARIA behavior).
@@ -44,4 +44,4 @@
 ### Patch Changes
 
 - Updated dependencies [8c10d4b]
-  - @dku/tokens@0.1.0
+  - @handamade/tokens@0.1.0

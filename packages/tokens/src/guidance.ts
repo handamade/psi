@@ -36,7 +36,7 @@ export const guidance = {
   },
   layout: {
     breakpoints: { sm: 560, md: 960 },
-    note: "Breakpoints are build-time constants (D31): import { breakpoints } from '@dku/tokens/types'. CSS vars cannot drive @media.",
+    note: "Breakpoints are build-time constants (D31): import { breakpoints } from '@handamade/tokens/types'. CSS vars cannot drive @media.",
     container: "Use .ds-container — max-width 1312px, gutter 40px stepping to 24px under md.",
     zIndex: { nav: 100, overlay: 1000, tooltip: 1100 },
   },

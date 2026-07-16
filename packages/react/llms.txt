@@ -1,14 +1,14 @@
-# @dku/react
+# @handamade/react
 
-11 React 19 components consuming @dku/tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+11 React 19 components consuming @handamade/tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
-- import { Button } from "@dku/react"; import "@dku/react/styles";
-- Also import from @dku/tokens: base.css, a theme css, components.css, utilities.css.
+- import { Button } from "@handamade/react"; import "@handamade/react/styles";
+- Also import from @handamade/tokens: base.css, a theme css, components.css, utilities.css.
 - size is a px number (24|32|40|48), never "sm"/"md"/"lg".
 - variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline.
 - One accent per visual group. danger only for destructive actions.
@@ -37,4 +37,4 @@
 - Native pass-through: components spread unlisted props onto their underlying element (Input → `<input>`, Select → `<select>`, Button → `<button>`/`<a>`), so `value`, `onChange`, `type`, `id`, `autoComplete`, `checked` etc. all work even though manifest.json lists only the component-specific props. Exception: Tooltip takes no host props — put handlers/attributes on its trigger child.
 - Subtree theming: the standard setup is `data-ds-theme` on `<html>`. For a themed subtree, set `data-ds-theme` on a wrapper and paint `background: var(--ds-bg-primary)` yourself; brand font combos do not reach nested subtrees (see guidance.fonts.scope).
 - Size selection: 32 is the default (compact UI); 40 for comfortable forms and marketing pages; 24 for inline/table-row actions; 48 for hero CTAs.
-- Full semantic token roster: `@dku/tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.
+- Full semantic token roster: `@handamade/tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.

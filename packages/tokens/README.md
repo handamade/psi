@@ -1,10 +1,10 @@
-# @dku/tokens
+# @handamade/tokens
 
 OKLCH formula-based design tokens. Code is the source of truth; all artifacts are generated.
 
 ## Installation
 
-**In workspace:** use `pnpm install` at the root. **@dku/tokens** is a local workspace dependency.
+**In workspace:** use `pnpm install` at the root. **@handamade/tokens** is a local workspace dependency.
 
 **External packages:** install from the private registry with your configured credentials.
 
@@ -13,10 +13,10 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ar
 Import tokens in your app's stylesheet:
 
 ```css
-@import "@dku/tokens/base.css";
-@import "@dku/tokens/light.css"; /* or dark.css, acme.css */
-@import "@dku/tokens/components.css";
-@import "@dku/tokens/utilities.css";
+@import "@handamade/tokens/base.css";
+@import "@handamade/tokens/light.css"; /* or dark.css, acme.css */
+@import "@handamade/tokens/components.css";
+@import "@handamade/tokens/utilities.css";
 ```
 
 Then set the theme on your root element:

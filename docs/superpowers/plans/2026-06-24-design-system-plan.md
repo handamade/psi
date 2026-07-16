@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship `@dku/tokens` and `@dku/react` — a themeable design system with OKLCH formula-based tokens, pixel-true scales, 8 core components, Storybook docs, a Figma sync plugin, and a customer-theme scaffolder.
+**Goal:** Ship `@handamade/tokens` and `@handamade/react` — a themeable design system with OKLCH formula-based tokens, pixel-true scales, 8 core components, Storybook docs, a Figma sync plugin, and a customer-theme scaffolder.
 
 **Architecture:** pnpm monorepo with 3 packages (`tokens`, `react`, `figma-plugin`) and 1 app (`storybook`). Tokens are authored as TypeScript formulas, codegen resolves them into live-calc CSS, static JSON, and TS types. React components consume only generated artifacts. A Figma plugin syncs resolved values into Figma variables.
 
@@ -33,7 +33,7 @@ ds/
 ├── vitest.workspace.ts                   workspace-level vitest config
 │
 ├── packages/tokens/
-│   ├── package.json                      @dku/tokens
+│   ├── package.json                      @handamade/tokens
 │   ├── tsconfig.json
 │   ├── src/
 │   │   ├── dsl/
@@ -84,7 +84,7 @@ ds/
 │       └── gamut.test.ts
 │
 ├── packages/react/
-│   ├── package.json                      @dku/react
+│   ├── package.json                      @handamade/react
 │   ├── tsconfig.json
 │   ├── src/
 │   │   ├── index.ts                      barrel export
@@ -155,7 +155,7 @@ ds/
   "type": "module",
   "scripts": {
     "build": "pnpm -r run build",
-    "dev": "pnpm run --filter @dku/tokens --filter storybook dev --parallel",
+    "dev": "pnpm run --filter @handamade/tokens --filter storybook dev --parallel",
     "test": "vitest run",
     "lint": "eslint ."
   },
@@ -222,7 +222,7 @@ dist
 
 ```json
 {
-  "name": "@dku/tokens",
+  "name": "@handamade/tokens",
   "version": "0.0.1",
   "type": "module",
   "exports": {
@@ -264,7 +264,7 @@ dist
 
 ```json
 {
-  "name": "@dku/react",
+  "name": "@handamade/react",
   "version": "0.0.1",
   "type": "module",
   "main": "dist/index.js",
@@ -283,12 +283,12 @@ dist
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@dku/tokens": "workspace:*"
+    "@handamade/tokens": "workspace:*"
   },
   "devDependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@dku/tokens": "workspace:*",
+    "@handamade/tokens": "workspace:*",
     "@vitejs/plugin-react": "^4.3.0",
     "vite": "^6.0.0",
     "vite-plugin-css-modules": "^0.3.0"
@@ -1356,7 +1356,7 @@ console.log("Build complete.");
 
 - [ ] **Step 8: Run build and verify outputs exist**
 
-Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm --filter @dku/tokens build && ls packages/tokens/dist/ && cat packages/tokens/dist/base.css | head -5`
+Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm --filter @handamade/tokens build && ls packages/tokens/dist/ && cat packages/tokens/dist/base.css | head -5`
 Expected: dist/ contains base.css, light.css, resolved/, types/
 
 - [ ] **Step 9: Commit**
@@ -1480,7 +1480,7 @@ const themes: Record<string, typeof lightTheme> = {
 
 - [ ] **Step 5: Rebuild and verify dark.css exists**
 
-Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm --filter @dku/tokens build && ls packages/tokens/dist/`
+Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm --filter @handamade/tokens build && ls packages/tokens/dist/`
 Expected: dark.css present alongside light.css and base.css
 
 - [ ] **Step 6: Commit**
@@ -1812,7 +1812,7 @@ writeFileSync(pathResolve(dist, "utilities.css"), emitUtilitiesCSS());
 
 - [ ] **Step 4: Rebuild and verify**
 
-Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm --filter @dku/tokens build && head -30 packages/tokens/dist/base.css && head -10 packages/tokens/dist/utilities.css`
+Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm --filter @handamade/tokens build && head -30 packages/tokens/dist/base.css && head -10 packages/tokens/dist/utilities.css`
 Expected: base.css contains `--ds-space-*`, `--ds-size-*`, `--ds-text-*`; utilities.css contains `ds-gap-*` classes
 
 - [ ] **Step 5: Commit**
@@ -1846,8 +1846,8 @@ git commit -m "feat(tokens): scales (spacing, sizes, radius, typography) + utili
     "build": "storybook build"
   },
   "dependencies": {
-    "@dku/tokens": "workspace:*",
-    "@dku/react": "workspace:*",
+    "@handamade/tokens": "workspace:*",
+    "@handamade/react": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
@@ -1882,8 +1882,8 @@ export default config;
 
 ```ts
 import type { Preview } from "@storybook/react-vite";
-import "@dku/tokens/base.css";
-import "@dku/tokens/light.css";
+import "@handamade/tokens/base.css";
+import "@handamade/tokens/light.css";
 
 const preview: Preview = {
   globalTypes: {
@@ -1949,7 +1949,7 @@ export const Default: Story = {};
 
 - [ ] **Step 5: Install and verify Storybook starts**
 
-Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm install && pnpm --filter @dku/tokens build && cd apps/storybook && pnpm storybook dev -p 6006`
+Run: `cd /Users/dmytrokurkin/Projects/dku/ds && pnpm install && pnpm --filter @handamade/tokens build && cd apps/storybook && pnpm storybook dev -p 6006`
 Expected: Storybook opens at localhost:6006 with Welcome story
 
 - [ ] **Step 6: Commit**
@@ -1972,8 +1972,8 @@ git commit -m "feat(storybook): scaffold with theme-switcher decorator + welcome
 - [ ] **Step 1: Create token-reader.ts**
 
 ```ts
-import lightData from "@dku/tokens/resolved/light.json";
-import type { ResolvedToken } from "@dku/tokens/types";
+import lightData from "@handamade/tokens/resolved/light.json";
+import type { ResolvedToken } from "@handamade/tokens/types";
 
 export interface TokenDoc {
   name: string;
@@ -2075,7 +2075,7 @@ Create `apps/storybook/src/token-docs/SpacingTokens.stories.tsx`:
 
 ```tsx
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { spacingScale } from "@dku/tokens/scales/spacing";
+import { spacingScale } from "@handamade/tokens/scales/spacing";
 
 function SpacingTokens() {
   return (
@@ -2114,7 +2114,7 @@ Create `apps/storybook/src/token-docs/TypographyTokens.stories.tsx`:
 
 ```tsx
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { typographyScale } from "@dku/tokens/scales/typography";
+import { typographyScale } from "@handamade/tokens/scales/typography";
 
 function TypographyTokens() {
   return (
@@ -2741,7 +2741,7 @@ git commit -m "feat(react): IconButton component — 4 variants, 4 sizes"
 
 ```json
 {
-  "name": "@dku/figma-plugin",
+  "name": "@handamade/figma-plugin",
   "private": true,
   "type": "module",
   "scripts": {
@@ -2852,7 +2852,7 @@ In `packages/tokens/package.json`:
 }
 ```
 
-- [ ] **Step 3: Test** — run `pnpm --filter @dku/tokens new-theme acme`, verify file created
+- [ ] **Step 3: Test** — run `pnpm --filter @handamade/tokens new-theme acme`, verify file created
 - [ ] **Step 4: Commit**
 
 ```bash
@@ -2869,7 +2869,7 @@ git commit -m "feat(tokens): customer theme scaffolder — pnpm new-theme <name>
 
 - [ ] **Step 1: Scaffold and customize**
 
-Run: `pnpm --filter @dku/tokens new-theme acme`
+Run: `pnpm --filter @handamade/tokens new-theme acme`
 
 Edit `packages/tokens/src/themes/customers/acme.ts` to use a warm brand palette:
 

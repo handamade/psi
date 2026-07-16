@@ -7,8 +7,8 @@
     "build": "storybook build"
   },
   "dependencies": {
-    "@dku/react": "workspace:*",
-    "@dku/tokens": "workspace:*",
+    "@handamade/react": "workspace:*",
+    "@handamade/tokens": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

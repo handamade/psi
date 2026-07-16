@@ -1,13 +1,13 @@
 import type { Preview } from "storybook";
 import { createElement } from "react";
 
-import "@dku/tokens/base.css";
-import "@dku/tokens/light.css";
-import "@dku/tokens/dark.css";
-import "@dku/tokens/acme.css";
-import "@dku/tokens/ember.css";
-import "@dku/tokens/utilities.css";
-import "@dku/tokens/components.css";
+import "@handamade/tokens/base.css";
+import "@handamade/tokens/light.css";
+import "@handamade/tokens/dark.css";
+import "@handamade/tokens/acme.css";
+import "@handamade/tokens/ember.css";
+import "@handamade/tokens/utilities.css";
+import "@handamade/tokens/components.css";
 
 const preview: Preview = {
   // Generated docs page per component — public link targets for the website

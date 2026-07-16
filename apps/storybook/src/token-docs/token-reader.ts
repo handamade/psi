@@ -1,7 +1,7 @@
-import resolvedLight from "@dku/tokens/resolved/light.json";
-import resolvedDark from "@dku/tokens/resolved/dark.json";
-import resolvedAcme from "@dku/tokens/resolved/acme.json";
-import resolvedEmber from "@dku/tokens/resolved/ember.json";
+import resolvedLight from "@handamade/tokens/resolved/light.json";
+import resolvedDark from "@handamade/tokens/resolved/dark.json";
+import resolvedAcme from "@handamade/tokens/resolved/acme.json";
+import resolvedEmber from "@handamade/tokens/resolved/ember.json";
 
 export type ThemeName = "light" | "dark" | "acme" | "ember";
 

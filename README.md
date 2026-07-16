@@ -44,7 +44,7 @@ Vercel from this repo:
 
 - [**Design spec**](docs/superpowers/specs/2026-06-12-design-system-design.md) — Principles, architecture, decisions
 - [**Implementation plan**](docs/superpowers/plans/2026-07-06-remediation-and-ai-readability-plan.md) — Active roadmap
-- [**@dku/tokens README**](packages/tokens/README.md) — Token usage and theming
-- [**@dku/react README**](packages/react/README.md) — Component usage and API
+- [**@handamade/tokens README**](packages/tokens/README.md) — Token usage and theming
+- [**@handamade/react README**](packages/react/README.md) — Component usage and API
 
 For AI: see [llms.txt](llms.txt) and per-package llms.txt files for machine-readable artifacts.

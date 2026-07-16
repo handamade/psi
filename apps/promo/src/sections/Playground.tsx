@@ -12,7 +12,7 @@ import {
   Tag,
   Tooltip,
   type ButtonProps,
-} from "@dku/react";
+} from "@handamade/react";
 
 import { storybookDocs } from "../lib/storybook";
 

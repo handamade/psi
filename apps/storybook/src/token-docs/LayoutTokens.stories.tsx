@@ -115,7 +115,7 @@ export const Specimens: Story = {
         }}
       >
         Build-time constants (D31) — imported from{" "}
-        <Code>@dku/tokens/types</Code>, not exposed as CSS vars, since custom
+        <Code>@handamade/tokens/types</Code>, not exposed as CSS vars, since custom
         properties cannot drive <Code>@media</Code>.
       </p>
       <Table headers={["Name", "Value"]}>

@@ -13,8 +13,8 @@
 ## Global Constraints
 
 - Browser floor: Chrome/Edge 119+, Safari 18+, Firefox 128+ (relative color syntax) — spec decision 5.
-- CSS prefix `--ds-`, class prefix `ds-`, npm scope `@dku`.
-- React 19: `ref` as normal prop, no forwardRef; zero runtime deps in `@dku/react`.
+- CSS prefix `--ds-`, class prefix `ds-`, npm scope `@handamade`.
+- React 19: `ref` as normal prop, no forwardRef; zero runtime deps in `@handamade/react`.
 - Pixel-true scale names, rem values; component `size` = `24 | 32 | 40 | 48` number literals.
 - Component module CSS may reference ONLY: its own `--ds-{component}-*` tokens, scale tokens (`--ds-space-*`, `--ds-size-*`, `--ds-radius-*`, `--ds-text-*`, `--ds-font-*`). No semantic color tokens. Enforced by stylelint from Task 6 on. (IconButton is declared a consumer of `--ds-button-*` — it is visually a button.)
 - Never hand-edit anything under `dist/`.
@@ -143,7 +143,7 @@ import { checkContrast, wcagAAPairs, componentLabelPairs } from "../src/contrast
 const contrastResults = checkContrast(resolved, [...wcagAAPairs, ...componentLabelPairs]);
 ```
 
-- [ ] **Step 5: Run** `pnpm vitest run packages/tokens` then `pnpm --filter @dku/tokens build` → all pass, build green for light/dark/acme.
+- [ ] **Step 5: Run** `pnpm vitest run packages/tokens` then `pnpm --filter @handamade/tokens build` → all pass, build green for light/dark/acme.
 - [ ] **Step 6: Commit** — `fix(tokens): component-label contrast pairs; darken emerald/coral/mint anchors; add fg-static-black (D20-D22)`
 
 ### Task 2: Composite alpha in sRGB, not OKLCH-linear (R10)
@@ -413,7 +413,7 @@ Add export to `packages/tokens/package.json`: `"./components.css": "./dist/compo
 
 **Files:** Modify `packages/react/src/Button/button.module.css`, `packages/react/src/IconButton/icon-button.module.css`, `apps/storybook/.storybook/preview.ts`
 
-- [ ] **Step 1:** In `preview.ts`, after the theme CSS imports add `import "@dku/tokens/components.css";`
+- [ ] **Step 1:** In `preview.ts`, after the theme CSS imports add `import "@handamade/tokens/components.css";`
 - [ ] **Step 2:** Rewrite every variant block in `button.module.css` to the pattern (all seven variants, no `var(--ds-fill-*)`/`var(--ds-fg-*)` left):
 
 ```css
@@ -557,7 +557,7 @@ export const tooltipVars: Record<string, string> = {
 ```
 
 - [ ] **Step 2:** Register in build; migrate both CSS files (tag lines 40,47–95; tooltip lines 15–16); remove from `ignoreFiles` — the ignore list is now empty, delete the key.
-- [ ] **Step 3:** `pnpm lint:css && pnpm test && pnpm --filter @dku/tokens build` all green; Storybook check — Tag warning label is now near-black in BOTH light and dark themes (intended, D22).
+- [ ] **Step 3:** `pnpm lint:css && pnpm test && pnpm --filter @handamade/tokens build` all green; Storybook check — Tag warning label is now near-black in BOTH light and dark themes (intended, D22).
 - [ ] **Step 4: Commit** — `feat(tokens,react): component tokens for Tag/Tooltip; tag warning label uses fg-static-black`
 
 ---
@@ -651,15 +651,15 @@ for (const c of typographyCombos) {
 
 Note: `font:` shorthand resets `font-family` — the combo vars embed `var(--ds-font-sans)`, so DELETE the now-redundant `font-family: var(--ds-font-sans)` lines in those blocks.
 
-- [ ] **Step 2:** Update `TypographyTokens.stories.tsx` to iterate `typographyCombos` (import from `@dku/tokens` source is not available to storybook — read combo names from the emitted utilities/vars or add combos to the resolved JSON in Task 15's emit-json change; simplest now: hardcode iteration over `getComputedStyle(document.documentElement)` lookups of `--ds-text-*` is NOT acceptable — instead extend `emit-json.ts` HERE: add `"typography": typographyCombos.map(c => ({...c, name: comboName(c)}))` to the JSON payload and read it in the story).
-- [ ] **Step 3:** `pnpm test && pnpm lint:css && pnpm --filter @dku/tokens build`; Storybook: typography specimen shows combo names, components render with correct sizes/weights.
+- [ ] **Step 2:** Update `TypographyTokens.stories.tsx` to iterate `typographyCombos` (import from `@handamade/tokens` source is not available to storybook — read combo names from the emitted utilities/vars or add combos to the resolved JSON in Task 15's emit-json change; simplest now: hardcode iteration over `getComputedStyle(document.documentElement)` lookups of `--ds-text-*` is NOT acceptable — instead extend `emit-json.ts` HERE: add `"typography": typographyCombos.map(c => ({...c, name: comboName(c)}))` to the JSON payload and read it in the story).
+- [ ] **Step 3:** `pnpm test && pnpm lint:css && pnpm --filter @handamade/tokens build`; Storybook: typography specimen shows combo names, components render with correct sizes/weights.
 - [ ] **Step 4: Commit** — `feat!: migrate components and docs to pixel-true typography combos`
 
 ---
 
 ## M4: Packaging & Tooling (Tasks 11–13)
 
-### Task 11: @dku/react library build (R5)
+### Task 11: @handamade/react library build (R5)
 
 **Files:** Create `packages/react/vite.config.ts`, `packages/react/tsconfig.build.json`, `packages/react/src/global.d.ts`; Modify `packages/react/package.json`
 
@@ -699,10 +699,10 @@ export default defineConfig({
 `src/global.d.ts`: `declare module "*.module.css" { const c: Record<string, string>; export default c; }`
 
 - [ ] **Step 3:** package.json: `"build": "vite build && tsc -p tsconfig.build.json"`, add `"files": ["dist", "docs", "README.md", "llms.txt"]`.
-- [ ] **Step 4:** `pnpm --filter @dku/react build` → verify `dist/index.js`, `dist/styles.css`, `dist/index.d.ts` all exist; `node -e "import('./packages/react/dist/index.js').then(m => console.log(Object.keys(m).length))"` prints > 20.
+- [ ] **Step 4:** `pnpm --filter @handamade/react build` → verify `dist/index.js`, `dist/styles.css`, `dist/index.d.ts` all exist; `node -e "import('./packages/react/dist/index.js').then(m => console.log(Object.keys(m).length))"` prints > 20.
 - [ ] **Step 5: Commit** — `fix(react): working library build — ESM bundle, styles.css, type declarations`
 
-### Task 12: @dku/tokens types artifact + export map fixes (R5)
+### Task 12: @handamade/tokens types artifact + export map fixes (R5)
 
 **Files:** Modify `packages/tokens/scripts/emit-types.ts`, `scripts/build.ts`, `packages/tokens/package.json`
 
@@ -717,7 +717,7 @@ import { ButtonVariant } from "../src/components/button.js"; // type only — ke
 Add to `src/components/button.ts`: `export const BUTTON_VARIANTS = ["accent","accent-subtle","neutral","neutral-subtle","ghost","danger","danger-subtle"] as const;` and pass `emitTokenTypes(themeDefs, [...sizeScale], [...BUTTON_VARIANTS])`.
 
 - [ ] **Step 3:** Emit BOTH `dist/types/index.d.ts` (the unions) and `dist/types/index.js` (`export {};\n`) in build.ts. Fix package.json: `"./types": { "types": "./dist/types/index.d.ts", "import": "./dist/types/index.js" }`. Add `"files": ["dist", "README.md", "llms.txt"]`.
-- [ ] **Step 4:** Build; verify `node -e "import('@dku/tokens/types')"` from `apps/storybook` cwd resolves. Commit — `fix(tokens): compileable ./types export with literal Size/Variant unions`
+- [ ] **Step 4:** Build; verify `node -e "import('@handamade/tokens/types')"` from `apps/storybook` cwd resolves. Commit — `fix(tokens): compileable ./types export with literal Size/Variant unions`
 
 ### Task 13: ESLint flat config (R5)
 
@@ -840,7 +840,7 @@ const themes: Record<string, ThemeConfig> = {
 ```
 
 - [ ] **Step 3:** `new-theme.ts`: after writing the theme file, insert the registration line before the `<ds:register` marker in `customers/index.ts` (string splice + writeFile), add an import line at the top, and prefix scaffolded palette names with the theme name (`{name}Ink`, `{name}Canvas`, `{name}Brand` — no more generic `dark/light/brand`). Update the success message: "Registered in customers/index.ts. Edit the palette, then pnpm build."
-- [ ] **Step 4: Test:** run `pnpm --filter @dku/tokens new-theme zorp`, then `pnpm --filter @dku/tokens build` → `dist/zorp.css` exists and contrast gate ran against it. Delete zorp files + registry line afterwards. Also note: the package.json `"./acme.css"` export becomes a pattern problem — change exports to `"./themes/*.css": "./dist/*.css"`? NO — keep it simple: add `"./*.css": "./dist/*.css"` replacing the individual css entries (base/light/dark/acme/utilities/components all match). Update storybook imports if specifier paths change (they don't: `@dku/tokens/base.css` still matches).
+- [ ] **Step 4: Test:** run `pnpm --filter @handamade/tokens new-theme zorp`, then `pnpm --filter @handamade/tokens build` → `dist/zorp.css` exists and contrast gate ran against it. Delete zorp files + registry line afterwards. Also note: the package.json `"./acme.css"` export becomes a pattern problem — change exports to `"./themes/*.css": "./dist/*.css"`? NO — keep it simple: add `"./*.css": "./dist/*.css"` replacing the individual css entries (base/light/dark/acme/utilities/components all match). Update storybook imports if specifier paths change (they don't: `@handamade/tokens/base.css` still matches).
 - [ ] **Step 5: Commit** — `feat(tokens): customer theme registry with formula overrides; self-registering scaffolder`
 
 ---
@@ -968,7 +968,7 @@ export function emitDTCG(themeName: string, resolved: ResolvedTheme): string {
 
 **Files:** Create `packages/react/scripts/emit-manifest.ts`; Modify `packages/react/package.json`
 
-- [ ] **Step 1:** `pnpm --filter @dku/react add -D react-docgen-typescript tsx`
+- [ ] **Step 1:** `pnpm --filter @handamade/react add -D react-docgen-typescript tsx`
 - [ ] **Step 2: Implement:**
 
 ```ts
@@ -1009,7 +1009,7 @@ console.log(`[react] wrote dist/manifest.json (${manifest.length} components)`);
 
 **Files:** Create `packages/react/scripts/emit-docs.ts`; Modify `packages/react/package.json`
 
-- [ ] **Step 1: Implement** — render `docs/{Component}.md` from `dist/manifest.json` + `@dku/tokens/dist/guidance.json`:
+- [ ] **Step 1: Implement** — render `docs/{Component}.md` from `dist/manifest.json` + `@handamade/tokens/dist/guidance.json`:
 
 ```ts
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -1063,7 +1063,7 @@ console.log(`[react] wrote docs/*.md (${components.length})`);
 - [ ] **Step 1: Write `packages/tokens/llms.txt`:**
 
 ```
-# @dku/tokens
+# @handamade/tokens
 
 OKLCH formula-based design tokens. Code is the source of truth; all artifacts generated.
 
@@ -1083,17 +1083,17 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 `packages/react/llms.txt`:
 
 ```
-# @dku/react
+# @handamade/react
 
-8 React 19 components consuming @dku/tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+8 React 19 components consuming @handamade/tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
-- import { Button } from "@dku/react"; import "@dku/react/styles";
-- Also import from @dku/tokens: base.css, a theme css, components.css.
+- import { Button } from "@handamade/react"; import "@handamade/react/styles";
+- Also import from @handamade/tokens: base.css, a theme css, components.css.
 - size is a px number (24|32|40|48), never "sm"/"md"/"lg".
 - variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle.
 - One accent per visual group. danger only for destructive actions.
@@ -1112,12 +1112,12 @@ Root `llms.txt`: 5 lines pointing at the two package llms.txt files, the spec, a
 - [ ] **Step 2:** Full pipeline verification:
 
 ```bash
-pnpm --filter @dku/tokens build && pnpm --filter @dku/react build && pnpm test && pnpm lint
+pnpm --filter @handamade/tokens build && pnpm --filter @handamade/react build && pnpm test && pnpm lint
 ```
 
 Expected: all green; `dist` trees contain components/, dtcg/, guidance.json, manifest.json, styles.css, types/index.d.ts.
 
-- [ ] **Step 3:** `pnpm changeset` — one minor changeset covering `@dku/tokens` and `@dku/react` (breaking-ish typography rename is pre-1.0; note it in the changeset body as a migration line: `--ds-text-{xs|sm|base|lg|...}-*` → `--ds-text-{size}-{lh}-{weight}`).
+- [ ] **Step 3:** `pnpm changeset` — one minor changeset covering `@handamade/tokens` and `@handamade/react` (breaking-ish typography rename is pre-1.0; note it in the changeset body as a migration line: `--ds-text-{xs|sm|base|lg|...}-*` → `--ds-text-{size}-{lh}-{weight}`).
 - [ ] **Step 4: Commit** — `docs(storybook): theme-aware token tables; changeset for v0.1.0`
 
 ---
