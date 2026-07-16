@@ -43,7 +43,7 @@ export const Introduction: Story = {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "var(--ds-fg-static-white)",
+              color: `var(--ds-tag-${name.toLowerCase()}-fg)`,
               font: "var(--ds-text-12-16-regular)",
             }}
           >

@@ -28,6 +28,9 @@ jobs:
       # Token build is the contrast gate: any WCAG AA failure in any theme throws
       - run: pnpm build
 
+      # Hand-written prose must agree with the generated manifest
+      - run: node tools/check-docs-drift.mjs
+
       - run: pnpm test
 
       - run: pnpm lint

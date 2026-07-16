@@ -1,6 +1,6 @@
 # @dku/react
 
-8 React 19 components consuming @dku/tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
+11 React 19 components consuming @dku/tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
 
 ## Installation
 

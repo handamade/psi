@@ -29,3 +29,12 @@
 
 ## Icons (22)
 - Full icon set: IconPlus, IconMinus, IconCheck, IconClose, IconChevronDown, IconChevronRight, IconSearch, IconSettings, IconUser, IconEye, IconEyeOff, IconEdit, IconCopy, IconTrash, IconLoader, IconExternalLink, plus D36 additions — arrows IconArrowDown and IconArrowUpRight, and social glyphs IconLinkedIn, IconGitHub, IconX, IconInstagram.
+
+## Compositions (recipes for what has no component yet)
+
+- Form field: there is no Field/Label component. Compose: `<label htmlFor>` styled with `.ds-text-14-20-medium`; the control (Input/Select); error text in `.ds-text-12-16-regular` with `color: var(--ds-fg-danger)`, linked via `aria-describedby` on the control plus `aria-invalid` and `error` when invalid.
+- Stacks/rows: `.ds-gap-*` utilities set only the gap — they do not create a flex/grid container. Pair them with `display: flex` (column for stacks, row for button groups).
+- Native pass-through: components spread unlisted props onto their underlying element (Input → `<input>`, Select → `<select>`, Button → `<button>`/`<a>`), so `value`, `onChange`, `type`, `id`, `autoComplete`, `checked` etc. all work even though manifest.json lists only the component-specific props. Exception: Tooltip takes no host props — put handlers/attributes on its trigger child.
+- Subtree theming: the standard setup is `data-ds-theme` on `<html>`. For a themed subtree, set `data-ds-theme` on a wrapper and paint `background: var(--ds-bg-primary)` yourself; brand font combos do not reach nested subtrees (see guidance.fonts.scope).
+- Size selection: 32 is the default (compact UI); 40 for comfortable forms and marketing pages; 24 for inline/table-row actions; 48 for hero CTAs.
+- Full semantic token roster: `@dku/tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.
