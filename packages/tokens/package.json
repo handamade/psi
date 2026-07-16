@@ -1,6 +1,6 @@
 {
   "name": "@dku/tokens",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "type": "module",
   "exports": {
     "./*.css": "./dist/*.css",
@@ -13,7 +13,11 @@
     },
     "./guidance.json": "./dist/guidance.json"
   },
-  "files": ["dist", "README.md", "llms.txt"],
+  "files": [
+    "dist",
+    "README.md",
+    "llms.txt"
+  ],
   "scripts": {
     "build": "tsx scripts/build.ts",
     "dev": "tsx --watch scripts/build.ts --watch",
