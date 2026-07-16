@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { Input } from "./Input.js";
 
@@ -59,5 +60,19 @@ describe("Input", () => {
     const { container } = render(<Input className="custom" />);
     const input = container.querySelector("input")!;
     expect(input.className).toContain("custom");
+  });
+
+  it("is reachable by Tab and associates its label", async () => {
+    const user = userEvent.setup();
+    render(
+      <label>
+        Name
+        <Input size={32} />
+      </label>,
+    );
+    await user.tab();
+    expect(screen.getByLabelText("Name")).toHaveFocus();
+    await user.keyboard("Dmytro");
+    expect(screen.getByLabelText("Name")).toHaveValue("Dmytro");
   });
 });

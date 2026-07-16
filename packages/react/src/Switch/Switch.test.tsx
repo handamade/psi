@@ -63,4 +63,13 @@ describe("Switch", () => {
     const label = container.querySelector("label")!;
     expect(label.className).toContain("disabled");
   });
+
+  it("toggles with Space via keyboard", async () => {
+    const user = userEvent.setup();
+    render(<Switch>Notify</Switch>);
+    await user.tab();
+    expect(screen.getByRole("switch")).toHaveFocus();
+    await user.keyboard(" ");
+    expect(screen.getByRole("switch")).toBeChecked();
+  });
 });
