@@ -11,6 +11,13 @@
 | `ref` | `Ref<HTMLInputElement>` | — | no | Forwarded ref to the underlying `<input type="checkbox">` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Space | Toggles. Native <input type=checkbox> underneath (visually hidden). |
+
+
 ## Theming
 
 Override `--ds-checkbox-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).

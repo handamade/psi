@@ -13,6 +13,14 @@
 | `ref` | `Ref<HTMLSpanElement>` | — | no | Forwarded ref to the underlying `<span>` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Enter / Space (dismiss button) | onDismiss renders a real <button>; keyboard-dismissible. |
+
+Passive label otherwise; not in the tab order without onDismiss.
+
 ## Theming
 
 Override `--ds-tag-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).

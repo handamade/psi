@@ -11,6 +11,15 @@
 | `children` | `ReactElement<Record<string, unknown>, string \| JSXElementConstructor<any>>` | — | yes | The trigger element (must accept ref, onMouseEnter/Leave, onFocus/Blur). |
 | `placement` | `"top" \| "bottom" \| "left" \| "right"` | top | no | Preferred placement. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Tab (focus trigger) | Shows immediately on focus (no delay). |
+| Escape | Dismisses while visible (WCAG 1.4.13). |
+
+Hover opens after a short delay; content is linked via aria-describedby while visible. Trigger must accept onMouseEnter/Leave and onFocus/Blur props (cloned in automatically) — no ref forwarding required.
+
 ## Theming
 
 Override `--ds-tooltip-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
