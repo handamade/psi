@@ -13,6 +13,6 @@ export default defineConfig({
     // (Storybook's "No Preview" screen). serve.json disables cleanUrls to keep query params intact.
     command: "npx serve -l 6208 -c ../vr/serve.json ../storybook-static",
     port: 6208,
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
 });
