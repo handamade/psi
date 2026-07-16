@@ -3,6 +3,7 @@ import { emitDTCG } from "../scripts/emit-dtcg.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
+import { easings } from "../src/scales/motion.js";
 
 describe("emitDTCG", () => {
   it("outputs valid JSON", () => {
@@ -75,5 +76,14 @@ describe("emitDTCG", () => {
     expect(parsed.fontFamily).toBeDefined();
     expect(parsed.fontFamily.sans).toBeDefined();
     expect(parsed.fontFamily.sans.$type).toBe("fontFamily");
+  });
+
+  it("emits easing tokens alongside durations", () => {
+    const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
+    const json = emitDTCG("light", resolved);
+    const parsed = JSON.parse(json);
+
+    expect(parsed.easing.standard).toEqual({ $type: "string", $value: "ease" });
+    expect(Object.keys(parsed.easing)).toEqual(Object.keys(easings));
   });
 });
