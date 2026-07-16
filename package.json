@@ -10,7 +10,7 @@
     "test": "vitest run",
     "lint": "eslint . && stylelint 'packages/react/src/**/*.module.css'",
     "lint:css": "stylelint 'packages/react/src/**/*.module.css'",
-    "release": "pnpm build && pnpm -r publish --access public && changeset tag"
+    "release": "node tools/release-guard.mjs && pnpm build && pnpm -r publish --access public && changeset tag"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
