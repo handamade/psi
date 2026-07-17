@@ -16,4 +16,13 @@ describe("guidance", () => {
   it("has hover state equal to 'L - 0.04'", () => {
     expect(guidance.states.hover).toBe("L - 0.04");
   });
+
+  it("encodes D40: tags exempt from one-accent-per-group, subtle badge guidance", () => {
+    expect(guidance.tags.accentRule).toMatch(/do not count|exempt/i);
+    expect(guidance.tags.badges).toEqual({
+      highlight: "accent-subtle",
+      meta: "neutral-subtle",
+      status: "success | warning | danger",
+    });
+  });
 });

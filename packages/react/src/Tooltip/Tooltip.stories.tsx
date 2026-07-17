@@ -1,5 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "storybook";
+import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 import { Tooltip } from "./Tooltip.js";
 
 const meta: Meta<typeof Tooltip> = {
@@ -23,12 +24,22 @@ const meta: Meta<typeof Tooltip> = {
 export default meta;
 type Story = StoryObj<typeof Tooltip>;
 
+// The bubble only exists while hovered/focused, so without this the story (and
+// its VR screenshot) shows nothing but the bare trigger.
+const showOnHover: Story["play"] = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  await userEvent.hover(canvas.getByRole("button"));
+  // Opening waits out the 150ms WCAG 1.4.13 hover delay.
+  await waitFor(() => expect(canvas.getByRole("tooltip")).toBeVisible());
+};
+
 export const Top: Story = {
   args: {
     content: "Top tooltip",
     placement: "top",
     children: <button>Hover me</button>,
   },
+  play: showOnHover,
 };
 
 export const Bottom: Story = {
@@ -37,6 +48,7 @@ export const Bottom: Story = {
     placement: "bottom",
     children: <button>Hover me</button>,
   },
+  play: showOnHover,
 };
 
 export const Left: Story = {
@@ -45,6 +57,7 @@ export const Left: Story = {
     placement: "left",
     children: <button>Hover me</button>,
   },
+  play: showOnHover,
 };
 
 export const Right: Story = {
@@ -53,6 +66,7 @@ export const Right: Story = {
     placement: "right",
     children: <button>Hover me</button>,
   },
+  play: showOnHover,
 };
 
 export const AllPlacements: Story = {
@@ -72,4 +86,13 @@ export const AllPlacements: Story = {
       </Tooltip>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // userEvent.hover would un-hover the previous trigger and close its bubble;
+    // raw mouseOver events (never followed by mouseOut) keep all four open.
+    for (const button of canvas.getAllByRole("button")) {
+      await fireEvent.mouseOver(button);
+    }
+    await waitFor(() => expect(canvas.getAllByRole("tooltip")).toHaveLength(4));
+  },
 };

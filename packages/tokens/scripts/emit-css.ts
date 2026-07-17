@@ -89,6 +89,8 @@ export function tokenToLiveCSS(def: TokenDef, slots: SlotMap): string {
 
 export function emitBaseCSS(palette: Palette): string {
   const lines: string[] = [];
+  lines.push("@layer ds.base, ds.theme, ds.components, ds.utilities;");
+  lines.push("");
   lines.push("@layer ds.base {");
   lines.push("  :root {");
 

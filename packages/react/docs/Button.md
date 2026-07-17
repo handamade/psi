@@ -15,6 +15,15 @@
 | `ref` | `Ref<HTMLButtonElement \| HTMLAnchorElement>` | — | no | Forwarded ref to the underlying element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Enter / Space | Activates the button. |
+| Tab | Focusable; visible focus ring via :focus-visible. |
+
+With href it renders an <a>; disabled anchors get aria-disabled, lose the href attribute, and suppress activation (D33).
+
 ## Theming
 
 Override `--ds-button-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).

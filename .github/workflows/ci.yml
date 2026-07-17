@@ -33,4 +33,17 @@ jobs:
 
       - run: pnpm test
 
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - run: pnpm vr
+        env: { CI: "true" }
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vr-baselines
+          path: |
+            apps/storybook/vr/stories.spec.ts-snapshots/
+            apps/storybook/test-results/
+
       - run: pnpm lint

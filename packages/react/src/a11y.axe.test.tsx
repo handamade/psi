@@ -1,0 +1,35 @@
+import { describe, it, expect } from "vitest";
+import { render } from "@testing-library/react";
+import axe from "axe-core";
+import {
+  Button, IconButton, Card, NavBar, AspectRatio, Input, Select, Checkbox, Switch, Tag, Tooltip,
+} from "./index.js";
+
+const cases: Array<[string, React.ReactElement]> = [
+  ["Button", <Button>Save</Button>],
+  ["Button as disabled anchor", <Button href="/x" disabled>Link</Button>],
+  ["IconButton", <IconButton aria-label="Close"><svg aria-hidden="true" /></IconButton>],
+  ["Card", <Card variant="stacked" media={<img alt="" src="x.png" />}>Body</Card>],
+  ["NavBar", <NavBar brand={<a href="/">DK</a>} actions={<Button size={32}>CTA</Button>}><a href="/a">A</a></NavBar>],
+  ["AspectRatio", <AspectRatio ratio={16 / 10}><img alt="demo" src="x.png" /></AspectRatio>],
+  ["Input", <label>Name<Input size={32} /></label>],
+  ["Input error", <label>Email<Input size={32} error aria-invalid="true" /></label>],
+  ["Select", <label>Plan<Select size={32}><option>Free</option></Select></label>],
+  ["Checkbox", <Checkbox>Beta features</Checkbox>],
+  ["Switch", <Switch>Email notifications</Switch>],
+  ["Tag", <Tag variant="accent" subtle>Pro</Tag>],
+  ["Tag dismissible", <Tag variant="neutral" onDismiss={() => {}}>Filter</Tag>],
+  ["Tooltip", <Tooltip content="Info"><button>Trigger</button></Tooltip>],
+];
+
+describe("axe: no violations in rendered components", () => {
+  for (const [name, el] of cases) {
+    it(name, async () => {
+      const { container } = render(el);
+      const results = await axe.run(container, {
+        rules: { "color-contrast": { enabled: false } }, // jsdom cannot compute; gated at token build instead
+      });
+      expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`)).toEqual([]);
+    });
+  }
+});

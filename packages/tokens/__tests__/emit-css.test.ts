@@ -14,6 +14,12 @@ describe("emitBaseCSS", () => {
     expect(css).toContain("--ds-palette-sapphire");
     expect(css).toContain("oklch(");
   });
+
+  it("base.css declares the full ds layer order before any layer block", () => {
+    const css = emitBaseCSS(defaultPalette);
+    const firstLayerLine = css.split("\n").find((l) => l.trimStart().startsWith("@layer"));
+    expect(firstLayerLine?.trim()).toBe("@layer ds.base, ds.theme, ds.components, ds.utilities;");
+  });
 });
 
 describe("emitThemeCSS", () => {

@@ -12,6 +12,15 @@
 | `ref` | `Ref<HTMLSelectElement>` | — | no | Forwarded ref to the underlying `<select>` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Tab | Focuses the native <select>. |
+| Arrow keys / typeahead | Native option navigation. |
+
+error: same contract as Input.
+
 ## Theming
 
 Override `--ds-select-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).

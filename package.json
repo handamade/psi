@@ -10,11 +10,14 @@
     "test": "vitest run",
     "lint": "eslint . && stylelint 'packages/react/src/**/*.module.css'",
     "lint:css": "stylelint 'packages/react/src/**/*.module.css'",
+    "vr": "playwright test -c apps/storybook/vr",
     "release": "node tools/release-guard.mjs && pnpm build && pnpm -r publish --access public && changeset tag"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
+    "axe-core": "^4.12.1",
     "eslint": "^10.6.0",
     "stylelint": "^17.14.0",
     "tsx": "^4.19.0",

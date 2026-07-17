@@ -12,6 +12,14 @@
 | `ref` | `Ref<HTMLInputElement>` | — | no | Forwarded ref to the underlying `<input>` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Tab | Focuses the native <input>; focus ring on the field. |
+
+error sets a red border only — pair with aria-invalid and aria-describedby pointing at your error text.
+
 ## Theming
 
 Override `--ds-input-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).

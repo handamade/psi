@@ -57,4 +57,13 @@ describe("Checkbox", () => {
     const label = container.querySelector("label")!;
     expect(label.className).toContain("disabled");
   });
+
+  it("toggles with Space via keyboard", async () => {
+    const user = userEvent.setup();
+    render(<Checkbox>Beta</Checkbox>);
+    await user.tab();
+    expect(screen.getByRole("checkbox")).toHaveFocus();
+    await user.keyboard(" ");
+    expect(screen.getByRole("checkbox")).toBeChecked();
+  });
 });

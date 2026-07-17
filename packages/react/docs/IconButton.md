@@ -15,6 +15,14 @@
 | `ref` | `Ref<HTMLButtonElement \| HTMLAnchorElement>` | — | no | Forwarded ref to the underlying element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Enter / Space | Activates. |
+
+Requires an accessible name — pass aria-label. IconButton does not hide its icon for you; mark the icon aria-hidden yourself.
+
 ## Theming
 
 Override `--ds-button-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).

@@ -44,4 +44,13 @@ export const guidance = {
     mediaTint: "Apply .ds-media-tint to media elements; the brand defines --ds-media-tint (D35). Hover/focus reveals true color over --ds-duration-450 --ds-ease-soft.",
     sectionHeader: "SectionHeader ships as a recipe, not a component (v1.2 non-goal): baseline-aligned flex row — mono annotation (--ds-text-mono-14-20-regular, --ds-fg-accent) + h2 (.ds-display-32-32-extrabold) + optional trailing meta, border-bottom 1px var(--ds-border-faint), padding-bottom var(--ds-space-20).",
   },
+  tags: {
+    accentRule:
+      "Tags are passive labels and do not count against 'one accent per visual group' — that rule governs interactive emphasis (buttons/CTAs). D40.",
+    badges: {
+      highlight: "accent-subtle",
+      meta: "neutral-subtle",
+      status: "success | warning | danger",
+    },
+  },
 } as const;
