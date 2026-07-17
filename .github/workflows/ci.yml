@@ -44,6 +44,6 @@ jobs:
           name: vr-baselines
           path: |
             apps/storybook/vr/stories.spec.ts-snapshots/
-            test-results/
+            apps/storybook/test-results/
 
       - run: pnpm lint
