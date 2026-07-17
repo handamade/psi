@@ -52,3 +52,14 @@ To refresh baselines after an intentional visual change:
 Do not hand-generate baselines on a non-Linux machine and commit them as the final
 answer — use `pnpm vr --update-snapshots` locally only to sanity-check that a story
 renders as expected, then let CI produce the real baseline.
+
+### Expect `pnpm vr` to fail on macOS
+
+Playwright's default snapshot names are platform-suffixed (`...--light-linux.png`
+vs `...--light-darwin.png`), so with linux baselines committed a local macOS run
+finds no `-darwin` baselines and fails every test as "snapshot doesn't exist" —
+that inversion is normal and not a regression. Worse, Playwright's default update
+mode (`missing`) will silently WRITE 152 `-darwin.png` files into the snapshot dir
+on such a run. Use `pnpm vr --update-snapshots=none` for local sanity checks, and
+never commit `-darwin.png` files. CI (linux) is the only place `pnpm vr` is
+expected to pass against the committed baselines.
