@@ -1,4 +1,4 @@
-import { token, delta, slot, ref } from "../../dsl/builders.js";
+import { token, set, delta, cap, slot, ref } from "../../dsl/builders.js";
 import type { Palette, SlotMap, ThemeDef } from "../../dsl/types.js";
 import type { BrandFonts } from "./index.js";
 
@@ -9,7 +9,7 @@ export const emberPalette: Palette = {
   emberInk: { l: 0.949, c: 0.011, h: 72 },     // #f3ede6 text
   emberAccent: { l: 0.724, c: 0.177, h: 40 },  // #ff7847
   emberEmerald: { l: 0.52, c: 0.19, h: 155 },  // default success anchor values
-  emberAmber: { l: 0.75, c: 0.18, h: 75 },     // default warning anchor values
+  emberAmber: { l: 0.75, c: 0.1582, h: 75 },   // default warning anchor values (c retuned in-gamut, D39)
   emberRuby: { l: 0.55, c: 0.22, h: 25 },      // default danger anchor values
   white: { l: 1.0, c: 0, h: 0 },
   black: { l: 0.0, c: 0, h: 0 },
@@ -49,4 +49,7 @@ export const emberOverrides: ThemeDef = {
   fgPrimary: token({ from: slot.ink }),                                       // #f3ede6
   // Dark label on the ember accent (D37): white is 2.62:1 on #ff7847.
   fgOnAccent: token({ from: ref.fgStaticBlack }),
+  // D39: ember's accent hue (40) allows more chroma at l 0.75 than dark.ts's
+  // sapphire-tuned cap(0.1286) — carry ember's own in-gamut max.  // #ff885d
+  fgAccent: token({ from: slot.accent, l: set(0.75), c: cap(0.156) }),
 };

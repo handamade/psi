@@ -18,10 +18,13 @@ export const darkTheme: ThemeDef = {
    * their anchor. */
   fgOnAccent: token({ from: ref.fgStaticWhite }),
 
-  fgAccent: token({ from: slot.accent, l: set(0.75), c: cap(0.23) }),
+  // D39: caps lowered to each hue's in-gamut max at l 0.75 — the values these
+  // tokens were already clamping to, so rendered hex is unchanged. fgSuccess
+  // keeps the loose cap: emerald at l 0.75 is already in-gamut.
+  fgAccent: token({ from: slot.accent, l: set(0.75), c: cap(0.1286) }),
   fgSuccess: token({ from: slot.success, l: set(0.75), c: cap(0.23) }),
-  fgWarning: token({ from: slot.warning, l: set(0.75), c: cap(0.23) }),
-  fgDanger: token({ from: slot.danger, l: set(0.75), c: cap(0.23) }),
+  fgWarning: token({ from: slot.warning, l: set(0.75), c: cap(0.1582) }),
+  fgDanger: token({ from: slot.danger, l: set(0.75), c: cap(0.1505) }),
 
   fillNeutral1: token({ from: slot.ink, l: set(0.18), c: set(0.012) }),
   fillNeutral2: token({ from: slot.ink, l: set(0.2), c: set(0.015) }),
@@ -31,7 +34,8 @@ export const darkTheme: ThemeDef = {
   fillNeutral6: token({ from: slot.ink, l: set(0.32), c: set(0.025) }),
 
   fillAccent: token({ from: slot.accent }),
-  fillSuccess: token({ from: slot.success }),
+  // D39: capped at the formula, not the emerald anchor (see light.ts).
+  fillSuccess: token({ from: slot.success, c: cap(0.1285) }),
   fillWarning: token({ from: slot.warning }),
   fillDanger: token({ from: slot.danger }),
 

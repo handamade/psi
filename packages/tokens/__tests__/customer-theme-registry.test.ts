@@ -13,8 +13,12 @@ describe("customer theme registry", () => {
     expect(customerThemes.acme.slots.ink).toBeTypeOf("string");
   });
 
+  // D39 note: this previously asserted acme itself ships no overrides, but the
+  // gamut retune gave acme fg* cap overrides — the API contract (overrides are
+  // optional) is what matters, so assert it directly.
   it("does not require overrides to be set", () => {
-    expect(customerThemes.acme.overrides).toBeUndefined();
+    const def = assembleCustomerTheme({ palette: acmePalette, slots: acmeSlots });
+    expect(def).toEqual(lightTheme);
   });
 
   it("every registered slot name resolves to a key in its own palette", () => {

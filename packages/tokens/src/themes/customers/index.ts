@@ -1,7 +1,7 @@
 import type { Palette, SlotMap, ThemeDef } from "../../dsl/types.js";
 import { lightTheme } from "../light.js";
 import { darkTheme } from "../dark.js";
-import { acmePalette, acmeSlots } from "./acme.js";
+import { acmePalette, acmeSlots, acmeOverrides } from "./acme.js";
 import { emberPalette, emberSlots, emberOverrides, emberFonts, emberComponentOverrides } from "./ember.js";
 
 /** Brand-level font role assignment (D29). Emitted inside the brand's theme
@@ -30,7 +30,7 @@ export function assembleCustomerTheme(c: CustomerTheme): ThemeDef {
 }
 
 export const customerThemes: Record<string, CustomerTheme> = {
-  acme: { palette: acmePalette, slots: acmeSlots },
+  acme: { palette: acmePalette, slots: acmeSlots, overrides: acmeOverrides },
   ember: { palette: emberPalette, slots: emberSlots, base: "dark", overrides: emberOverrides, fonts: emberFonts, componentOverrides: emberComponentOverrides },
   // <ds:register — new-theme inserts here, do not remove>
 };

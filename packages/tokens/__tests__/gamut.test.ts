@@ -4,6 +4,40 @@ import { resolve } from "../src/dsl/resolver.js";
 import { token, set, slot } from "../src/dsl/builders.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
+import { darkTheme } from "../src/themes/dark.js";
+import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
+import type { Palette, SlotMap, ThemeDef } from "../src/dsl/types.js";
+
+/** Constructs the fully-assembled theme/palette/slots for a built theme name,
+ * mirroring scripts/build.ts's theme table (D39 gamut retune harness). */
+function buildTheme(name: string): {
+  resolved: ReturnType<typeof resolve>;
+  theme: ThemeDef;
+  palette: Palette;
+  slots: SlotMap;
+} {
+  let theme: ThemeDef;
+  let palette: Palette;
+  let slots: SlotMap;
+
+  if (name === "light") {
+    theme = lightTheme;
+    palette = defaultPalette;
+    slots = defaultSlots;
+  } else if (name === "dark") {
+    theme = darkTheme;
+    palette = defaultPalette;
+    slots = defaultSlots;
+  } else {
+    const c = customerThemes[name]!;
+    theme = assembleCustomerTheme(c);
+    palette = c.palette;
+    slots = c.slots;
+  }
+
+  const resolved = resolve(theme, palette, slots);
+  return { resolved, theme, palette, slots };
+}
 
 describe("gamutWarnings", () => {
   it("flags tokens clamped by more than deltaE 2", () => {
@@ -24,25 +58,15 @@ describe("gamutWarnings", () => {
     expect(warnings[0]).toMatch(/hot/);
   });
 
-  // KNOWN STATE (2026-07): default palette anchors exceed sRGB gamut — delete this test when anchors are retuned.
-  // The palette anchors for emerald, amber, and ruby were darkened in commit 126fcab for D20-D22 contrast
-  // compliance, but this created out-of-gamut colors. This test pins the current bad state to prevent
-  // accidental regressions. When the design team retunes the anchors to be in-gamut (see target contract below),
-  // this test should be deleted and the target contract test should be unskipped.
-  it("KNOWN STATE (2026-07): default palette anchors exceed sRGB gamut — delete when anchors are retuned", () => {
-    const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
-    const warnings = gamutWarnings(resolved, lightTheme, defaultPalette, defaultSlots);
-    // Current palette anchors have out-of-gamut colors that need to be adjusted
-    // Affected tokens: fgSuccess, fgWarning, fgDanger, fillSuccess, fillWarning, fillTintSuccess, fillTintWarning, fillTintDanger
-    expect(warnings.length).toBeGreaterThan(0);
-    expect(warnings.some((w) => w.includes("fgSuccess"))).toBe(true);
-    expect(warnings.some((w) => w.includes("fgWarning"))).toBe(true);
-    expect(warnings.some((w) => w.includes("fgDanger"))).toBe(true);
-  });
-
-  // Target contract per spec decision D19 — unskip when palette anchors are retuned in-gamut.
-  it.skip("default light theme produces no gamut warnings (target contract)", () => {
+  // Target contract per spec decision D19 — unskipped now that palette anchors
+  // and formula caps are retuned to their in-gamut rendered values (D39).
+  it("default light theme produces no gamut warnings (target contract)", () => {
     const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
     expect(gamutWarnings(resolved, lightTheme, defaultPalette, defaultSlots)).toEqual([]);
+  });
+
+  it.each(["light", "dark", "acme", "ember"])("%s theme resolves fully in-gamut (D39)", (name) => {
+    const { resolved, theme, palette, slots } = buildTheme(name);
+    expect(gamutWarnings(resolved, theme, palette, slots)).toEqual([]);
   });
 });

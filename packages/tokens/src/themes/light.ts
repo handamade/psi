@@ -19,9 +19,11 @@ export const lightTheme: ThemeDef = {
   fgOnAccent: token({ from: ref.fgStaticWhite }),
 
   fgAccent: token({ from: slot.accent, l: set(0.48), c: cap(0.23) }),
-  fgSuccess: token({ from: slot.success, l: set(0.48), c: cap(0.23) }),
-  fgWarning: token({ from: slot.warning, l: set(0.48), c: cap(0.23) }),
-  fgDanger: token({ from: slot.danger, l: set(0.48), c: cap(0.23) }),
+  // D39: status-fg caps lowered to each hue's in-gamut max at l 0.48 — the
+  // values these tokens were already clamping to, so rendered hex is unchanged.
+  fgSuccess: token({ from: slot.success, l: set(0.48), c: cap(0.1187) }),
+  fgWarning: token({ from: slot.warning, l: set(0.48), c: cap(0.1013) }),
+  fgDanger: token({ from: slot.danger, l: set(0.48), c: cap(0.1946) }),
 
   fillNeutral1: token({ from: slot.canvas, l: delta(+0.016), c: delta(-0.001) }),
   fillNeutral2: token({ from: slot.canvas }),
@@ -31,7 +33,10 @@ export const lightTheme: ThemeDef = {
   fillNeutral6: token({ from: slot.canvas, l: delta(-0.048), c: delta(+0.004) }),
 
   fillAccent: token({ from: slot.accent }),
-  fillSuccess: token({ from: slot.success }),
+  // D39: capped at the formula, not the emerald anchor — dark fgSuccess reads
+  // the same anchor at a different lightness where it IS in-gamut (see
+  // default.ts comment on emerald).
+  fillSuccess: token({ from: slot.success, c: cap(0.1285) }),
   fillWarning: token({ from: slot.warning }),
   fillDanger: token({ from: slot.danger }),
 
