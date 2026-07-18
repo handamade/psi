@@ -42,19 +42,32 @@ never hand-maintain what can drift.
   be ceremony. If layering ever earns its keep, it can be added as a manifest
   field without breaking this schema.
 
-- **D46 — Tokens declare scopes; the stylelint plugin enforces them.** The
-  existing custom stylelint rule already forbids hardcoded colors and requires
-  `var(--psi-*)` bindings. It cannot yet catch a *wrong* token on a property —
-  `--psi-color-text-muted` as a `background` is legal CSS and an illegal
-  design decision. Token sources in `packages/tokens/src` gain an optional
-  `scopes` array (CSS property names / property groups the token may bind to,
-  e.g. `["color", "fill", "stroke"]` for text colors). Scopes are emitted into
-  `dist/resolved/<theme>.json` and into DTCG output under `$extensions.psi`,
-  and the token build generates a scope map consumed by the stylelint plugin:
-  binding a scoped token to an out-of-scope property is a lint error.
-  Unscoped tokens stay valid everywhere (adoption is incremental — scope the
-  high-risk families first: text colors, surface colors, gaps). The WCAG AA
-  build gate is untouched; scope enforcement is lint-time, not build-time.
+- **D46 — Tokens declare scopes; the token build is the primary gate,
+  stylelint the secondary.** A *wrong* token on a property —
+  `--psi-fg-muted` as a background — is legal CSS and an illegal design
+  decision, and nothing catches it today. Token sources in
+  `packages/tokens/src` gain an optional `scopes` array (CSS property names /
+  property groups the token may bind to, e.g. `["color", "fill", "stroke"]`
+  for text colors). Crucially, in Psi the semantic-token → property binding
+  does **not** happen in CSS: component CSS may only use
+  `--psi-<component>-*` and scale tokens (the existing stylelint rule
+  enforces that), so the real binding site is
+  `packages/tokens/src/components/*.ts`
+  (`"accent-bg": "var(--psi-fill-accent)"`). The **token build** is therefore
+  the primary enforcement point: a component token may only reference
+  semantic tokens whose scopes match the property group its own name
+  declares. This makes the `-bg` / `-fg` / `-border` suffix convention
+  normative (the suffix → property-group map ships with the build), and the
+  check follows references through `oklch(from var(--psi-...) ...)`
+  derivations. Violations throw — same posture as the WCAG contrast gate.
+  Secondary gate: scopes are emitted into `dist/resolved/<theme>.json` and
+  DTCG `$extensions.psi`, and the build generates a scope map consumed by the
+  stylelint plugin, so *consumer* CSS binding a scoped token to an
+  out-of-scope property is a lint error. Unscoped tokens stay valid
+  everywhere (adoption is incremental — scope the high-risk families first:
+  text colors, surface colors, gaps). This matches AINDF's own posture:
+  scopes live in the token source and are checked by a validator, not a
+  linter.
 
 - **D47 — Patterns are parametrized composition recipes with clarifying
   parameters, and `gaps` drive the backlog.** A pattern composes existing Psi
@@ -84,7 +97,11 @@ never hand-maintain what can drift.
   value outside the manifest's literal union, or filling a slot in violation
   of its D45 contract; a pattern parameter referenced in `compose` but not
   declared (or vice versa); a `scopes` entry that is not a known CSS property
-  or declared group. `gaps` entries are exempt by design — they are the one
+  or declared group. Parameter substitution is typed at the declaration site:
+  a parameter's `options` must be a subset of the manifest literal union of
+  every prop site its `{param:*}` placeholder fills (e.g. `[32, 40]` ⊆
+  Button's sizes); the placeholder string itself is then satisfied by that
+  check, not type-checked in place. `gaps` entries are exempt by design — they are the one
   legal kind of dangling reference, and the validator prints them as a
   report, not an error. This mirrors the token build's philosophy: the build
   is the conformance gate, so a green build *is* the conformance claim.
@@ -134,7 +151,7 @@ Abstract contracts (`contracts.json`):
 ```json
 {
   "interactive": ["Button", "Tag"],
-  "inline-content": ["Tag", "Icon"]
+  "inline-content": ["Tag", "IconButton"]
 }
 ```
 
@@ -186,7 +203,9 @@ enforces the mechanical parts; guidance.json keeps carrying the intent.
 - Manifest merge test against real component sources (same posture as
   psi-mcp's index-builder tests — real `dist`, not fixtures — so a manifest
   format change breaks loudly in CI).
-- Stylelint scope rule: positive/negative cases per scoped family.
+- Scope gates: token-build binding checks (positive/negative per scoped
+  family, including through `oklch(from …)` derivations) + stylelint consumer
+  rule cases.
 - Preset JSX rendering: snapshot per fully-bound pattern; re-render must be
   byte-identical (generated artifact discipline).
 - `check-docs-drift.mjs` extended: pattern count in docs matches
@@ -197,7 +216,8 @@ enforces the mechanical parts; guidance.json keeps carrying the intent.
 Nothing in this spec ships until adopted into a numbered release. Adoption
 order is deliberately incremental and each step is independently valuable:
 
-1. **D46 token scopes** — smallest diff, immediate lint value, zero API surface.
+1. **D46 token scopes** — smallest diff, immediate build-gate value, zero
+   API surface.
 2. **D45 slot contracts** — becomes meaningful the moment Dialog (the first
    truly slot-heavy component) lands in 0.5.
 3. **D47/D48 patterns + validator** — after 0.5 closes the Field/Label and
