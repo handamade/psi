@@ -209,6 +209,27 @@ order is deliberately incremental and each step is independently valuable:
 - AINDF conformance (`conformsTo: "aindf@0.1"`) — we are shape-compatible on
   purpose but claim nothing; revisit only if AINDF grows an ecosystem.
 - A layer taxonomy (atoms/elements/…) — see D45.
+- A `renderTarget` axis (`inline | overlay`) — AINDF's other fixed axis,
+  deliberately not adopted even though Dialog (0.5) will be Psi's first true
+  top-layer component (Tooltip is CSS-positioned, not portalled). Slot
+  `accepts` is an allowlist: a component participates in inline composition
+  only if a slot or contract names it, so overlay surfaces are excluded from
+  layout slots by construction — the validator needs no axis to keep a Dialog
+  out of a Card body. What remains is semantics ("renders in the top layer;
+  compose the trigger, not the surface"), and that is guidance.json's job. If
+  composition ever needs the *set* of overlay components (a pattern accepting
+  "any overlay surface"), contracts.json already expresses it as a named
+  contract with zero schema change; a per-component manifest field is the
+  fallback only if membership must live next to the component. Revisit when
+  Dialog's `slots.json` is authored. This sequence — allowlist exclusion by
+  default, guidance for semantics, a named contract when composition needs
+  the set, a manifest field as last resort — is the template for any future
+  component class this spec didn't consider.
+- AINDF's modifier/applicability edge — Psi's cross-cutting variation is flat
+  variant props (already literal unions in the manifest, already validated by
+  D48) plus exactly one out-of-band attribute, `data-psi-theme`, which is
+  theming infrastructure, not a per-component modifier vocabulary. A modifier
+  system would be a second way to say what props already say.
 - Write/scaffold MCP tools — D43's read-only posture stands; patterns are
   data the agent reads, generation happens in the consumer's repo.
 - Figma round-trip of patterns — Figma stays a generated-values consumer.
