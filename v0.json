@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "referenceWorkspace": {
+    "sources": [
+      { "id": "psi", "repo": "handamade/psi", "ref": "main", "mount": "/" }
+    ]
+  },
+  "starter": "v0-default"
+}
