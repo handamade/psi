@@ -25,6 +25,9 @@
     "typescript-eslint": "^8.62.1",
     "vitest": "^3.2.0"
   },
+  "dependencies": {
+    "@handamade/psi-mcp": "workspace:*"
+  },
   "packageManager": "pnpm@11.9.0",
   "engines": {
     "node": ">=20",
