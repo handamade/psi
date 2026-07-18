@@ -12,6 +12,7 @@ const claims = [
   ["README.md", /(\d+) React 19 components/],
   ["packages/react/README.md", /(\d+) React 19 components/],
   ["packages/react/llms.txt", /(\d+) React 19 components/],
+  ["packages/mcp/README.md", /(\d+) React 19 components/],
 ];
 
 let failed = false;

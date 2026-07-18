@@ -55,3 +55,12 @@ Vercel from this repo:
 - [**@handamade/psi-react README**](packages/react/README.md) — Component usage and API
 
 For AI: see [llms.txt](llms.txt) and per-package llms.txt files for machine-readable artifacts.
+
+## Agent access (MCP)
+
+- **Hosted (no install):** Streamable HTTP at `https://psi.kurkin.de/mcp`
+- **Local (stdio):** `npx @handamade/psi-mcp`
+
+Tools: `search(query)` → compact briefs with ids · `get(id)` → full detail (`component:Button`, `token:bgPrimary`, `topic:variants`, or a bare name).
+
+Generate agent context: `npx @handamade/psi-mcp init` (writes/updates AGENTS.md; add `--claude` for CLAUDE.md too). See [packages/mcp/README.md](packages/mcp/README.md).

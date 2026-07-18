@@ -1,0 +1,10 @@
+# @handamade/psi-mcp — MCP access to Psi (Ψ)
+
+Two read-only tools over a baked index of the generated artifacts:
+- search(query): briefs {id, kind, title, summary}; empty query = overview
+- get(id): component (props/defaults/a11y doc) | token (formula + OKLCH/hex per theme) | topic (guidance)
+Ids: component:<Name>, token:<name>, topic:<key>; bare names resolve case-insensitively.
+
+Connect: https://psi.kurkin.de/mcp (Streamable HTTP) or `npx @handamade/psi-mcp` (stdio).
+Agent context: `npx @handamade/psi-mcp init [--claude]` writes a marker-delimited block into AGENTS.md/CLAUDE.md (D44).
+The index bakes packages/react/dist/manifest.json + packages/tokens/dist/{guidance.json,resolved/*.json} at publish; lockstep versioning keeps it truthful (D43).

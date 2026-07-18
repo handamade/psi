@@ -41,3 +41,5 @@
 - CSS import order: all DS stylesheets are order-independent — base.css opens with an explicit `@layer psi.base, psi.theme, psi.components, psi.utilities;` statement. Recommended listing for readability: base → theme → components → utilities → @handamade/psi-react/styles.
 - Widths: content widths are app-level; the system tokenizes the page container only (`--psi-container-max`). Component width tokens arrive with Field/Dialog (next cycle).
 - Full semantic token roster: `@handamade/psi-tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.
+
+Live MCP access to this data: see packages/mcp/llms.txt (hosted: https://psi.kurkin.de/mcp).

@@ -44,3 +44,5 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 
 ## Component overrides (D34)
 - A brand's theme file may declare `componentOverrides: Record<string, string>` (e.g. ember: button-font → mono, card-radius → 0, media-tint → its filter chain), emitted in the brand's own theme file (e.g. dist/ember.css) inside `@layer psi.components`. Prefer this over forking a component's CSS Module for brand-specific token values.
+
+Live MCP access to this data: see packages/mcp/llms.txt (hosted: https://psi.kurkin.de/mcp).

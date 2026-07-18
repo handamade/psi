@@ -8,6 +8,7 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 2. `packages/react/dist/manifest.json` — full component/prop inventory with types and defaults (generated; run `pnpm build` if missing)
 3. `packages/tokens/dist/guidance.json` — variant intent and typical use
 4. `packages/tokens/dist/resolved/<theme>.json` — every semantic token with resolved values per theme
+5. `@handamade/psi-mcp` — MCP server (search/get) over manifest+guidance+resolved tokens; hosted at psi.kurkin.de/mcp; `init` generates consumer AGENTS.md (D43–D44).
 
 ## House rules (non-negotiable)
 

@@ -2,6 +2,8 @@
 
 See `packages/tokens/llms.txt` and `packages/react/llms.txt` for per-package machine-readable artifacts and authoring rules.
 
+- packages/mcp/llms.txt — MCP tools (search/get), hosted at https://psi.kurkin.de/mcp, init command for AGENTS.md
+
 **Specs** (principles, architecture, decisions):
 - `docs/superpowers/specs/2026-06-12-design-system-design.md` (core, decisions D1–D26)
 - `docs/superpowers/specs/2026-07-09-site-scale-and-portfolio-readiness-spec.md` (dark-first brands, serif/display typography, motion/layout tokens, new components; decisions D27–D37)
