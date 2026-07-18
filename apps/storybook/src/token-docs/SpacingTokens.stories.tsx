@@ -13,7 +13,7 @@ const spacingScale = [0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80];
 
 export const Scale: Story = {
   render: () => (
-    <div className="ds-p-24" style={{ maxWidth: 700 }}>
+    <div className="psi-p-24" style={{ maxWidth: 700 }}>
       <h1
         style={{
           font: "var(--psi-text-24-32-medium)",

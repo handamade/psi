@@ -13,7 +13,7 @@ type Story = StoryObj;
 
 export const Specimens: Story = {
   render: () => (
-    <div className="ds-p-24" style={{ maxWidth: 800 }}>
+    <div className="psi-p-24" style={{ maxWidth: 800 }}>
       <h1
         style={{
           font: "var(--psi-text-24-32-medium)",
@@ -71,7 +71,7 @@ export const Specimens: Story = {
               {d.cssWeight})
             </span>
             <span
-              className={"ds-display-" + d.name}
+              className={"psi-display-" + d.name}
               style={{ color: "var(--psi-fg-primary)" }}
             >
               Aa Ember Field

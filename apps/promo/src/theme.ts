@@ -18,7 +18,7 @@ export function useTheme(): [ThemeName, (theme: ThemeName) => void] {
     setThemeState(next);
     document.documentElement.dataset.dsTheme = next;
     try {
-      localStorage.setItem("ds-theme", next);
+      localStorage.setItem("psi-theme", next);
     } catch {
       /* storage unavailable */
     }

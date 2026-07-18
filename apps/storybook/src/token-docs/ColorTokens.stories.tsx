@@ -95,7 +95,7 @@ export const AllColorTokens: Story = {
     const theme = (globals.theme as ThemeName | undefined) ?? "light";
     const groups = groupByPrefix(getTokens(theme));
     return (
-      <div className="ds-p-24" style={{ maxWidth: 900 }}>
+      <div className="psi-p-24" style={{ maxWidth: 900 }}>
         <h1
           style={{
             font: "var(--psi-text-24-32-medium)",

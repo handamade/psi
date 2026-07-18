@@ -11,7 +11,7 @@ type Story = StoryObj;
 
 export const Introduction: Story = {
   render: () => (
-    <div className="ds-p-24" style={{ maxWidth: 640 }}>
+    <div className="psi-p-24" style={{ maxWidth: 640 }}>
       <h1
         style={{
           font: "var(--psi-text-30-36-bold)",
@@ -19,7 +19,7 @@ export const Introduction: Story = {
           marginBottom: "var(--psi-space-16)",
         }}
       >
-        DKU Design System
+        Psi Design System
       </h1>
       <p
         style={{
@@ -31,7 +31,7 @@ export const Introduction: Story = {
         A token-first design system built on OKLCH color science. Browse the
         sidebar to explore tokens, assets, and components.
       </p>
-      <div className="ds-gap-12" style={{ display: "flex", flexWrap: "wrap" }}>
+      <div className="psi-gap-12" style={{ display: "flex", flexWrap: "wrap" }}>
         {["Accent", "Success", "Warning", "Danger"].map((name) => (
           <div
             key={name}

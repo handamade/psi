@@ -13,7 +13,7 @@ type Story = StoryObj;
 
 export const Specimens: Story = {
   render: () => (
-    <div className="ds-p-24" style={{ maxWidth: 800 }}>
+    <div className="psi-p-24" style={{ maxWidth: 800 }}>
       <style>{`
         .psi-motion-demo {
           transform: translateX(0);
@@ -134,7 +134,7 @@ export const Specimens: Story = {
               </span>
             </div>
             <div
-              className="ds-motion-demo"
+              className="psi-motion-demo"
               style={{
                 width: 48,
                 height: 48,
