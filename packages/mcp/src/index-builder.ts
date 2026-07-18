@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { ComponentEntry, PsiIndex, TokenEntry } from "./types.js";
+import type { ComponentEntry, Oklch, PropDoc, PsiIndex, TokenEntry } from "./types.js";
 
 const THEMES = ["light", "dark", "acme", "ember"];
 
@@ -28,16 +28,36 @@ export const GETTING_STARTED = {
     "Never hardcode colors — bind var(--psi-*).",
 };
 
-async function readJson(path: string): Promise<any> {
+/** Shape of a component record in `packages/react/dist/manifest.json`. */
+interface ManifestComponent {
+  name: string;
+  description: string;
+  props: PropDoc[];
+}
+
+/** Shape of `packages/tokens/dist/resolved/<theme>.json`. */
+interface ResolvedTheme {
+  tokens: Record<string, { formula: string; oklch: Oklch; hex: string }>;
+  scales: Record<string, unknown>;
+}
+
+async function readJson(path: string): Promise<unknown> {
   return JSON.parse(await readFile(path, "utf8"));
 }
 
 export async function buildIndex(inputs: BuildInputs): Promise<PsiIndex> {
-  const manifest = await readJson(join(inputs.reactDist, "manifest.json"));
-  const guidance = await readJson(join(inputs.tokensDist, "guidance.json"));
-  const resolved: Record<string, any> = {};
+  const manifest = (await readJson(join(inputs.reactDist, "manifest.json"))) as {
+    components: ManifestComponent[];
+  };
+  const guidance = (await readJson(join(inputs.tokensDist, "guidance.json"))) as Record<
+    string,
+    unknown
+  >;
+  const resolved: Record<string, ResolvedTheme> = {};
   for (const theme of THEMES) {
-    resolved[theme] = await readJson(join(inputs.tokensDist, "resolved", `${theme}.json`));
+    resolved[theme] = (await readJson(
+      join(inputs.tokensDist, "resolved", `${theme}.json`),
+    )) as ResolvedTheme;
   }
 
   const components: ComponentEntry[] = [];
