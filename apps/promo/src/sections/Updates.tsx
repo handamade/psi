@@ -23,7 +23,7 @@ export function Updates() {
     <section className="section" id="updates">
       <div className="container">
         <div className="section-head">
-          <span className="annot annot--accent">06 · Updates</span>
+          <span className="annot annot--accent">07 · Updates</span>
           <h2>What&apos;s new in the system.</h2>
           <p className="lede">
             Announcements land here as the system evolves — releases, new

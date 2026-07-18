@@ -4,6 +4,7 @@ import { Principles } from "./sections/Principles";
 import { Playground } from "./sections/Playground";
 import { Theming } from "./sections/Theming";
 import { Pipeline } from "./sections/Pipeline";
+import { AgentReady } from "./sections/AgentReady";
 import { Roadmap } from "./sections/Roadmap";
 import { Updates } from "./sections/Updates";
 import { Footer } from "./sections/Footer";
@@ -21,6 +22,7 @@ export function App() {
         <Playground />
         <Theming />
         <Pipeline />
+        <AgentReady />
         <Roadmap />
         <Updates />
       </main>

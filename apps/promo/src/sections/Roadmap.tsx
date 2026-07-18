@@ -6,12 +6,12 @@ const SHIPPED = [
   ["Contrast gate", "WCAG AA validated per theme, at build time"],
   ["Figma sync", "Psi Token Sync plugin — code → Figma variables"],
   ["AI artifacts", "llms.txt, manifest.json, guidance.json, DTCG export"],
+  ["@handamade/psi-mcp", "hosted + local MCP server, tokens and guidance as queryable tools for agents"],
 ] as const;
 
 const NEXT = [
   ["Custom listbox Select", "v1 ships a styled native <select>; a fully custom listbox is v2"],
   ["Tooltip on the Popover API", "native anchor positioning once support settles"],
-  ["@handamade/mcp", "tokens and guidance as queryable tools for agents"],
   ["Visual regression", "screenshot testing across all themes"],
 ] as const;
 
@@ -20,7 +20,7 @@ export function Roadmap() {
     <section className="section" id="roadmap">
       <div className="container">
         <div className="section-head">
-          <span className="annot annot--accent">05 · Roadmap</span>
+          <span className="annot annot--accent">06 · Roadmap</span>
           <h2>Deliberately small. Honestly documented.</h2>
         </div>
         <div className="roadmap-grid">
