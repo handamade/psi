@@ -5,6 +5,8 @@
 
 # Psi — themeable design system
 
+**Live site:** [psi.kurkin.de](https://psi.kurkin.de) · [Storybook](https://psi.kurkin.de/storybook/)
+
 OKLCH-based design system for web applications, built on four core principles:
 
 1. **OKLCH calculations, not swatch ladders.** Semantic colors are formulas, not hand-picked scales.
