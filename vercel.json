@@ -3,5 +3,6 @@
   "buildCommand": "pnpm build:web",
   "outputDirectory": "site-dist",
   "installCommand": "pnpm install --frozen-lockfile",
-  "framework": null
+  "framework": null,
+  "rewrites": [{ "source": "/mcp", "destination": "/api/mcp" }]
 }
