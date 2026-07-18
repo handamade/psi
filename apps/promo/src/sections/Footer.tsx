@@ -4,13 +4,13 @@ const QUICK_START = `pnpm install
 pnpm build     # tokens + components + docs
 pnpm dev       # tokens watcher + storybook`;
 
-const USAGE = `import { Button } from "@handamade/react";
-import "@handamade/react/styles";
-import "@handamade/tokens/base.css";
-import "@handamade/tokens/light.css";
-import "@handamade/tokens/components.css";
+const USAGE = `import { Button } from "@handamade/psi-react";
+import "@handamade/psi-react/styles";
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css";
+import "@handamade/psi-tokens/components.css";
 
-<html data-ds-theme="light">`;
+<html data-psi-theme="light">`;
 
 export function Footer() {
   return (
@@ -40,10 +40,10 @@ export function Footer() {
         </nav>
         <div className="footer-note">
           <span className="annot">
-            DS · @handamade — docs in packages/*/README.md and the design spec
+            Psi · @handamade — docs in packages/*/README.md and the design spec
           </span>
           <span className="annot">
-            Built with DS itself (apps/promo) — flip the theme and watch every
+            Built with Psi itself (apps/promo) — flip the theme and watch every
             color re-derive.
           </span>
         </div>

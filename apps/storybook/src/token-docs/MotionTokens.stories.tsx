@@ -15,26 +15,26 @@ export const Specimens: Story = {
   render: () => (
     <div className="ds-p-24" style={{ maxWidth: 800 }}>
       <style>{`
-        .ds-motion-demo {
+        .psi-motion-demo {
           transform: translateX(0);
         }
-        .ds-motion-demo:hover {
+        .psi-motion-demo:hover {
           transform: translateX(40px);
         }
       `}</style>
       <h1
         style={{
-          font: "var(--ds-text-24-32-medium)",
-          color: "var(--ds-fg-primary)",
-          marginBottom: "var(--ds-space-24)",
+          font: "var(--psi-text-24-32-medium)",
+          color: "var(--psi-fg-primary)",
+          marginBottom: "var(--psi-space-24)",
         }}
       >
         Motion
       </h1>
       <p
         style={{
-          color: "var(--ds-fg-secondary)",
-          marginBottom: "var(--ds-space-32)",
+          color: "var(--psi-fg-secondary)",
+          marginBottom: "var(--psi-space-32)",
         }}
       >
         Duration and easing tokens (WS3) drive every transition and
@@ -43,9 +43,9 @@ export const Specimens: Story = {
 
       <h2
         style={{
-          font: "var(--ds-text-18-28-medium)",
-          color: "var(--ds-fg-primary)",
-          marginBottom: "var(--ds-space-12)",
+          font: "var(--psi-text-18-28-medium)",
+          color: "var(--psi-fg-primary)",
+          marginBottom: "var(--psi-space-12)",
         }}
       >
         Durations
@@ -54,8 +54,8 @@ export const Specimens: Story = {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--ds-space-16)",
-          marginBottom: "var(--ds-space-32)",
+          gap: "var(--psi-space-16)",
+          marginBottom: "var(--psi-space-32)",
         }}
       >
         {docMotion.durations.map((ms) => (
@@ -64,32 +64,32 @@ export const Specimens: Story = {
             style={{
               display: "flex",
               alignItems: "baseline",
-              gap: "var(--ds-space-24)",
-              borderBottom: "1px solid var(--ds-border-neutral)",
-              paddingBottom: "var(--ds-space-8)",
+              gap: "var(--psi-space-24)",
+              borderBottom: "1px solid var(--psi-border-neutral)",
+              paddingBottom: "var(--psi-space-8)",
             }}
           >
             <code
               style={{
-                font: "var(--ds-text-12-16-regular)",
+                font: "var(--psi-text-12-16-regular)",
                 fontFamily: "monospace",
-                color: "var(--ds-fg-accent)",
+                color: "var(--psi-fg-accent)",
                 width: 200,
                 flexShrink: 0,
               }}
             >
-              --ds-duration-{ms}
+              --psi-duration-{ms}
             </code>
-            <span style={{ color: "var(--ds-fg-primary)" }}>{ms}ms</span>
+            <span style={{ color: "var(--psi-fg-primary)" }}>{ms}ms</span>
           </div>
         ))}
       </div>
 
       <h2
         style={{
-          font: "var(--ds-text-18-28-medium)",
-          color: "var(--ds-fg-primary)",
-          marginBottom: "var(--ds-space-12)",
+          font: "var(--psi-text-18-28-medium)",
+          color: "var(--psi-fg-primary)",
+          marginBottom: "var(--psi-space-12)",
         }}
       >
         Easings
@@ -98,8 +98,8 @@ export const Specimens: Story = {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--ds-space-16)",
-          marginBottom: "var(--ds-space-32)",
+          gap: "var(--psi-space-16)",
+          marginBottom: "var(--psi-space-32)",
         }}
       >
         {Object.entries(docMotion.easings).map(([name, curve]) => (
@@ -108,26 +108,26 @@ export const Specimens: Story = {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "var(--ds-space-24)",
-              borderBottom: "1px solid var(--ds-border-neutral)",
-              paddingBottom: "var(--ds-space-16)",
+              gap: "var(--psi-space-24)",
+              borderBottom: "1px solid var(--psi-border-neutral)",
+              paddingBottom: "var(--psi-space-16)",
             }}
           >
             <div style={{ width: 200, flexShrink: 0 }}>
               <code
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
+                  font: "var(--psi-text-12-16-regular)",
                   fontFamily: "monospace",
-                  color: "var(--ds-fg-accent)",
+                  color: "var(--psi-fg-accent)",
                   display: "block",
                 }}
               >
-                --ds-ease-{name}
+                --psi-ease-{name}
               </code>
               <span
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
-                  color: "var(--ds-fg-tertiary)",
+                  font: "var(--psi-text-12-16-regular)",
+                  color: "var(--psi-fg-tertiary)",
                 }}
               >
                 {curve}
@@ -138,9 +138,9 @@ export const Specimens: Story = {
               style={{
                 width: 48,
                 height: 48,
-                borderRadius: "var(--ds-radius-8)",
-                backgroundColor: "var(--ds-fill-accent)",
-                transition: `transform var(--ds-duration-350) var(--ds-ease-${name})`,
+                borderRadius: "var(--psi-radius-8)",
+                backgroundColor: "var(--psi-fill-accent)",
+                transition: `transform var(--psi-duration-350) var(--psi-ease-${name})`,
               }}
             />
           </div>
@@ -149,11 +149,11 @@ export const Specimens: Story = {
 
       <p
         style={{
-          font: "var(--ds-text-12-16-regular)",
-          color: "var(--ds-fg-tertiary)",
+          font: "var(--psi-text-12-16-regular)",
+          color: "var(--psi-fg-tertiary)",
         }}
       >
-        D30: &ldquo;All --ds-duration-* zero under prefers-reduced-motion;
+        D30: &ldquo;All --psi-duration-* zero under prefers-reduced-motion;
         drive all transitions/animations with duration tokens.&rdquo;
       </p>
     </div>

@@ -81,7 +81,7 @@ export const DisabledLink: Story = {
 
 export const AllSizes: Story = {
   render: () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "var(--ds-space-12)" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "var(--psi-space-12)" }}>
       <IconButton variant="accent" size={24} aria-label="Size 24">
         <StarIcon />
       </IconButton>
@@ -100,7 +100,7 @@ export const AllSizes: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: "var(--ds-space-12)" }}>
+    <div style={{ display: "flex", gap: "var(--psi-space-12)" }}>
       <IconButton variant="accent" aria-label="Accent">
         <StarIcon />
       </IconButton>
@@ -122,10 +122,10 @@ export const VariantSizeMatrix: Story = {
     const variants = ["accent", "neutral", "ghost", "danger"] as const;
     const sizes = [24, 32, 40, 48] as const;
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-12)" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--psi-space-12)" }}>
         {variants.map((variant) => (
-          <div key={variant} style={{ display: "flex", alignItems: "center", gap: "var(--ds-space-12)" }}>
-            <span style={{ width: 60, font: "var(--ds-text-12-16-regular)", color: "var(--ds-fg-secondary)" }}>
+          <div key={variant} style={{ display: "flex", alignItems: "center", gap: "var(--psi-space-12)" }}>
+            <span style={{ width: 60, font: "var(--psi-text-12-16-regular)", color: "var(--psi-fg-secondary)" }}>
               {variant}
             </span>
             {sizes.map((size) => (

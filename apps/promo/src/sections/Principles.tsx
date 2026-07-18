@@ -12,7 +12,7 @@ const PRINCIPLES = [
     title: "Pixel-true scale names",
     body: (
       <>
-        <code>ds-gap-8</code> means 8px. Component sizes are numbers —{" "}
+        <code>psi-gap-8</code> means 8px. Component sizes are numbers —{" "}
         <code>32</code>, <code>40</code> — never S/M/L. What you read is what
         renders.
       </>
@@ -23,7 +23,7 @@ const PRINCIPLES = [
     body: (
       <>
         Every component is independently themeable via its own{" "}
-        <code>--ds-*</code> variables; derived states live in code, not as
+        <code>--psi-*</code> variables; derived states live in code, not as
         separate styles.
       </>
     ),

@@ -8,8 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@handamade/react": "workspace:*",
-    "@handamade/tokens": "workspace:*",
+    "@handamade/psi-react": "workspace:*",
+    "@handamade/psi-tokens": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

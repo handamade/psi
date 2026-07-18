@@ -1,8 +1,8 @@
-/** Switch component tokens (--ds-switch-*). */
+/** Switch component tokens (--psi-switch-*). */
 export const switchVars: Record<string, string> = {
-  fg: "var(--ds-fg-primary)",
-  "track-bg": "var(--ds-fill-neutral4)",
-  "track-bg-checked": "var(--ds-fill-accent)",
-  "thumb-bg": "var(--ds-fg-static-white)",
-  "focus-ring": "var(--ds-border-focus)",
+  fg: "var(--psi-fg-primary)",
+  "track-bg": "var(--psi-fill-neutral4)",
+  "track-bg-checked": "var(--psi-fill-accent)",
+  "thumb-bg": "var(--psi-fg-static-white)",
+  "focus-ring": "var(--psi-border-focus)",
 };

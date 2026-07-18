@@ -16,17 +16,17 @@ export const Specimens: Story = {
     <div className="ds-p-24" style={{ maxWidth: 800 }}>
       <h1
         style={{
-          font: "var(--ds-text-24-32-medium)",
-          color: "var(--ds-fg-primary)",
-          marginBottom: "var(--ds-space-24)",
+          font: "var(--psi-text-24-32-medium)",
+          color: "var(--psi-fg-primary)",
+          marginBottom: "var(--psi-space-24)",
         }}
       >
         Typography Scale
       </h1>
       <p
         style={{
-          color: "var(--ds-fg-secondary)",
-          marginBottom: "var(--ds-space-32)",
+          color: "var(--psi-fg-secondary)",
+          marginBottom: "var(--psi-space-32)",
         }}
       >
         Each combo defines font size, line height, and weight together as a
@@ -36,7 +36,7 @@ export const Specimens: Story = {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--ds-space-24)",
+          gap: "var(--psi-space-24)",
         }}
       >
         {docTypography.map((combo) => (
@@ -45,17 +45,17 @@ export const Specimens: Story = {
             style={{
               display: "flex",
               alignItems: "baseline",
-              gap: "var(--ds-space-24)",
-              borderBottom: "1px solid var(--ds-border-neutral)",
-              paddingBottom: "var(--ds-space-16)",
+              gap: "var(--psi-space-24)",
+              borderBottom: "1px solid var(--psi-border-neutral)",
+              paddingBottom: "var(--psi-space-16)",
             }}
           >
             <div style={{ width: 200, flexShrink: 0 }}>
               <code
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
+                  font: "var(--psi-text-12-16-regular)",
                   fontFamily: "monospace",
-                  color: "var(--ds-fg-accent)",
+                  color: "var(--psi-fg-accent)",
                   display: "block",
                 }}
               >
@@ -63,8 +63,8 @@ export const Specimens: Story = {
               </code>
               <span
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
-                  color: "var(--ds-fg-tertiary)",
+                  font: "var(--psi-text-12-16-regular)",
+                  color: "var(--psi-fg-tertiary)",
                 }}
               >
                 {combo.fontSize}px / {combo.lineHeight}px &middot;{" "}
@@ -73,8 +73,8 @@ export const Specimens: Story = {
             </div>
             <span
               style={{
-                font: `var(--ds-text-${combo.name})`,
-                color: "var(--ds-fg-primary)",
+                font: `var(--psi-text-${combo.name})`,
+                color: "var(--psi-fg-primary)",
               }}
             >
               The quick brown fox jumps over the lazy dog

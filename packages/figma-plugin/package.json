@@ -1,5 +1,5 @@
 {
-  "name": "@handamade/figma-plugin",
+  "name": "@handamade/psi-figma-plugin",
   "private": true,
   "type": "module",
   "scripts": {

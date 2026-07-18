@@ -23,14 +23,14 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
       style={{
         width: "100%",
         borderCollapse: "collapse",
-        font: "var(--ds-text-14-20-regular)",
+        font: "var(--psi-text-14-20-regular)",
       }}
     >
       <thead>
         <tr
           style={{
             textAlign: "left",
-            borderBottom: "1px solid var(--ds-border-neutral)",
+            borderBottom: "1px solid var(--psi-border-neutral)",
           }}
         >
           <th style={{ padding: "8px 12px" }}>Swatch</th>
@@ -43,25 +43,25 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
         {tokens.map((t) => (
           <tr
             key={t.name}
-            style={{ borderBottom: "1px solid var(--ds-border-neutral)" }}
+            style={{ borderBottom: "1px solid var(--psi-border-neutral)" }}
           >
             <td style={{ padding: "8px 12px" }}>
               <div
                 style={{
                   width: 32,
                   height: 32,
-                  borderRadius: "var(--ds-radius-4)",
+                  borderRadius: "var(--psi-radius-4)",
                   backgroundColor: `var(${t.cssVar})`,
-                  border: "1px solid var(--ds-border-neutral)",
+                  border: "1px solid var(--psi-border-neutral)",
                 }}
               />
             </td>
             <td style={{ padding: "8px 12px" }}>
               <code
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
+                  font: "var(--psi-text-12-16-regular)",
                   fontFamily: "monospace",
-                  color: "var(--ds-fg-primary)",
+                  color: "var(--psi-fg-primary)",
                 }}
               >
                 {t.cssVar}
@@ -70,16 +70,16 @@ function TokenTable({ tokens }: { tokens: DocToken[] }) {
             <td style={{ padding: "8px 12px" }}>
               <code
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
+                  font: "var(--psi-text-12-16-regular)",
                   fontFamily: "monospace",
-                  color: "var(--ds-fg-secondary)",
+                  color: "var(--psi-fg-secondary)",
                 }}
               >
                 {t.hex}
               </code>
             </td>
             <td style={{ padding: "8px 12px" }}>
-              <span style={{ color: "var(--ds-fg-tertiary)" }}>
+              <span style={{ color: "var(--psi-fg-tertiary)" }}>
                 {t.formula}
               </span>
             </td>
@@ -98,17 +98,17 @@ export const AllColorTokens: Story = {
       <div className="ds-p-24" style={{ maxWidth: 900 }}>
         <h1
           style={{
-            font: "var(--ds-text-24-32-medium)",
-            color: "var(--ds-fg-primary)",
-            marginBottom: "var(--ds-space-24)",
+            font: "var(--psi-text-24-32-medium)",
+            color: "var(--psi-fg-primary)",
+            marginBottom: "var(--psi-space-24)",
           }}
         >
           Color Tokens
         </h1>
         <p
           style={{
-            color: "var(--ds-fg-secondary)",
-            marginBottom: "var(--ds-space-32)",
+            color: "var(--psi-fg-secondary)",
+            marginBottom: "var(--psi-space-32)",
           }}
         >
           Semantic color tokens resolved for the active{" "}
@@ -121,13 +121,13 @@ export const AllColorTokens: Story = {
           return (
             <section
               key={prefix}
-              style={{ marginBottom: "var(--ds-space-32)" }}
+              style={{ marginBottom: "var(--psi-space-32)" }}
             >
               <h2
                 style={{
-                  font: "var(--ds-text-18-28-medium)",
-                  color: "var(--ds-fg-primary)",
-                  marginBottom: "var(--ds-space-12)",
+                  font: "var(--psi-text-18-28-medium)",
+                  color: "var(--psi-fg-primary)",
+                  marginBottom: "var(--psi-space-12)",
                   textTransform: "capitalize",
                 }}
               >

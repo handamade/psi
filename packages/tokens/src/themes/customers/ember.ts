@@ -34,9 +34,9 @@ export const emberFonts: BrandFonts = {
   display: '"Archivo", system-ui, sans-serif',
 };
 
-/** D34 component-token overrides — emitted at [data-ds-theme="ember"] in ds.components. */
+/** D34 component-token overrides — emitted at [data-psi-theme="ember"] in psi.components. */
 export const emberComponentOverrides: Record<string, string> = {
-  "button-font": "var(--ds-text-mono-15-24-regular)",
+  "button-font": "var(--psi-text-mono-15-24-regular)",
   "card-radius": "0",
   "media-tint": "grayscale(1) sepia(0.65) saturate(1.6) hue-rotate(-12deg) brightness(0.88) contrast(1.05)",
 };

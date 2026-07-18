@@ -34,7 +34,7 @@ describe("ember brand (WS1)", () => {
   });
 
   it("ember restyles button typography to mono via component override (D34)", () => {
-    expect(customerThemes.ember.componentOverrides?.["button-font"]).toBe("var(--ds-text-mono-15-24-regular)");
+    expect(customerThemes.ember.componentOverrides?.["button-font"]).toBe("var(--psi-text-mono-15-24-regular)");
   });
 
   it("ember squares off card corners via component override (WS5): portfolio cards are square", () => {

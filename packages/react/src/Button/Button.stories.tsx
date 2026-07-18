@@ -60,7 +60,7 @@ export const DangerSubtle: Story = {
 
 export const Outline: Story = {
   render: () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "var(--ds-space-12)" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "var(--psi-space-12)" }}>
       <Button variant="outline" size={24}>Size 24</Button>
       <Button variant="outline" size={32}>Size 32</Button>
       <Button variant="outline" size={40}>Size 40</Button>
@@ -94,7 +94,7 @@ export const DisabledLink: Story = {
 
 export const AllSizes: Story = {
   render: () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "var(--ds-space-12)" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "var(--psi-space-12)" }}>
       <Button variant="accent" size={24}>Size 24</Button>
       <Button variant="accent" size={32}>Size 32</Button>
       <Button variant="accent" size={40}>Size 40</Button>
@@ -105,7 +105,7 @@ export const AllSizes: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-12)" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--psi-space-12)" }}>
       <Button variant="accent">Accent</Button>
       <Button variant="accent-subtle">Accent Subtle</Button>
       <Button variant="neutral">Neutral</Button>

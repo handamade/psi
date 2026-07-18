@@ -1,8 +1,8 @@
 const FIGMA_VARS = [
-  { name: "bg/primary", varClass: "--ds-bg-primary", note: "COLOR · 3 modes" },
-  { name: "fg/accent", varClass: "--ds-fg-accent", note: "COLOR · 3 modes" },
-  { name: "space/16", varClass: "--ds-fill-neutral3", note: "FLOAT · 16" },
-  { name: "radius/8", varClass: "--ds-fill-neutral4", note: "FLOAT · 8" },
+  { name: "bg/primary", varClass: "--psi-bg-primary", note: "COLOR · 3 modes" },
+  { name: "fg/accent", varClass: "--psi-fg-accent", note: "COLOR · 3 modes" },
+  { name: "space/16", varClass: "--psi-fill-neutral3", note: "FLOAT · 16" },
+  { name: "radius/8", varClass: "--psi-fill-neutral4", note: "FLOAT · 8" },
 ];
 
 const ARTIFACTS = [
@@ -39,11 +39,11 @@ export function Pipeline() {
 
         <div className="pipeline-grid">
           <div className="card">
-            <h3 style={{ font: "var(--ds-text-20-28-semibold)" }}>
+            <h3 style={{ font: "var(--psi-text-20-28-semibold)" }}>
               Figma, synced from code
             </h3>
             <p>
-              The in-repo <strong>DS Token Sync</strong> plugin upserts a
+              The in-repo <strong>Psi Token Sync</strong> plugin upserts a
               variable collection into Figma: one mode per theme, colors
               grouped bg/fg/fill/border, floats for space, size and radius,
               text styles for every type combo. Idempotent, with a dry-run
@@ -66,7 +66,7 @@ export function Pipeline() {
           </div>
 
           <div className="card">
-            <h3 style={{ font: "var(--ds-text-20-28-semibold)" }}>
+            <h3 style={{ font: "var(--psi-text-20-28-semibold)" }}>
               Readable by your AI, too
             </h3>
             <p>

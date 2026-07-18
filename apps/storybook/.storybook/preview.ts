@@ -1,13 +1,13 @@
 import type { Preview } from "storybook";
 import { createElement } from "react";
 
-import "@handamade/tokens/base.css";
-import "@handamade/tokens/light.css";
-import "@handamade/tokens/dark.css";
-import "@handamade/tokens/acme.css";
-import "@handamade/tokens/ember.css";
-import "@handamade/tokens/utilities.css";
-import "@handamade/tokens/components.css";
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css";
+import "@handamade/psi-tokens/dark.css";
+import "@handamade/psi-tokens/acme.css";
+import "@handamade/psi-tokens/ember.css";
+import "@handamade/psi-tokens/utilities.css";
+import "@handamade/psi-tokens/components.css";
 
 const preview: Preview = {
   // Generated docs page per component — public link targets for the website
@@ -36,7 +36,7 @@ const preview: Preview = {
       const theme = context.globals.theme ?? "light";
       return createElement(
         "div",
-        { "data-ds-theme": theme, style: { padding: "1rem" } },
+        { "data-psi-theme": theme, style: { padding: "1rem" } },
         createElement(Story),
       );
     },

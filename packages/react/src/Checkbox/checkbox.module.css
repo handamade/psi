@@ -3,11 +3,11 @@
 .label {
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-space-8);
+  gap: var(--psi-space-8);
   cursor: pointer;
   user-select: none;
-  font: var(--ds-text-14-20-regular);
-  color: var(--ds-checkbox-fg);
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-checkbox-fg);
 }
 
 .disabled {
@@ -38,18 +38,18 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  border: 1px solid var(--ds-checkbox-box-border);
-  border-radius: var(--ds-radius-4);
-  background: var(--ds-checkbox-box-bg);
+  border: 1px solid var(--psi-checkbox-box-border);
+  border-radius: var(--psi-radius-4);
+  background: var(--psi-checkbox-box-bg);
   transition:
-    background-color var(--ds-duration-150) var(--ds-ease-standard),
-    border-color var(--ds-duration-150) var(--ds-ease-standard);
+    background-color var(--psi-duration-150) var(--psi-ease-standard),
+    border-color var(--psi-duration-150) var(--psi-ease-standard);
 }
 
 /* Checked state */
 .input:checked + .indicator {
-  background: var(--ds-checkbox-box-bg-checked);
-  border-color: var(--ds-checkbox-box-border-checked);
+  background: var(--psi-checkbox-box-bg-checked);
+  border-color: var(--psi-checkbox-box-border-checked);
 }
 
 /* Check mark via CSS */
@@ -58,19 +58,19 @@
   display: block;
   width: 4px;
   height: 8px;
-  border: solid var(--ds-checkbox-check-fg);
+  border: solid var(--psi-checkbox-check-fg);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg) translate(-0.5px, -0.5px);
 }
 
 /* Focus visible */
 .input:focus-visible + .indicator {
-  outline: 2px solid var(--ds-checkbox-focus-ring);
+  outline: 2px solid var(--psi-checkbox-focus-ring);
   outline-offset: 2px;
 }
 
 /* ── Label text ──────────────────────────────────────────────── */
 
 .text {
-  color: var(--ds-checkbox-fg);
+  color: var(--psi-checkbox-fg);
 }

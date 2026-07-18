@@ -1,14 +1,14 @@
-import resolvedLight from "@handamade/tokens/resolved/light.json";
-import resolvedDark from "@handamade/tokens/resolved/dark.json";
-import resolvedAcme from "@handamade/tokens/resolved/acme.json";
-import resolvedEmber from "@handamade/tokens/resolved/ember.json";
+import resolvedLight from "@handamade/psi-tokens/resolved/light.json";
+import resolvedDark from "@handamade/psi-tokens/resolved/dark.json";
+import resolvedAcme from "@handamade/psi-tokens/resolved/acme.json";
+import resolvedEmber from "@handamade/psi-tokens/resolved/ember.json";
 
 export type ThemeName = "light" | "dark" | "acme" | "ember";
 
 export interface DocToken {
   /** Original camelCase name from the theme definition */
   name: string;
-  /** CSS custom property, e.g. `--ds-bg-primary` */
+  /** CSS custom property, e.g. `--psi-bg-primary` */
   cssVar: string;
   /** Resolved hex value */
   hex: string;
@@ -74,7 +74,7 @@ const RESOLVED: Record<ThemeName, ResolvedTheme> = {
 function buildDocTokens(resolved: ResolvedTheme): DocToken[] {
   return Object.values(resolved.tokens).map((t) => ({
     name: t.name,
-    cssVar: `--ds-${camelToKebab(t.name)}`,
+    cssVar: `--psi-${camelToKebab(t.name)}`,
     hex: t.hex,
     formula: t.formula,
     oklch: formatOklch(t.oklch),

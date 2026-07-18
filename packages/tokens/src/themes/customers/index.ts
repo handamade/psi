@@ -18,7 +18,7 @@ export interface CustomerTheme {
   /** Optional brand-level font role assignment (D29). */
   fonts?: BrandFonts;
   /** Component-token overrides (D34) — part of the themeable surface. Keys
-   * omit the --ds- prefix, e.g. "card-radius": "0". Must not break a11y,
+   * omit the --psi- prefix, e.g. "card-radius": "0". Must not break a11y,
    * sizing contracts, or interaction states. */
   componentOverrides?: Record<string, string>;
 }

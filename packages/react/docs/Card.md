@@ -9,13 +9,13 @@
 |---|---|---|---|---|
 | `variant` | `"stacked" \| "featured"` | stacked | no | stacked = media above body; featured = media beside body (~1.6fr/1fr), stacks under md. |
 | `media` | `ReactNode` | — | no | Media slot rendered edge-to-edge (img, AspectRatio, …). |
-| `hoverLift` | `boolean` | false | no | Lift on hover: translateY(-6px) over --ds-duration-350. |
+| `hoverLift` | `boolean` | false | no | Lift on hover: translateY(-6px) over --psi-duration-350. |
 | `ref` | `Ref<HTMLDivElement>` | — | no | Forwarded ref to the root element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
 ## Theming
 
-Override `--ds-card-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-card-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
 
 ## Variant guidance
 
@@ -34,6 +34,6 @@ Override `--ds-card-*` custom properties at any scope; interactive states derive
 - One accent per visual group; everything else neutral or ghost.
 - danger only for actions with real consequences.
 - Sizes are px numbers (24|32|40|48), never S/M/L.
-- Typography tokens are --ds-text-{size}-{lineHeight}-{weight}.
-- Override component tokens (--ds-{component}-*), not semantic tokens, for one-off theming.
-- --ds-button-font overrides button typography across all sizes (documented D34 override; ember → mono).
+- Typography tokens are --psi-text-{size}-{lineHeight}-{weight}.
+- Override component tokens (--psi-{component}-*), not semantic tokens, for one-off theming.
+- --psi-button-font overrides button typography across all sizes (documented D34 override; ember → mono).

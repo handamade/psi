@@ -1,4 +1,4 @@
-import { Button, IconCheck, Switch, Tag } from "@handamade/react";
+import { Button, IconCheck, Switch, Tag } from "@handamade/psi-react";
 
 import type { ThemeName } from "../theme";
 
@@ -20,7 +20,7 @@ export const acmeSlots: SlotMap = {
 function ThemePreview({ name }: { name: ThemeName }) {
   return (
     <figure className="theme-card">
-      <div className="theme-card-ui" data-ds-theme={name}>
+      <div className="theme-card-ui" data-psi-theme={name}>
         <header>
           <strong>Invoices</strong>
           <Tag variant="success" subtle>
@@ -33,7 +33,7 @@ function ThemePreview({ name }: { name: ThemeName }) {
           <Button variant="accent">New invoice</Button>
         </div>
       </div>
-      <figcaption className="annot">data-ds-theme=&quot;{name}&quot;</figcaption>
+      <figcaption className="annot">data-psi-theme=&quot;{name}&quot;</figcaption>
     </figure>
   );
 }
@@ -47,7 +47,7 @@ export function Theming() {
           <h2>A customer is a theme file, not a fork.</h2>
           <p className="lede">
             The same markup, rendered three times below — each card just sets
-            its own <code>data-ds-theme</code>. Semantic token names never
+            its own <code>data-psi-theme</code>. Semantic token names never
             change, so consuming code is theme-agnostic.
           </p>
         </div>
@@ -86,7 +86,7 @@ export function Theming() {
               <IconCheck size={16} aria-hidden="true" />
               <span>
                 <strong>Themes are attribute-scoped</strong> — nest{" "}
-                <code>data-ds-theme</code> anywhere for per-surface theming,
+                <code>data-psi-theme</code> anywhere for per-surface theming,
                 like the three cards above.
               </span>
             </li>

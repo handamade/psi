@@ -18,4 +18,4 @@ export function storybookDocs(title: string): string {
   return `${STORYBOOK_BASE}?path=/docs/${id}--docs`;
 }
 
-export const REPO_URL = "https://github.com/handamade/s-ds-claude";
+export const REPO_URL = "https://github.com/handamade/psi";

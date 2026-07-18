@@ -47,7 +47,7 @@ export const Dismissible: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--psi-space-8)" }}>
       <Tag variant="neutral">Neutral</Tag>
       <Tag variant="accent">Accent</Tag>
       <Tag variant="success">Success</Tag>
@@ -59,7 +59,7 @@ export const AllVariants: Story = {
 
 export const SubtleVariants: Story = {
   render: () => (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--psi-space-8)" }}>
       <Tag variant="neutral" subtle>Neutral</Tag>
       <Tag variant="accent" subtle>Accent</Tag>
       <Tag variant="success" subtle>Success</Tag>

@@ -71,7 +71,7 @@ export const Right: Story = {
 
 export const AllPlacements: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: "var(--ds-space-32)" }}>
+    <div style={{ display: "flex", gap: "var(--psi-space-32)" }}>
       <Tooltip content="Top" placement="top">
         <button>Top</button>
       </Tooltip>

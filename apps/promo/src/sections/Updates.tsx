@@ -1,4 +1,4 @@
-import { Tag, type TagProps } from "@handamade/react";
+import { Tag, type TagProps } from "@handamade/psi-react";
 
 import { UPDATES, type UpdateEntry } from "../content/updates";
 

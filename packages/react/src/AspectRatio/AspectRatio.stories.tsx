@@ -20,7 +20,7 @@ export const Wide: Story = {
   render: (args) => (
     <div style={{ width: "320px" }}>
       <AspectRatio {...args}>
-        <div style={{ background: "var(--ds-fill-neutral4)", width: "100%", height: "100%" }} />
+        <div style={{ background: "var(--psi-fill-neutral4)", width: "100%", height: "100%" }} />
       </AspectRatio>
     </div>
   ),
@@ -33,7 +33,7 @@ export const Portrait: Story = {
   render: (args) => (
     <div style={{ width: "320px" }}>
       <AspectRatio {...args}>
-        <div style={{ background: "var(--ds-fill-neutral4)", width: "100%", height: "100%" }} />
+        <div style={{ background: "var(--psi-fill-neutral4)", width: "100%", height: "100%" }} />
       </AspectRatio>
     </div>
   ),

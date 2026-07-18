@@ -32,7 +32,7 @@ export const Disabled: Story = {
 
 export const AllSizes: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-12)", maxWidth: 320 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--psi-space-12)", maxWidth: 320 }}>
       <Input size={24} placeholder="Size 24" />
       <Input size={32} placeholder="Size 32" />
       <Input size={40} placeholder="Size 40" />
@@ -43,7 +43,7 @@ export const AllSizes: Story = {
 
 export const States: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-12)", maxWidth: 320 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--psi-space-12)", maxWidth: 320 }}>
       <Input placeholder="Default" />
       <Input placeholder="Error" error />
       <Input placeholder="Disabled" disabled />

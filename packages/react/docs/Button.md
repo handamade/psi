@@ -26,7 +26,7 @@ With href it renders an <a>; disabled anchors get aria-disabled, lose the href a
 
 ## Theming
 
-Override `--ds-button-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-button-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
 
 ## Variant guidance
 
@@ -45,6 +45,6 @@ Override `--ds-button-*` custom properties at any scope; interactive states deri
 - One accent per visual group; everything else neutral or ghost.
 - danger only for actions with real consequences.
 - Sizes are px numbers (24|32|40|48), never S/M/L.
-- Typography tokens are --ds-text-{size}-{lineHeight}-{weight}.
-- Override component tokens (--ds-{component}-*), not semantic tokens, for one-off theming.
-- --ds-button-font overrides button typography across all sizes (documented D34 override; ember → mono).
+- Typography tokens are --psi-text-{size}-{lineHeight}-{weight}.
+- Override component tokens (--psi-{component}-*), not semantic tokens, for one-off theming.
+- --psi-button-font overrides button typography across all sizes (documented D34 override; ember → mono).
