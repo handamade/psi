@@ -14,11 +14,11 @@ export function camelToKebab(str: string): string {
 }
 
 export function tokenVar(name: string): string {
-  return `--ds-${camelToKebab(name)}`;
+  return `--psi-${camelToKebab(name)}`;
 }
 
 export function paletteVar(name: string): string {
-  return `--ds-palette-${name}`;
+  return `--psi-palette-${name}`;
 }
 
 /**
@@ -45,13 +45,13 @@ export function opToCSS(channel: string, op: ChannelOp): string {
  * Assemble the full oklch(from var(...) ...) expression for a token.
  *
  * Slot-sourced token with ops:
- *   oklch(from var(--ds-palette-sapphire) 0.65 min(c, 0.23) h)
+ *   oklch(from var(--psi-palette-sapphire) 0.65 min(c, 0.23) h)
  *
  * Ref-sourced token with alpha:
- *   oklch(from var(--ds-fg-primary) l c h / 0.7)
+ *   oklch(from var(--psi-fg-primary) l c h / 0.7)
  *
  * No-op (just a slot reference, no ops, no alpha):
- *   var(--ds-palette-platinum)
+ *   var(--psi-palette-platinum)
  */
 export function tokenToLiveCSS(def: TokenDef, slots: SlotMap): string {
   const hasOps = def.l || def.c || def.h;
@@ -89,9 +89,9 @@ export function tokenToLiveCSS(def: TokenDef, slots: SlotMap): string {
 
 export function emitBaseCSS(palette: Palette): string {
   const lines: string[] = [];
-  lines.push("@layer ds.base, ds.theme, ds.components, ds.utilities;");
+  lines.push("@layer psi.base, psi.theme, psi.components, psi.utilities;");
   lines.push("");
-  lines.push("@layer ds.base {");
+  lines.push("@layer psi.base {");
   lines.push("  :root {");
 
   for (const [name, entry] of Object.entries(palette)) {
@@ -120,10 +120,10 @@ export function emitThemeCSS(
   // Determine selector
   const selector =
     themeName === "light"
-      ? `:root, [data-ds-theme="light"]`
-      : `[data-ds-theme="${themeName}"]`;
+      ? `:root, [data-psi-theme="light"]`
+      : `[data-psi-theme="${themeName}"]`;
 
-  lines.push("@layer ds.theme {");
+  lines.push("@layer psi.theme {");
   lines.push(`  ${selector} {`);
 
   // Scope this theme's own palette vars inside its selector block so a
@@ -143,7 +143,7 @@ export function emitThemeCSS(
 
   if (opts?.fonts) {
     for (const [role, stack] of Object.entries(opts.fonts)) {
-      lines.push(`    --ds-font-${role}: ${stack};`);
+      lines.push(`    --psi-font-${role}: ${stack};`);
     }
   }
 
@@ -151,10 +151,10 @@ export function emitThemeCSS(
   lines.push("}");
 
   if (opts?.componentOverrides && Object.keys(opts.componentOverrides).length > 0) {
-    lines.push("@layer ds.components {");
-    lines.push(`  [data-ds-theme="${themeName}"] {`);
+    lines.push("@layer psi.components {");
+    lines.push(`  [data-psi-theme="${themeName}"] {`);
     for (const [name, value] of Object.entries(opts.componentOverrides)) {
-      lines.push(`    --ds-${name}: ${value};`);
+      lines.push(`    --psi-${name}: ${value};`);
     }
     lines.push("  }");
     lines.push("}");

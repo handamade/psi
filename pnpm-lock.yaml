@@ -41,10 +41,10 @@ importers:
 
   apps/promo:
     dependencies:
-      '@handamade/react':
+      '@handamade/psi-react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@handamade/tokens':
+      '@handamade/psi-tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       react:
@@ -72,10 +72,10 @@ importers:
 
   apps/storybook:
     dependencies:
-      '@handamade/react':
+      '@handamade/psi-react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@handamade/tokens':
+      '@handamade/psi-tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       react:
@@ -112,7 +112,7 @@ importers:
 
   packages/react:
     devDependencies:
-      '@handamade/tokens':
+      '@handamade/psi-tokens':
         specifier: workspace:*
         version: link:../tokens
       '@testing-library/jest-dom':

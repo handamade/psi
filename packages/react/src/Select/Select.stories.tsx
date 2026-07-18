@@ -56,7 +56,7 @@ export const Disabled: Story = {
 
 export const AllSizes: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-12)", maxWidth: 320 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--psi-space-12)", maxWidth: 320 }}>
       {([24, 32, 40, 48] as const).map((size) => (
         <Select key={size} size={size}>
           <option>Size {size}</option>

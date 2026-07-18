@@ -4,21 +4,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--ds-space-6);
+  gap: var(--psi-space-6);
   border: none;
-  border-radius: var(--ds-radius-8);
+  border-radius: var(--psi-radius-8);
   cursor: pointer;
-  font-family: var(--ds-font-sans);
+  font-family: var(--psi-font-sans);
   white-space: nowrap;
   text-decoration: none;
   user-select: none;
   transition:
-    background-color var(--ds-duration-150) var(--ds-ease-standard),
-    color var(--ds-duration-150) var(--ds-ease-standard);
+    background-color var(--psi-duration-150) var(--psi-ease-standard),
+    color var(--psi-duration-150) var(--psi-ease-standard);
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--ds-button-focus-ring);
+  outline: 2px solid var(--psi-button-focus-ring);
   outline-offset: 2px;
 }
 
@@ -37,126 +37,126 @@
 /* ── Sizes ────────────────────────────────────────────────────── */
 
 .size24 {
-  height: var(--ds-size-24);
-  padding-inline: var(--ds-space-8);
-  font: var(--ds-button-font, var(--ds-text-12-16-medium));
+  height: var(--psi-size-24);
+  padding-inline: var(--psi-space-8);
+  font: var(--psi-button-font, var(--psi-text-12-16-medium));
 }
 
 .size32 {
-  height: var(--ds-size-32);
-  padding-inline: var(--ds-space-12);
-  font: var(--ds-button-font, var(--ds-text-14-20-medium));
+  height: var(--psi-size-32);
+  padding-inline: var(--psi-space-12);
+  font: var(--psi-button-font, var(--psi-text-14-20-medium));
 }
 
 .size40 {
-  height: var(--ds-size-40);
-  padding-inline: var(--ds-space-16);
-  font: var(--ds-button-font, var(--ds-text-16-24-medium));
+  height: var(--psi-size-40);
+  padding-inline: var(--psi-space-16);
+  font: var(--psi-button-font, var(--psi-text-16-24-medium));
 }
 
 .size48 {
-  height: var(--ds-size-48);
-  padding-inline: var(--ds-space-20);
-  font: var(--ds-button-font, var(--ds-text-18-28-medium));
+  height: var(--psi-size-48);
+  padding-inline: var(--psi-space-20);
+  font: var(--psi-button-font, var(--psi-text-18-28-medium));
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */
 
 /* Accent */
 .accent {
-  background: var(--ds-button-accent-bg);
-  color: var(--ds-button-accent-fg);
+  background: var(--psi-button-accent-bg);
+  color: var(--psi-button-accent-fg);
 }
 .accent:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-accent-bg-hover);
+  background: var(--psi-button-accent-bg-hover);
 }
 .accent:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-accent-bg-active);
+  background: var(--psi-button-accent-bg-active);
 }
 
 /* Accent Subtle */
 .accentSubtle {
-  background: var(--ds-button-accent-subtle-bg);
-  color: var(--ds-button-accent-subtle-fg);
+  background: var(--psi-button-accent-subtle-bg);
+  color: var(--psi-button-accent-subtle-fg);
 }
 .accentSubtle:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-accent-subtle-bg-hover);
+  background: var(--psi-button-accent-subtle-bg-hover);
 }
 .accentSubtle:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-accent-subtle-bg-active);
+  background: var(--psi-button-accent-subtle-bg-active);
 }
 
 /* Neutral */
 .neutral {
-  background: var(--ds-button-neutral-bg);
-  color: var(--ds-button-neutral-fg);
+  background: var(--psi-button-neutral-bg);
+  color: var(--psi-button-neutral-fg);
 }
 .neutral:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-neutral-bg-hover);
+  background: var(--psi-button-neutral-bg-hover);
 }
 .neutral:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-neutral-bg-active);
+  background: var(--psi-button-neutral-bg-active);
 }
 
 /* Neutral Subtle */
 .neutralSubtle {
-  background: var(--ds-button-neutral-subtle-bg);
-  color: var(--ds-button-neutral-subtle-fg);
+  background: var(--psi-button-neutral-subtle-bg);
+  color: var(--psi-button-neutral-subtle-fg);
 }
 .neutralSubtle:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-neutral-subtle-bg-hover);
+  background: var(--psi-button-neutral-subtle-bg-hover);
 }
 .neutralSubtle:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-neutral-subtle-bg-active);
+  background: var(--psi-button-neutral-subtle-bg-active);
 }
 
 /* Ghost */
 .ghost {
-  background: var(--ds-button-ghost-bg);
-  color: var(--ds-button-ghost-fg);
+  background: var(--psi-button-ghost-bg);
+  color: var(--psi-button-ghost-fg);
 }
 .ghost:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-ghost-bg-hover);
+  background: var(--psi-button-ghost-bg-hover);
 }
 .ghost:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-ghost-bg-active);
+  background: var(--psi-button-ghost-bg-active);
 }
 
 /* Danger */
 .danger {
-  background: var(--ds-button-danger-bg);
-  color: var(--ds-button-danger-fg);
+  background: var(--psi-button-danger-bg);
+  color: var(--psi-button-danger-fg);
 }
 .danger:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-danger-bg-hover);
+  background: var(--psi-button-danger-bg-hover);
 }
 .danger:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-danger-bg-active);
+  background: var(--psi-button-danger-bg-active);
 }
 
 /* Danger Subtle */
 .dangerSubtle {
-  background: var(--ds-button-danger-subtle-bg);
-  color: var(--ds-button-danger-subtle-fg);
+  background: var(--psi-button-danger-subtle-bg);
+  color: var(--psi-button-danger-subtle-fg);
 }
 .dangerSubtle:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-danger-subtle-bg-hover);
+  background: var(--psi-button-danger-subtle-bg-hover);
 }
 .dangerSubtle:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-danger-subtle-bg-active);
+  background: var(--psi-button-danger-subtle-bg-active);
 }
 
 /* Outline — ghost-bordered CTA (WS5). Hover fills accent. */
 .outline {
-  background: var(--ds-button-outline-bg);
-  color: var(--ds-button-outline-fg);
-  border: 1px solid var(--ds-button-outline-border);
+  background: var(--psi-button-outline-bg);
+  color: var(--psi-button-outline-fg);
+  border: 1px solid var(--psi-button-outline-border);
 }
 .outline:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-outline-bg-hover);
-  color: var(--ds-button-outline-fg-hover);
+  background: var(--psi-button-outline-bg-hover);
+  color: var(--psi-button-outline-fg-hover);
   border-color: transparent;
 }
 .outline:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-outline-bg-active);
+  background: var(--psi-button-outline-bg-active);
 }

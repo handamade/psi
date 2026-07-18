@@ -22,7 +22,7 @@ function MediaPlaceholder({ height = 160 }: { height?: number }) {
   return (
     <div
       style={{
-        background: "var(--ds-fill-neutral4)",
+        background: "var(--psi-fill-neutral4)",
         height,
         width: "100%",
       }}
@@ -70,7 +70,7 @@ export const HoverLift: Story = {
       <>
         <h3 style={{ margin: 0 }}>Hover me</h3>
         <p style={{ margin: 0 }}>
-          Lifts on hover: translateY(-6px) over --ds-duration-350.
+          Lifts on hover: translateY(-6px) over --psi-duration-350.
         </p>
       </>
     ),

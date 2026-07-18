@@ -1,15 +1,15 @@
-# @handamade/react
+# @handamade/psi-react
 
-11 React 19 components consuming @handamade/tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
+11 React 19 components consuming @handamade/psi-tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
 
 ## Installation
 
-**Peer dependencies:** `react@^19.0.0`, `react-dom@^19.0.0`, `@handamade/tokens@workspace:*`
+**Peer dependencies:** `react@^19.0.0`, `react-dom@^19.0.0`, `@handamade/psi-tokens@workspace:*`
 
 **In workspace:** already installed. **External:** install from the private registry.
 
 ```bash
-pnpm add react react-dom @handamade/tokens
+pnpm add react react-dom @handamade/psi-tokens
 ```
 
 ## Usage
@@ -17,13 +17,13 @@ pnpm add react react-dom @handamade/tokens
 Import components and their styles:
 
 ```tsx
-import { Button } from "@handamade/react";
-import "@handamade/react/styles";
+import { Button } from "@handamade/psi-react";
+import "@handamade/psi-react/styles";
 
 // Also import token styles in your app root
-import "@handamade/tokens/base.css";
-import "@handamade/tokens/light.css"; // or dark.css
-import "@handamade/tokens/components.css";
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css"; // or dark.css
+import "@handamade/psi-tokens/components.css";
 
 export default function App() {
   return <Button size={32} variant="accent">Click me</Button>;

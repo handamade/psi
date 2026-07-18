@@ -1,4 +1,4 @@
-# @handamade/tokens
+# @handamade/psi-tokens
 
 OKLCH formula-based design tokens. Code is the source of truth; all artifacts generated.
 
@@ -6,41 +6,41 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - dist/resolved/{light,dark,acme,ember}.json: every token with OKLCH, hex, and derivation formula
 - dist/guidance.json: variant intent, usage rules, state derivation, typography defaults, motion/layout/fonts notes, recipes
 - dist/dtcg/{theme}.json: W3C DTCG format export
-- dist/components/{name}.vars.css: component-token declarations (--ds-{component}-*)
+- dist/components/{name}.vars.css: component-token declarations (--psi-{component}-*)
 
 ## Rules for generated code
-- Use semantic tokens (--ds-bg-*, --ds-fg-*, --ds-fill-*, --ds-border-*) in app CSS.
-- Override --ds-{component}-* tokens for one-off component theming; never fork semantic tokens.
-- Scales are pixel-true: --ds-space-8 is 8px (0.5rem). Typography: --ds-text-{size}-{lh}-{weight}.
-- Themes: import base.css + {theme}.css + components.css + utilities.css; set data-ds-theme="{name}" ({light,dark,acme,ember}).
+- Use semantic tokens (--psi-bg-*, --psi-fg-*, --psi-fill-*, --psi-border-*) in app CSS.
+- Override --psi-{component}-* tokens for one-off component theming; never fork semantic tokens.
+- Scales are pixel-true: --psi-space-8 is 8px (0.5rem). Typography: --psi-text-{size}-{lh}-{weight}.
+- Themes: import base.css + {theme}.css + components.css + utilities.css; set data-psi-theme="{name}" ({light,dark,acme,ember}).
 
-## Motion (--ds-duration-*, --ds-ease-*)
-- Durations: 150/200/350/450/600ms. Easings: --ds-ease-standard, --ds-ease-in-out, --ds-ease-soft.
+## Motion (--psi-duration-*, --psi-ease-*)
+- Durations: 150/200/350/450/600ms. Easings: --psi-ease-standard, --psi-ease-in-out, --psi-ease-soft.
 - Always drive transitions/animations with duration/ease tokens; never hardcode times or curves.
-- Under prefers-reduced-motion, all --ds-duration-* zero out (D30) — no per-component opt-out needed.
+- Under prefers-reduced-motion, all --psi-duration-* zero out (D30) — no per-component opt-out needed.
 
-## Layout (--ds-container-max, --ds-gutter, --ds-z-*)
-- .ds-container: max-width 1312px, gutter 40px stepping to 24px under the md breakpoint.
-- --ds-z-nav (100), --ds-z-overlay (1000), --ds-z-tooltip (1100).
-- Breakpoints (sm 560 / md 960) are build-time constants (D31), not CSS vars: `import { breakpoints } from "@handamade/tokens/types"` for any @media-driven JS/CSS-in-JS.
+## Layout (--psi-container-max, --psi-gutter, --psi-z-*)
+- .psi-container: max-width 1312px, gutter 40px stepping to 24px under the md breakpoint.
+- --psi-z-nav (100), --psi-z-overlay (1000), --psi-z-tooltip (1100).
+- Breakpoints (sm 560 / md 960) are build-time constants (D31), not CSS vars: `import { breakpoints } from "@handamade/psi-tokens/types"` for any @media-driven JS/CSS-in-JS.
 
 ## Typography: display, serif, mono
-- Fluid display tier: --ds-display-{min}-{max}-{weight} (e.g. --ds-display-56-128-black), clamp-based and pixel-true at both endpoints; pair with the matching .ds-display-* utility class for tracking/uppercase.
-- Serif and mono are first-class combo roles alongside sans: --ds-text-serif-{size}-{lh}-{weight} and --ds-text-mono-{size}-{lh}-{weight}, same naming shape as the sans scale.
+- Fluid display tier: --psi-display-{min}-{max}-{weight} (e.g. --psi-display-56-128-black), clamp-based and pixel-true at both endpoints; pair with the matching .psi-display-* utility class for tracking/uppercase.
+- Serif and mono are first-class combo roles alongside sans: --psi-text-serif-{size}-{lh}-{weight} and --psi-text-mono-{size}-{lh}-{weight}, same naming shape as the sans scale.
 
 ## Scrims and borders
-- --ds-scrim-soft/medium/heavy: bgPrimary-derived translucent overlays (0.25/0.35/0.82 alpha) for text-over-media legibility.
-- --ds-border-faint: low-contrast hairline border (fgPrimary at 0.08 alpha), used by Card/NavBar and other bordered surfaces.
+- --psi-scrim-soft/medium/heavy: bgPrimary-derived translucent overlays (0.25/0.35/0.82 alpha) for text-over-media legibility.
+- --psi-border-faint: low-contrast hairline border (fgPrimary at 0.08 alpha), used by Card/NavBar and other bordered surfaces.
 
-## Media tint (--ds-media-tint, .ds-media-tint)
-- --ds-media-tint is a brand-defined filter chain (D35); apply the .ds-media-tint utility class to media elements to get a tinted-at-rest, true-color-on-hover/focus treatment, transitioning over --ds-duration-450 / --ds-ease-soft.
+## Media tint (--psi-media-tint, .psi-media-tint)
+- --psi-media-tint is a brand-defined filter chain (D35); apply the .psi-media-tint utility class to media elements to get a tinted-at-rest, true-color-on-hover/focus treatment, transitioning over --psi-duration-450 / --psi-ease-soft.
 
 ## Dark-first brands
 - A brand theme can declare `base: "dark"` (see ember) so its formulas derive from the dark palette instead of light — use this for brands whose primary surface is a dark canvas rather than treating dark as an inverted afterthought.
 
 ## Brand fonts (D29)
 - Font roles (sans/serif/mono/display) are brand-level. The DS ships no font files — consumers load each brand's webfonts themselves (e.g. ember: Archivo for display/sans, IBM Plex Serif/Mono).
-- Brand font stacks fully apply when data-ds-theme is set on the root <html> element. In nested subtree theming, --ds-text-*/--ds-display-* combos keep the default stacks, since unregistered custom properties only substitute at :root.
+- Brand font stacks fully apply when data-psi-theme is set on the root <html> element. In nested subtree theming, --psi-text-*/--psi-display-* combos keep the default stacks, since unregistered custom properties only substitute at :root.
 
 ## Component overrides (D34)
-- A brand's theme file may declare `componentOverrides: Record<string, string>` (e.g. ember: button-font → mono, card-radius → 0, media-tint → its filter chain), emitted in the brand's own theme file (e.g. dist/ember.css) inside `@layer ds.components`. Prefer this over forking a component's CSS Module for brand-specific token values.
+- A brand's theme file may declare `componentOverrides: Record<string, string>` (e.g. ember: button-font → mono, card-radius → 0, media-tint → its filter chain), emitted in the brand's own theme file (e.g. dist/ember.css) inside `@layer psi.components`. Prefer this over forking a component's CSS Module for brand-specific token values.

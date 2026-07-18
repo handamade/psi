@@ -13,20 +13,20 @@ type Story = StoryObj;
 
 export const Specimens: Story = {
   render: () => (
-    <div className="ds-p-24" style={{ maxWidth: 800 }}>
+    <div className="psi-p-24" style={{ maxWidth: 800 }}>
       <h1
         style={{
-          font: "var(--ds-text-24-32-medium)",
-          color: "var(--ds-fg-primary)",
-          marginBottom: "var(--ds-space-24)",
+          font: "var(--psi-text-24-32-medium)",
+          color: "var(--psi-fg-primary)",
+          marginBottom: "var(--psi-space-24)",
         }}
       >
         Display Scale
       </h1>
       <p
         style={{
-          color: "var(--ds-fg-secondary)",
-          marginBottom: "var(--ds-space-32)",
+          color: "var(--psi-fg-secondary)",
+          marginBottom: "var(--psi-space-32)",
         }}
       >
         Fluid display combos (D28) clamp between a min and max pixel size.
@@ -37,42 +37,42 @@ export const Specimens: Story = {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--ds-space-32)",
+          gap: "var(--psi-space-32)",
         }}
       >
         {docDisplay.map((d) => (
           <div
             key={d.name}
             style={{
-              borderBottom: "1px solid var(--ds-border-neutral)",
-              paddingBottom: "var(--ds-space-16)",
+              borderBottom: "1px solid var(--psi-border-neutral)",
+              paddingBottom: "var(--psi-space-16)",
             }}
           >
             <code
               style={{
-                font: "var(--ds-text-12-16-regular)",
+                font: "var(--psi-text-12-16-regular)",
                 fontFamily: "monospace",
-                color: "var(--ds-fg-accent)",
+                color: "var(--psi-fg-accent)",
                 display: "block",
-                marginBottom: "var(--ds-space-8)",
+                marginBottom: "var(--psi-space-8)",
               }}
             >
               display-{d.name}
             </code>
             <span
               style={{
-                font: "var(--ds-text-12-16-regular)",
-                color: "var(--ds-fg-tertiary)",
+                font: "var(--psi-text-12-16-regular)",
+                color: "var(--psi-fg-tertiary)",
                 display: "block",
-                marginBottom: "var(--ds-space-8)",
+                marginBottom: "var(--psi-space-8)",
               }}
             >
               {d.min}px &rarr; {d.max}px &middot; {d.vw}vw &middot; {d.weight} (
               {d.cssWeight})
             </span>
             <span
-              className={"ds-display-" + d.name}
-              style={{ color: "var(--ds-fg-primary)" }}
+              className={"psi-display-" + d.name}
+              style={{ color: "var(--psi-fg-primary)" }}
             >
               Aa Ember Field
             </span>

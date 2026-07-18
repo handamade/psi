@@ -12,7 +12,7 @@ import {
   Tag,
   Tooltip,
   type ButtonProps,
-} from "@handamade/react";
+} from "@handamade/psi-react";
 
 import { storybookDocs } from "../lib/storybook";
 
@@ -113,7 +113,7 @@ export function Playground() {
                 </Tooltip>
               </div>
               <Select aria-label="Color space" defaultValue="oklch">
-                <option value="oklch">oklch(from var(--ds-…))</option>
+                <option value="oklch">oklch(from var(--psi-…))</option>
                 <option value="p3">display-p3 (roadmap)</option>
                 <option value="srgb">static sRGB fallback JSON</option>
               </Select>

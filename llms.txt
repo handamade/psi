@@ -1,4 +1,4 @@
-# ds — AI-readable design system
+# Psi (Ψ) — AI-readable design system
 
 See `packages/tokens/llms.txt` and `packages/react/llms.txt` for per-package machine-readable artifacts and authoring rules.
 

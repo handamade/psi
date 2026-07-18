@@ -5,18 +5,18 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--ds-radius-8);
+  border-radius: var(--psi-radius-8);
   cursor: pointer;
   padding: 0;
   text-decoration: none;
   user-select: none;
   transition:
-    background-color var(--ds-duration-150) var(--ds-ease-standard),
-    color var(--ds-duration-150) var(--ds-ease-standard);
+    background-color var(--psi-duration-150) var(--psi-ease-standard),
+    color var(--psi-duration-150) var(--psi-ease-standard);
 }
 
 .iconButton:focus-visible {
-  outline: 2px solid var(--ds-button-focus-ring);
+  outline: 2px solid var(--psi-button-focus-ring);
   outline-offset: 2px;
 }
 
@@ -35,71 +35,71 @@
 /* ── Sizes (square: width = height) ──────────────────────────── */
 
 .size24 {
-  width: var(--ds-size-24);
-  height: var(--ds-size-24);
+  width: var(--psi-size-24);
+  height: var(--psi-size-24);
 }
 
 .size32 {
-  width: var(--ds-size-32);
-  height: var(--ds-size-32);
+  width: var(--psi-size-32);
+  height: var(--psi-size-32);
 }
 
 .size40 {
-  width: var(--ds-size-40);
-  height: var(--ds-size-40);
+  width: var(--psi-size-40);
+  height: var(--psi-size-40);
 }
 
 .size48 {
-  width: var(--ds-size-48);
-  height: var(--ds-size-48);
+  width: var(--psi-size-48);
+  height: var(--psi-size-48);
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */
 
 /* Accent */
 .accent {
-  background: var(--ds-button-accent-bg);
-  color: var(--ds-button-accent-fg);
+  background: var(--psi-button-accent-bg);
+  color: var(--psi-button-accent-fg);
 }
 .accent:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-accent-bg-hover);
+  background: var(--psi-button-accent-bg-hover);
 }
 .accent:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-accent-bg-active);
+  background: var(--psi-button-accent-bg-active);
 }
 
 /* Neutral */
 .neutral {
-  background: var(--ds-button-neutral-bg);
-  color: var(--ds-button-neutral-fg);
+  background: var(--psi-button-neutral-bg);
+  color: var(--psi-button-neutral-fg);
 }
 .neutral:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-neutral-bg-hover);
+  background: var(--psi-button-neutral-bg-hover);
 }
 .neutral:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-neutral-bg-active);
+  background: var(--psi-button-neutral-bg-active);
 }
 
 /* Ghost */
 .ghost {
-  background: var(--ds-button-ghost-bg);
-  color: var(--ds-button-ghost-fg);
+  background: var(--psi-button-ghost-bg);
+  color: var(--psi-button-ghost-fg);
 }
 .ghost:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-ghost-bg-hover);
+  background: var(--psi-button-ghost-bg-hover);
 }
 .ghost:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-ghost-bg-active);
+  background: var(--psi-button-ghost-bg-active);
 }
 
 /* Danger */
 .danger {
-  background: var(--ds-button-danger-bg);
-  color: var(--ds-button-danger-fg);
+  background: var(--psi-button-danger-bg);
+  color: var(--psi-button-danger-fg);
 }
 .danger:hover:not(:disabled):not(.disabled) {
-  background: var(--ds-button-danger-bg-hover);
+  background: var(--psi-button-danger-bg-hover);
 }
 .danger:active:not(:disabled):not(.disabled) {
-  background: var(--ds-button-danger-bg-active);
+  background: var(--psi-button-danger-bg-active);
 }

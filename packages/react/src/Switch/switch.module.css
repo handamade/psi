@@ -3,11 +3,11 @@
 .label {
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-space-8);
+  gap: var(--psi-space-8);
   cursor: pointer;
   user-select: none;
-  font: var(--ds-text-14-20-regular);
-  color: var(--ds-switch-fg);
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-switch-fg);
 }
 
 .disabled {
@@ -38,18 +38,18 @@
   width: 36px;
   height: 20px;
   flex-shrink: 0;
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-switch-track-bg);
-  transition: background-color var(--ds-duration-150) var(--ds-ease-standard);
+  border-radius: var(--psi-radius-full);
+  background: var(--psi-switch-track-bg);
+  transition: background-color var(--psi-duration-150) var(--psi-ease-standard);
 }
 
 .input:checked + .track {
-  background: var(--ds-switch-track-bg-checked);
+  background: var(--psi-switch-track-bg-checked);
 }
 
 /* Focus visible */
 .input:focus-visible + .track {
-  outline: 2px solid var(--ds-switch-focus-ring);
+  outline: 2px solid var(--psi-switch-focus-ring);
   outline-offset: 2px;
 }
 
@@ -59,10 +59,10 @@
   position: absolute;
   width: 16px;
   height: 16px;
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-switch-thumb-bg);
+  border-radius: var(--psi-radius-full);
+  background: var(--psi-switch-thumb-bg);
   left: 2px;
-  transition: left var(--ds-duration-150) var(--ds-ease-standard);
+  transition: left var(--psi-duration-150) var(--psi-ease-standard);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
 }
 
@@ -73,5 +73,5 @@
 /* ── Label text ──────────────────────────────────────────────── */
 
 .text {
-  color: var(--ds-switch-fg);
+  color: var(--psi-switch-fg);
 }

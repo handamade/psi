@@ -1,13 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import "@handamade/tokens/base.css";
-import "@handamade/tokens/light.css";
-import "@handamade/tokens/dark.css";
-import "@handamade/tokens/acme.css";
-import "@handamade/tokens/components.css";
-import "@handamade/tokens/utilities.css";
-import "@handamade/react/styles";
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css";
+import "@handamade/psi-tokens/dark.css";
+import "@handamade/psi-tokens/acme.css";
+import "@handamade/psi-tokens/components.css";
+import "@handamade/psi-tokens/utilities.css";
+import "@handamade/psi-react/styles";
 import "./promo.css";
 
 import { App } from "./App";

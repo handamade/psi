@@ -3,11 +3,11 @@
 .tag {
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-space-4);
+  gap: var(--psi-space-4);
   height: 24px;
-  padding-inline: var(--ds-space-8);
-  border-radius: var(--ds-radius-full);
-  font: var(--ds-text-12-16-medium);
+  padding-inline: var(--psi-space-8);
+  border-radius: var(--psi-radius-full);
+  font: var(--psi-text-12-16-medium);
   white-space: nowrap;
   user-select: none;
 }
@@ -24,9 +24,9 @@
   color: inherit;
   cursor: pointer;
   opacity: 0.7;
-  margin-inline-start: var(--ds-space-2);
-  margin-inline-end: calc(-1 * var(--ds-space-4));
-  border-radius: var(--ds-radius-full);
+  margin-inline-start: var(--psi-space-2);
+  margin-inline-end: calc(-1 * var(--psi-space-4));
+  border-radius: var(--psi-radius-full);
 }
 
 .dismiss:hover {
@@ -34,60 +34,60 @@
 }
 
 .dismiss:focus-visible {
-  outline: 2px solid var(--ds-tag-focus-ring);
+  outline: 2px solid var(--psi-tag-focus-ring);
   outline-offset: 2px;
 }
 
 /* ── Solid variants ──────────────────────────────────────────── */
 
 .neutral {
-  background: var(--ds-tag-neutral-bg);
-  color: var(--ds-tag-neutral-fg);
+  background: var(--psi-tag-neutral-bg);
+  color: var(--psi-tag-neutral-fg);
 }
 
 .accent {
-  background: var(--ds-tag-accent-bg);
-  color: var(--ds-tag-accent-fg);
+  background: var(--psi-tag-accent-bg);
+  color: var(--psi-tag-accent-fg);
 }
 
 .success {
-  background: var(--ds-tag-success-bg);
-  color: var(--ds-tag-success-fg);
+  background: var(--psi-tag-success-bg);
+  color: var(--psi-tag-success-fg);
 }
 
 .warning {
-  background: var(--ds-tag-warning-bg);
-  color: var(--ds-tag-warning-fg);
+  background: var(--psi-tag-warning-bg);
+  color: var(--psi-tag-warning-fg);
 }
 
 .danger {
-  background: var(--ds-tag-danger-bg);
-  color: var(--ds-tag-danger-fg);
+  background: var(--psi-tag-danger-bg);
+  color: var(--psi-tag-danger-fg);
 }
 
 /* ── Subtle variants ─────────────────────────────────────────── */
 
 .neutralSubtle {
-  background: var(--ds-tag-neutral-subtle-bg);
-  color: var(--ds-tag-neutral-subtle-fg);
+  background: var(--psi-tag-neutral-subtle-bg);
+  color: var(--psi-tag-neutral-subtle-fg);
 }
 
 .accentSubtle {
-  background: var(--ds-tag-accent-subtle-bg);
-  color: var(--ds-tag-accent-subtle-fg);
+  background: var(--psi-tag-accent-subtle-bg);
+  color: var(--psi-tag-accent-subtle-fg);
 }
 
 .successSubtle {
-  background: var(--ds-tag-success-subtle-bg);
-  color: var(--ds-tag-success-subtle-fg);
+  background: var(--psi-tag-success-subtle-bg);
+  color: var(--psi-tag-success-subtle-fg);
 }
 
 .warningSubtle {
-  background: var(--ds-tag-warning-subtle-bg);
-  color: var(--ds-tag-warning-subtle-fg);
+  background: var(--psi-tag-warning-subtle-bg);
+  color: var(--psi-tag-warning-subtle-fg);
 }
 
 .dangerSubtle {
-  background: var(--ds-tag-danger-subtle-bg);
-  color: var(--ds-tag-danger-subtle-fg);
+  background: var(--psi-tag-danger-subtle-bg);
+  color: var(--psi-tag-danger-subtle-fg);
 }

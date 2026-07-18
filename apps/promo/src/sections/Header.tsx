@@ -1,4 +1,4 @@
-import { Button } from "@handamade/react";
+import { Button } from "@handamade/psi-react";
 
 import { STORYBOOK_BASE } from "../lib/storybook";
 import { THEMES, type ThemeName } from "../theme";
@@ -22,9 +22,9 @@ export function Header({
   return (
     <header className="site-header">
       <div className="container">
-        <a className="wordmark" href="#top" aria-label="DS — back to top">
+        <a className="wordmark" href="#top" aria-label="Psi — back to top">
           <span className="wordmark-mark" aria-hidden="true">
-            ds
+            psi
           </span>
           <span className="wordmark-sub">design system</span>
         </a>
@@ -38,7 +38,7 @@ export function Header({
         <div
           className="theme-switch"
           role="group"
-          aria-label="Theme (sets data-ds-theme)"
+          aria-label="Theme (sets data-psi-theme)"
         >
           {THEMES.map((name) => (
             <Button

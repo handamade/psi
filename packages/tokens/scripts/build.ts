@@ -75,7 +75,7 @@ function build(): void {
   // base.css only ever carries the default brand's palette.
   const baseCSS =
     emitBaseCSS(defaultPalette) +
-    `\n@layer ds.base {\n  :root {\n${emitScaleVarsCSS()}\n  }\n}\n`;
+    `\n@layer psi.base {\n  :root {\n${emitScaleVarsCSS()}\n  }\n}\n`;
   writeFileSync(join(distDir, "base.css"), baseCSS);
   console.log("  wrote dist/base.css");
 

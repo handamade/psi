@@ -1,7 +1,7 @@
 import stylelint from "stylelint";
 
-const ruleName = "ds/component-tokens-only";
-const ALLOWED_GLOBAL = /^--ds-(space|size|radius|text|font|duration|ease|z)-/;
+const ruleName = "psi/component-tokens-only";
+const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|z)-/;
 // componentName derived from filename: button.module.css → button; icon-button → button (declared alias)
 const ALIASES = { "icon-button": "button" };
 
@@ -11,27 +11,27 @@ const rule = (enabled) => (root, result) => {
   const m = file.match(/([a-z-]+)\.module\.css$/);
   if (!m) return;
   const component = ALIASES[m[1]] ?? m[1];
-  const own = new RegExp(`^--ds-${component}-`);
+  const own = new RegExp(`^--psi-${component}-`);
   root.walkDecls((decl) => {
-    for (const varName of decl.value.matchAll(/var\((--ds-[a-z0-9-]+)/g)) {
+    for (const varName of decl.value.matchAll(/var\((--psi-[a-z0-9-]+)/g)) {
       const name = varName[1];
       if (!own.test(name) && !ALLOWED_GLOBAL.test(name)) {
         stylelint.utils.report({
           ruleName, result, node: decl,
-          message: `${name} is not a --ds-${component}-* or scale token (ds/component-tokens-only)`,
+          message: `${name} is not a --psi-${component}-* or scale token (psi/component-tokens-only)`,
         });
       }
     }
     if (/^(transition|animation)/.test(decl.prop) && /(^|[\s,(])\d+(\.\d+)?m?s\b/.test(decl.value)) {
       stylelint.utils.report({
         ruleName, result, node: decl,
-        message: `literal duration in "${decl.prop}" — use var(--ds-duration-*) (ds/component-tokens-only)`,
+        message: `literal duration in "${decl.prop}" — use var(--psi-duration-*) (psi/component-tokens-only)`,
       });
     }
     if (decl.prop === "z-index" && /^\d+$/.test(decl.value.trim())) {
       stylelint.utils.report({
         ruleName, result, node: decl,
-        message: `literal z-index — use var(--ds-z-*) (ds/component-tokens-only)`,
+        message: `literal z-index — use var(--psi-z-*) (psi/component-tokens-only)`,
       });
     }
   });

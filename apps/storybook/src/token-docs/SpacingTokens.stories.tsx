@@ -13,20 +13,20 @@ const spacingScale = [0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80];
 
 export const Scale: Story = {
   render: () => (
-    <div className="ds-p-24" style={{ maxWidth: 700 }}>
+    <div className="psi-p-24" style={{ maxWidth: 700 }}>
       <h1
         style={{
-          font: "var(--ds-text-24-32-medium)",
-          color: "var(--ds-fg-primary)",
-          marginBottom: "var(--ds-space-24)",
+          font: "var(--psi-text-24-32-medium)",
+          color: "var(--psi-fg-primary)",
+          marginBottom: "var(--psi-space-24)",
         }}
       >
         Spacing Scale
       </h1>
       <p
         style={{
-          color: "var(--ds-fg-secondary)",
-          marginBottom: "var(--ds-space-32)",
+          color: "var(--psi-fg-secondary)",
+          marginBottom: "var(--psi-space-32)",
         }}
       >
         The spacing scale provides consistent spatial values across the design
@@ -34,7 +34,7 @@ export const Scale: Story = {
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {spacingScale.map((px) => {
-          const cssVar = `--ds-space-${px}`;
+          const cssVar = `--psi-space-${px}`;
           return (
             <div
               key={px}
@@ -46,9 +46,9 @@ export const Scale: Story = {
             >
               <code
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
+                  font: "var(--psi-text-12-16-regular)",
                   fontFamily: "monospace",
-                  color: "var(--ds-fg-secondary)",
+                  color: "var(--psi-fg-secondary)",
                   width: 140,
                   flexShrink: 0,
                 }}
@@ -57,8 +57,8 @@ export const Scale: Story = {
               </code>
               <span
                 style={{
-                  font: "var(--ds-text-12-16-regular)",
-                  color: "var(--ds-fg-tertiary)",
+                  font: "var(--psi-text-12-16-regular)",
+                  color: "var(--psi-fg-tertiary)",
                   width: 50,
                   flexShrink: 0,
                   textAlign: "right",
@@ -71,8 +71,8 @@ export const Scale: Story = {
                   height: 20,
                   width: `var(${cssVar})`,
                   minWidth: px === 0 ? 2 : undefined,
-                  backgroundColor: "var(--ds-fill-accent)",
-                  borderRadius: "var(--ds-radius-4)",
+                  backgroundColor: "var(--psi-fill-accent)",
+                  borderRadius: "var(--psi-radius-4)",
                   transition: "width 0.2s ease",
                 }}
               />

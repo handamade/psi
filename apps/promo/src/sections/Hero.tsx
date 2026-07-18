@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from "react";
-import { Button } from "@handamade/react";
+import { Button } from "@handamade/psi-react";
 
 const STATS = [
   "11 components",
@@ -30,7 +30,7 @@ export function Hero() {
             className="hero-lede rise"
             style={{ "--rise": "0.12s" } as CSSProperties}
           >
-            DS is a themeable design system where every semantic color is an
+            Psi is a themeable design system where every semantic color is an
             OKLCH formula — brand anchors in, a contrast-validated, multi-theme
             token set out. No swatch ladders. No forks per customer.
           </p>
@@ -79,7 +79,7 @@ export function Hero() {
         >
           <div className="formula-card-head">
             <span className="annot">themes/light.ts</span>
-            <span className="annot annot--accent">→ --ds-fg-accent</span>
+            <span className="annot annot--accent">→ --psi-fg-accent</span>
           </div>
           <pre aria-label="Token formula source code">
             {"fgAccent: "}

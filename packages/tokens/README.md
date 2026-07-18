@@ -1,10 +1,10 @@
-# @handamade/tokens
+# @handamade/psi-tokens
 
 OKLCH formula-based design tokens. Code is the source of truth; all artifacts are generated.
 
 ## Installation
 
-**In workspace:** use `pnpm install` at the root. **@handamade/tokens** is a local workspace dependency.
+**In workspace:** use `pnpm install` at the root. **@handamade/psi-tokens** is a local workspace dependency.
 
 **External packages:** install from the private registry with your configured credentials.
 
@@ -13,23 +13,23 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ar
 Import tokens in your app's stylesheet:
 
 ```css
-@import "@handamade/tokens/base.css";
-@import "@handamade/tokens/light.css"; /* or dark.css, acme.css */
-@import "@handamade/tokens/components.css";
-@import "@handamade/tokens/utilities.css";
+@import "@handamade/psi-tokens/base.css";
+@import "@handamade/psi-tokens/light.css"; /* or dark.css, acme.css */
+@import "@handamade/psi-tokens/components.css";
+@import "@handamade/psi-tokens/utilities.css";
 ```
 
 Then set the theme on your root element:
 
 ```html
-<html data-ds-theme="light">
+<html data-psi-theme="light">
   <!-- your app -->
 </html>
 ```
 
-All tokens are CSS custom properties: `--ds-bg-primary`, `--ds-fg-secondary`, `--ds-space-12`, etc.
+All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, `--psi-space-12`, etc.
 
-**utilities.css is required**: it carries `.ds-container`, `.ds-text-*`, `.ds-display-*` utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
+**utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*` utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
 
 ## Creating a custom theme
 

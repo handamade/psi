@@ -28,7 +28,7 @@ export const Disabled: Story = {
 
 export const States: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-12)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--psi-space-12)" }}>
       <Switch>Off</Switch>
       <Switch defaultChecked>On</Switch>
       <Switch disabled>Disabled off</Switch>

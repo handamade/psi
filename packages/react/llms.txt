@@ -1,14 +1,14 @@
-# @handamade/react
+# @handamade/psi-react
 
-11 React 19 components consuming @handamade/tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+11 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
-- import { Button } from "@handamade/react"; import "@handamade/react/styles";
-- Also import from @handamade/tokens: base.css, a theme css, components.css, utilities.css.
+- import { Button } from "@handamade/psi-react"; import "@handamade/psi-react/styles";
+- Also import from @handamade/psi-tokens: base.css, a theme css, components.css, utilities.css.
 - size is a px number (24|32|40|48), never "sm"/"md"/"lg".
 - variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline.
 - One accent per visual group. danger only for destructive actions.
@@ -16,28 +16,28 @@
 ## Button: href + outline (D33/D34)
 - Button renders as an <a> when given `href` (plus optional `target`/`rel`); disabled anchors get aria-disabled, no href attribute, and pointer-events: none instead of the disabled attribute.
 - `outline` is a bordered-ghost variant: visible structure, no fill until hover — good for marketing CTAs and download buttons.
-- --ds-button-font overrides button typography across all sizes in one declaration; brands can set it via componentOverrides (ember → mono).
+- --psi-button-font overrides button typography across all sizes in one declaration; brands can set it via componentOverrides (ember → mono).
 
 ## Card
-- <Card variant="stacked" | "featured" media={...} hoverLift>: stacked places media above the body, featured places media beside it (~1.6fr/1fr, stacks under the md breakpoint). hoverLift lifts the card translateY(-6px) over --ds-duration-350. Border uses --ds-border-faint.
+- <Card variant="stacked" | "featured" media={...} hoverLift>: stacked places media above the body, featured places media beside it (~1.6fr/1fr, stacks under the md breakpoint). hoverLift lifts the card translateY(-6px) over --psi-duration-350. Border uses --psi-border-faint.
 
 ## NavBar
-- <NavBar brand={...} actions={...}>{links}</NavBar>: brand slot leading, nav links centered/inline, actions slot trailing (theme switch, CTA). Renders inside .ds-container. Background defaults to --ds-scrim-heavy so content can scroll underneath; border uses --ds-border-faint.
+- <NavBar brand={...} actions={...}>{links}</NavBar>: brand slot leading, nav links centered/inline, actions slot trailing (theme switch, CTA). Renders inside .psi-container. Background defaults to --psi-scrim-heavy so content can scroll underneath; border uses --psi-border-faint.
 
 ## AspectRatio
-- <AspectRatio ratio={16/10}>{children}</AspectRatio>: a frame div with CSS aspect-ratio set from the numeric ratio prop — wrap images/media to reserve layout space before load. Combine with the .ds-media-tint utility for the brand media-tint treatment.
+- <AspectRatio ratio={16/10}>{children}</AspectRatio>: a frame div with CSS aspect-ratio set from the numeric ratio prop — wrap images/media to reserve layout space before load. Combine with the .psi-media-tint utility for the brand media-tint treatment.
 
 ## Icons (22)
 - Full icon set: IconPlus, IconMinus, IconCheck, IconClose, IconChevronDown, IconChevronRight, IconSearch, IconSettings, IconUser, IconEye, IconEyeOff, IconEdit, IconCopy, IconTrash, IconLoader, IconExternalLink, plus D36 additions — arrows IconArrowDown and IconArrowUpRight, and social glyphs IconLinkedIn, IconGitHub, IconX, IconInstagram.
 
 ## Compositions (recipes for what has no component yet)
 
-- Form field: there is no Field/Label component. Compose: `<label htmlFor>` styled with `.ds-text-14-20-medium`; the control (Input/Select); error text in `.ds-text-12-16-regular` with `color: var(--ds-fg-danger)`, linked via `aria-describedby` on the control plus `aria-invalid` and `error` when invalid. Spacing: `ds-gap-6` label→control, `ds-gap-24` between fields, `ds-gap-12` for toggle groups, `ds-gap-8` for button rows and label+Tag rows.
-- Stacks/rows: `.ds-gap-*` utilities set only the gap — they do not create a flex/grid container. Pair them with `display: flex` (column for stacks, row for button groups).
+- Form field: there is no Field/Label component. Compose: `<label htmlFor>` styled with `.psi-text-14-20-medium`; the control (Input/Select); error text in `.psi-text-12-16-regular` with `color: var(--psi-fg-danger)`, linked via `aria-describedby` on the control plus `aria-invalid` and `error` when invalid. Spacing: `ds-gap-6` label→control, `ds-gap-24` between fields, `ds-gap-12` for toggle groups, `ds-gap-8` for button rows and label+Tag rows.
+- Stacks/rows: `.psi-gap-*` utilities set only the gap — they do not create a flex/grid container. Pair them with `display: flex` (column for stacks, row for button groups).
 - Native pass-through: components spread unlisted props onto their underlying element (Input → `<input>`, Select → `<select>`, Button → `<button>`/`<a>`), so `value`, `onChange`, `type`, `id`, `autoComplete`, `checked` etc. all work even though manifest.json lists only the component-specific props. Exception: Tooltip takes no host props — put handlers/attributes on its trigger child.
-- Theming, programmatic: the standard setup is `data-ds-theme` on `<html>`. From JS, set it once at app init: `document.documentElement.dataset.dsTheme = "dark"` (React: in a root-level effect). Theme CSS does NOT paint the page background — paint `background: var(--ds-bg-primary)` at your app root yourself. For a themed subtree, set `data-ds-theme` on a wrapper and paint its background the same way; brand font combos do not reach nested subtrees (see guidance.fonts.scope).
+- Theming, programmatic: the standard setup is `data-psi-theme` on `<html>`. From JS, set it once at app init: `document.documentElement.dataset.dsTheme = "dark"` (React: in a root-level effect). Theme CSS does NOT paint the page background — paint `background: var(--psi-bg-primary)` at your app root yourself. For a themed subtree, set `data-psi-theme` on a wrapper and paint its background the same way; brand font combos do not reach nested subtrees (see guidance.fonts.scope).
 - Size selection: 32 is the default (compact UI); 40 for comfortable forms and marketing pages; 24 for inline/table-row actions; 48 for hero CTAs.
 - Tags & the accent rule (D40): Tags are passive labels — they do NOT count against "one accent per visual group" (that rule governs buttons/CTAs). Badge mapping: highlight (e.g. a plan badge) → `accent-subtle`; meta → `neutral-subtle`; status → `success`/`warning`/`danger`.
-- CSS import order: all DS stylesheets are order-independent — base.css opens with an explicit `@layer ds.base, ds.theme, ds.components, ds.utilities;` statement. Recommended listing for readability: base → theme → components → utilities → @handamade/react/styles.
-- Widths: content widths are app-level; the system tokenizes the page container only (`--ds-container-max`). Component width tokens arrive with Field/Dialog (next cycle).
-- Full semantic token roster: `@handamade/tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.
+- CSS import order: all DS stylesheets are order-independent — base.css opens with an explicit `@layer psi.base, psi.theme, psi.components, psi.utilities;` statement. Recommended listing for readability: base → theme → components → utilities → @handamade/psi-react/styles.
+- Widths: content widths are app-level; the system tokenizes the page container only (`--psi-container-max`). Component width tokens arrive with Field/Dialog (next cycle).
+- Full semantic token roster: `@handamade/psi-tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.

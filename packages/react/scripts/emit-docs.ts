@@ -32,14 +32,14 @@ let guidance: Guidance;
 try {
   components = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8")).components;
 } catch {
-  console.error("[react] ERROR: dist/manifest.json not found. Run `pnpm --filter @handamade/tokens build` and `pnpm --filter @handamade/react build` first.");
+  console.error("[react] ERROR: dist/manifest.json not found. Run `pnpm --filter @handamade/psi-tokens build` and `pnpm --filter @handamade/psi-react build` first.");
   process.exit(1);
 }
 
 try {
   guidance = JSON.parse(readFileSync(join(root, "../tokens/dist/guidance.json"), "utf8"));
 } catch {
-  console.error("[react] ERROR: ../tokens/dist/guidance.json not found. Run `pnpm --filter @handamade/tokens build` first.");
+  console.error("[react] ERROR: ../tokens/dist/guidance.json not found. Run `pnpm --filter @handamade/psi-tokens build` first.");
   process.exit(1);
 }
 
@@ -67,12 +67,12 @@ for (const c of components) {
     .join("\n");
 
   // Determine token name (special cases where the component's PascalCase
-  // name doesn't kebab-case to its actual --ds-{component}-* token prefix)
+  // name doesn't kebab-case to its actual --psi-{component}-* token prefix)
   const TOKEN_NAME_OVERRIDES: Record<string, string> = {
     IconButton: "button",
     NavBar: "navbar",
   };
-  const tokenName = `--ds-${TOKEN_NAME_OVERRIDES[c.name] ?? toKebabCase(c.name)}-*`;
+  const tokenName = `--psi-${TOKEN_NAME_OVERRIDES[c.name] ?? toKebabCase(c.name)}-*`;
 
   // Check if component has variant prop
   const hasVariant = c.props.some((p) => p.name === "variant");

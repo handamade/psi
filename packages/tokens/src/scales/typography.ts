@@ -6,11 +6,11 @@ export type ComboRole = "sans" | "serif" | "mono";
 export interface TypographyCombo { fontSize: number; lineHeight: number; weight: Weight; role?: ComboRole; }
 export const comboName = (c: TypographyCombo) =>
   `${c.role && c.role !== "sans" ? `${c.role}-` : ""}${c.fontSize}-${c.lineHeight}-${c.weight}`;
-export const comboFontVar = (c: TypographyCombo) => `--ds-font-${c.role ?? "sans"}`;
+export const comboFontVar = (c: TypographyCombo) => `--psi-font-${c.role ?? "sans"}`;
 
 export interface DisplayCombo { min: number; max: number; vw: number; lineHeight: number; weight: Weight; tracking: number; }
-/** Fluid display tier (D28): --ds-display-{min}-{max}-{weight}, pixel-true at
- * both clamp endpoints. Tracking/uppercase live in the .ds-display-* utilities
+/** Fluid display tier (D28): --psi-display-{min}-{max}-{weight}, pixel-true at
+ * both clamp endpoints. Tracking/uppercase live in the .psi-display-* utilities
  * because the font shorthand can't carry them. */
 export const displayCombos: DisplayCombo[] = [
   { min: 56, max: 128, vw: 9, lineHeight: 0.95, weight: "black", tracking: -0.02 },

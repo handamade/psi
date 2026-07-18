@@ -3,27 +3,27 @@
 .input {
   display: block;
   width: 100%;
-  border: 1px solid var(--ds-input-border);
-  border-radius: var(--ds-radius-8);
-  background: var(--ds-input-bg);
-  color: var(--ds-input-fg);
-  font-family: var(--ds-font-sans);
-  padding-inline: var(--ds-space-8);
+  border: 1px solid var(--psi-input-border);
+  border-radius: var(--psi-radius-8);
+  background: var(--psi-input-bg);
+  color: var(--psi-input-fg);
+  font-family: var(--psi-font-sans);
+  padding-inline: var(--psi-space-8);
   transition:
-    border-color var(--ds-duration-150) var(--ds-ease-standard),
-    outline var(--ds-duration-150) var(--ds-ease-standard);
+    border-color var(--psi-duration-150) var(--psi-ease-standard),
+    outline var(--psi-duration-150) var(--psi-ease-standard);
 }
 
 .input::placeholder {
-  color: var(--ds-input-placeholder);
+  color: var(--psi-input-placeholder);
 }
 
 .input:hover:not(:disabled):not(:focus) {
-  border-color: var(--ds-input-border-hover);
+  border-color: var(--psi-input-border-hover);
 }
 
 .input:focus {
-  outline: 2px solid var(--ds-input-focus-ring);
+  outline: 2px solid var(--psi-input-focus-ring);
   outline-offset: -1px;
   border-color: transparent;
 }
@@ -36,31 +36,31 @@
 /* ── Sizes ────────────────────────────────────────────────────── */
 
 .size24 {
-  height: var(--ds-size-24);
-  font: var(--ds-text-12-16-regular);
+  height: var(--psi-size-24);
+  font: var(--psi-text-12-16-regular);
 }
 
 .size32 {
-  height: var(--ds-size-32);
-  font: var(--ds-text-14-20-regular);
+  height: var(--psi-size-32);
+  font: var(--psi-text-14-20-regular);
 }
 
 .size40 {
-  height: var(--ds-size-40);
-  font: var(--ds-text-16-24-regular);
+  height: var(--psi-size-40);
+  font: var(--psi-text-16-24-regular);
 }
 
 .size48 {
-  height: var(--ds-size-48);
-  font: var(--ds-text-18-28-medium);
+  height: var(--psi-size-48);
+  font: var(--psi-text-18-28-medium);
 }
 
 /* ── Error ────────────────────────────────────────────────────── */
 
 .error {
-  border-color: var(--ds-input-border-error);
+  border-color: var(--psi-input-border-error);
 }
 
 .error:hover:not(:disabled):not(:focus) {
-  border-color: var(--ds-input-border-error);
+  border-color: var(--psi-input-border-error);
 }

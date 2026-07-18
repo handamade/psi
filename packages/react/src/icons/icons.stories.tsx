@@ -71,15 +71,15 @@ const IconCell = ({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      gap: "var(--ds-space-4)",
-      padding: "var(--ds-space-8)",
+      gap: "var(--psi-space-4)",
+      padding: "var(--psi-space-8)",
     }}
   >
     <Component size={size} />
     <span
       style={{
-        font: "var(--ds-text-12-16-regular)",
-        color: "var(--ds-fg-secondary)",
+        font: "var(--psi-text-12-16-regular)",
+        color: "var(--psi-fg-secondary)",
       }}
     >
       {name}
@@ -89,7 +89,7 @@ const IconCell = ({
 
 export const Size16: Story = {
   render: () => (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--psi-space-8)" }}>
       {icons.map(({ name, Component }) => (
         <IconCell key={name} name={name} Component={Component} size={16} />
       ))}
@@ -99,7 +99,7 @@ export const Size16: Story = {
 
 export const Size20: Story = {
   render: () => (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--psi-space-8)" }}>
       {icons.map(({ name, Component }) => (
         <IconCell key={name} name={name} Component={Component} size={20} />
       ))}
@@ -109,7 +109,7 @@ export const Size20: Story = {
 
 export const Size24: Story = {
   render: () => (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--psi-space-8)" }}>
       {icons.map(({ name, Component }) => (
         <IconCell key={name} name={name} Component={Component} size={24} />
       ))}
@@ -119,13 +119,13 @@ export const Size24: Story = {
 
 export const AllSizes: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--ds-space-24)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--psi-space-24)" }}>
       {[16, 20, 24].map((size) => (
         <div key={size}>
-          <h3 style={{ margin: "0 0 var(--ds-space-8)", font: "var(--ds-text-14-20-regular)", color: "var(--ds-fg-secondary)" }}>
+          <h3 style={{ margin: "0 0 var(--psi-space-8)", font: "var(--psi-text-14-20-regular)", color: "var(--psi-fg-secondary)" }}>
             Size {size}
           </h3>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-8)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--psi-space-8)" }}>
             {icons.map(({ name, Component }) => (
               <IconCell key={name} name={name} Component={Component} size={size} />
             ))}

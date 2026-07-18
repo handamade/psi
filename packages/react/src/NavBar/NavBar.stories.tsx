@@ -10,7 +10,7 @@ const meta: Meta<typeof NavBar> = {
     (Story) => (
       <div style={{ height: "200vh" }}>
         <Story />
-        <div style={{ padding: "var(--ds-space-24)" }}>
+        <div style={{ padding: "var(--psi-space-24)" }}>
           <p>Scroll down — the bar stays pinned to the top of the viewport.</p>
           {Array.from({ length: 20 }, (_, i) => (
             <p key={i}>Placeholder content block {i + 1}.</p>

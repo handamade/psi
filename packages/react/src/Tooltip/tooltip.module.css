@@ -9,12 +9,12 @@
 
 .tooltip {
   position: absolute;
-  z-index: var(--ds-z-tooltip);
-  padding: var(--ds-space-4) var(--ds-space-8);
-  border-radius: var(--ds-radius-6);
-  background: var(--ds-tooltip-bg);
-  color: var(--ds-tooltip-fg);
-  font: var(--ds-text-12-16-regular);
+  z-index: var(--psi-z-tooltip);
+  padding: var(--psi-space-4) var(--psi-space-8);
+  border-radius: var(--psi-radius-6);
+  background: var(--psi-tooltip-bg);
+  color: var(--psi-tooltip-fg);
+  font: var(--psi-text-12-16-regular);
   white-space: nowrap;
   pointer-events: none;
 }
@@ -25,26 +25,26 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-bottom: var(--ds-space-4);
+  margin-bottom: var(--psi-space-4);
 }
 
 .bottom {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-top: var(--ds-space-4);
+  margin-top: var(--psi-space-4);
 }
 
 .left {
   right: 100%;
   top: 50%;
   transform: translateY(-50%);
-  margin-right: var(--ds-space-4);
+  margin-right: var(--psi-space-4);
 }
 
 .right {
   left: 100%;
   top: 50%;
   transform: translateY(-50%);
-  margin-left: var(--ds-space-4);
+  margin-left: var(--psi-space-4);
 }

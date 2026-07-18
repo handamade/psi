@@ -7,7 +7,7 @@ function isTheme(value: string | undefined): value is ThemeName {
   return (THEMES as readonly string[]).includes(value ?? "");
 }
 
-/** Theme state synced to <html data-ds-theme> — the DS theming contract. */
+/** Theme state synced to <html data-psi-theme> — the Psi theming contract. */
 export function useTheme(): [ThemeName, (theme: ThemeName) => void] {
   const [theme, setThemeState] = useState<ThemeName>(() => {
     const current = document.documentElement.dataset.dsTheme;
@@ -18,7 +18,7 @@ export function useTheme(): [ThemeName, (theme: ThemeName) => void] {
     setThemeState(next);
     document.documentElement.dataset.dsTheme = next;
     try {
-      localStorage.setItem("ds-theme", next);
+      localStorage.setItem("psi-theme", next);
     } catch {
       /* storage unavailable */
     }
