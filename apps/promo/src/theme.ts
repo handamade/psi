@@ -10,13 +10,13 @@ function isTheme(value: string | undefined): value is ThemeName {
 /** Theme state synced to <html data-psi-theme> — the Psi theming contract. */
 export function useTheme(): [ThemeName, (theme: ThemeName) => void] {
   const [theme, setThemeState] = useState<ThemeName>(() => {
-    const current = document.documentElement.dataset.dsTheme;
+    const current = document.documentElement.dataset.psiTheme;
     return isTheme(current) ? current : "light";
   });
 
   const setTheme = (next: ThemeName) => {
     setThemeState(next);
-    document.documentElement.dataset.dsTheme = next;
+    document.documentElement.dataset.psiTheme = next;
     try {
       localStorage.setItem("psi-theme", next);
     } catch {
