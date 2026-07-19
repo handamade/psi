@@ -12,3 +12,6 @@ blob-report
 
 # local git worktrees
 .worktrees/
+
+# local Claude Code session config (machine-specific launch.json etc.)
+.claude/
