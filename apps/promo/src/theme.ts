@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const THEMES = ["light", "dark", "acme"] as const;
+export const THEMES = ["light", "dark", "acme", "ember"] as const;
 export type ThemeName = (typeof THEMES)[number];
 
 function isTheme(value: string | undefined): value is ThemeName {
