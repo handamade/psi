@@ -31,6 +31,7 @@ const placementClass: Record<Placement, string> = {
 /** Hover must not open the tooltip on incidental mouse-over (WCAG 1.4.13). */
 const HOVER_DELAY_MS = 150;
 
+/** Short hover/focus hint attached to a single trigger element. */
 export function Tooltip({
   content,
   children,

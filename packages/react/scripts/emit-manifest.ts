@@ -65,7 +65,8 @@ const manifest = COMPONENTS.map((name) => {
   }
   return {
     name,
-    description: doc.description ?? "",
+    // Collapse TSDoc line wrapping — the manifest description is a one-liner.
+    description: (doc.description ?? "").replace(/\s+/g, " ").trim(),
     props: Object.values(doc.props ?? {}).map((p) => ({
       name: p.name,
       type: typeToString(p),

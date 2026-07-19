@@ -12,6 +12,7 @@ export interface NavBarProps extends HTMLAttributes<HTMLElement> {
   ref?: Ref<HTMLElement>;
 }
 
+/** Top navigation bar with brand, nav-link, and trailing-action slots. */
 export function NavBar({ brand, actions, children, className, ref, ...rest }: NavBarProps) {
   const cls = [styles.navbar, className].filter(Boolean).join(" ");
   return (

@@ -12,6 +12,8 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
 }
 
+/** Content container with an optional edge-to-edge media slot; `stacked`
+ * (media above body) or `featured` (media beside body) layout. */
 export function Card({
   variant = "stacked",
   media,

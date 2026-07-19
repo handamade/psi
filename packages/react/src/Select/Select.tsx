@@ -24,6 +24,7 @@ const sizeClass: Record<Size, string> = {
   48: styles.size48,
 };
 
+/** Styled native `<select>` with pixel-true heights (24–48) and an error state. */
 export function Select({
   size = 32,
   error = false,

@@ -9,6 +9,8 @@ export interface SwitchProps
   ref?: Ref<HTMLInputElement>;
 }
 
+/** On/off toggle (`role="switch"`) with a built-in label; for settings that
+ * take effect immediately. */
 export function Switch({
   children,
   className,

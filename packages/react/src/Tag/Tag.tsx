@@ -30,6 +30,8 @@ const subtleVariantClass: Record<Variant, string> = {
   danger: styles.dangerSubtle,
 };
 
+/** Compact label for status or category; semantic variants, optional subtle
+ * tint and dismiss button. */
 export function Tag({
   variant = "neutral",
   subtle = false,

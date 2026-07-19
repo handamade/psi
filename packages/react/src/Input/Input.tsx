@@ -19,6 +19,7 @@ const sizeClass: Record<Size, string> = {
   48: styles.size48,
 };
 
+/** Single-line text input with pixel-true heights (24–48) and an error state. */
 export function Input({
   size = 32,
   error = false,

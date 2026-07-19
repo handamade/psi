@@ -40,6 +40,8 @@ const sizeClass: Record<Size, string> = {
   48: styles.size48,
 };
 
+/** Square icon-only button; same variant/size/href contract as Button.
+ * Give it an accessible name (`aria-label`). */
 export function IconButton({
   variant = "neutral",
   size = 32,
