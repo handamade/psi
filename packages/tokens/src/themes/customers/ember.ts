@@ -47,8 +47,12 @@ export const emberOverrides: ThemeDef = {
   bgPrimary: token({ from: slot.canvas }),                                    // #0c0a09
   bgSecondary: token({ from: slot.canvas, l: delta(+0.015), c: delta(+0.003) }), // #100d0b
   fgPrimary: token({ from: slot.ink }),                                       // #f3ede6
-  // Dark label on the ember accent (D37): white is 2.62:1 on #ff7847.
-  fgOnAccent: token({ from: ref.fgStaticBlack }),
+  // Dark label on the ember accent (D37): white is 2.62:1 on #ff7847. The
+  // brand's warm black (l 0.25) scored 6.12:1 — AA-passing but visibly weak
+  // on the saturated orange with the mono button face (field report,
+  // 2026-07-19). Deepened to l 0.14 → 7.5:1, AAA for normal text; scoped
+  // here so fgStaticBlack stays warm everywhere else.
+  fgOnAccent: token({ from: ref.fgStaticBlack, l: set(0.14) }),
   // D39: ember's accent hue (40) allows more chroma at l 0.75 than dark.ts's
   // sapphire-tuned cap(0.1286) — carry ember's own in-gamut max.  // #ff885d
   fgAccent: token({ from: slot.accent, l: set(0.75), c: cap(0.156) }),
