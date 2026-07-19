@@ -30,6 +30,7 @@ import { tooltipVars } from "../src/components/tooltip.js";
 import { cardVars } from "../src/components/card.js";
 import { navbarVars } from "../src/components/navbar.js";
 import { mediaVars } from "../src/components/media.js";
+import { fieldVars } from "../src/components/field.js";
 import { guidance } from "../src/guidance.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
@@ -144,15 +145,16 @@ function build(): void {
   // 5. Emit component vars
   const componentVars: Record<string, Record<string, string>> = {
     button: buttonVars,
-    input: inputVars,
-    select: selectVars,
+    card: cardVars,
     checkbox: checkboxVars,
+    field: fieldVars,
+    input: inputVars,
+    media: mediaVars,
+    navbar: navbarVars,
+    select: selectVars,
     switch: switchVars,
     tag: tagVars,
     tooltip: tooltipVars,
-    card: cardVars,
-    navbar: navbarVars,
-    media: mediaVars,
   };
   const componentsDir = join(distDir, "components");
   mkdirSync(componentsDir, { recursive: true });
