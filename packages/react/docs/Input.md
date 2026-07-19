@@ -18,7 +18,7 @@ Single-line text input with pixel-true heights (24–48) and an error state. Ins
 |---|---|
 | Tab | Focuses the native <input>; focus ring on the field. |
 
-error sets a red border only — pair with aria-invalid and aria-describedby pointing at your error text.
+error sets a red border only. Inside a Field, aria-invalid and aria-describedby are wired automatically (D49); standalone, pair them yourself.
 
 ## Theming
 

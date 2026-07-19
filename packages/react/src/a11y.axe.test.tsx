@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
-  Button, IconButton, Card, NavBar, AspectRatio, Input, Select, Checkbox, Switch, Tag, Tooltip,
+  Button, IconButton, Card, NavBar, AspectRatio, Field, Input, Select, Checkbox, Switch, Tag, Tooltip,
 } from "./index.js";
 
 const cases: Array<[string, React.ReactElement]> = [
@@ -15,6 +15,9 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Input", <label>Name<Input size={32} /></label>],
   ["Input error", <label>Email<Input size={32} error aria-invalid="true" /></label>],
   ["Select", <label>Plan<Select size={32}><option>Free</option></Select></label>],
+  ["Field with Input", <Field label="Email" description="We never share it."><Input size={40} /></Field>],
+  ["Field error", <Field label="Email" error="Invalid email." required><Input size={40} /></Field>],
+  ["Field group", <Field group label="Notifications" description="Pick channels."><Checkbox>Email</Checkbox><Switch>Push</Switch></Field>],
   ["Checkbox", <Checkbox>Beta features</Checkbox>],
   ["Switch", <Switch>Email notifications</Switch>],
   ["Tag", <Tag variant="accent" subtle>Pro</Tag>],

@@ -19,7 +19,7 @@ Styled native `<select>` with pixel-true heights (24–48) and an error state. I
 | Tab | Focuses the native <select>. |
 | Arrow keys / typeahead | Native option navigation. |
 
-error: same contract as Input.
+error: same contract as Input — sets a red border only. Inside a Field, aria-invalid and aria-describedby are wired automatically (D49); standalone, pair them yourself.
 
 ## Theming
 

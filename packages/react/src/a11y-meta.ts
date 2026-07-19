@@ -25,14 +25,23 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   Input: {
     keyboard: [{ keys: "Tab", behavior: "Focuses the native <input>; focus ring on the field." }],
-    notes: "error sets a red border only — pair with aria-invalid and aria-describedby pointing at your error text.",
+    notes:
+      "error sets a red border only. Inside a Field, aria-invalid and aria-describedby are wired automatically (D49); standalone, pair them yourself.",
   },
   Select: {
     keyboard: [
       { keys: "Tab", behavior: "Focuses the native <select>." },
       { keys: "Arrow keys / typeahead", behavior: "Native option navigation." },
     ],
-    notes: "error: same contract as Input.",
+    notes:
+      "error: same contract as Input — sets a red border only. Inside a Field, aria-invalid and aria-describedby are wired automatically (D49); standalone, pair them yourself.",
+  },
+  Field: {
+    keyboard: [
+      { keys: "Tab", behavior: "Focus moves to the wrapped control; the label is announced with it." },
+    ],
+    notes:
+      "Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend.",
   },
   Checkbox: {
     keyboard: [{ keys: "Space", behavior: "Toggles. Native <input type=checkbox> underneath (visually hidden)." }],
