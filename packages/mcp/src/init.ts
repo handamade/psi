@@ -28,7 +28,7 @@ export function renderAgentsBlock(index: PsiIndex): string {
     "- Sizes are px numbers (24 | 32 | 40 | 48), never S/M/L.",
     "- Variants are flat: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline. One accent per visual group (Tags exempt, D40); danger only for destructive actions.",
     "- Never hardcode colors — bind var(--psi-*) custom properties.",
-    "- Import all four token CSS files: base.css, one theme css, components.css, utilities.css (utilities is REQUIRED — .psi-container + reduced-motion zeroing).",
+    "- Import all four token CSS files: base.css, one theme css, components.css, utilities.css (utilities is REQUIRED — .psi-container + reduced-motion zeroing) — PLUS @handamade/psi-react/styles (component CSS; separate export, never auto-imported).",
     `- Themes: ${index.themes.join(" | ")} — set data-psi-theme on <html> or a subtree root.`,
     "",
     `## Components (${index.components.length})`,

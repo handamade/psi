@@ -19,6 +19,8 @@ export const GETTING_STARTED = {
     "@handamade/psi-tokens/<theme>.css — one per theme you use (light|dark|acme|ember)",
     "@handamade/psi-tokens/components.css",
     "@handamade/psi-tokens/utilities.css — REQUIRED: .psi-container + reduced-motion zeroing",
+    "@handamade/psi-react/styles — REQUIRED: component CSS. Separate export; the JS never " +
+      "imports it for you. Without it every component renders unstyled (HAN-17 finding).",
   ],
   themeAttribute: 'Set data-psi-theme="light|dark|acme|ember" on <html> or a subtree root.',
   rules:
@@ -26,6 +28,18 @@ export const GETTING_STARTED = {
     "(accent, accent-subtle, neutral, neutral-subtle, ghost, danger, danger-subtle, outline); " +
     "one accent per visual group (Tags exempt, D40); danger only for destructive actions. " +
     "Never hardcode colors — bind var(--psi-*).",
+};
+
+/** Theme mechanics; travels with the index (spec: topics). */
+export const THEMES_TOPIC = {
+  themes: [...THEMES],
+  attribute: 'Set data-psi-theme="light|dark|acme|ember" on <html> or a subtree root.',
+  switching:
+    "Theme CSS files are scoped under [data-psi-theme] and co-import safely — " +
+    "import every theme you switch between at runtime.",
+  customerThemes:
+    "light/dark are the core pair; acme and ember are customer brand themes " +
+    "(OKLCH formula overrides, same semantic token names).",
 };
 
 /** Shape of a component record in `packages/react/dist/manifest.json`. */
@@ -88,6 +102,11 @@ export async function buildIndex(inputs: BuildInputs): Promise<PsiIndex> {
     components,
     tokens,
     scales: light.scales,
-    topics: { ...guidance, "getting-started": GETTING_STARTED },
+    topics: {
+      ...guidance,
+      "getting-started": GETTING_STARTED,
+      themes: THEMES_TOPIC,
+      scales: light.scales,
+    },
   };
 }
