@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-11 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+12 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -32,14 +32,14 @@
 
 ## Compositions (recipes for what has no component yet)
 
-- Form field: there is no Field/Label component. Compose: `<label htmlFor>` styled with `.psi-text-14-20-medium`; the control (Input/Select); error text in `.psi-text-12-16-regular` with `color: var(--psi-fg-danger)`, linked via `aria-describedby` on the control plus `aria-invalid` and `error` when invalid. Spacing: `psi-gap-6` label→control, `psi-gap-24` between fields, `psi-gap-12` for toggle groups, `psi-gap-8` for button rows and label+Tag rows.
+- Form field: wrap the label, control, and message with `<Field label description error required>{control}</Field>` — label association (htmlFor/id), the description/error message line (swaps to error, aria-live="polite"), and aria-describedby/aria-invalid wiring onto a nested Input/Select are automatic (D49). `group` mode renders fieldset/legend for self-labeled controls (Checkbox/Switch). Standalone Input/Select used outside Field still need `aria-invalid` and `aria-describedby` paired manually. Spacing: `psi-gap-24` between fields, `psi-gap-12` for toggle groups, `psi-gap-8` for button rows and label+Tag rows.
 - Stacks/rows: `.psi-gap-*` utilities set only the gap — they do not create a flex/grid container. Pair them with `display: flex` (column for stacks, row for button groups).
 - Native pass-through: components spread unlisted props onto their underlying element (Input → `<input>`, Select → `<select>`, Button → `<button>`/`<a>`), so `value`, `onChange`, `type`, `id`, `autoComplete`, `checked` etc. all work even though manifest.json lists only the component-specific props. Exception: Tooltip takes no host props — put handlers/attributes on its trigger child.
 - Theming, programmatic: the standard setup is `data-psi-theme` on `<html>`. From JS, set it once at app init: `document.documentElement.dataset.psiTheme = "dark"` (React: in a root-level effect). Theme CSS does NOT paint the page background — paint `background: var(--psi-bg-primary)` at your app root yourself. For a themed subtree, set `data-psi-theme` on a wrapper and paint its background the same way; brand font combos do not reach nested subtrees (see guidance.fonts.scope).
 - Size selection: 32 is the default (compact UI); 40 for comfortable forms and marketing pages; 24 for inline/table-row actions; 48 for hero CTAs.
 - Tags & the accent rule (D40): Tags are passive labels — they do NOT count against "one accent per visual group" (that rule governs buttons/CTAs). Badge mapping: highlight (e.g. a plan badge) → `accent-subtle`; meta → `neutral-subtle`; status → `success`/`warning`/`danger`.
 - CSS import order: all DS stylesheets are order-independent — base.css opens with an explicit `@layer psi.base, psi.theme, psi.components, psi.utilities;` statement. Recommended listing for readability: base → theme → components → utilities → @handamade/psi-react/styles.
-- Widths: content widths are app-level; the system tokenizes the page container only (`--psi-container-max`). Component width tokens arrive with Field/Dialog (next cycle).
+- Widths: content widths are app-level; the system tokenizes the page container only (`--psi-container-max`). Component width tokens arrive with Dialog (next cycle).
 - Full semantic token roster: `@handamade/psi-tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.
 
 Live MCP access to this data: see packages/mcp/llms.txt (hosted: https://psi.kurkin.de/mcp).

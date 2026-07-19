@@ -47,3 +47,4 @@ Override `--psi-button-*` custom properties at any scope; interactive states der
 - Typography tokens are --psi-text-{size}-{lineHeight}-{weight}.
 - Override component tokens (--psi-{component}-*), not semantic tokens, for one-off theming.
 - --psi-button-font overrides button typography across all sizes (documented D34 override; ember → mono).
+- Wrap labeled form controls in Field — label association, description/error line, aria-describedby and aria-invalid come wired; don't hand-roll label+message rows.

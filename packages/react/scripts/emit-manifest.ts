@@ -10,6 +10,7 @@ const COMPONENTS = [
   "Card",
   "Input",
   "Select",
+  "Field",
   "Checkbox",
   "Switch",
   "Tag",

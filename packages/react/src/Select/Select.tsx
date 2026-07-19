@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import type { SelectHTMLAttributes, Ref } from "react";
+import { FieldContext } from "../Field/Field.js";
 import styles from "./select.module.css";
 
 type Size = 24 | 32 | 40 | 48;
@@ -11,7 +13,7 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
    * @default 32
    */
   size?: Size;
-  /** Show error styling. @default false */
+  /** Show error styling. Inside a Field, the Field's error also lights this. @default false */
   error?: boolean;
   /** Forwarded ref to the underlying `<select>` element. */
   ref?: Ref<HTMLSelectElement>;
@@ -24,7 +26,9 @@ const sizeClass: Record<Size, string> = {
   48: styles.size48,
 };
 
-/** Styled native `<select>` with pixel-true heights (24–48) and an error state. */
+/** Styled native `<select>` with pixel-true heights (24–48) and an error state.
+ * Inside a Field, id/aria-describedby/aria-invalid/required are wired
+ * automatically (D49). */
 export function Select({
   size = 32,
   error = false,
@@ -33,17 +37,30 @@ export function Select({
   children,
   ...rest
 }: SelectProps) {
+  const field = useContext(FieldContext);
+  const invalid = error || (field?.invalid ?? false);
+  const describedBy =
+    [field?.describedBy, rest["aria-describedby"]].filter(Boolean).join(" ") || undefined;
+
   const cls = [
     styles.select,
     sizeClass[size],
-    error && styles.error,
+    invalid && styles.error,
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <select ref={ref} className={cls} {...rest}>
+    <select
+      ref={ref}
+      className={cls}
+      id={rest.id ?? field?.id}
+      required={rest.required ?? (field?.required || undefined)}
+      aria-invalid={field?.invalid || undefined}
+      {...rest}
+      aria-describedby={describedBy}
+    >
       {children}
     </select>
   );

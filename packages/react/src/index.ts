@@ -8,6 +8,8 @@ export { NavBar } from "./NavBar/NavBar.js";
 export type { NavBarProps } from "./NavBar/NavBar.js";
 export { AspectRatio } from "./AspectRatio/AspectRatio.js";
 export type { AspectRatioProps } from "./AspectRatio/AspectRatio.js";
+export { Field } from "./Field/Field.js";
+export type { FieldProps } from "./Field/Field.js";
 export { Input } from "./Input/Input.js";
 export type { InputProps } from "./Input/Input.js";
 export { Select } from "./Select/Select.js";
