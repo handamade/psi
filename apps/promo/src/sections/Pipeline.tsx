@@ -1,6 +1,6 @@
 const FIGMA_VARS = [
-  { name: "bg/primary", varClass: "--psi-bg-primary", note: "COLOR · 3 modes" },
-  { name: "fg/accent", varClass: "--psi-fg-accent", note: "COLOR · 3 modes" },
+  { name: "bg/primary", varClass: "--psi-bg-primary", note: "COLOR · 4 modes" },
+  { name: "fg/accent", varClass: "--psi-fg-accent", note: "COLOR · 4 modes" },
   { name: "space/16", varClass: "--psi-fill-neutral3", note: "FLOAT · 16" },
   { name: "radius/8", varClass: "--psi-fill-neutral4", note: "FLOAT · 8" },
 ];
