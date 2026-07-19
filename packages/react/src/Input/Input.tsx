@@ -40,7 +40,7 @@ export function Input({ size = 32, error = false, className, ref, ...rest }: Inp
       className={cls}
       id={rest.id ?? field?.id}
       required={rest.required ?? (field?.required || undefined)}
-      aria-invalid={invalid || undefined}
+      aria-invalid={field?.invalid || undefined}
       {...rest}
       aria-describedby={describedBy}
     />

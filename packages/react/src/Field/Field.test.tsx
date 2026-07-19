@@ -129,4 +129,27 @@ describe("FieldContext wiring", () => {
     expect(input).not.toHaveAttribute("aria-describedby");
     expect(input).not.toHaveAttribute("id");
   });
+
+  it("standalone error prop does not set aria-invalid (styling only)", () => {
+    render(<Input error aria-label="SoloInvalid" />);
+    expect(screen.getByLabelText("SoloInvalid")).not.toHaveAttribute("aria-invalid");
+  });
+
+  it("standalone Select error prop does not set aria-invalid (styling only)", () => {
+    render(
+      <Select error aria-label="SoloInvalidSelect">
+        <option>Free</option>
+      </Select>,
+    );
+    expect(screen.getByLabelText("SoloInvalidSelect")).not.toHaveAttribute("aria-invalid");
+  });
+
+  it("own error inside an error-free Field does not set aria-invalid", () => {
+    render(
+      <Field label="Nick" description="Optional.">
+        <Input error />
+      </Field>,
+    );
+    expect(screen.getByLabelText("Nick")).not.toHaveAttribute("aria-invalid");
+  });
 });
