@@ -1,16 +1,28 @@
 {
   "name": "@handamade/psi-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "MCP server and agent-context generator for the Psi (Ψ) design system",
   "type": "module",
-  "bin": { "psi-mcp": "dist/cli.js" },
+  "bin": {
+    "psi-mcp": "dist/cli.js"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./http": { "types": "./dist/http.d.ts", "import": "./dist/http.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js"
+    }
   },
-  "files": ["dist", "README.md", "llms.txt"],
+  "files": [
+    "dist",
+    "README.md",
+    "llms.txt"
+  ],
   "scripts": {
     "build": "tsx scripts/build-index.ts && tsc -p tsconfig.build.json"
   },
