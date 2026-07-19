@@ -1,5 +1,21 @@
 # @handamade/tokens
 
+## 0.5.0
+
+### Minor Changes
+
+- b30e35c: New `Dialog` component (D50): modal on the native `<dialog>` top layer —
+  controlled `open`/`onClose(reason)`, title/footer slots, width 400|560|720,
+  dismissible gate over Esc/backdrop/close-button. First D45 slot contracts:
+  `manifest.json` component entries now carry `slots` (authored for Dialog,
+  explicit `[]` elsewhere), validated at build. New `--psi-dialog-*` tokens.
+  The psi-mcp index passes slot contracts through (`get component:Dialog` returns them).
+- 3a753a5: New `Field` component (D49): labeled form-row wrapper — label above, one
+  message line below (error replaces description, aria-live), fieldset/legend
+  group mode. Input and Select now consume FieldContext when wrapped:
+  id/aria-describedby/aria-invalid/required are wired automatically (additive —
+  standalone behavior unchanged). New `--psi-field-*` component tokens.
+
 ## 0.4.1
 
 ### Patch Changes
