@@ -18,6 +18,7 @@ export const guidance = {
     "Override component tokens (--psi-{component}-*), not semantic tokens, for one-off theming.",
     "--psi-button-font overrides button typography across all sizes (documented D34 override; ember → mono).",
     "Wrap labeled form controls in Field — label association, description/error line, aria-describedby and aria-invalid come wired; don't hand-roll label+message rows.",
+    "Use Dialog for blocking modal flows — title/footer slots, dismissible gate; danger stays on the footer Buttons, one accent per group.",
   ],
   states: { hover: "L - 0.04", active: "L - 0.08", disabled: "element opacity 0.4 (keeps hue)", focus: "2px ring var(--psi-{component}-focus-ring)" },
   typographyDefaults: { body: "16-24-regular", compactUI: "14-20-regular", heading: "24-32-medium", caption: "12-16-regular" },
