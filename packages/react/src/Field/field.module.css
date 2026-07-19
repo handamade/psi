@@ -1,0 +1,28 @@
+.field {
+  display: grid;
+  gap: var(--psi-field-gap);
+  border: 0; /* fieldset reset (group mode) */
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.label {
+  font: var(--psi-text-14-20-medium);
+  color: var(--psi-field-label-fg);
+  padding: 0; /* legend reset (group mode) */
+}
+
+.marker {
+  color: var(--psi-field-marker-fg);
+}
+
+.message {
+  margin: 0;
+  font: var(--psi-text-12-16-regular);
+  color: var(--psi-field-message-fg);
+}
+
+.invalid .message {
+  color: var(--psi-field-error-fg);
+}
