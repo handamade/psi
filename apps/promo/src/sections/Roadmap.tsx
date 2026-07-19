@@ -1,18 +1,21 @@
 import { IconCheck, IconChevronRight } from "@handamade/psi-react";
 
 const SHIPPED = [
-  ["11 atoms, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, NavBar, AspectRatio"],
+  ["13 components, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, NavBar, AspectRatio, Field, Dialog"],
   ["4 themes", "light, dark and two customer brands (acme, ember) — plus `pnpm new-theme --base dark`"],
   ["Contrast gate", "WCAG AA validated per theme, at build time"],
+  ["Visual regression", "Playwright screenshots per component, light + ember, gated in CI"],
   ["Figma sync", "Psi Token Sync plugin — code → Figma variables"],
   ["AI artifacts", "llms.txt, manifest.json, guidance.json, DTCG export"],
-  ["@handamade/psi-mcp", "hosted + local MCP server, tokens and guidance as queryable tools for agents"],
+  ["@handamade/psi-mcp", "hosted + local MCP server, tokens, guidance and slot contracts as queryable tools for agents"],
+  ["Slot contracts", "what nests where, authored per component and merged into the manifest — validated at build (D45)"],
 ] as const;
 
 const NEXT = [
+  ["Token scopes", "which CSS properties a token may bind to — enforced at the token build (D46)"],
+  ["Composition patterns", "parametrized recipes with clarifying questions agents ask before generating (D47)"],
   ["Custom listbox Select", "v1 ships a styled native <select>; a fully custom listbox is v2"],
   ["Tooltip on the Popover API", "native anchor positioning once support settles"],
-  ["Visual regression", "screenshot testing across all themes"],
 ] as const;
 
 export function Roadmap() {
@@ -56,8 +59,8 @@ export function Roadmap() {
           </div>
         </div>
         <p className="annot roadmap-foot">
-          v1 stops at atoms on purpose: layout, typography compositions and
-          marketing-scale type belong to consuming apps. This page is one —
+          The system stays deliberately small: layout, typography compositions
+          and marketing-scale type belong to consuming apps. This page is one —
           every section here is plain markup over --psi-* tokens. View source.
         </p>
       </div>

@@ -15,6 +15,31 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-07-19",
+    tag: "release",
+    title: "Psi 0.5.0 — Field, Dialog, and slot contracts",
+    body: "The two components agents asked for most: Field wraps any labeled control and wires ids, aria-describedby and error state automatically; Dialog is a modal on the native top layer — focus trap and aria-modal from the platform. And the first slot contracts ship: the manifest now says what nests where, validated at build.",
+    link: { label: "Browse the Storybook", href: "/storybook/" },
+  },
+  {
+    date: "2026-07-19",
+    tag: "docs",
+    title: "0.4.1 — the agent surface, sharpened",
+    body: "A day-one consumer build found the gaps, so we fixed them the same day: the required component-CSS import is now documented everywhere, every component carries a one-line description, and the MCP index answers theme and spacing-scale questions it couldn't before.",
+  },
+  {
+    date: "2026-07-18",
+    tag: "release",
+    title: "Psi 0.4.0 — the system, queryable",
+    body: "@handamade/psi-mcp lands: a hosted MCP server (psi.kurkin.de/mcp) plus a local stdio mode, exposing components, tokens and guidance as search/get tools. npx @handamade/psi-mcp init writes the agent guide straight into your repo.",
+  },
+  {
+    date: "2026-07-18",
+    tag: "release",
+    title: "The system has a name: Psi (Ψ)",
+    body: "0.3.0 renames everything — @handamade/psi-tokens and @handamade/psi-react on npm, --psi-* custom properties, data-psi-theme. Breaking, but a one-pass find-and-replace; the migration is documented in the changelog.",
+  },
+  {
     date: "2026-07-08",
     tag: "site",
     title: "The design system gets a public home",

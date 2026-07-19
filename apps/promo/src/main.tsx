@@ -5,6 +5,7 @@ import "@handamade/psi-tokens/base.css";
 import "@handamade/psi-tokens/light.css";
 import "@handamade/psi-tokens/dark.css";
 import "@handamade/psi-tokens/acme.css";
+import "@handamade/psi-tokens/ember.css";
 import "@handamade/psi-tokens/components.css";
 import "@handamade/psi-tokens/utilities.css";
 import "@handamade/psi-react/styles";

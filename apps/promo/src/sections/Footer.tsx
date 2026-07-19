@@ -5,10 +5,11 @@ pnpm build     # tokens + components + docs
 pnpm dev       # tokens watcher + storybook`;
 
 const USAGE = `import { Button } from "@handamade/psi-react";
-import "@handamade/psi-react/styles";
 import "@handamade/psi-tokens/base.css";
 import "@handamade/psi-tokens/light.css";
 import "@handamade/psi-tokens/components.css";
+import "@handamade/psi-tokens/utilities.css";
+import "@handamade/psi-react/styles.css";
 
 <html data-psi-theme="light">`;
 
