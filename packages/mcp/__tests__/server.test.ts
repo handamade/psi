@@ -44,7 +44,7 @@ describe("psi MCP server", () => {
   });
 
   it("flags unknown ids as errors without throwing", async () => {
-    const res = (await client.callTool({ name: "get", arguments: { id: "component:Dialog" } })) as ToolCallResult;
+    const res = (await client.callTool({ name: "get", arguments: { id: "component:DoesNotExist" } })) as ToolCallResult;
     expect(res.isError).toBe(true);
     expect(res.content[0].text).toContain("search");
   });

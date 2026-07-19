@@ -1,6 +1,6 @@
 # @handamade/psi-mcp
 
-MCP server and agent-context generator for the Psi (Ψ) design system. Documents the system — the 12 React 19 components, every semantic token with its OKLCH derivation formula resolved across all four themes, and the usage guidance — through two read-only tools. It does not write code.
+MCP server and agent-context generator for the Psi (Ψ) design system. Documents the system — the 13 React 19 components, every semantic token with its OKLCH derivation formula resolved across all four themes, and the usage guidance — through two read-only tools. It does not write code.
 
 ## Connect
 

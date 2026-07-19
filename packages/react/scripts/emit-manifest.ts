@@ -12,6 +12,7 @@ const COMPONENTS = [
   "Input",
   "Select",
   "Field",
+  "Dialog",
   "Checkbox",
   "Switch",
   "Tag",

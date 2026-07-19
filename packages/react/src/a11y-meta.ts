@@ -43,6 +43,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend.",
   },
+  Dialog: {
+    keyboard: [
+      { keys: "Esc", behavior: "Dismisses via onClose('esc') when dismissible; swallowed otherwise." },
+      { keys: "Tab", behavior: "Focus is trapped inside by the native <dialog> top layer; restored on close." },
+    ],
+    notes:
+      "Rendered with showModal(): aria-modal, inert background and focus restore come from the platform. title wires aria-labelledby; without title, pass aria-label. Backdrop click dismisses only when dismissible.",
+  },
   Checkbox: {
     keyboard: [{ keys: "Space", behavior: "Toggles. Native <input type=checkbox> underneath (visually hidden)." }],
   },

@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-12 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+13 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -39,7 +39,7 @@
 - Size selection: 32 is the default (compact UI); 40 for comfortable forms and marketing pages; 24 for inline/table-row actions; 48 for hero CTAs.
 - Tags & the accent rule (D40): Tags are passive labels — they do NOT count against "one accent per visual group" (that rule governs buttons/CTAs). Badge mapping: highlight (e.g. a plan badge) → `accent-subtle`; meta → `neutral-subtle`; status → `success`/`warning`/`danger`.
 - CSS import order: all DS stylesheets are order-independent — base.css opens with an explicit `@layer psi.base, psi.theme, psi.components, psi.utilities;` statement. Recommended listing for readability: base → theme → components → utilities → @handamade/psi-react/styles.
-- Widths: content widths are app-level; the system tokenizes the page container only (`--psi-container-max`). Component width tokens arrive with Dialog (next cycle).
+- Widths: content widths are app-level; the system tokenizes the page container only (`--psi-container-max`). Dialog is the first component with its own width union — `width` is `400 | 560 | 720` (default 560).
 - Full semantic token roster: `@handamade/psi-tokens/resolved/<theme>.json` has every token with resolved values — this file lists only the patterns.
 
 Live MCP access to this data: see packages/mcp/llms.txt (hosted: https://psi.kurkin.de/mcp).

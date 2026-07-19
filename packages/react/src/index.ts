@@ -10,6 +10,8 @@ export { AspectRatio } from "./AspectRatio/AspectRatio.js";
 export type { AspectRatioProps } from "./AspectRatio/AspectRatio.js";
 export { Field } from "./Field/Field.js";
 export type { FieldProps } from "./Field/Field.js";
+export { Dialog } from "./Dialog/Dialog.js";
+export type { DialogProps } from "./Dialog/Dialog.js";
 export { Input } from "./Input/Input.js";
 export type { InputProps } from "./Input/Input.js";
 export { Select } from "./Select/Select.js";
