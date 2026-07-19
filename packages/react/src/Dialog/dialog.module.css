@@ -1,0 +1,57 @@
+/* packages/react/src/Dialog/dialog.module.css */
+.dialog {
+  padding: 0; /* panel owns spacing; a bare click on .dialog = backdrop click */
+  border: 1px solid var(--psi-dialog-border);
+  border-radius: var(--psi-radius-12);
+  background: var(--psi-dialog-bg);
+  max-width: calc(100vw - var(--psi-space-32));
+}
+
+.dialog::backdrop {
+  background: var(--psi-dialog-backdrop);
+}
+
+.dialog[open] {
+  animation: dialog-enter var(--psi-duration-200) var(--psi-ease-soft);
+}
+
+.dialog[open]::backdrop {
+  animation: backdrop-enter var(--psi-duration-200) var(--psi-ease-soft);
+}
+
+@keyframes dialog-enter {
+  from { opacity: 0; transform: scale(0.97); }
+}
+
+@keyframes backdrop-enter {
+  from { opacity: 0; }
+}
+
+.w400 { width: 400px; }
+.w560 { width: 560px; }
+.w720 { width: 720px; }
+
+.panel {
+  display: grid;
+  gap: var(--psi-space-16);
+  padding: var(--psi-space-24);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--psi-space-12);
+}
+
+.title {
+  margin: 0;
+  font: var(--psi-text-18-28-medium);
+  color: var(--psi-dialog-title-fg);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--psi-space-8);
+}
