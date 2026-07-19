@@ -52,6 +52,8 @@ const sizeClass: Record<Size, string> = {
   48: styles.size48,
 };
 
+/** Action trigger. With `href` renders an anchor with identical styling (D33);
+ * `disabled` then maps to `aria-disabled`. */
 export function Button({
   variant = "neutral",
   size = 32,

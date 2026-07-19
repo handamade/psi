@@ -28,6 +28,7 @@ describe("renderAgentsBlock", () => {
   it("carries the house rules and every component with its axes", () => {
     expect(block).toContain("24 | 32 | 40 | 48");
     expect(block).toContain("utilities.css");
+    expect(block).toContain("@handamade/psi-react/styles");
     expect(block).toContain("data-psi-theme");
     for (const c of index.components) expect(block).toContain(`- ${c.name}`);
     expect(block).toContain("accent-subtle");

@@ -29,7 +29,11 @@ const TOPIC_SUMMARIES: Record<string, string> = {
   layout: "Breakpoints, container, z-index",
   recipes: "Composition recipes (mediaTint, sectionHeader)",
   tags: "Tag/badge rules incl. the accent exemption (D40)",
-  "getting-started": "Install, the four required CSS imports, theme attribute, core rules",
+  "getting-started": "Install, the five required CSS imports, theme attribute, core rules",
+  themes: "Theme list (light|dark|acme|ember), data-psi-theme mechanics, customer themes",
+  scales:
+    "Pixel scales — space, size, radius, motion, layout — the values behind " +
+    "--psi-space-* / --psi-radius-* / --psi-duration-*",
 };
 
 function componentSummary(c: ComponentEntry): string {

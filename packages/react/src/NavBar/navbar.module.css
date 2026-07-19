@@ -22,4 +22,28 @@
   gap: var(--psi-space-20);
   margin-inline-start: auto;
 }
+
+/* Anchor slots: raw anchors passed as brand/children get the DS treatment
+ * (HAN-16 — previously they rendered browser-default blue/underlined).
+ * Brand reads at full strength; nav links sit one step down until hover. */
+.links a,
+.brand a {
+  text-decoration: none;
+  transition: color var(--psi-duration-150) var(--psi-ease-soft);
+}
+
+.links a {
+  color: var(--psi-navbar-link-fg);
+}
+
+.links a:hover,
+.brand a {
+  color: var(--psi-navbar-link-fg-hover);
+}
+
+.links a:focus-visible,
+.brand a:focus-visible {
+  outline: 2px solid var(--psi-navbar-focus-ring);
+  outline-offset: 2px;
+}
 .actions { display: flex; align-items: center; gap: var(--psi-space-8); }

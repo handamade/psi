@@ -29,6 +29,15 @@ describe("search", () => {
     expect(store.search("variants").some((b) => b.id === "topic:variants")).toBe(true);
   });
 
+  it("resolves scale and theme queries to their topics (HAN-16)", () => {
+    expect(store.search("space").some((b) => b.id === "topic:scales")).toBe(true);
+    expect(store.search("radius").some((b) => b.id === "topic:scales")).toBe(true);
+    expect(store.search("themes").some((b) => b.id === "topic:themes")).toBe(true);
+    const themes = store.get("topic:themes") as { content: { themes: string[] } };
+    expect(themes.content.themes).toContain("ember");
+    expect((store.get("topic:scales") as { content: object }).content).toHaveProperty("space");
+  });
+
   it("stays within the response budget", () => {
     for (const q of ["", "button", "color", "a"]) {
       expect(JSON.stringify(store.search(q)).length).toBeLessThanOrEqual(6000);

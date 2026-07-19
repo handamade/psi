@@ -9,6 +9,7 @@ export interface CheckboxProps
   ref?: Ref<HTMLInputElement>;
 }
 
+/** Native checkbox with a built-in label; for independent binary choices. */
 export function Checkbox({
   children,
   className,

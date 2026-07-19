@@ -43,4 +43,26 @@ describe("buildIndex", () => {
     expect(index.scales).toHaveProperty("space");
     expect(index.version).toBe("0.0.0-test");
   });
+
+  it("getting-started lists the component styles import (HAN-16)", async () => {
+    const index = await buildIndex(inputs);
+    const gs = index.topics["getting-started"] as { cssImports: string[] };
+    expect(gs.cssImports.some((l) => l.includes("@handamade/psi-react/styles"))).toBe(true);
+  });
+
+  it("exposes themes and scales as topics (HAN-16)", async () => {
+    const index = await buildIndex(inputs);
+    const themes = index.topics.themes as { themes: string[]; customerThemes: string };
+    expect(themes.themes).toEqual(["light", "dark", "acme", "ember"]);
+    expect(themes.customerThemes).toContain("acme");
+    expect(index.topics.scales).toHaveProperty("space");
+    expect(index.topics.scales).toHaveProperty("radius");
+  });
+
+  it("every component carries a non-empty description (HAN-16)", async () => {
+    const index = await buildIndex(inputs);
+    for (const c of index.components) {
+      expect(c.description, `${c.name} has no description`).not.toBe("");
+    }
+  });
 });

@@ -8,6 +8,7 @@ export interface AspectRatioProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
 }
 
+/** Fixed-aspect-ratio box that sizes its child media. */
 export function AspectRatio({ ratio, className, style, children, ref, ...rest }: AspectRatioProps) {
   const cls = [styles.frame, className].filter(Boolean).join(" ");
   return (

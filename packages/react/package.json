@@ -10,6 +10,7 @@
       "types": "./dist/index.d.ts"
     },
     "./styles": "./dist/styles.css",
+    "./styles.css": "./dist/styles.css",
     "./manifest.json": "./dist/manifest.json"
   },
   "files": [
