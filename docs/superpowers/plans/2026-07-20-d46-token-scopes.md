@@ -1185,3 +1185,15 @@ PR body: summarize the gate posture, the cross-family scope decisions (fgDanger,
 - **Spec coverage:** scopes field (T2/T4) ✓; primary build gate w/ suffix map + derivation see-through (T5/T6) ✓; throw posture (T6) ✓; resolved JSON + DTCG `$extensions.psi` (T6) ✓; generated scope map + stylelint consumer rule (T7) ✓; unscoped-valid-everywhere (T5 tests) ✓; high-risk families first: text/surface (T4), gaps via `SCALE_SCOPES.space` + stylelint (T1/T6/T7) ✓; unknown-scope-entry error (T2) ✓; positive/negative tests per scoped family incl. derivations (T5) + stylelint cases (T7) ✓.
 - **Known judgment points for the executor:** (1) Task 3 contrast-matrix pair shape must be read from the real file; (2) Task 5's "real inventory" tests are the moment latent violations surface — stop and report, don't tune scopes to pass; (3) Task 7's repo-wide lint may surface consumer CSS in `apps/` using semantic tokens on odd properties — same rule.
 - **Type consistency:** `ScopeViolation`, `checkScopes`, `checkOverrideScopes`, `validateScopeConsistency`, `SCALE_SCOPES` names match across Tasks 1/2/5/6/7.
+
+---
+
+## Addendum (2026-07-20, during Task 5): fifth cross-family binding
+
+The gate's real-inventory run found `switch.ts:6` `"thumb-bg": "var(--psi-fg-static-white)"` — a deliberate binding (white thumb disc, static across themes) absent from the pre-flight cross-family table (the audit grep only surfaced unsuffixed keys). Resolution follows the Task 3 precedent, not scope-widening (widening fgStaticWhite to surface would legalize the spec's motivating violation class for a heavily-used text token):
+
+- New pure-ref token in light.ts AND dark.ts: `fillStaticWhite: token({ from: ref.fgStaticWhite, scopes: ["surface"] })` — byte-identical hex with fgStaticWhite in every theme.
+- `switch.ts` rebinds: `"thumb-bg": "var(--psi-fill-static-white)"`.
+- `inverted-tokens.test.ts` gains the hex-equality assertion `r.fillStaticWhite.hex === r.fgStaticWhite.hex` across all four themes.
+- The full-object theme literal tests (light-theme/dark-theme) gain the new token.
+- The Task 4 scope table's surface row now includes `fillStaticWhite`.

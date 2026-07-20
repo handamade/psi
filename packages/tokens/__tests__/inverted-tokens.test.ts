@@ -5,6 +5,7 @@ import { darkTheme } from "../src/themes/dark.js";
 import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { tooltipVars } from "../src/components/tooltip.js";
+import { switchVars } from "../src/components/switch.js";
 
 const themes = [
   { name: "light", theme: lightTheme, palette: defaultPalette, slots: defaultSlots },
@@ -26,5 +27,19 @@ describe("inversion tokens (D46 tooltip rebind)", () => {
   it("tooltip binds the inversion tokens, not raw fg/bg", () => {
     expect(tooltipVars.bg).toBe("var(--psi-bg-inverted)");
     expect(tooltipVars.fg).toBe("var(--psi-fg-on-inverted)");
+  });
+
+  // Pure ref → byte-identical hex with fgStaticWhite in EVERY theme. This is
+  // the zero-visual-diff guarantee for the switch-thumb rebind (D46 gate
+  // caught fgStaticWhite-as-surface on switch.thumb-bg; resolution follows
+  // the same inversion-token precedent instead of widening fgStaticWhite's
+  // scopes).
+  it.each(themes)("fillStaticWhite ≡ fgStaticWhite in $name", (t) => {
+    const r = resolve(t.theme, t.palette, t.slots);
+    expect(r.fillStaticWhite.hex).toBe(r.fgStaticWhite.hex);
+  });
+
+  it("switch binds the surface-scoped static-white token, not the text one", () => {
+    expect(switchVars["thumb-bg"]).toBe("var(--psi-fill-static-white)");
   });
 });

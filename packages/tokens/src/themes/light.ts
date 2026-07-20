@@ -45,6 +45,10 @@ export const lightTheme: ThemeDef = {
   fillTintWarning: token({ from: ref.fgWarning, alpha: 0.12, scopes: ["surface"] }),
   fillTintDanger: token({ from: ref.fgDanger, alpha: 0.12, scopes: ["surface"] }),
 
+  /** D46: the static-white SURFACE (switch thumb) — pure ref, byte-identical
+   * with fgStaticWhite; scoped for what it is. */
+  fillStaticWhite: token({ from: ref.fgStaticWhite, scopes: ["surface"] }),
+
   borderFaint: token({ from: ref.fgPrimary, alpha: 0.08, scopes: ["border"] }),
   borderNeutral: token({ from: ref.fgPrimary, alpha: 0.15, scopes: ["border"] }),
   borderStrong: token({ from: ref.fgPrimary, alpha: 0.3, scopes: ["border"] }),
