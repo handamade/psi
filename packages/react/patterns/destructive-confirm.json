@@ -1,0 +1,26 @@
+{
+  "id": "destructive-confirm",
+  "intent": "Dialog confirming a destructive action",
+  "match": ["delete confirmation", "are you sure", "destructive dialog", "confirm delete"],
+  "compose": {
+    "component": "Dialog",
+    "slots": {
+      "title": ["{content:title}"],
+      "body": ["{content:consequence}"],
+      "footer": [
+        { "component": "Button", "props": { "variant": "ghost", "size": "{param:size}" }, "content": "cancel-label" },
+        { "component": "Button", "props": { "variant": "danger", "size": "{param:size}" }, "content": "confirm-label" }
+      ]
+    }
+  },
+  "parameters": [
+    { "key": "size", "ask": "Button size?", "options": [32, 40], "default": 32 }
+  ],
+  "content": {
+    "title": "<Delete the object?>",
+    "consequence": "<what is permanently lost>",
+    "cancel-label": "Cancel",
+    "confirm-label": "<verb the object>"
+  },
+  "gaps": []
+}

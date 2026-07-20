@@ -1,0 +1,21 @@
+import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { loadPatterns, validatePatterns } from "./patterns.js";
+
+const root = join(import.meta.dirname, "..");
+const manifest = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8"));
+const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf8"));
+const patterns = loadPatterns(join(root, "patterns"));
+
+describe("seed patterns against the real manifest", () => {
+  it("all three load and validate; only filter-toolbar is gapped", () => {
+    const { gaps } = validatePatterns(patterns, manifest.components, contracts);
+    expect(patterns.map((p) => p.id).sort()).toEqual(["destructive-confirm", "filter-toolbar", "settings-form-row"]);
+    expect(gaps).toEqual({ "filter-toolbar": ["Toolbar"] });
+  });
+  it("Field declares its prop-slots in the manifest", () => {
+    const field = manifest.components.find((c: { name: string }) => c.name === "Field");
+    expect(field.slots.map((s: { name: string }) => s.name)).toEqual(["label", "body", "description"]);
+  });
+});

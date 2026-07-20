@@ -1,0 +1,7 @@
+{
+  "slots": [
+    { "name": "label", "accepts": {}, "cardinality": "0..1", "order": 1 },
+    { "name": "body", "accepts": {}, "cardinality": "1..*", "order": 2 },
+    { "name": "description", "accepts": {}, "cardinality": "0..1", "order": 3 }
+  ]
+}
