@@ -5,6 +5,7 @@ import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
 import { durationScale, easings } from "../src/scales/motion.js";
 import { breakpoints, container, zIndex } from "../src/scales/layout.js";
+import { SCALE_SCOPES } from "../src/scopes.js";
 
 /**
  * Emit a JSON string containing the resolved theme tokens.
@@ -24,6 +25,7 @@ export function emitResolvedJSON(
         radius: [...radiusScale],
         motion: { durations: [...durationScale], easings },
         layout: { breakpoints, container, zIndex },
+        scopes: SCALE_SCOPES,
       },
       typography: typographyCombos.map((c) => ({
         name: comboName(c),

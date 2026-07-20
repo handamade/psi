@@ -91,4 +91,14 @@ describe("resolver", () => {
     expect(hexNum).toBeGreaterThanOrEqual(0);
     expect(hexNum).toBeLessThanOrEqual(0xffffff);
   });
+
+  it("carries scopes into ResolvedToken and does not inherit them through refs", () => {
+    const theme: ThemeDef = {
+      fgStaticBlack: token({ from: slot.ink, scopes: ["text"] }),
+      fgOnAccent: token({ from: ref.fgStaticBlack, l: set(0.14) }),
+    };
+    const resolved = resolve(theme, palette, slots);
+    expect(resolved.fgStaticBlack.scopes).toEqual(["text"]);
+    expect(resolved.fgOnAccent.scopes).toBeUndefined();
+  });
 });

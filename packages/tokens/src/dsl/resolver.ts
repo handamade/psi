@@ -140,6 +140,7 @@ export function resolve(
       },
       hex,
       formula: formatFormula(def),
+      ...(def.scopes !== undefined ? { scopes: def.scopes } : {}),
     };
 
     cache.set(name, resolved);

@@ -23,7 +23,26 @@ pnpm vr      # runs Playwright against the built Storybook, diffs against baseli
 ```
 
 `pnpm vr` serves `storybook-static/` via `npx serve` on port 6208 and exits non-zero
-on any visual diff (`maxDiffPixelRatio: 0.001`).
+on any visual diff (`maxDiffPixels: 48`, per-pixel `threshold: 0.02`).
+
+### Why absolute maxDiffPixels and a strict threshold (HAN-20)
+
+Two masking layers let real regressions through the old config
+(`maxDiffPixelRatio: 0.001`, default `threshold: 0.2`):
+
+- **Per-pixel threshold** was the dominant mask: the ember `fgOnAccent` AAA fix
+  (#25211c → #0c0805 — every accent-button label in ember) registered **zero**
+  differing pixels at threshold 0.2, and still zero at 0.1. Dark-on-dark or
+  small-hue shifts — exactly the class field reports catch by eye — are
+  invisible to the default. At 0.02 that change measures 54–439 diff px per
+  affected story.
+- **Ratio** scaled the allowance with screenshot area (~800+ px on a full-page
+  shot), so tooltip-sized diffs could never reach 0.1% of the page.
+
+Same-environment re-renders are deterministic: measured 0 diff pixels across
+all stories at threshold 0. The cost of the strict config: when the CI runner
+image updates its font stack, expect a mass baseline refresh (the documented
+workflow below) rather than silent absorption — that trade is deliberate.
 
 ### Why `serve.json` exists
 

@@ -7,11 +7,13 @@ import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
 import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
 import type { BrandFonts } from "../src/themes/customers/index.js";
-import { validate } from "../src/dsl/validator.js";
+import { validate, validateScopeConsistency } from "../src/dsl/validator.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { checkContrast, wcagAAPairs, componentLabelPairs } from "../src/contrast-matrix.js";
+import { checkScopes, checkOverrideScopes } from "../src/scope-gate.js";
+import { SCALE_SCOPES, PROPERTY_GROUPS, keyGroup } from "../src/scopes.js";
 
-import { emitBaseCSS, emitThemeCSS } from "./emit-css.js";
+import { emitBaseCSS, emitThemeCSS, camelToKebab } from "./emit-css.js";
 import { emitResolvedJSON } from "./emit-json.js";
 import { emitTokenTypes } from "./emit-types.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "./emit-utilities.js";
@@ -62,8 +64,31 @@ const dtcgDir = join(distDir, "dtcg");
 
 // ── Build ─────────────────────────────────────────────────────────
 
+// Component var registry — used by the D46 scope gate in the theme loop
+// below, and by the component-vars CSS emit (step 5).
+const componentVars: Record<string, Record<string, string>> = {
+  button: buttonVars,
+  card: cardVars,
+  checkbox: checkboxVars,
+  dialog: dialogVars,
+  field: fieldVars,
+  input: inputVars,
+  media: mediaVars,
+  navbar: navbarVars,
+  select: selectVars,
+  switch: switchVars,
+  tag: tagVars,
+  tooltip: tooltipVars,
+};
+
 function build(): void {
   console.log("[tokens] Building...");
+
+  // D46 — every theme must declare the same scope (or no scope) for a
+  // given token name; catches accidental scope drift across brands.
+  validateScopeConsistency(
+    Object.fromEntries(Object.entries(themes).map(([n, c]) => [n, c.theme])),
+  );
 
   // Create output directories
   mkdirSync(distDir, { recursive: true });
@@ -109,6 +134,20 @@ function build(): void {
     }
     console.log(`  contrast check passed for ${themeName}`);
 
+    // D46 scope gate — same posture as the contrast gate.
+    const scopeViolations = [
+      ...checkScopes(componentVars, themeDef),
+      ...checkOverrideScopes(config.componentOverrides ?? {}, componentVars, themeDef),
+    ];
+    if (scopeViolations.length > 0) {
+      console.error(`  SCOPE VIOLATIONS in ${themeName}:`);
+      for (const v of scopeViolations) {
+        console.error(`    --psi-${v.component}-${v.key} (${v.group}) binds ${v.token} [${v.scopes.join(", ") || "unknown token"}]`);
+      }
+      throw new Error(`${themeName} theme has ${scopeViolations.length} scope violations`);
+    }
+    console.log(`  scope gate passed for ${themeName}`);
+
     // Emit theme CSS (live oklch formulas)
     const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots, {
       fonts: config.fonts,
@@ -144,20 +183,6 @@ function build(): void {
   console.log("  wrote dist/utilities.css");
 
   // 5. Emit component vars
-  const componentVars: Record<string, Record<string, string>> = {
-    button: buttonVars,
-    card: cardVars,
-    checkbox: checkboxVars,
-    dialog: dialogVars,
-    field: fieldVars,
-    input: inputVars,
-    media: mediaVars,
-    navbar: navbarVars,
-    select: selectVars,
-    switch: switchVars,
-    tag: tagVars,
-    tooltip: tooltipVars,
-  };
   const componentsDir = join(distDir, "components");
   mkdirSync(componentsDir, { recursive: true });
   const aggregate: string[] = [];
@@ -169,6 +194,28 @@ function build(): void {
   }
   writeFileSync(join(distDir, "components.css"), aggregate.join("\n"));
   console.log("  wrote dist/components.css");
+
+  // D46 scope map for the stylelint consumer rule.
+  const semanticScopes = Object.fromEntries(
+    Object.entries(themes.light.theme)
+      .filter(([, def]) => def.scopes !== undefined)
+      .map(([name, def]) => [camelToKebab(name), def.scopes]),
+  );
+  const componentScopes = Object.fromEntries(
+    Object.entries(componentVars).flatMap(([component, vars]) =>
+      Object.keys(vars)
+        .map((key) => [`${component}-${key}`, keyGroup(key)] as const)
+        .filter(([, g]) => g !== undefined)
+        .map(([k, g]) => [k, [g]]),
+    ),
+  );
+  writeFileSync(join(distDir, "scope-map.json"), JSON.stringify({
+    propertyGroups: PROPERTY_GROUPS,
+    semantic: semanticScopes,
+    component: componentScopes,
+    scales: SCALE_SCOPES,
+  }, null, 2) + "\n");
+  console.log("  wrote dist/scope-map.json");
 
   // 6. Emit guidance.json
   writeFileSync(join(distDir, "guidance.json"), JSON.stringify(guidance, null, 2));

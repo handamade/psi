@@ -60,9 +60,9 @@ describe("light theme", () => {
   });
 
   it("defines hairline and scrim alphas (WS4, D32)", () => {
-    expect(lightTheme.borderFaint).toEqual(token({ from: ref.fgPrimary, alpha: 0.08 }));
-    expect(lightTheme.scrimSoft).toEqual(token({ from: ref.bgPrimary, alpha: 0.25 }));
-    expect(lightTheme.scrimMedium).toEqual(token({ from: ref.bgPrimary, alpha: 0.35 }));
-    expect(lightTheme.scrimHeavy).toEqual(token({ from: ref.bgPrimary, alpha: 0.82 }));
+    expect(lightTheme.borderFaint).toEqual(token({ from: ref.fgPrimary, alpha: 0.08, scopes: ["border"] }));
+    expect(lightTheme.scrimSoft).toEqual(token({ from: ref.bgPrimary, alpha: 0.25, scopes: ["surface"] }));
+    expect(lightTheme.scrimMedium).toEqual(token({ from: ref.bgPrimary, alpha: 0.35, scopes: ["surface"] }));
+    expect(lightTheme.scrimHeavy).toEqual(token({ from: ref.bgPrimary, alpha: 0.82, scopes: ["surface"] }));
   });
 });
