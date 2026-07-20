@@ -55,4 +55,10 @@ export const lightTheme: ThemeDef = {
   scrimSoft: token({ from: ref.bgPrimary, alpha: 0.25 }),
   scrimMedium: token({ from: ref.bgPrimary, alpha: 0.35 }),
   scrimHeavy: token({ from: ref.bgPrimary, alpha: 0.82 }),
+
+  /** D46: the deliberate inversion pair (tooltip). Pure refs — always
+   * byte-identical with fgPrimary/bgPrimary in every theme — but scoped
+   * for what they ARE: an inverted surface and the label on it. */
+  bgInverted: token({ from: ref.fgPrimary }),
+  fgOnInverted: token({ from: ref.bgPrimary }),
 };
