@@ -151,4 +151,5 @@ export const componentLabelPairs: ContrastPair[] = [
   { fg: "fgStaticWhite", bg: "fillDanger", minRatio: 4.5 },  // Button/IconButton/Tag danger
   { fg: "fgStaticWhite", bg: "fillSuccess", minRatio: 4.5 }, // Tag success
   { fg: "fgStaticBlack", bg: "fillWarning", minRatio: 4.5 }, // Tag warning (D22)
+  { fg: "fgOnInverted", bg: "bgInverted", minRatio: 4.5 },   // Tooltip label (D46 inversion pair)
 ];

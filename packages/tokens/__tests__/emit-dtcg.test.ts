@@ -86,4 +86,21 @@ describe("emitDTCG", () => {
     expect(parsed.easing.standard).toEqual({ $type: "string", $value: "ease" });
     expect(Object.keys(parsed.easing)).toEqual(Object.keys(easings));
   });
+
+  it("scoped tokens carry $extensions.psi.scopes (D46)", () => {
+    const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
+    const json = emitDTCG("light", resolved);
+    const parsed = JSON.parse(json);
+
+    expect(parsed.color.fg.primary.$extensions).toEqual({ psi: { scopes: ["text"] } });
+    expect(parsed.color.fill.accent.$extensions).toEqual({ psi: { scopes: ["surface", "border"] } });
+  });
+
+  it("dimension.space carries $extensions.psi.scopes", () => {
+    const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
+    const json = emitDTCG("light", resolved);
+    const parsed = JSON.parse(json);
+
+    expect(parsed.dimension.space.$extensions).toEqual({ psi: { scopes: ["gap"] } });
+  });
 });

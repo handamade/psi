@@ -6,6 +6,7 @@ import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
 import { durationScale, easings } from "../src/scales/motion.js";
 import { breakpoints, container } from "../src/scales/layout.js";
+import { SCALE_SCOPES } from "../src/scopes.js";
 
 const GROUPS = ["bg", "fg", "fill", "border", "scrim"] as const;
 
@@ -21,6 +22,7 @@ export function emitDTCG(themeName: string, resolved: ResolvedTheme): string {
         ? `${t.hex}${Math.round(t.oklch.alpha * 255).toString(16).padStart(2, "0")}`
         : t.hex,
       $description: t.formula,
+      ...(t.scopes !== undefined ? { $extensions: { psi: { scopes: t.scopes } } } : {}),
     };
   }
   const dim = (px: number) => ({ $type: "dimension", $value: px === 0 ? "0" : `${px / 16}rem` });
@@ -28,7 +30,10 @@ export function emitDTCG(themeName: string, resolved: ResolvedTheme): string {
     $description: `DS tokens, theme "${themeName}". Generated — do not edit.`,
     color,
     dimension: {
-      space: Object.fromEntries(spacingScale.map((px) => [String(px), dim(px)])),
+      space: {
+        ...Object.fromEntries(spacingScale.map((px) => [String(px), dim(px)])),
+        $extensions: { psi: { scopes: SCALE_SCOPES.space } },
+      },
       size: Object.fromEntries(sizeScale.map((px) => [String(px), dim(px)])),
       radius: Object.fromEntries(radiusScale.map((px) => [String(px), dim(px)])),
       breakpoint: Object.fromEntries(Object.entries(breakpoints).map(([k, v]) => [k, { $type: "dimension", $value: `${v}px` }])),

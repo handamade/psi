@@ -1,4 +1,4 @@
-import type { Palette, SlotMap, ThemeDef } from "../../dsl/types.js";
+import type { Palette, SlotMap, ThemeDef, TokenDef } from "../../dsl/types.js";
 import { lightTheme } from "../light.js";
 import { darkTheme } from "../dark.js";
 import { acmePalette, acmeSlots, acmeOverrides } from "./acme.js";
@@ -23,10 +23,19 @@ export interface CustomerTheme {
   componentOverrides?: Record<string, string>;
 }
 
-/** Assemble the full semantic ThemeDef for a customer brand (D27). */
+/** Assemble the full semantic ThemeDef for a customer brand (D27). D46: an
+ * override inherits the base token's scopes unless it declares its own — a
+ * brand retuning fgOnAccent's formula must not silently unscope it. */
 export function assembleCustomerTheme(c: CustomerTheme): ThemeDef {
   const base = c.base === "dark" ? darkTheme : lightTheme;
-  return { ...base, ...c.overrides };
+  const merged: Record<string, TokenDef> = { ...base };
+  for (const [name, def] of Object.entries(c.overrides ?? {})) {
+    const baseScopes = base[name]?.scopes;
+    merged[name] = def.scopes === undefined && baseScopes !== undefined
+      ? { ...def, scopes: baseScopes }
+      : def;
+  }
+  return merged;
 }
 
 export const customerThemes: Record<string, CustomerTheme> = {

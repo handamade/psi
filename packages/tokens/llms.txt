@@ -7,12 +7,14 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - dist/guidance.json: variant intent, usage rules, state derivation, typography defaults, motion/layout/fonts notes, recipes
 - dist/dtcg/{theme}.json: W3C DTCG format export
 - dist/components/{name}.vars.css: component-token declarations (--psi-{component}-*)
+- dist/scope-map.json: D46 token scopes — property groups, per-token scopes (semantic + component), scale-family scopes
 
 ## Rules for generated code
 - Use semantic tokens (--psi-bg-*, --psi-fg-*, --psi-fill-*, --psi-border-*) in app CSS.
 - Override --psi-{component}-* tokens for one-off component theming; never fork semantic tokens.
 - Scales are pixel-true: --psi-space-8 is 8px (0.5rem). Typography: --psi-text-{size}-{lh}-{weight}.
 - Themes: import base.css + {theme}.css + components.css + utilities.css; set data-psi-theme="{name}" ({light,dark,acme,ember}).
+- Scoped tokens bind only their declared property groups (D46): fg* → text properties, bg*/fill*/scrim* → surfaces, border* → borders, --psi-space-* → gaps/padding/margin. Cross-family bindings that are design decisions carry both scopes (fgDanger: text+border for error borders; fillAccent: surface+border for selected controls). The token build enforces component bindings; stylelint (psi/token-scopes) enforces consumer CSS.
 
 ## Motion (--psi-duration-*, --psi-ease-*)
 - Durations: 150/200/350/450/600ms. Easings: --psi-ease-standard, --psi-ease-in-out, --psi-ease-soft.

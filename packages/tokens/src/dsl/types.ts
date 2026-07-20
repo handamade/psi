@@ -39,6 +39,9 @@ export interface TokenDef {
   readonly c?: ChannelOp;
   readonly h?: ChannelOp;
   readonly alpha?: number;
+  /** D46: property groups / CSS properties this token may bind to
+   * (see src/scopes.ts). Unscoped tokens are valid everywhere. */
+  readonly scopes?: readonly string[];
 }
 
 // ── Palette ─────────────────────────────────────────────────────────
@@ -78,4 +81,5 @@ export interface ResolvedToken {
   };
   readonly hex: string;
   readonly formula: string;
+  readonly scopes?: readonly string[];
 }

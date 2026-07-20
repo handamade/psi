@@ -1,4 +1,5 @@
 import type { SlotMap, ThemeDef } from "./types.js";
+import { isKnownScopeEntry } from "../scopes.js";
 
 // ── Validation error ───────────────────────────────────────────────
 
@@ -87,8 +88,37 @@ export function validate(
         );
       }
     }
+
+    for (const entry of token.scopes ?? []) {
+      if (!isKnownScopeEntry(entry)) {
+        throw new ValidationError(
+          `Unknown scope entry "${entry}" in token "${name}" — not a known CSS property or declared group`,
+          [name],
+        );
+      }
+    }
   }
 
   // Detect cycles in ref chains
   detectCycles(theme);
+}
+
+/** D46: the same token name must carry identical scopes in every theme —
+ * scopes are a property of the token's meaning, not of a theme. */
+export function validateScopeConsistency(themes: Record<string, ThemeDef>): void {
+  const seen = new Map<string, { theme: string; scopes: string }>();
+  for (const [themeName, theme] of Object.entries(themes)) {
+    for (const [name, def] of Object.entries(theme)) {
+      const key = JSON.stringify(def.scopes ?? null);
+      const prior = seen.get(name);
+      if (prior === undefined) {
+        seen.set(name, { theme: themeName, scopes: key });
+      } else if (prior.scopes !== key) {
+        throw new ValidationError(
+          `Scope drift for token "${name}": ${prior.theme} declares ${prior.scopes}, ${themeName} declares ${key}`,
+          [name],
+        );
+      }
+    }
+  }
 }

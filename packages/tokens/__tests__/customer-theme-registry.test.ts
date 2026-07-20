@@ -47,7 +47,8 @@ describe("dark-first customer themes (D27)", () => {
   it("merges overrides over the dark base", () => {
     const overrides = { bgPrimary: token({ from: slot.canvas }) };
     const def = assembleCustomerTheme({ palette: acmePalette, slots: acmeSlots, base: "dark", overrides });
-    expect(def.bgPrimary).toEqual(overrides.bgPrimary);
+    // D46: an override without its own scopes inherits the base token's scopes.
+    expect(def.bgPrimary).toEqual({ ...overrides.bgPrimary, scopes: darkTheme.bgPrimary.scopes });
     expect(def.bgSecondary).toEqual(darkTheme.bgSecondary);
   });
 });

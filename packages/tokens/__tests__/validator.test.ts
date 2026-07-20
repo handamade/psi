@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validate, ValidationError } from "../src/dsl/validator.js";
+import { validate, ValidationError, validateScopeConsistency } from "../src/dsl/validator.js";
 import { token, set, slot, ref } from "../src/dsl/builders.js";
 import type { SlotMap, ThemeDef } from "../src/dsl/types.js";
 
@@ -63,5 +63,34 @@ describe("validator", () => {
     expect(() => validate(theme, slots, ["fgPrimary"])).toThrow(
       /duplicate.*fgPrimary/i,
     );
+  });
+});
+
+describe("scope validation (D46)", () => {
+  it("accepts tokens with known scope entries", () => {
+    const theme: ThemeDef = {
+      fgPrimary: token({ from: slot.ink, scopes: ["text"] }),
+      fgDanger: token({ from: slot.danger, scopes: ["text", "border"] }),
+    };
+    expect(() => validate(theme, slots)).not.toThrow();
+  });
+
+  it("rejects unknown scope entries", () => {
+    const theme: ThemeDef = {
+      fgPrimary: token({ from: slot.ink, scopes: ["texture"] }),
+    };
+    expect(() => validate(theme, slots)).toThrow(ValidationError);
+  });
+
+  it("rejects scope drift between themes for the same token name", () => {
+    const a: ThemeDef = { fgPrimary: token({ from: slot.ink, scopes: ["text"] }) };
+    const b: ThemeDef = { fgPrimary: token({ from: slot.ink, scopes: ["surface"] }) };
+    expect(() => validateScopeConsistency({ light: a, dark: b })).toThrow(ValidationError);
+  });
+
+  it("accepts identical or absent scopes across themes", () => {
+    const a: ThemeDef = { fgPrimary: token({ from: slot.ink, scopes: ["text"] }), x: token({ from: slot.ink }) };
+    const b: ThemeDef = { fgPrimary: token({ from: slot.ink, scopes: ["text"] }), x: token({ from: slot.ink }) };
+    expect(() => validateScopeConsistency({ light: a, dark: b })).not.toThrow();
   });
 });
