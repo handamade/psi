@@ -96,6 +96,16 @@ describe("validatePatterns (one case per D48 error class)", () => {
     const two = base({ compose: { component: "Dialog", slots: { title: ["{content:a}", "{content:b}"], footer: [{ component: "Button" }] }, content: { a: "x", b: "y" } } });
     expect(() => ok(two)).toThrow(/title.*0\.\.1/);
   });
+  it("5b: unrecognized cardinality is a defensive throw, not silently accepted", () => {
+    const weird: ManifestComponent = {
+      name: "Weird",
+      slots: [{ name: "body", accepts: {}, cardinality: "2..3", order: 1 }],
+      props: [],
+    };
+    expect(() =>
+      validatePatterns([base({ compose: { component: "Weird" } })], [...components, weird], contracts),
+    ).toThrow(/slot "body".*unrecognized cardinality "2\.\.3"/);
+  });
   it("6: param referenced but undeclared, and declared but unreferenced", () => {
     expect(() => ok(base({ compose: { component: "Button", props: { size: "{param:size}" } } }))).toThrow(/param "size".*not declared/);
     expect(() => ok(base({ parameters: [{ key: "size", ask: "?", options: [32], default: 32 }] }))).toThrow(/param "size".*never referenced/);
@@ -112,6 +122,16 @@ describe("validatePatterns (one case per D48 error class)", () => {
       parameters: [{ key: "d", ask: "?", options: [1], default: 1 }],
     });
     expect(() => ok(nonUnion)).toThrow(/param "d".*not a literal-union prop/);
+  });
+  it("7b: {param:} is legal only in prop positions — throws in a slot text fill", () => {
+    const inSlot = base({
+      compose: { component: "Dialog", slots: { title: ["{param:x}"], footer: [{ component: "Button" }] } },
+    });
+    expect(() => ok(inSlot)).toThrow(/param "x" used outside a prop position/);
+  });
+  it("7c: {param:} is legal only in prop positions — throws in node content", () => {
+    const inContent = base({ compose: { component: "Button", content: "{param:x}" } });
+    expect(() => ok(inContent)).toThrow(/param "x" used outside a prop position/);
   });
   it("8: content key referenced but undeclared, and declared but unreferenced", () => {
     expect(() => ok(base({ compose: { component: "Button", content: "label" } }))).toThrow(/content "label".*not declared/);

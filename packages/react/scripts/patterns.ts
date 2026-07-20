@@ -87,6 +87,7 @@ export function parseLiteralUnion(type: string): Array<string | number> | null {
 
 const PARAM_RE = /^\{param:([a-z0-9-]+)\}$/;
 const CONTENT_RE = /^\{content:([a-z0-9-]+)\}$/;
+const CANONICAL_CARDINALITIES = new Set(["0..1", "1..1", "0..*", "1..*"]);
 
 /** Validates every pattern's compose tree against the manifest and the D45
  * slot contracts (D48 error classes 1-8). Throws on the first violation
@@ -106,10 +107,24 @@ export function validatePatterns(
     const paramSites = new Map<string, Array<Array<string | number>>>();
     const referencedContent = new Set<string>();
 
-    const trackPlaceholders = (value: unknown) => {
+    // Legal in prop positions: both {param:key} and {content:key}.
+    const trackPropPlaceholders = (value: unknown) => {
       if (typeof value !== "string") return;
       const paramMatch = PARAM_RE.exec(value);
       if (paramMatch) referencedParams.add(paramMatch[1]);
+      const contentMatch = CONTENT_RE.exec(value);
+      if (contentMatch) referencedContent.add(contentMatch[1]);
+    };
+
+    // Legal in text positions (slot string fills, node `content`): only
+    // {content:key} — {param:key} only binds prop values (D48).
+    const trackTextPlaceholder = (value: string) => {
+      const paramMatch = PARAM_RE.exec(value);
+      if (paramMatch) {
+        throw new Error(
+          `${prefix}param "${paramMatch[1]}" used outside a prop position — parameters bind prop values (D48)`,
+        );
+      }
       const contentMatch = CONTENT_RE.exec(value);
       if (contentMatch) referencedContent.add(contentMatch[1]);
     };
@@ -122,7 +137,18 @@ export function validatePatterns(
         throw new Error(`${prefix}${path}: unknown component "${node.component}"`);
       }
 
-      if (node.content !== undefined) referencedContent.add(node.content);
+      if (node.content !== undefined) {
+        // node.content is a bare content-key reference (not {content:key}
+        // syntax) — but a {param:key} placeholder here is still a prop-only
+        // violation (D48) and must throw, not be silently treated as a key.
+        const paramMatch = PARAM_RE.exec(node.content);
+        if (paramMatch) {
+          throw new Error(
+            `${prefix}param "${paramMatch[1]}" used outside a prop position — parameters bind prop values (D48)`,
+          );
+        }
+        referencedContent.add(node.content);
+      }
 
       if (manifestComponent && !isGap) {
         for (const [propName, propValue] of Object.entries(node.props ?? {})) {
@@ -132,7 +158,7 @@ export function validatePatterns(
               `${prefix}${path}: unknown prop "${propName}" on component "${node.component}"`,
             );
           }
-          trackPlaceholders(propValue);
+          trackPropPlaceholders(propValue);
 
           const paramMatch = typeof propValue === "string" ? PARAM_RE.exec(propValue) : null;
           if (paramMatch) {
@@ -171,6 +197,9 @@ export function validatePatterns(
       const checkCardinality = (slotName: string, slotDef: ManifestComponent["slots"][number] | undefined, count: number) => {
         if (!slotDef) return;
         const cardinality = slotDef.cardinality;
+        if (!CANONICAL_CARDINALITIES.has(cardinality)) {
+          throw new Error(`${prefix}slot "${slotName}" has unrecognized cardinality "${cardinality}"`);
+        }
         const min = cardinality === "1..1" || cardinality === "1..*" ? 1 : 0;
         const max = cardinality === "0..1" || cardinality === "1..1" ? 1 : Infinity;
         if (count < min || count > max) {
@@ -192,7 +221,7 @@ export function validatePatterns(
         for (const [i, fill] of fills.entries()) {
           const fillPath = `${path}.${slotName}[${i}]`;
           if (typeof fill === "string") {
-            trackPlaceholders(fill);
+            trackTextPlaceholder(fill);
             continue;
           }
 
