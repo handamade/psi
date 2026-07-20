@@ -291,3 +291,116 @@ export function validatePatterns(
     gaps: Object.fromEntries(patterns.filter((p) => p.gaps.length > 0).map((p) => [p.id, p.gaps])),
   };
 }
+
+/** Renders a fully-bound pattern (`gaps: []`, every parameter defaulted) to a
+ * deterministic JSX string using each parameter/content default — a
+ * byte-identical re-render every time. Returns null when the pattern has
+ * gaps or any parameter lacks a `default` (not renderable as a static
+ * preset). Pure string building; `components` is accepted for interface
+ * symmetry with `validatePatterns` but rendering only needs the pattern's
+ * own compose tree, parameters, and content. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- `components` kept for interface symmetry with `validatePatterns`.
+export function renderPreset(pattern: Pattern, components: ManifestComponent[]): string | null {
+  if (pattern.gaps.length > 0) return null;
+  if (pattern.parameters.some((p) => p.default === undefined)) return null;
+
+  const paramDefaults = new Map(pattern.parameters.map((p) => [p.key, p.default as string | number]));
+  const content = pattern.content;
+  const ind = (depth: number) => "  ".repeat(depth);
+
+  // Resolves a text position (slot string fill, or a prop's raw string):
+  // {content:key} -> content value; anything else is literal text.
+  const resolveText = (raw: string): string => {
+    const contentMatch = CONTENT_RE.exec(raw);
+    return contentMatch ? content[contentMatch[1]] : raw;
+  };
+
+  // Resolves a prop's rendered RHS: {param:key} -> the parameter's default
+  // (typed, so a numeric default renders as `{32}` not `"32"`); {content:key}
+  // -> the content string; a literal string/number/boolean renders as-is.
+  const resolvePropValue = (raw: unknown): string => {
+    if (typeof raw === "string") {
+      const paramMatch = PARAM_RE.exec(raw);
+      if (paramMatch) {
+        const value = paramDefaults.get(paramMatch[1]);
+        return typeof value === "number" ? `{${value}}` : `"${value}"`;
+      }
+      return `"${resolveText(raw)}"`;
+    }
+    return `{${raw}}`; // number | boolean literal
+  };
+
+  const renderNode = (node: PatternNode, depth: number): string => {
+    const props: Array<{ name: string; value: string }> = [];
+
+    for (const [name, raw] of Object.entries(node.props ?? {})) {
+      props.push({ name, value: resolvePropValue(raw) });
+    }
+
+    for (const [slotName, fills] of Object.entries(node.slots ?? {})) {
+      if (slotName === "body") continue;
+      if (fills.length === 1) {
+        const fill = fills[0];
+        props.push(
+          typeof fill === "string"
+            ? { name: slotName, value: `"${resolveText(fill)}"` }
+            : { name: slotName, value: `{${renderNode(fill, depth + 1)}}` },
+        );
+      } else {
+        const items = fills.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill, depth + 2)));
+        const inner = items.map((item) => `${ind(depth + 2)}${item}`).join("\n");
+        props.push({ name: slotName, value: `{<>\n${inner}\n${ind(depth + 1)}</>}` });
+      }
+    }
+
+    props.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+
+    // Children: a `body` slot's fills, else a bare `content` key lookup.
+    let childText: string | null = null;
+    let childNodes: string[] | null = null;
+    const body = node.slots?.body;
+    if (body && body.length > 0) {
+      if (body.length === 1 && typeof body[0] === "string") {
+        childText = resolveText(body[0]);
+      } else {
+        childNodes = body.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill, depth + 1)));
+      }
+    } else if (node.content !== undefined) {
+      childText = content[node.content];
+    }
+
+    // Block mode (props each on their own line, children each on their own
+    // line) is forced by any prop value that itself spans multiple lines
+    // (a fragment or nested-node slot fill), or by multiple/non-text
+    // children. Otherwise everything fits on one line.
+    const blockMode = props.some((p) => p.value.includes("\n")) || childNodes !== null;
+
+    if (!blockMode) {
+      const propsInline = props.map((p) => `${p.name}=${p.value}`).join(" ");
+      const open = `<${node.component}${propsInline ? ` ${propsInline}` : ""}`;
+      return childText !== null ? `${open}>${childText}</${node.component}>` : `${open} />`;
+    }
+
+    if (props.length === 0) {
+      const lines = [`<${node.component}>`];
+      if (childText !== null) lines.push(`${ind(depth + 1)}${childText}`);
+      if (childNodes) for (const c of childNodes) lines.push(`${ind(depth + 1)}${c}`);
+      lines.push(`${ind(depth)}</${node.component}>`);
+      return lines.join("\n");
+    }
+
+    const lines = [`<${node.component}`];
+    for (const p of props) lines.push(`${ind(depth + 1)}${p.name}=${p.value}`);
+    if (childText === null && childNodes === null) {
+      lines.push(`${ind(depth)}/>`);
+      return lines.join("\n");
+    }
+    lines.push(`${ind(depth)}>`);
+    if (childText !== null) lines.push(`${ind(depth + 1)}${childText}`);
+    if (childNodes) for (const c of childNodes) lines.push(`${ind(depth + 1)}${c}`);
+    lines.push(`${ind(depth)}</${node.component}>`);
+    return lines.join("\n");
+  };
+
+  return `${renderNode(pattern.compose, 0)}\n`;
+}
