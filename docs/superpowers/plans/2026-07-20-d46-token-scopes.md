@@ -29,6 +29,7 @@
 | `border-error: var(--psi-fg-danger)` (Input + Select) | `packages/tokens/src/components/input.ts:8`, `select.ts:8` | `fgDanger` scoped `["text","border"]` |
 | `box-border-checked: var(--psi-fill-accent)` (Checkbox) | `packages/tokens/src/components/checkbox.ts:7` | `fillAccent` scoped `["surface","border"]` |
 | `navbar bg: var(--psi-scrim-heavy)` | `packages/tokens/src/components/navbar.ts:5` | scrims scoped `["surface"]` — passes |
+| `thumb-bg: var(--psi-fg-static-white)` (Switch — found by the gate itself, Task 5) | `packages/tokens/src/components/switch.ts:6` | New pure-ref token `fillStaticWhite` scoped `["surface"]`; switch rebinds (see Addendum) |
 
 ---
 
@@ -450,7 +451,7 @@ git commit -m "feat(tokens): bgInverted/fgOnInverted inversion pair; tooltip reb
 |---|---|
 | `fgPrimary fgSecondary fgTertiary fgQuaternary fgPrimaryInverted fgStaticWhite fgStaticBlack fgOnAccent fgAccent fgSuccess fgWarning fgOnInverted` | `["text"]` |
 | `fgDanger` | `["text", "border"]` (error borders: input.ts:8, select.ts:8) |
-| `bgPrimary bgSecondary bgInverted fillNeutral1..6 fillSuccess fillWarning fillDanger fillTintAccent fillTintSuccess fillTintWarning fillTintDanger scrimSoft scrimMedium scrimHeavy` | `["surface"]` |
+| `bgPrimary bgSecondary bgInverted fillStaticWhite fillNeutral1..6 fillSuccess fillWarning fillDanger fillTintAccent fillTintSuccess fillTintWarning fillTintDanger scrimSoft scrimMedium scrimHeavy` | `["surface"]` |
 | `fillAccent` | `["surface", "border"]` (selected-control borders: checkbox.ts:7) |
 | `borderFaint borderNeutral borderStrong borderFocus` | `["border"]` |
 
@@ -1195,5 +1196,5 @@ The gate's real-inventory run found `switch.ts:6` `"thumb-bg": "var(--psi-fg-sta
 - New pure-ref token in light.ts AND dark.ts: `fillStaticWhite: token({ from: ref.fgStaticWhite, scopes: ["surface"] })` — byte-identical hex with fgStaticWhite in every theme.
 - `switch.ts` rebinds: `"thumb-bg": "var(--psi-fill-static-white)"`.
 - `inverted-tokens.test.ts` gains the hex-equality assertion `r.fillStaticWhite.hex === r.fgStaticWhite.hex` across all four themes.
-- The full-object theme literal tests (light-theme/dark-theme) gain the new token.
+- The theme tests needed no edits — they sample with toContain rather than enumerate (verified in review).
 - The Task 4 scope table's surface row now includes `fillStaticWhite`.
