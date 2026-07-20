@@ -30,6 +30,7 @@ export function renderAgentsBlock(index: PsiIndex): string {
     "- Never hardcode colors — bind var(--psi-*) custom properties.",
     "- Import all four token CSS files: base.css, one theme css, components.css, utilities.css (utilities is REQUIRED — .psi-container + reduced-motion zeroing) — PLUS @handamade/psi-react/styles (component CSS; separate export, never auto-imported).",
     `- Themes: ${index.themes.join(" | ")} — set data-psi-theme on <html> or a subtree root.`,
+    "- Before composing multi-component UI, search for a matching pattern and ask its clarifying parameters; only freehand when no pattern matches.",
     "",
     `## Components (${index.components.length})`,
     ...index.components.map((c) => `- ${c.name}${axes(c)}`),

@@ -1,0 +1,20 @@
+{
+  "id": "filter-toolbar",
+  "intent": "Toolbar of filter controls: search, category select, active-filter tags",
+  "match": ["filter toolbar", "filter bar", "search and filter", "faceted filters"],
+  "compose": {
+    "component": "Toolbar",
+    "slots": {
+      "body": [
+        { "component": "Input" },
+        { "component": "Select" },
+        { "component": "Tag", "content": "example-filter" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "example-filter": "<active filter>"
+  },
+  "gaps": ["Toolbar"]
+}

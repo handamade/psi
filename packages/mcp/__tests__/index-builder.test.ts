@@ -73,4 +73,13 @@ describe("buildIndex", () => {
     const dialog = index.components.find((c) => c.name === "Dialog");
     expect(dialog!.slots.map((s) => s.name)).toEqual(["title", "body", "footer"]);
   });
+
+  it("indexes patterns from react/dist/patterns.json (D47/D48)", async () => {
+    const index = await buildIndex(inputs);
+    expect(index.patterns.length).toBeGreaterThanOrEqual(3);
+    const destructiveConfirm = index.patterns.find((p) => p.id === "destructive-confirm");
+    expect(destructiveConfirm).toBeDefined();
+    expect(destructiveConfirm!.blocked).toBe(false);
+    expect(destructiveConfirm!.preset).toBeTypeOf("string");
+  });
 });

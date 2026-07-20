@@ -1,7 +1,15 @@
 import { readFile } from "node:fs/promises";
 import type { PsiIndex } from "./types.js";
 
-export type { PsiIndex, ComponentEntry, TokenEntry, PropDoc } from "./types.js";
+export type {
+  PsiIndex,
+  ComponentEntry,
+  TokenEntry,
+  PropDoc,
+  PatternEntry,
+  PatternNode,
+  PatternParameter,
+} from "./types.js";
 export { buildIndex, GETTING_STARTED } from "./index-builder.js";
 export { createStore } from "./store.js";
 export type { Store, Brief, Detail } from "./store.js";

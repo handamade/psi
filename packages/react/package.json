@@ -20,7 +20,7 @@
     "llms.txt"
   ],
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json && tsx scripts/emit-manifest.ts && tsx scripts/emit-docs.ts",
+    "build": "vite build && tsc -p tsconfig.build.json && tsx scripts/emit-manifest.ts && tsx scripts/emit-patterns.ts && tsx scripts/emit-docs.ts",
     "dev": "vite build --watch"
   },
   "peerDependencies": {

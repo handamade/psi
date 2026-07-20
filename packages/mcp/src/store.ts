@@ -1,8 +1,8 @@
-import type { ComponentEntry, PsiIndex, TokenEntry } from "./types.js";
+import type { ComponentEntry, PatternEntry, PsiIndex, TokenEntry } from "./types.js";
 
 export interface Brief {
   id: string;
-  kind: "component" | "token" | "topic";
+  kind: "component" | "token" | "topic" | "pattern";
   title: string;
   summary: string;
 }
@@ -10,6 +10,7 @@ export interface Brief {
 export type Detail =
   | ({ kind: "component" } & ComponentEntry)
   | ({ kind: "token" } & TokenEntry)
+  | ({ kind: "pattern" } & PatternEntry)
   | { kind: "topic"; name: string; content: unknown };
 
 export interface Store {
@@ -48,6 +49,12 @@ function componentSummary(c: ComponentEntry): string {
   return parts.join(" — ").slice(0, 220);
 }
 
+function patternSummary(p: PatternEntry): string {
+  let summary = `${p.intent} — ${p.match.join(", ")}, ${p.parameters.length} parameters`;
+  if (p.blocked) summary += `, blocked (gaps: ${p.gaps.join(", ")})`;
+  return summary;
+}
+
 export function createStore(index: PsiIndex): Store {
   const briefs: Brief[] = [
     ...index.components.map((c) => ({
@@ -55,6 +62,12 @@ export function createStore(index: PsiIndex): Store {
       kind: "component" as const,
       title: c.name,
       summary: componentSummary(c),
+    })),
+    ...index.patterns.map((p) => ({
+      id: `pattern:${p.id}`,
+      kind: "pattern" as const,
+      title: p.id,
+      summary: patternSummary(p),
     })),
     ...Object.keys(index.topics).map((name) => ({
       id: `topic:${name}`,
@@ -85,7 +98,7 @@ export function createStore(index: PsiIndex): Store {
   function search(query: string): Brief[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
-      // Overview: all components + all topics (tokens are discoverable via query).
+      // Overview: all components, patterns, and topics (tokens are discoverable via query).
       return briefs.filter((b) => b.kind !== "token").slice(0, MAX_RESULTS + 10);
     }
     return briefs
@@ -108,6 +121,10 @@ export function createStore(index: PsiIndex): Store {
     if (want("token")) {
       const t = index.tokens.find((t) => t.name.toLowerCase() === name);
       if (t) return { kind: "token", ...t };
+    }
+    if (want("pattern")) {
+      const p = index.patterns.find((p) => p.id.toLowerCase() === name);
+      if (p) return { kind: "pattern", ...p };
     }
     if (want("topic")) {
       const key = Object.keys(index.topics).find((k) => k.toLowerCase() === name);

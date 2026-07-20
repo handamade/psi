@@ -48,6 +48,12 @@ describe("search", () => {
     const briefs = store.search("");
     expect(briefs.some((b) => b.kind === "component")).toBe(true);
     expect(briefs.some((b) => b.kind === "topic")).toBe(true);
+    expect(briefs.some((b) => b.kind === "pattern")).toBe(true);
+  });
+
+  it("ranks the destructive-confirm pattern first for 'delete confirmation' (D47)", () => {
+    const briefs = store.search("delete confirmation");
+    expect(briefs[0].id).toBe("pattern:destructive-confirm");
   });
 });
 
@@ -72,5 +78,17 @@ describe("get", () => {
   it("returns topic content and null for unknown ids", () => {
     expect((store.get("topic:getting-started") as any).content).toHaveProperty("cssImports");
     expect(store.get("nope:nothing")).toBeNull();
+  });
+
+  it("returns full pattern detail with parameters (D47)", () => {
+    const detail = store.get("pattern:destructive-confirm");
+    expect(detail).toMatchObject({ kind: "pattern", id: "destructive-confirm" });
+    expect((detail as any).parameters.length).toBeGreaterThan(0);
+  });
+
+  it("marks a blocked pattern's brief summary as blocked (D48)", () => {
+    const brief = store.search("filter toolbar").find((b) => b.id === "pattern:filter-toolbar");
+    expect(brief).toBeDefined();
+    expect(brief!.summary).toContain("blocked");
   });
 });

@@ -1,0 +1,23 @@
+{
+  "id": "settings-form-row",
+  "intent": "Labeled settings row: a self-labeled control with a group label and helper text",
+  "match": ["settings row", "form row", "labeled switch", "preference toggle", "settings form"],
+  "compose": {
+    "component": "Field",
+    "props": { "group": true },
+    "slots": {
+      "label": ["{content:row-label}"],
+      "body": [
+        { "component": "Switch", "content": "control-label" }
+      ],
+      "description": ["{content:row-description}"]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "row-label": "<setting name>",
+    "control-label": "<what turning it on does>",
+    "row-description": "<one-line consequence of the setting>"
+  },
+  "gaps": []
+}

@@ -38,6 +38,10 @@ describe("renderAgentsBlock", () => {
     expect(block).toContain("https://psi.kurkin.de/mcp");
     expect(block).toContain("npx @handamade/psi-mcp");
   });
+
+  it("carries the pattern-first house rule (D43/D44)", () => {
+    expect(block).toContain("search for a matching pattern");
+  });
 });
 
 describe("applyBlock", () => {

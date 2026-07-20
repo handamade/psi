@@ -10,8 +10,9 @@ export function createPsiServer(store: Store, version: string): McpServer {
     {
       title: "Search the Psi design system",
       description:
-        "Keyword search over Psi components, semantic tokens, and guidance topics. " +
-        "Returns compact briefs with ids for the get tool. Empty query returns an overview.",
+        "Keyword search over Psi components, composition patterns, semantic tokens, and " +
+        "guidance topics. Returns compact briefs with ids for the get tool. Empty query " +
+        "returns an overview.",
       inputSchema: { query: z.string().describe("Keywords, e.g. 'button variants' or 'bg token'") },
     },
     async ({ query }) => ({
@@ -25,8 +26,11 @@ export function createPsiServer(store: Store, version: string): McpServer {
       title: "Get full Psi detail by id",
       description:
         "Full detail for one id from search: component (props, defaults, a11y doc), " +
-        "token (formula + resolved OKLCH/hex in all four themes), or topic (guidance). " +
-        "Accepts 'component:Button', 'token:bgPrimary', 'topic:variants', or a bare name.",
+        "pattern (composition recipe: compose tree, clarifying parameters, content, " +
+        "gaps/blocked status, and a copy-paste preset when unblocked), token (formula + " +
+        "resolved OKLCH/hex in all four themes), or topic (guidance). Accepts " +
+        "'component:Button', 'pattern:destructive-confirm', 'token:bgPrimary', " +
+        "'topic:variants', or a bare name.",
       inputSchema: { id: z.string().describe("An id from search results, or a bare name") },
     },
     async ({ id }) => {

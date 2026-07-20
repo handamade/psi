@@ -30,11 +30,46 @@ export interface TokenEntry {
   values: Record<string, { oklch: Oklch; hex: string }>;
 }
 
+/** A single node in a pattern's `compose` tree: a component instance, its
+ * props (which may hold `{param:key}` / `{content:key}` placeholders), and
+ * its slot fills (nested nodes or string literals / placeholders). Mirrors
+ * `packages/react/scripts/patterns.ts`'s `PatternNode` — the shape emitted
+ * into `packages/react/dist/patterns.json` (D47). */
+export interface PatternNode {
+  component: string;
+  props?: Record<string, unknown>;
+  slots?: Record<string, Array<PatternNode | string>>;
+  content?: string;
+}
+
+export interface PatternParameter {
+  key: string;
+  ask: string;
+  options: Array<string | number>;
+  default?: string | number;
+}
+
+/** Shape of one entry in `packages/react/dist/patterns.json` (D47/D48):
+ * an authored composition recipe plus its build-time validation/render
+ * results (`gaps`, `blocked`, `preset`). */
+export interface PatternEntry {
+  id: string;
+  intent: string;
+  match: string[];
+  compose: PatternNode;
+  parameters: PatternParameter[];
+  content: Record<string, string>;
+  gaps: string[];
+  blocked: boolean;
+  preset: string | null;
+}
+
 export interface PsiIndex {
   version: string;
   themes: string[];
   components: ComponentEntry[];
   tokens: TokenEntry[];
+  patterns: PatternEntry[];
   scales: Record<string, unknown>;
   topics: Record<string, unknown>;
 }

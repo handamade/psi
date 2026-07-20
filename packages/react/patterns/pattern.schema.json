@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://psi.kurkin.de/schema/pattern.schema.json",
+  "$comment": "Documentation artifact — the build validator (scripts/patterns.ts) is the enforcement point (D48).",
+  "title": "Pattern",
+  "description": "An authored composition recipe (D47): what to build, from what parts, with what parameters exposed to the consumer, and which named components in `compose` are known gaps (not yet in the manifest).",
+  "type": "object",
+  "required": ["id", "intent", "match", "compose"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique pattern identifier; matches the filename stem by convention."
+    },
+    "intent": {
+      "type": "string",
+      "description": "One-line statement of what this pattern is for."
+    },
+    "match": {
+      "type": "array",
+      "description": "Natural-language phrases an agent can match a request against to find this pattern.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "compose": { "$ref": "#/$defs/patternNode" },
+    "parameters": {
+      "type": "array",
+      "description": "Consumer-facing knobs that bind `{param:key}` placeholders in `compose` prop positions.",
+      "items": {
+        "type": "object",
+        "required": ["key", "ask", "options"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string", "description": "Placeholder key referenced as `{param:key}` in a prop value." },
+          "ask": { "type": "string", "description": "Question to surface to the consumer when resolving this parameter." },
+          "options": {
+            "type": "array",
+            "description": "Allowed values; must be a subset of the literal union of every prop the param fills.",
+            "items": { "type": ["string", "number"] }
+          },
+          "default": { "type": ["string", "number"], "description": "Default value, used when the consumer doesn't answer `ask`." }
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "description": "Text fills referenced as `{content:key}` (prop/slot positions) or bare keys (node `content`) in `compose`.",
+      "additionalProperties": { "type": "string" }
+    },
+    "gaps": {
+      "type": "array",
+      "description": "Component names used in `compose` that are not yet in the manifest — skipped by prop/slot validation.",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "patternNode": {
+      "type": "object",
+      "description": "A single node in a pattern's `compose` tree: a component instance, its props (which may hold `{param:key}` / `{content:key}` placeholders), and its slot fills (nested nodes or string literals / placeholders).",
+      "required": ["component"],
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "Component name; must be in the manifest or listed in the pattern's `gaps`."
+        },
+        "props": {
+          "type": "object",
+          "description": "Prop values; string values may be `{param:key}` or `{content:key}` placeholders (legal only in prop positions)."
+        },
+        "slots": {
+          "type": "object",
+          "description": "Named slot fills; each value is an ordered list of child nodes or string text fills (`{content:key}` or literal text).",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "oneOf": [{ "$ref": "#/$defs/patternNode" }, { "type": "string" }]
+            }
+          }
+        },
+        "content": {
+          "type": "string",
+          "description": "Content key for this node's text children (bare key, not `{content:key}` syntax)."
+        }
+      }
+    }
+  }
+}
