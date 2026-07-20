@@ -1,5 +1,19 @@
 # @handamade/tokens
 
+## 0.6.0
+
+### Minor Changes
+
+- 2864521: D46 token scopes: semantic tokens declare the CSS property groups they may bind (`scopes` on token sources); the token build gates every component-token binding (through `oklch(from var())` derivations) and throws on violations; scopes are emitted into `dist/resolved/<theme>.json`, DTCG `$extensions.psi`, and a generated `dist/scope-map.json` consumed by the new `psi/token-scopes` stylelint rule. New inversion tokens `bgInverted`/`fgOnInverted` (tooltip rebind, zero visual change). Implementation surfaced two additional tokens (`fillStaticWhite` for the switch thumb, caught by the build gate) and property-group vocabulary refinements plus a checkbox `currentColor` refactor (caught by the stylelint gate on first run).
+
+### Patch Changes
+
+- 0d8cc5b: Ember: `fgOnAccent` deepened from the brand's warm black (l 0.25, 6.12:1 on
+  the accent) to l 0.14 — 7.63:1, AAA for normal text. The warm black stays
+  untouched everywhere else; only labels on the ember accent get darker.
+  Field report: AA-passing contrast still read weak on the saturated orange
+  with the mono button face on mobile OLED.
+
 ## 0.5.0
 
 ### Minor Changes
