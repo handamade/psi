@@ -1,4 +1,4 @@
 {
   "plugins": ["./tools/stylelint-plugin-psi-tokens.mjs"],
-  "rules": { "psi/component-tokens-only": true }
+  "rules": { "psi/component-tokens-only": true, "psi/token-scopes": true }
 }

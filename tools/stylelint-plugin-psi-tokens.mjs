@@ -1,4 +1,7 @@
 import stylelint from "stylelint";
+import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 const ruleName = "psi/component-tokens-only";
 const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|z)-/;
@@ -38,4 +41,41 @@ const rule = (enabled) => (root, result) => {
 };
 rule.ruleName = ruleName;
 rule.messages = stylelint.utils.ruleMessages(ruleName, {});
-export default stylelint.createPlugin(ruleName, rule);
+
+const scopeRuleName = "psi/token-scopes";
+const mapPath = join(dirname(fileURLToPath(import.meta.url)), "..", "packages", "tokens", "dist", "scope-map.json");
+
+/** D46 secondary gate. The token build is the primary gate; when the map
+ * has not been generated yet (fresh clone, no pnpm build), skip silently. */
+const scopeRule = (enabled) => (root, result) => {
+  if (!enabled || !existsSync(mapPath)) return;
+  const map = JSON.parse(readFileSync(mapPath, "utf8"));
+  const expand = (scopes) =>
+    new Set(scopes.flatMap((s) => map.propertyGroups[s] ?? [s]));
+  const lookup = (name) => {
+    const bare = name.slice("--psi-".length);
+    const scaleFamily = Object.keys(map.scales).find((f) => bare.startsWith(`${f}-`));
+    if (scaleFamily) return map.scales[scaleFamily];
+    return map.semantic[bare] ?? map.component[bare];
+  };
+  root.walkDecls((decl) => {
+    if (decl.prop.startsWith("--")) return; // assigning to a custom prop is not a property binding
+    for (const m of decl.value.matchAll(/var\((--psi-[a-z0-9-]+)/g)) {
+      const scopes = lookup(m[1]);
+      if (!scopes) continue; // unscoped
+      if (!expand(scopes).has(decl.prop)) {
+        stylelint.utils.report({
+          ruleName: scopeRuleName, result, node: decl,
+          message: `${m[1]} is scoped to [${scopes.join(", ")}] and may not bind "${decl.prop}" (psi/token-scopes)`,
+        });
+      }
+    }
+  });
+};
+scopeRule.ruleName = scopeRuleName;
+scopeRule.messages = stylelint.utils.ruleMessages(scopeRuleName, {});
+
+export default [
+  stylelint.createPlugin(ruleName, rule),
+  stylelint.createPlugin(scopeRuleName, scopeRule),
+];
