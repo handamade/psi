@@ -1,9 +1,8 @@
 # Composition contracts — slot contracts, token scopes, patterns (D45–D48)
 
-Date: 2026-07-18. Status: **Draft — not scheduled into a release.** Lives on the
-`spec/composition-contracts` branch and evolves there until a release adopts it
-(candidate: 0.5+, after Field/Label and Dialog land — patterns need those
-components to be worth shipping).
+Date: 2026-07-18. Status: **Adopted** — D45 slot contracts shipped in 0.5.0;
+D46 token scopes, D47 patterns, and D48 contract validator shipped in 0.6.0
+(2026-07-20). The adoption-order sequencing below is now historical record.
 
 Provenance: shape borrowed from the AINDF spec
 (<https://github.com/0leg-design/ai-native-design-framework>, MIT, Draft 0.1).
