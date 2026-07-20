@@ -1198,3 +1198,11 @@ The gate's real-inventory run found `switch.ts:6` `"thumb-bg": "var(--psi-fg-sta
 - `inverted-tokens.test.ts` gains the hex-equality assertion `r.fillStaticWhite.hex === r.fgStaticWhite.hex` across all four themes.
 - The theme tests needed no edits — they sample with toContain rather than enumerate (verified in review).
 - The Task 4 scope table's surface row now includes `fillStaticWhite`.
+
+## Addendum 2 (2026-07-20, during Task 7): secondary-gate catches on real CSS
+
+First repo-wide run of `psi/token-scopes` flagged 8 declarations. Rulings:
+
+- **Vocabulary omissions (5)** — `gap` group gains the 8 logical longhands (`padding/margin-inline/block-start/end`); `border` group gains the side shorthands (`border-top/right/bottom/left`, `border-inline`, `border-block`).
+- **Edge-distance uses (2)** — `background-position` (Select icon offset) and `max-width` (Dialog viewport-inset calc) join the `gap` group: both express edge distance, the gap family's meaning. The theoretical "space token as element size" misuse this admits is not a plausible error class; color-category confusion is what the gate defends.
+- **Checkbox checkmark hack (1)** — the ink token painted `border` (rotated-box glyph technique). Fixed in CSS, not vocabulary: `color: var(--psi-checkbox-check-fg); border: solid currentColor` — the var now binds a text property, the border inherits, rendering byte-identical. Widening the token to `["text","border"]` was rejected: unlike fgDanger (error borders are systemic), a glyph hack is an implementation detail, and currentColor lets the CSS say so.
