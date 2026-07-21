@@ -441,6 +441,10 @@ section {
   flex-direction: column;
 }
 
+.pg-surface {
+  grid-column: span 12;
+}
+
 .pg-row {
   display: flex;
   flex-wrap: wrap;
