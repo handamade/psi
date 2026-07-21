@@ -54,5 +54,7 @@ export const guidance = {
       meta: "neutral-subtle",
       status: "success | warning | danger",
     },
+    tagApi:
+      'On Tag, subtle is a boolean prop, not part of the variant union: accent-subtle is spelled variant="accent" subtle (Tag variants: neutral | accent | success | warning | danger).',
   },
 } as const;
