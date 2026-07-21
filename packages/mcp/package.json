@@ -1,6 +1,6 @@
 {
   "name": "@handamade/psi-mcp",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "MCP server and agent-context generator for the Psi (Ψ) design system",
   "type": "module",
   "bin": {

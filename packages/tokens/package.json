@@ -1,6 +1,6 @@
 {
   "name": "@handamade/psi-tokens",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "type": "module",
   "exports": {
     "./*.css": "./dist/*.css",

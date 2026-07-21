@@ -1,5 +1,11 @@
 # @handamade/tokens
 
+## 0.7.0
+
+### Minor Changes
+
+- e8ad93c: D51: shared `--psi-surface-*` elevated-surface token family + `Panel` component. Dialog's panel rebinds to the family (zero visual change). Scope gate now follows cross-family component-token refs.
+
 ## 0.6.0
 
 ### Minor Changes
