@@ -2,7 +2,7 @@
 .dialog {
   padding: 0; /* panel owns spacing; a bare click on .dialog = backdrop click */
   border: 1px solid var(--psi-dialog-border);
-  border-radius: var(--psi-radius-12);
+  border-radius: var(--psi-dialog-radius);
   background: var(--psi-dialog-bg);
   color: var(--psi-dialog-fg);
   max-width: calc(100vw - var(--psi-space-32));
