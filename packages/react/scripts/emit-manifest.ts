@@ -17,6 +17,7 @@ const COMPONENTS = [
   "Checkbox",
   "Switch",
   "Tag",
+  "Toolbar",
   "Tooltip",
   "NavBar",
   "AspectRatio",

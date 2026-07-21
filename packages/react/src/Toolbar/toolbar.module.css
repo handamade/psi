@@ -1,0 +1,9 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.gap8 { gap: var(--psi-space-8); }
+.gap12 { gap: var(--psi-space-12); }
+.gap16 { gap: var(--psi-space-16); }

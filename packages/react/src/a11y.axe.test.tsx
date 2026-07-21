@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
-  Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip,
+  Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
 } from "./index.js";
 
 const cases: Array<[string, React.ReactElement]> = [
@@ -27,6 +27,8 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Tag", <Tag variant="accent" subtle>Pro</Tag>],
   ["Tag dismissible", <Tag variant="neutral" onDismiss={() => {}}>Filter</Tag>],
   ["Tooltip", <Tooltip content="Info"><button>Trigger</button></Tooltip>],
+  ["Toolbar labeled", <Toolbar aria-label="Filters"><label>Search<Input size={32} /></label><Tag variant="neutral">Active</Tag></Toolbar>],
+  ["Toolbar unlabeled", <Toolbar><Button size={32} variant="ghost">Clear</Button></Toolbar>],
 ];
 
 describe("axe: no violations in rendered components", () => {

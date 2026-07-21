@@ -26,6 +26,8 @@ export { Tag } from "./Tag/Tag.js";
 export type { TagProps } from "./Tag/Tag.js";
 export { Tooltip } from "./Tooltip/Tooltip.js";
 export type { TooltipProps } from "./Tooltip/Tooltip.js";
+export { Toolbar } from "./Toolbar/Toolbar.js";
+export type { ToolbarProps } from "./Toolbar/Toolbar.js";
 export {
   IconPlus,
   IconMinus,

@@ -76,4 +76,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Plain <div> container with no implicit role. Pass aria-* host props if the panel should announce as a region.",
   },
+  Toolbar: {
+    keyboard: [
+      { keys: "Tab", behavior: "Moves through the controls in DOM order — no roving tabindex (deliberately not role=toolbar, D52)." },
+    ],
+    notes:
+      "With aria-label it renders role=group so the control cluster announces with a name; unlabeled it is a plain layout div.",
+  },
 };
