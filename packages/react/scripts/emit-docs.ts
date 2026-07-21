@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { a11yMeta } from "../src/a11y-meta.js";
+import { themingSection } from "./docs-sections.js";
 
 interface Prop {
   name: string;
@@ -72,7 +73,16 @@ for (const c of components) {
     IconButton: "button",
     NavBar: "navbar",
   };
-  const tokenName = `--psi-${TOKEN_NAME_OVERRIDES[c.name] ?? toKebabCase(c.name)}-*`;
+  const familyName = TOKEN_NAME_OVERRIDES[c.name] ?? toKebabCase(c.name);
+  const tokenName = `--psi-${familyName}-*`;
+
+  // HAN-41: only claim token overrides / derived states the family really has.
+  let varsCss: string | null;
+  try {
+    varsCss = readFileSync(join(root, `../tokens/dist/components/${familyName}.vars.css`), "utf8");
+  } catch {
+    varsCss = null;
+  }
 
   // Check if component has variant prop
   const hasVariant = c.props.some((p) => p.name === "variant");
@@ -115,7 +125,7 @@ ${props}
 
 ${a11ySection}## Theming
 
-Override \`${tokenName}\` custom properties at any scope; interactive states derive automatically (${guidance.states.hover} hover, ${guidance.states.active} active).
+${themingSection(tokenName, varsCss, guidance.states as { hover: string; active: string })}
 
 ${variantGuidanceSection}
 

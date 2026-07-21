@@ -27,7 +27,7 @@ Rendered with showModal(): aria-modal, inert background and focus restore come f
 
 ## Theming
 
-Override `--psi-dialog-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-dialog-*` custom properties at any scope.
 
 
 

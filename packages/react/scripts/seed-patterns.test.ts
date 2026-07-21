@@ -18,4 +18,8 @@ describe("seed patterns against the real manifest", () => {
     const field = manifest.components.find((c: { name: string }) => c.name === "Field");
     expect(field.slots.map((s: { name: string }) => s.name)).toEqual(["label", "body", "description"]);
   });
+  it("Tag lists children like the other content-bearing leaves (eval run 07-21)", () => {
+    const tag = manifest.components.find((c: { name: string }) => c.name === "Tag");
+    expect(tag.props.map((p: { name: string }) => p.name)).toContain("children");
+  });
 });

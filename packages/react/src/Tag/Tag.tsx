@@ -4,6 +4,8 @@ import styles from "./tag.module.css";
 type Variant = "neutral" | "accent" | "success" | "warning" | "danger";
 
 export interface TagProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Label content. */
+  children?: React.ReactNode;
   /** Semantic color variant. @default "neutral" */
   variant?: Variant;
   /** Use tinted background with semantic foreground. @default false */

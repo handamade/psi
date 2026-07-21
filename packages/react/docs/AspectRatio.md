@@ -13,7 +13,7 @@ Fixed-aspect-ratio box that sizes its child media.
 
 ## Theming
 
-Override `--psi-aspect-ratio-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+This component has no `--psi-aspect-ratio-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
 
 
 

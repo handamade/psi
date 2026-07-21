@@ -90,5 +90,7 @@ describe("get", () => {
     const brief = store.search("filter toolbar").find((b) => b.id === "pattern:filter-toolbar");
     expect(brief).toBeDefined();
     expect(brief!.summary).not.toContain("blocked");
+    const detail = store.get("pattern:filter-toolbar");
+    expect(JSON.stringify(detail)).toContain("<Toolbar");
   });
 });
