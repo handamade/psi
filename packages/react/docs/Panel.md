@@ -21,7 +21,7 @@ Plain <div> container with no implicit role. Pass aria-* host props if the panel
 
 ## Theming
 
-Override `--psi-panel-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-panel-*` custom properties at any scope.
 
 
 

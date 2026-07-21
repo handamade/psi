@@ -22,7 +22,7 @@ Hover opens after a short delay; content is linked via aria-describedby while vi
 
 ## Theming
 
-Override `--psi-tooltip-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-tooltip-*` custom properties at any scope.
 
 
 

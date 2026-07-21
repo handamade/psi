@@ -7,6 +7,7 @@ Compact label for status or category; semantic variants, optional subtle tint an
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | Label content. |
 | `variant` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger"` | neutral | no | Semantic color variant. |
 | `subtle` | `boolean` | false | no | Use tinted background with semantic foreground. |
 | `onDismiss` | `(() => void)` | — | no | When provided, renders a dismiss button that calls this handler. |
@@ -23,7 +24,7 @@ Passive label otherwise; not in the tab order without onDismiss.
 
 ## Theming
 
-Override `--psi-tag-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-tag-*` custom properties at any scope.
 
 ## Variant guidance
 

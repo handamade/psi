@@ -20,7 +20,7 @@ On/off toggle (`role="switch"`) with a built-in label; for settings that take ef
 
 ## Theming
 
-Override `--psi-switch-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-switch-*` custom properties at any scope.
 
 
 

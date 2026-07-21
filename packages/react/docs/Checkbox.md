@@ -20,7 +20,7 @@ Native checkbox with a built-in label; for independent binary choices.
 
 ## Theming
 
-Override `--psi-checkbox-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-checkbox-*` custom properties at any scope.
 
 
 

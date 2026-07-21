@@ -26,7 +26,7 @@ Wires label association, aria-describedby and aria-invalid into a wrapped Input/
 
 ## Theming
 
-Override `--psi-field-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-field-*` custom properties at any scope.
 
 
 
