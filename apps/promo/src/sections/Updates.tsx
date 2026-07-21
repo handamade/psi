@@ -1,4 +1,4 @@
-import { Tag, type TagProps } from "@handamade/psi-react";
+import { Panel, Tag, type TagProps } from "@handamade/psi-react";
 
 import { UPDATES, type UpdateEntry } from "../content/updates";
 
@@ -33,24 +33,26 @@ export function Updates() {
         </div>
         <ol className="updates-list">
           {UPDATES.map((entry) => (
-            <li className="card update" key={`${entry.date}-${entry.title}`}>
-              <div className="update-meta">
-                <time className="annot" dateTime={entry.date}>
-                  {formatDate(entry.date)}
-                </time>
-                <Tag variant={TAG_VARIANT[entry.tag]} subtle>
-                  {entry.tag}
-                </Tag>
-              </div>
-              <div>
-                <h3>{entry.title}</h3>
-                <p>{entry.body}</p>
-                {entry.link && (
-                  <a className="update-link" href={entry.link.href}>
-                    {entry.link.label} →
-                  </a>
-                )}
-              </div>
+            <li className="update" key={`${entry.date}-${entry.title}`}>
+              <Panel className="card">
+                <div className="update-meta">
+                  <time className="annot" dateTime={entry.date}>
+                    {formatDate(entry.date)}
+                  </time>
+                  <Tag variant={TAG_VARIANT[entry.tag]} subtle>
+                    {entry.tag}
+                  </Tag>
+                </div>
+                <div>
+                  <h3>{entry.title}</h3>
+                  <p>{entry.body}</p>
+                  {entry.link && (
+                    <a className="update-link" href={entry.link.href}>
+                      {entry.link.label} →
+                    </a>
+                  )}
+                </div>
+              </Panel>
             </li>
           ))}
         </ol>

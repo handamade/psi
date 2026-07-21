@@ -360,13 +360,6 @@ section {
   text-wrap: pretty;
 }
 
-.card {
-  border: 1px solid var(--promo-hairline-faint);
-  border-radius: var(--psi-radius-12);
-  background: var(--psi-bg-secondary);
-  padding: var(--psi-space-24);
-}
-
 /* principles */
 
 .principles-grid {
@@ -674,7 +667,7 @@ section {
   gap: var(--psi-space-12);
 }
 
-.update {
+.update .card {
   display: grid;
   grid-template-columns: 160px minmax(0, 1fr);
   gap: var(--psi-space-24);
@@ -817,7 +810,7 @@ section {
     display: none;
   }
 
-  .update {
+  .update .card {
     grid-template-columns: 1fr;
     gap: var(--psi-space-12);
   }

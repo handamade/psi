@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from "react";
 import { Button } from "@handamade/psi-react";
 
 const STATS = [
-  "13 components",
+  "15 components",
   "22 icons",
   "4 themes",
   "0 runtime deps",

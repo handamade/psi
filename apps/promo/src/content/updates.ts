@@ -15,6 +15,18 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-07-21",
+    tag: "release",
+    title: "0.7.0 — Panel, Toolbar, and the surface family",
+    body: "The shared --psi-surface-* recipe lands as tokens plus a Panel primitive (Dialog rebinds, zero visual change). Toolbar unblocks the filter-toolbar pattern — all three patterns are now live. This site's panels are the first Panel consumer.",
+  },
+  {
+    date: "2026-07-20",
+    tag: "release",
+    title: "0.6.0 — composition contracts complete",
+    body: "Token scopes (D46) now gate every binding at build time; three composition patterns with clarifying parameters (D47) ship in patterns.json; the D48 validator runs in every build.",
+  },
+  {
     date: "2026-07-19",
     tag: "release",
     title: "Psi 0.5.0 — Field, Dialog, and slot contracts",
