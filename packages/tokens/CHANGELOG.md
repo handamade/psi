@@ -1,5 +1,11 @@
 # @handamade/tokens
 
+## 0.7.1
+
+### Patch Changes
+
+- `guidance.tags` gains a `tagApi` note documenting Tag's spelling of subtle variants (`variant="accent" subtle` — subtle is a boolean prop, not a variant-union entry), closing the last 07-16 generation-eval docs gap. Landed with PR #43 which missed its changeset.
+
 ## 0.7.0
 
 ### Minor Changes
