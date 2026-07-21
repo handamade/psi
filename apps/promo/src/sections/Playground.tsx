@@ -11,6 +11,7 @@ import {
   Select,
   Switch,
   Tag,
+  Toolbar,
   Tooltip,
   type ButtonProps,
 } from "@handamade/psi-react";
@@ -37,10 +38,15 @@ const INITIAL_TAGS = [
   { label: "zero-deps", variant: "neutral" },
 ] as const;
 
+const INITIAL_FILTERS = ["psi-tokens", "0.7.0", "wcag-aa"] as const;
+
 export function Playground() {
   const [tags, setTags] = useState<readonly (typeof INITIAL_TAGS)[number][]>(
     [...INITIAL_TAGS],
   );
+  const [filters, setFilters] = useState<readonly string[]>([
+    ...INITIAL_FILTERS,
+  ]);
 
   return (
     <section className="section" id="components">
@@ -158,6 +164,69 @@ export function Playground() {
               switch, tab through the focus rings.
             </p>
           </Panel>
+
+          <Panel className="card pg-surface">
+            <h3>
+              Panel + Toolbar · the 0.7 surface pair
+              <a
+                className="sb-link"
+                href={storybookDocs("Components/Toolbar")}
+              >
+                storybook →
+              </a>
+            </h3>
+            <Toolbar aria-label="Filters">
+              <Input
+                size={32}
+                placeholder="Search components…"
+                aria-label="Search components"
+                style={{ width: 240 }}
+              />
+              <Select
+                size={32}
+                aria-label="Category"
+                defaultValue="all"
+                style={{ width: 200 }}
+              >
+                <option value="all">All categories</option>
+                <option value="forms">Form controls</option>
+                <option value="surfaces">Surfaces</option>
+              </Select>
+              {filters.map((filter) => (
+                <Tag
+                  key={filter}
+                  variant="neutral"
+                  onDismiss={() =>
+                    setFilters((current) => current.filter((f) => f !== filter))
+                  }
+                >
+                  {filter}
+                </Tag>
+              ))}
+              {filters.length > 0 ? (
+                <Button
+                  variant="ghost"
+                  size={32}
+                  onClick={() => setFilters([])}
+                >
+                  Clear all
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size={32}
+                  onClick={() => setFilters([...INITIAL_FILTERS])}
+                >
+                  Restore filters
+                </Button>
+              )}
+            </Toolbar>
+            <p className="annot pg-note">
+              This card is the new Panel — the elevated surface recipe Dialog
+              shares. The row above is the filter-toolbar pattern from
+              patterns.json, live: dismiss a filter and the Toolbar reflows.
+            </p>
+          </Panel>
         </div>
 
         <p className="pg-index annot">
@@ -173,6 +242,8 @@ export function Playground() {
             "Tooltip",
             "Field",
             "Dialog",
+            "Panel",
+            "Toolbar",
           ].map((name, index) => (
             <span key={name}>
               {index > 0 && " · "}
