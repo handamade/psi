@@ -24,5 +24,6 @@ describe("guidance", () => {
       meta: "neutral-subtle",
       status: "success | warning | danger",
     });
+    expect(guidance.tags.tagApi).toMatch(/variant="accent" subtle/);
   });
 });
