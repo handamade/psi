@@ -33,4 +33,10 @@ describe("emitPatterns (real-dist posture)", () => {
     const second = readFileSync(distPath);
     expect(second.equals(first)).toBe(true);
   });
+
+  it("package.json exports patterns.json alongside manifest.json (HAN-24)", () => {
+    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+    expect(pkg.exports["./manifest.json"]).toBe("./dist/manifest.json");
+    expect(pkg.exports["./patterns.json"]).toBe("./dist/patterns.json");
+  });
 });
