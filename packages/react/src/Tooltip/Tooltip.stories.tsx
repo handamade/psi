@@ -24,9 +24,12 @@ const meta: Meta<typeof Tooltip> = {
 export default meta;
 type Story = StoryObj<typeof Tooltip>;
 
-// The bubble only exists while hovered/focused, so without this the story (and
-// its VR screenshot) shows nothing but the bare trigger.
-const showOnHover: Story["play"] = async ({ canvasElement }) => {
+// The bubble only exists while hovered/focused. The VR runner opens it via
+// this play fn so screenshots capture the bubble — but only under the `vr`
+// global it passes in its URL; interactively, tooltips start closed like in
+// any real app (HAN-39).
+const showOnHover: Story["play"] = async ({ canvasElement, globals }) => {
+  if (!globals.vr) return;
   const canvas = within(canvasElement);
   await userEvent.hover(canvas.getByRole("button"));
   // Opening waits out the 150ms WCAG 1.4.13 hover delay.
@@ -86,7 +89,8 @@ export const AllPlacements: Story = {
       </Tooltip>
     </div>
   ),
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, globals }) => {
+    if (!globals.vr) return;
     const canvas = within(canvasElement);
     // userEvent.hover would un-hover the previous trigger and close its bubble;
     // raw mouseOver events (never followed by mouseOut) keep all four open.

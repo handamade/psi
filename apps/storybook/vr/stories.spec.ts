@@ -17,7 +17,9 @@ const themesFor = (e: IndexEntry) =>
 for (const s of stories) {
   for (const theme of themesFor(s)) {
     test(`${s.id} @ ${theme}`, async ({ page }) => {
-      await page.goto(`/iframe.html?id=${s.id}&globals=theme:${theme}`, { waitUntil: "networkidle" });
+      // `vr:true` tells play functions they run for the camera (tooltip
+      // stories open their bubbles only then — HAN-39).
+      await page.goto(`/iframe.html?id=${s.id}&globals=theme:${theme};vr:true`, { waitUntil: "networkidle" });
       if (s.id.startsWith("components-tooltip")) {
         // Tooltip stories open the bubble via a play fn (hover + 150ms delay);
         // wait for it deterministically instead of racing the fixed settle below.

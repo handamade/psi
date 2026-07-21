@@ -8,6 +8,7 @@ import "@handamade/psi-tokens/acme.css";
 import "@handamade/psi-tokens/ember.css";
 import "@handamade/psi-tokens/utilities.css";
 import "@handamade/psi-tokens/components.css";
+import "./preview.css";
 
 const preview: Preview = {
   // Generated docs page per component — public link targets for the website
@@ -30,15 +31,16 @@ const preview: Preview = {
   },
   initialGlobals: {
     theme: "light",
+    vr: false,
   },
   decorators: [
     (Story, context) => {
       const theme = context.globals.theme ?? "light";
-      return createElement(
-        "div",
-        { "data-psi-theme": theme, style: { padding: "1rem" } },
-        createElement(Story),
-      );
+      // The preview iframe is the app root: per the house rule, the theme
+      // lives on <html> and the canvas paints bg/fg itself (preview.css) —
+      // theme CSS never paints backgrounds (HAN-38).
+      document.documentElement.dataset.psiTheme = theme;
+      return createElement("div", { style: { padding: "1rem" } }, createElement(Story));
     },
   ],
 };

@@ -1,0 +1,8 @@
+/* The preview iframe is the app root. Per the consumer contract (llms.txt:
+ * theme CSS never paints the page), the canvas paints bg/fg itself — same
+ * pattern as psi-demo's app.css (HAN-38). */
+html,
+body {
+  background: var(--psi-bg-primary);
+  color: var(--psi-fg-primary);
+}
