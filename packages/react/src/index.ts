@@ -4,6 +4,8 @@ export { IconButton } from "./IconButton/IconButton.js";
 export type { IconButtonProps } from "./IconButton/IconButton.js";
 export { Card } from "./Card/Card.js";
 export type { CardProps } from "./Card/Card.js";
+export { Panel } from "./Panel/Panel.js";
+export type { PanelProps } from "./Panel/Panel.js";
 export { NavBar } from "./NavBar/NavBar.js";
 export type { NavBarProps } from "./NavBar/NavBar.js";
 export { AspectRatio } from "./AspectRatio/AspectRatio.js";

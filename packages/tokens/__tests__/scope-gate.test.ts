@@ -14,6 +14,7 @@ import { fieldVars } from "../src/components/field.js";
 import { inputVars } from "../src/components/input.js";
 import { mediaVars } from "../src/components/media.js";
 import { navbarVars } from "../src/components/navbar.js";
+import { panelVars } from "../src/components/panel.js";
 import { selectVars } from "../src/components/select.js";
 import { surfaceVars } from "../src/components/surface.js";
 import { switchVars } from "../src/components/switch.js";
@@ -22,7 +23,7 @@ import { tooltipVars } from "../src/components/tooltip.js";
 
 const allVars = {
   button: buttonVars, card: cardVars, checkbox: checkboxVars, dialog: dialogVars,
-  field: fieldVars, input: inputVars, media: mediaVars, navbar: navbarVars,
+  field: fieldVars, input: inputVars, media: mediaVars, navbar: navbarVars, panel: panelVars,
   select: selectVars, surface: surfaceVars, switch: switchVars, tag: tagVars, tooltip: tooltipVars,
 };
 

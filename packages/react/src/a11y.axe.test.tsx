@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
-  Button, IconButton, Card, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip,
+  Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip,
 } from "./index.js";
 
 const cases: Array<[string, React.ReactElement]> = [
@@ -10,6 +10,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Button as disabled anchor", <Button href="/x" disabled>Link</Button>],
   ["IconButton", <IconButton aria-label="Close"><svg aria-hidden="true" /></IconButton>],
   ["Card", <Card variant="stacked" media={<img alt="" src="x.png" />}>Body</Card>],
+  ["Panel", <Panel><h3>Usage</h3><p>Elevated surface body.</p></Panel>],
   ["NavBar", <NavBar brand={<a href="/">DK</a>} actions={<Button size={32}>CTA</Button>}><a href="/a">A</a></NavBar>],
   ["AspectRatio", <AspectRatio ratio={16 / 10}><img alt="demo" src="x.png" /></AspectRatio>],
   ["Input", <label>Name<Input size={32} /></label>],

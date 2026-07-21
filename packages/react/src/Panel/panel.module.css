@@ -1,0 +1,8 @@
+.panel {
+  background: var(--psi-panel-bg);
+  border: 1px solid var(--psi-panel-border);
+  border-radius: var(--psi-panel-radius);
+  padding: var(--psi-panel-padding);
+}
+
+.padding16 { padding: var(--psi-space-16); }

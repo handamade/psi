@@ -33,6 +33,7 @@ import { tooltipVars } from "../src/components/tooltip.js";
 import { cardVars } from "../src/components/card.js";
 import { dialogVars } from "../src/components/dialog.js";
 import { navbarVars } from "../src/components/navbar.js";
+import { panelVars } from "../src/components/panel.js";
 import { mediaVars } from "../src/components/media.js";
 import { fieldVars } from "../src/components/field.js";
 import { guidance } from "../src/guidance.js";
@@ -76,6 +77,7 @@ const componentVars: Record<string, Record<string, string>> = {
   input: inputVars,
   media: mediaVars,
   navbar: navbarVars,
+  panel: panelVars,
   select: selectVars,
   surface: surfaceVars,
   switch: switchVars,

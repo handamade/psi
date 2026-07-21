@@ -9,6 +9,7 @@ const COMPONENTS = [
   "Button",
   "IconButton",
   "Card",
+  "Panel",
   "Input",
   "Select",
   "Field",

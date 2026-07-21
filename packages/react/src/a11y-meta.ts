@@ -69,4 +69,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Hover opens after a short delay; content is linked via aria-describedby while visible. Trigger must accept onMouseEnter/Leave and onFocus/Blur props (cloned in automatically) — no ref forwarding required.",
   },
+  Panel: {
+    keyboard: [
+      { keys: "Tab", behavior: "Skipped — Panel itself is not focusable; focus moves through its children." },
+    ],
+    notes:
+      "Plain <div> container with no implicit role. Pass aria-* host props if the panel should announce as a region.",
+  },
 };
