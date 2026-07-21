@@ -1,3 +1,5 @@
+import { Panel } from "@handamade/psi-react";
+
 const PRINCIPLES = [
   {
     title: "OKLCH calculations, not swatch ladders",
@@ -50,10 +52,12 @@ export function Principles() {
         </div>
         <div className="principles-grid">
           {PRINCIPLES.map((principle, index) => (
-            <article className="card principle" key={principle.title}>
-              <span className="annot">0{index + 1}</span>
-              <h3>{principle.title}</h3>
-              <p>{principle.body}</p>
+            <article className="principle" key={principle.title}>
+              <Panel className="card">
+                <span className="annot">0{index + 1}</span>
+                <h3>{principle.title}</h3>
+                <p>{principle.body}</p>
+              </Panel>
             </article>
           ))}
         </div>

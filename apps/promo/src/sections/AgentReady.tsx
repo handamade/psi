@@ -1,3 +1,5 @@
+import { Panel } from "@handamade/psi-react";
+
 const METHODS = [
   {
     name: "Hosted MCP",
@@ -31,13 +33,13 @@ export function AgentReady() {
         </div>
         <div className="theme-grid">
           {METHODS.map((m) => (
-            <div className="card" key={m.name}>
+            <Panel className="card" key={m.name}>
               <span className="annot annot--accent">{m.name}</span>
               <p style={{ margin: "var(--psi-space-16) 0 var(--psi-space-8)" }}>
                 <code>{m.snippet}</code>
               </p>
               <p style={{ color: "var(--psi-fg-secondary)" }}>{m.note}</p>
-            </div>
+            </Panel>
           ))}
         </div>
       </div>

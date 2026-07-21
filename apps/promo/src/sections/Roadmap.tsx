@@ -1,4 +1,4 @@
-import { IconCheck, IconChevronRight } from "@handamade/psi-react";
+import { IconCheck, IconChevronRight, Panel } from "@handamade/psi-react";
 
 const SHIPPED = [
   ["13 components, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, NavBar, AspectRatio, Field, Dialog"],
@@ -27,7 +27,7 @@ export function Roadmap() {
           <h2>Deliberately small. Honestly documented.</h2>
         </div>
         <div className="roadmap-grid">
-          <div className="card">
+          <Panel className="card">
             <h3 style={{ font: "var(--psi-text-20-28-semibold)", marginBottom: "var(--psi-space-20)" }}>
               In v1 today
             </h3>
@@ -41,8 +41,8 @@ export function Roadmap() {
                 </li>
               ))}
             </ul>
-          </div>
-          <div className="card">
+          </Panel>
+          <Panel className="card">
             <h3 style={{ font: "var(--psi-text-20-28-semibold)", marginBottom: "var(--psi-space-20)" }}>
               Next
             </h3>
@@ -56,7 +56,7 @@ export function Roadmap() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Panel>
         </div>
         <p className="annot roadmap-foot">
           The system stays deliberately small: layout, typography compositions

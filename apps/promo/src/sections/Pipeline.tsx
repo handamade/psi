@@ -1,3 +1,5 @@
+import { Panel } from "@handamade/psi-react";
+
 const FIGMA_VARS = [
   { name: "bg/primary", varClass: "--psi-bg-primary", note: "COLOR · 4 modes" },
   { name: "fg/accent", varClass: "--psi-fg-accent", note: "COLOR · 4 modes" },
@@ -38,7 +40,7 @@ export function Pipeline() {
         </div>
 
         <div className="pipeline-grid">
-          <div className="card">
+          <Panel className="card">
             <h3 style={{ font: "var(--psi-text-20-28-semibold)" }}>
               Figma, synced from code
             </h3>
@@ -63,9 +65,9 @@ export function Pipeline() {
                 </div>
               ))}
             </div>
-          </div>
+          </Panel>
 
-          <div className="card">
+          <Panel className="card">
             <h3 style={{ font: "var(--psi-text-20-28-semibold)" }}>
               Readable by your AI, too
             </h3>
@@ -82,7 +84,7 @@ export function Pipeline() {
                 </div>
               ))}
             </div>
-          </div>
+          </Panel>
         </div>
       </div>
     </section>

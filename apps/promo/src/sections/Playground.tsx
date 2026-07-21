@@ -7,6 +7,7 @@ import {
   IconSearch,
   IconSettings,
   Input,
+  Panel,
   Select,
   Switch,
   Tag,
@@ -55,7 +56,7 @@ export function Playground() {
         </div>
 
         <div className="playground">
-          <div className="card pg-buttons">
+          <Panel className="card pg-buttons">
             <h3>
               Button · 8 variants × 4 sizes
               <a className="sb-link" href={storybookDocs("Components/Button")}>
@@ -94,9 +95,9 @@ export function Playground() {
             <p className="annot pg-note">
               Sizes are px numbers, never S/M/L — principle 02 in practice.
             </p>
-          </div>
+          </Panel>
 
-          <div className="card pg-controls">
+          <Panel className="card pg-controls">
             <h3>
               Form controls · hover, focus &amp; error states
               <a className="sb-link" href={storybookDocs("Components/Input")}>
@@ -156,7 +157,7 @@ export function Playground() {
               Real components, not screenshots — dismiss the tags, flip the
               switch, tab through the focus rings.
             </p>
-          </div>
+          </Panel>
         </div>
 
         <p className="pg-index annot">
