@@ -7,7 +7,7 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 3 patterns sorted by id, gap-blocked patterns have no preset", () => {
+  it("writes dist/patterns.json: 3 patterns sorted by id, all unblocked with presets (D52)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
@@ -22,8 +22,8 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(destructiveConfirm.preset).toContain('variant="danger"');
 
     const filterToolbar = output.patterns.find((p: { id: string }) => p.id === "filter-toolbar");
-    expect(filterToolbar.blocked).toBe(true);
-    expect(filterToolbar.preset).toBeNull();
+    expect(filterToolbar.blocked).toBe(false);
+    expect(filterToolbar.preset).toContain("<Toolbar>");
   });
 
   it("double-emit is byte-identical", () => {

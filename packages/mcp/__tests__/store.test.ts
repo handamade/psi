@@ -86,9 +86,9 @@ describe("get", () => {
     expect((detail as any).parameters.length).toBeGreaterThan(0);
   });
 
-  it("marks a blocked pattern's brief summary as blocked (D48)", () => {
+  it("filter-toolbar is now unblocked with a preset (D52)", () => {
     const brief = store.search("filter toolbar").find((b) => b.id === "pattern:filter-toolbar");
     expect(brief).toBeDefined();
-    expect(brief!.summary).toContain("blocked");
+    expect(brief!.summary).not.toContain("blocked");
   });
 });

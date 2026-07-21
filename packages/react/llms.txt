@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-14 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+15 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -25,6 +25,9 @@
 
 ## Panel
 - <Panel padding={16|24}>: the elevated surface panel (D51) — bg-secondary, faint hairline border, radius-12, space-24 padding (16 for compact). Binds the shared --psi-surface-* recipe Dialog's panel also uses; brands retune both by overriding --psi-surface-*. Not a Card: no media slot, no hover lift.
+
+## Toolbar
+- <Toolbar gap={8|12|16} aria-label="Filters">: horizontal wrapping row for filter/search controls (Input, Select, Tag, Button). Wraps on overflow (D52); with aria-label it announces as role=group. Deliberately not ARIA role=toolbar (no roving tabindex). Unblocks the filter-toolbar pattern — consult dist/patterns.json for the preset.
 
 ## NavBar
 - <NavBar brand={...} actions={...}>{links}</NavBar>: brand slot leading, nav links centered/inline, actions slot trailing (theme switch, CTA). Renders inside .psi-container. Background defaults to --psi-scrim-heavy so content can scroll underneath; border uses --psi-border-faint.
