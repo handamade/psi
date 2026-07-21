@@ -15,7 +15,7 @@ Content container with an optional edge-to-edge media slot; `stacked` (media abo
 
 ## Theming
 
-Override `--psi-card-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-card-*` custom properties at any scope.
 
 ## Variant guidance
 
