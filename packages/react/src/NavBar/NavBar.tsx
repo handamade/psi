@@ -17,7 +17,7 @@ export function NavBar({ brand, actions, children, className, ref, ...rest }: Na
   const cls = [styles.navbar, className].filter(Boolean).join(" ");
   return (
     <header ref={ref} className={cls} {...rest}>
-      <div className={`ds-container ${styles.inner}`}>
+      <div className={`psi-container ${styles.inner}`}>
         {brand != null && <div className={styles.brand}>{brand}</div>}
         <nav className={styles.links}>{children}</nav>
         {actions != null && <div className={styles.actions}>{actions}</div>}

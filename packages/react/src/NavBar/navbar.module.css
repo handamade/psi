@@ -1,4 +1,5 @@
 .navbar {
+  font: var(--psi-text-14-20-medium);
   position: sticky;
   top: 0;
   z-index: var(--psi-z-nav);
