@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validate, ValidationError, validateScopeConsistency } from "../src/dsl/validator.js";
+import { validate, ValidationError, validateScopeConsistency, validateNoScalePrefixShadow } from "../src/dsl/validator.js";
 import { token, set, slot, ref } from "../src/dsl/builders.js";
 import type { SlotMap, ThemeDef } from "../src/dsl/types.js";
 
@@ -92,5 +92,17 @@ describe("scope validation (D46)", () => {
     const a: ThemeDef = { fgPrimary: token({ from: slot.ink, scopes: ["text"] }), x: token({ from: slot.ink }) };
     const b: ThemeDef = { fgPrimary: token({ from: slot.ink, scopes: ["text"] }), x: token({ from: slot.ink }) };
     expect(() => validateScopeConsistency({ light: a, dark: b })).not.toThrow();
+  });
+
+  it("rejects absent-vs-present scope drift for the same token name", () => {
+    const a: ThemeDef = { fgPrimary: token({ from: slot.ink, scopes: ["text"] }) };
+    const b: ThemeDef = { fgPrimary: token({ from: slot.ink }) };
+    expect(() => validateScopeConsistency({ light: a, dark: b })).toThrow(ValidationError);
+  });
+
+  it("rejects semantic token names that shadow a scale-family prefix", () => {
+    expect(() => validateNoScalePrefixShadow(["space-hero"])).toThrow(ValidationError);
+    expect(() => validateNoScalePrefixShadow(["z-banner"])).toThrow(ValidationError);
+    expect(() => validateNoScalePrefixShadow(["fg-primary", "spacing-x", "texture-1"])).not.toThrow();
   });
 });

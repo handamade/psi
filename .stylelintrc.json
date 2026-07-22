@@ -1,4 +1,5 @@
 {
   "plugins": ["./tools/stylelint-plugin-psi-tokens.mjs"],
+  "ignoreFiles": ["**/node_modules/**", "**/storybook-static/**", "**/dist/**", "**/site-dist/**"],
   "rules": { "psi/component-tokens-only": true, "psi/token-scopes": true }
 }

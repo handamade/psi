@@ -7,7 +7,7 @@ import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
 import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
 import type { BrandFonts } from "../src/themes/customers/index.js";
-import { validate, validateScopeConsistency } from "../src/dsl/validator.js";
+import { validate, validateScopeConsistency, validateNoScalePrefixShadow } from "../src/dsl/validator.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { checkContrast, wcagAAPairs, componentLabelPairs } from "../src/contrast-matrix.js";
 import { checkScopes, checkOverrideScopes } from "../src/scope-gate.js";
@@ -92,6 +92,11 @@ function build(): void {
   // given token name; catches accidental scope drift across brands.
   validateScopeConsistency(
     Object.fromEntries(Object.entries(themes).map(([n, c]) => [n, c.theme])),
+  );
+
+  // D46 follow-up (HAN-21) — semantic names must not shadow scale families.
+  validateNoScalePrefixShadow(
+    Object.values(themes).flatMap((c) => Object.keys(c.theme).map(camelToKebab)),
   );
 
   // Create output directories

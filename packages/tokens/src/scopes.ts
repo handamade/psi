@@ -7,7 +7,7 @@
 
 export const PROPERTY_GROUPS: Record<string, readonly string[]> = {
   text: ["color", "fill", "stroke", "caret-color", "text-decoration-color"],
-  surface: ["background", "background-color"],
+  surface: ["background", "background-color", "accent-color"],
   border: [
     "border", "border-color", "border-top-color", "border-right-color",
     "border-bottom-color", "border-left-color", "outline", "outline-color",

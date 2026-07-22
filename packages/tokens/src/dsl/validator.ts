@@ -122,3 +122,20 @@ export function validateScopeConsistency(themes: Record<string, ThemeDef>): void
     }
   }
 }
+
+// Both gates resolve --psi-* names scale-first, so a semantic token whose
+// kebab name starts with a scale-family prefix would be silently shadowed.
+const SCALE_FAMILY_PREFIX = /^(space|size|radius|text|font|duration|ease|z)-/;
+
+/** D46 follow-up (HAN-21): reject semantic token kebab names that a
+ * scale-family lookup would shadow before the semantic lookup runs. */
+export function validateNoScalePrefixShadow(kebabNames: readonly string[]): void {
+  for (const name of kebabNames) {
+    if (SCALE_FAMILY_PREFIX.test(name)) {
+      throw new ValidationError(
+        `Semantic token "${name}" starts with a scale-family prefix — it would be shadowed by the scale lookup in the build and stylelint gates`,
+        [name],
+      );
+    }
+  }
+}

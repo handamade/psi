@@ -203,7 +203,10 @@ section {
   content: "";
   width: 24px;
   height: 1px;
-  background: var(--psi-fg-accent);
+  /* decorative rule reads as text-strength ink — bind the fg token to color
+   * and paint via currentColor (D46: fg tokens are text-scope only) */
+  color: var(--psi-fg-accent);
+  background: currentColor;
 }
 
 .hero h1 {
