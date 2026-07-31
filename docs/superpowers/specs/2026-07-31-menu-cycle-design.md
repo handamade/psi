@@ -174,10 +174,14 @@ queued changesets (D46 follow-up, NavBar fix) are already on `main`:
 
 - **MIT `LICENSE`** at repo root. Stated intent in the growth strategy; never
   landed. The market comparison notes Astryx is `npm install` away with MIT.
-- **Branch protection on `main`**, requiring the CI checks. Spec'd as a
-  process change in the surface cycle; `gh api` currently returns
-  "Branch not protected".
 - **`.DS_Store` in `.gitignore`** — nine are untracked in the working tree.
+
+Branch protection is **already in place** and needs nothing: ruleset
+`protect-main` requires a PR and a strict `ci` status check, and blocks
+deletion and non-fast-forward pushes. Note for future audits — query
+`repos/handamade/psi/rules/branches/main`; the legacy
+`/branches/main/protection` endpoint 404s on ruleset-protected branches and
+reads as "unprotected".
 
 Then, after 0.8.0 ships: promo Playground demo for Menu (the HAN-42
 precedent), and a generation-eval rerun, which the harness cadence
