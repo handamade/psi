@@ -21,3 +21,52 @@
 .menu:not([data-open]):not(:popover-open) {
   display: none;
 }
+
+/* ── Items ────────────────────────────────────────────────────── */
+
+.item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: var(--psi-space-8) var(--psi-space-12);
+  border: 0;
+  border-radius: var(--psi-radius-6);
+  background: var(--psi-menu-item-bg);
+  color: var(--psi-menu-item-fg);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--psi-menu-item-bg-hover);
+}
+
+.item:active {
+  background: var(--psi-menu-item-bg-active);
+}
+
+.item[data-variant="danger"] {
+  color: var(--psi-menu-item-fg-danger);
+}
+
+.item[aria-disabled="true"] {
+  color: var(--psi-menu-item-fg-disabled);
+  cursor: default;
+}
+
+.item[aria-disabled="true"]:hover {
+  background: var(--psi-menu-item-bg);
+}
+
+/* ── Separator ────────────────────────────────────────────────── */
+
+.separator {
+  /* border-top, not background: --psi-menu-separator-border is scoped to
+     [border] by the token build (packages/tokens/src/components/menu.ts) —
+     the stylelint psi/token-scopes rule rejects a background binding. The
+     brief's draft CSS used background; this is the corrected form. */
+  height: 0;
+  margin: var(--psi-space-4) 0;
+  border-top: 1px solid var(--psi-menu-separator-border);
+}
