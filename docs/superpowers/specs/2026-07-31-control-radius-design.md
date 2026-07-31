@@ -53,10 +53,20 @@ D57 is the theme console that consumes it — prompt → constraint vector →
   `radius-4` and Tooltip at `radius-6`; binding either straight to an
   8px-default dial over-rounds a 16px checkbox, and hard-coding them off the
   dial leaves a "sharp" theme with visibly rounded small objects. `min()`
-  makes them track the dial downward while never exceeding their own ceiling.
-  It is the idiom the colour layer already uses for exactly this purpose —
-  `oklch(from var(--psi-palette-sapphire) 0.48 min(c, 0.23) h)` in every
-  theme's `fg-accent`.
+  caps each at its own ceiling and never exceeds it, regardless of what the
+  dial is set to. It is the idiom the colour layer already uses for exactly
+  this purpose — `oklch(from var(--psi-palette-sapphire) 0.48 min(c, 0.23)
+  h)` in every theme's `fg-accent`.
+
+  The published radius scale (`radiusScale = [4, 6, 8, 12]` in
+  `packages/tokens/src/scales/radius.ts`) has no rung below `radius-4`, so
+  `min(var(--psi-control-radius), var(--psi-radius-4))` evaluates to 4px for
+  every *on-scale* value a theme can set — Checkbox's cap does not track a
+  sharp theme downward, because there is nowhere below `radius-4` for it to
+  go on the published scale. It only moves below 4px if a theme reaches for
+  an off-scale value, e.g. `--psi-control-radius: 0px` — the rung scale has
+  no `radius-0`. Tooltip's ceiling (`radius-6`) sits one rung above the
+  floor, so it does genuinely track a sharper theme, down to `radius-4`.
 
   Checkbox and Tooltip are outside the D54–D55 ramp (that family covers
   Button, IconButton, Input, Select) but inside this one, because radius is
