@@ -1,6 +1,6 @@
 # Control ramp — per-size geometry as tokens (D54–D55)
 
-Date: 2026-07-31. Status: **Draft** — targets 0.8.0.
+Date: 2026-07-31. Status: **Draft** — targets 0.7.3.
 
 Provenance: the 2026-07-31 analysis of the BuninUX token/geometry skills
 (`bunind/gtc-tokens`, `bunind/concentric`) against Psi. Two ideas in those
@@ -203,9 +203,9 @@ shipping the tokens without the answer would leave the promise half-kept.
 
 ## Release, consumers, process
 
-- One release: `@handamade/psi-tokens` and `@handamade/psi-react` 0.8.0.
-  Minor at 0.x, with the before/after ramp in the changeset note. Input and
-  Select padding is a visible change for consumers; text-only Buttons are
+- One release: `@handamade/psi-tokens` and `@handamade/psi-react` 0.7.3.
+  Patch, with the before/after ramp in the changeset note. Input and Select
+  padding is a visible change for consumers; text-only Buttons are
   pixel-identical; icon-bearing Buttons shift by design.
 - **Sequencing with D53.** Branched off `main` while the Menu cycle is still
   in flight. The only shared file is `packages/tokens/scripts/build.ts` (two
@@ -224,13 +224,13 @@ shipping the tokens without the answer would leave the promise half-kept.
   `dtcg/{theme}.json` with `$extensions.mode` keyed by px size, plus a single
   mode-carrying file across all four themes. Cheap once the tokens exist, and
   the natural companion to the Figma plugin work.
-- **Chevron size ramping.** Select's chevron stays a fixed 12×12 at all four
-  sizes. It looks undersized at 48 next to 18px text, but ramping it means
-  swapping `background-size` per size and re-measuring against the native
-  control — its own small cycle, flagged here rather than guessed at.
-- **Icon sizing in Button.** Icons are passed as children and Psi does not
-  size them; an icon's dimensions are the consumer's. Related to the chevron
-  question and deferred with it.
+- **Chevron size ramping — backlog.** Select's chevron stays a fixed 12×12 at
+  all four sizes. It looks undersized at 48 next to 18px text, but ramping it
+  means swapping `background-size` per size and re-measuring against the
+  native control. Its own small cycle; not carried by D54–D55.
+- **Icon sizing in Button — backlog.** Icons are passed as children and Psi
+  does not size them; an icon's dimensions are the consumer's. Same family of
+  question as the chevron, deferred with it.
 - **Leading icons in Input/Select.** Neither component supports them today,
   so `control-value-*` ships no `padding-inline-icon`. Additive later.
 - **Tokenizing unsized components.** `MenuItem` hardcodes
