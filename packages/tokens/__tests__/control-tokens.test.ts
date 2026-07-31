@@ -2,6 +2,11 @@ import { describe, it, expect } from "vitest";
 import { controlVars } from "../src/components/control.js";
 import { inputVars } from "../src/components/input.js";
 import { selectVars } from "../src/components/select.js";
+import { buttonVars } from "../src/components/button.js";
+import { checkboxVars } from "../src/components/checkbox.js";
+import { tooltipVars } from "../src/components/tooltip.js";
+import { tagVars } from "../src/components/tag.js";
+import { switchVars } from "../src/components/switch.js";
 import { emitComponentVarsCSS } from "../scripts/emit-components.js";
 import { keyGroup } from "../src/scopes.js";
 
@@ -105,5 +110,45 @@ describe("value-ramp consumers cannot drift (D54 acceptance)", () => {
         `calc(var(--psi-control-value-${n}-padding-inline) + var(--psi-space-16))`,
       );
     }
+  });
+});
+
+describe("control radius consumers (D56)", () => {
+  it("Button, Input and Select bind the dial directly", () => {
+    expect(buttonVars.radius).toBe("var(--psi-control-radius)");
+    expect(inputVars.radius).toBe("var(--psi-control-radius)");
+    expect(selectVars.radius).toBe("var(--psi-control-radius)");
+  });
+
+  it("Checkbox and Tooltip cap themselves at their own ceiling", () => {
+    expect(checkboxVars["box-radius"]).toBe(
+      "min(var(--psi-control-radius), var(--psi-radius-4))",
+    );
+    expect(tooltipVars.radius).toBe(
+      "min(var(--psi-control-radius), var(--psi-radius-6))",
+    );
+  });
+
+  it("Tag and Switch declare no radius token — pill-ness is identity", () => {
+    for (const vars of [tagVars, switchVars]) {
+      expect(Object.keys(vars).filter((k) => k.includes("radius"))).toEqual([]);
+    }
+  });
+
+  it("radius keys carry no D46 scope, so both gates skip them", () => {
+    expect(keyGroup("radius")).toBeUndefined();
+    expect(keyGroup("box-radius")).toBeUndefined();
+  });
+
+  it("emits the five per-component custom properties", () => {
+    expect(emitComponentVarsCSS("button", buttonVars)).toContain(
+      "--psi-button-radius: var(--psi-control-radius)",
+    );
+    expect(emitComponentVarsCSS("checkbox", checkboxVars)).toContain(
+      "--psi-checkbox-box-radius: min(var(--psi-control-radius), var(--psi-radius-4))",
+    );
+    expect(emitComponentVarsCSS("tooltip", tooltipVars)).toContain(
+      "--psi-tooltip-radius: min(var(--psi-control-radius), var(--psi-radius-6))",
+    );
   });
 });

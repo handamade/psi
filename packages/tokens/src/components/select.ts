@@ -9,6 +9,9 @@ export const selectVars: Record<string, string> = {
   "focus-ring": "var(--psi-border-focus)",
   "chevron-fg": "var(--psi-fg-secondary)",
 
+  // ── Shape (D56) ──
+  radius: "var(--psi-control-radius)",
+
   // ── Size ramp (D54) — same value ramp as Input, by construction ──
   "24-height": "var(--psi-control-24-height)",
   "32-height": "var(--psi-control-32-height)",
