@@ -516,14 +516,19 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
    *reports*; the menu stays open until the consumer flips `open`. So
    `onClose` must call `setMenuOpen(false)` for **all three** reasons, or Esc
    and item-select will appear dead.
-2. **The trigger click is an outside click.** Menu drives the popover
-   imperatively (`showPopover()`), not via `popovertarget`, so there is no
-   invoker relationship. Clicking the trigger while the menu is open makes the
-   browser light-dismiss first (`onClose("outside")` → `open` false), and then
-   the trigger's own `onClick` fires — a naive `setMenuOpen(o => !o)` flips it
-   straight back and the menu looks stuck open. The guard below ignores a
-   trigger click that lands within 200ms of a dismissal. **Step 6 exists
-   specifically to prove this works; do not skip it.**
+2. **A plain toggle is correct here — do not add a re-open guard.** An earlier
+   draft of this plan asserted that clicking the trigger while open would
+   light-dismiss and then immediately re-open. **That was investigated in a
+   real browser (Chrome 148) and refuted.** The light dismiss lands on
+   `pointerdown`, *before* `click`, and the `toggle` event that drives
+   `onClose` is queued and arrives ~50ms *after* `click`. So the trigger's
+   `onClick` still observes `open === true`, toggles to `false`, and the late
+   `onClose("outside")` agrees. Final state closed, no flicker.
+
+   Caveat recorded for whoever reads this later: that ordering is a Chromium
+   observation and was not verified in Firefox or WebKit. The robust fix
+   belongs in the component (see "Related Menu bugs" at the foot of this
+   plan), not in consumer code here.
 
 - [ ] **Step 1: Extend the imports**
 
@@ -562,22 +567,18 @@ line 49), add:
   const [menuOpen, setMenuOpen] = useState(false);
   const [lastReason, setLastReason] = useState<string | null>(null);
   const [lastAction, setLastAction] = useState<string | null>(null);
-  /** Light dismiss fires before the trigger's own click; without this the
-   *  trigger would reopen the menu it just closed. See D53 — Menu has no
-   *  popovertarget invoker relationship, so its trigger is "outside". */
-  const dismissedAt = useRef(0);
 
   const closeMenu = (reason: "item-select" | "esc" | "outside") => {
     setLastReason(reason);
     setMenuOpen(false);
-    dismissedAt.current = performance.now();
   };
 
-  const toggleMenu = () => {
-    if (performance.now() - dismissedAt.current < 200) return;
-    setMenuOpen((open) => !open);
-  };
+  const toggleMenu = () => setMenuOpen((open) => !open);
 ```
+
+This card renders a **single** Menu with its own state. The confirmed D53 bug
+(a stale light-dismiss report closing a *different*, newly-opened menu) needs
+two menus sharing one `openId`, so this card cannot hit it.
 
 - [ ] **Step 3: Add the card**
 
@@ -676,8 +677,10 @@ card. Run all four checks:
 | Reopen, click "Edit" | Menu closes; reads `onClose("item-select") · Edit` |
 | **Reopen, click the gear again** | **Menu closes and stays closed** |
 
-The last row is the guard from the preamble. If the menu flickers shut and
-immediately reopens, `dismissedAt` is not wired — re-check Step 2.
+The last row is a regression check on the refuted re-open hypothesis. In
+Chrome it passes with the plain toggle. If it *does* flicker shut and reopen,
+the browser orders `toggle` before `click` — record which browser and report
+back rather than patching around it here; that is the component fix's job.
 
 - [ ] **Step 7: Browser check — keyboard and roving tabindex**
 
@@ -694,10 +697,8 @@ git add apps/promo/src/sections/Playground.tsx
 git commit -m "docs(promo): Menu card — the 0.8 overlay tier, live
 
 Menu's first real controlled consumer: every story ships open:true, so
-nothing exercised the toggle. Handles all three onClose reasons and
-guards the trigger against its own light dismiss -- Menu drives the
-popover imperatively, so the trigger counts as an outside click and a
-naive toggle reopens the menu it just closed.
+nothing in the repo exercised a real toggle. Handles all three onClose
+reasons.
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
@@ -954,3 +955,38 @@ seam, point them here.
 
 **`pnpm release` does not push tags.** Unrelated one-liner, deliberately not
 bundled into this branch (`CLAUDE.md`: one branch, one PR).
+
+## Related Menu bugs — separate branch, not this one
+
+A browser investigation on 2026-07-31 (Chrome 148) found four real faults in
+`packages/react/src/Menu`. **None of them block this plan** — the promo card
+is a single Menu inside a flex row with `align-items: center`, which hits
+neither the shared-state bug nor the anchor-stretch bug. They are recorded
+here only so nobody tries to fix them on this branch; `packages/` changes need
+their own PR and a changeset.
+
+1. **Stale light-dismiss report closes the wrong menu.** With two menus
+   sharing one `openId`, opening B while A is open leaves *both* closed. When
+   the platform light-dismisses A, A's popover is already closed by the time
+   its `open` prop flips, so the sync effect takes neither branch
+   (`Menu.tsx:108`) and never arms `suppressNextCloseRef`. The queued toggle
+   then reports `onClose("outside")` at `Menu.tsx:125` for a menu the consumer
+   has already closed, and the consumer clears `openId` — killing B. This
+   breaks the shipped `row-actions` pattern's most natural implementation.
+2. **The anchor box stretches.** `.trigger` is `display: inline-flex` with no
+   width (`menu.module.css:4`). As a *grid* item (`justify-self: stretch`) or
+   a *flex-column* item (`align-items: stretch`) it fills the cell, so the
+   menu anchors to the cell rather than the button. Flex rows with
+   `align-items: center` are unaffected.
+3. **The `Placements` story is unrenderable.** `popover="auto"` mutually
+   dismisses, so four sibling popovers cannot be open at once — only the
+   last-mounted survives.
+4. **`FallbackPlacement` contaminates the preview iframe.** It overwrites
+   `CSS.supports` without restoring it and injects a `<style>` scoped to
+   `[data-psi-menu]` document-wide, so every Menu rendered afterwards in the
+   same session — including the autodocs page — takes the fallback branch.
+
+Test-gap note: `vitest.setup.ts`'s Popover polyfill is synchronous with no
+light dismiss and no mutual dismissal, so this whole bug class is unreachable
+from jsdom. Its comment claims light dismiss is "exercised in Playwright VR" —
+VR only takes screenshots, so in practice it is exercised nowhere.
