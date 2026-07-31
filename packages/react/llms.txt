@@ -4,7 +4,7 @@
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
-- dist/patterns.json: 3 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
+- dist/patterns.json: 4 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
