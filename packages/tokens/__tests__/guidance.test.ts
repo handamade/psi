@@ -66,4 +66,10 @@ describe("guidance", () => {
     expect(sizes.map((n) => combo(controlVars[`value-${n}-font`])))
       .toEqual([...guidance.geometry.value.font]);
   });
+
+  it("exposes the D56 radius dial and its two capped consumers", () => {
+    expect(guidance.geometry.radius).toMatch(/--psi-control-radius/);
+    expect(guidance.geometry.radius).toMatch(/min\(/);
+    expect(guidance.geometry.radius).toMatch(/Tag and Switch/);
+  });
 });
