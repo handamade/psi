@@ -108,6 +108,15 @@ export const FallbackPlacement: Story = {
       // installed — if a concurrent instance's stub is in place instead
       // (e.g. StrictMode double-render remounting hooks), overwriting it
       // would stomp that instance's install rather than being a no-op. (D58)
+      // The converse hazard: under a StrictMode remount, this cleanup also
+      // fires for the *first* mount's effect while the story is still
+      // mounted (mount → cleanup → mount is how StrictMode probes for
+      // missing cleanup), restoring native CSS.supports and silently
+      // un-forcing the fallback branch before the story that needs it ever
+      // renders visibly. Storybook does not enable StrictMode today
+      // (apps/storybook/.storybook/main.ts sets no `reactStrictMode`), so
+      // this is currently inert — noted so it isn't rediscovered the hard
+      // way if that ever changes.
       React.useEffect(
         () => () => {
           if (originalRef.current && CSS.supports === stubRef.current) {

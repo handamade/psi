@@ -242,6 +242,12 @@ describe("Menu", () => {
   // `toggle` arrives, `open` is already false — the close is old news, and
   // reporting it would clear a selection that has since moved on. ──
 
+  // This test pins the invariant (open === false at dispatch → no report),
+  // not the effect-flush timing that motivated reading `open` from the
+  // closure rather than a ref. jsdom flushes effects synchronously on
+  // rerender, so the two can't be told apart here; the timing question is
+  // menu.interaction.spec.ts's job. Don't read this test as having settled
+  // the ref-vs-closure question.
   it("does not report a dismissal for a menu whose open prop is already false", () => {
     const onClose = vi.fn();
     const view = (open: boolean) => (

@@ -31,6 +31,16 @@ test("switching from one menu to another leaves the new one open @interaction", 
 
   // A's stale toggle lands ~50ms after the click; outlast it before asserting
   // that nothing was reported and that B survived it.
+  //
+  // This assertion is stricter than the shipped contract. The invariant is
+  // "B survives"; asserting "none" additionally assumes the queued `toggle`
+  // is delivered after the click handler that opens B. If a future browser
+  // delivered it before instead, the behaviour would still be correct
+  // (report, then reopen) but this line would go red for the wrong reason —
+  // a failure here does not by itself mean the invariant broke, only that
+  // the delivery ordering changed. It is kept anyway: it is the sharpest
+  // available signal, and the `toBeVisible()` below is the one that actually
+  // pins the invariant.
   await page.waitForTimeout(250);
   await expect(page.getByTestId("last-reason")).toHaveText("none");
   await expect(page.locator(menu("b"))).toBeVisible();

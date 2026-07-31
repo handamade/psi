@@ -41,8 +41,8 @@ Vitest (jsdom), changesets.
   reasons.
 - **Do not add a re-open guard.** The hypothesis that clicking an open menu's
   trigger re-opens it was tested in Chrome 148 and **refuted** — light dismiss
-  lands on `pointerdown`, before `click`, and the queued `toggle` arrives
-  after. A plain toggle is correct.
+  lands before the consumer's click handler runs, and the queued `toggle`
+  arrives after it. A plain toggle is correct.
 
 ## Standard commands
 
@@ -178,9 +178,10 @@ test("switching from one menu to another leaves the new one open @interaction", 
   await expect(page.locator(menu("a"))).toBeVisible();
   await expect(page.locator(menu("b"))).toBeHidden();
 
-  // The regression: the platform light-dismisses A on pointerdown, and A's
-  // late toggle used to report onClose("outside") — clearing openId and
-  // closing B milliseconds after it opened.
+  // The regression: the platform light-dismisses A before the consumer's
+  // click handler runs, and A's late toggle used to report
+  // onClose("outside") — clearing openId and closing B milliseconds after
+  // it opened.
   await page.getByRole("button", { name: "B", exact: true }).click();
   await expect(page.locator(menu("b"))).toBeVisible();
   await expect(page.locator(menu("a"))).toBeHidden();
@@ -278,12 +279,13 @@ Then extend `handleToggle` (currently lines 114-126) so it reads:
     }
     if (isPopoverOpen(el)) return; // opening toggle — nothing to report
     // D58: the platform can close this popover before `open` flips — light
-    // dismiss fires on pointerdown when another menu's trigger is clicked. In
-    // that case the sync effect takes neither branch (the popover is already
-    // closed), so suppressNextCloseRef is never armed. Report a dismissal only
-    // for a menu that is still open according to its own prop; otherwise this
-    // is a stale toggle for a close the consumer already knows about, and
-    // reporting it would clear a selection that has since moved on.
+    // dismiss fires before the consumer's click handler runs when another
+    // menu's trigger is clicked. In that case the sync effect takes neither
+    // branch (the popover is already closed), so suppressNextCloseRef is
+    // never armed. Report a dismissal only for a menu that is still open
+    // according to its own prop; otherwise this is a stale toggle for a
+    // close the consumer already knows about, and reporting it would clear
+    // a selection that has since moved on.
     if (!openRef.current) return;
     onClose("outside");
   }, [onClose]);
@@ -298,8 +300,9 @@ appending this paragraph before the closing `*/`:
    * Invariant (D58): a dismissal is only ever reported for a menu that is
    * currently open according to its own `open` prop. The platform can close
    * an auto popover before the consumer's state catches up — clicking another
-   * menu's trigger light-dismisses this one on pointerdown — and a report for
-   * an already-closed menu would clear a selection that has since moved on.
+   * menu's trigger light-dismisses this one before the consumer's click
+   * handler runs — and a report for an already-closed menu would clear a
+   * selection that has since moved on.
 ```
 
 - [ ] **Step 7: Rebuild and run the spec to verify it PASSES**
@@ -682,10 +685,11 @@ Menu no longer reports a dismissal for a menu the consumer has already closed (D
 
 Two menus sharing one `openId` — the shape of the `row-actions` pattern —
 left **both** closed when you switched between them. Clicking B's trigger
-light-dismisses A at the platform level on `pointerdown`, so A's popover was
-already closed by the time its `open` prop flipped; the sync effect then armed
-no suppression and A's queued `toggle` reported `onClose("outside")`, clearing
-`openId` and closing B milliseconds after it opened.
+light-dismisses A at the platform level before the consumer's click handler
+runs, so A's popover was already closed by the time its `open` prop flipped;
+the sync effect then armed no suppression and A's queued `toggle` reported
+`onClose("outside")`, clearing `openId` and closing B milliseconds after it
+opened.
 
 `onClose` now carries an invariant: a dismissal is only ever reported for a
 menu that is still open according to its own `open` prop. Genuine light
@@ -817,20 +821,42 @@ rm -rf apps/storybook/vr/stories.spec.ts-snapshots
 cp -R /tmp/vr-baselines/stories.spec.ts-snapshots apps/storybook/vr/
 ```
 
+This alone will **not** show the two `components-menu--placements--*` files
+as deleted: the `vr-baselines` CI artifact is uploaded from CI's checked-out
+snapshot directory, which still contains those two committed orphans (the
+`Placements` story no longer exists, but its old baselines were never
+removed from disk), so `cp -R` restores them right back. Delete them by
+hand:
+
+```bash
+rm apps/storybook/vr/stories.spec.ts-snapshots/components-menu--placements--{light,ember}-linux.png
+```
+
+Orphan baselines fail nothing in CI — an unreferenced PNG is not compared
+against anything — so nothing else will catch this if it's skipped.
+
 4. Sanity-check the delta before committing:
 
 ```bash
 git status --porcelain apps/storybook/vr/stories.spec.ts-snapshots | sort
 ```
 
-Expected, and nothing else:
-- **Deleted:** `components-menu--placements--{light,ember}-linux.png`
+Expected, and nothing else: **2 deleted, 10 added, 0 modified.**
+- **Deleted:** `components-menu--placements--{light,ember}-linux.png` (2 files,
+  from the manual delete in Step 3)
 - **Added:** `components-menu--placement-{bottom-start,bottom-end,top-start,top-end}--{light,ember}-linux.png` (8 files)
 - **Added:** `components-menu--switching-between-menus--{light,ember}-linux.png` (2 files)
-- **Modified:** other `components-menu--*` files, if the width fix moved their pixels
 
-Any change to a **non-Menu** story is a red flag — stop and investigate rather
-than committing it.
+No existing Menu baseline should come back **modified**. Storybook's global
+decorator already renders every story inside a `display: block` wrapper, so
+`.trigger` was already shrink-to-fit in every existing Menu story before this
+branch's width fix — measured on `components-menu--default`, the wrapper is
+73.59px wide, same as the button. The fix changes nothing pixel-wise for
+stories that already existed. A **modified** Menu baseline here is therefore
+a tripwire to investigate, not expected churn.
+
+Any change to a **non-Menu** story, or a **modified** Menu baseline, is a red
+flag — stop and investigate rather than committing it.
 
 5. Confirm no macOS baselines slipped in:
 

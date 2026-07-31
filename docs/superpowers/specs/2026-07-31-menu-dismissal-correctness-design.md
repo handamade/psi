@@ -29,9 +29,10 @@ final: openId=null, both closed
 ```
 
 Root cause, at `packages/react/src/Menu/Menu.tsx:103-126`. When the platform
-light-dismisses A (on `pointerdown`, because B's trigger is outside A's
-popover), A's popover is **already closed** by the time A's `open` prop flips
-`true → false` in the consumer's re-render. The sync effect therefore takes
+light-dismisses A (before the consumer's click handler runs, because B's
+trigger is outside A's popover), A's popover is **already closed** by the
+time A's `open` prop flips `true → false` in the consumer's re-render. The
+sync effect therefore takes
 neither branch — `open && !isOpen` is false, and `!open && isOpen` is false
 because `isOpen` is already false — so `suppressNextCloseRef` is **never
 armed** (`Menu.tsx:109`). A's queued `toggle` then arrives, finds no
@@ -145,8 +146,9 @@ root `test:e2e` script runs it alone via a `@interaction` grep.
 **Extending the jsdom polyfill was rejected.** Teaching it mutual dismissal
 and async toggle would be cheaper, but a polyfill that models the platform
 approximately is what produced this false confidence in the first place. The
-ordering that matters here (`pointerdown` → `beforetoggle` → `click` →
-`toggle`) is precisely what a polyfill cannot be trusted to reproduce.
+ordering that matters here — light dismiss lands before the consumer's click
+handler runs, and the queued `toggle` that drives `onClose` arrives after
+it — is precisely what a polyfill cannot be trusted to reproduce.
 
 ## Non-goals
 
@@ -158,8 +160,9 @@ ordering that matters here (`pointerdown` → `beforetoggle` → `click` →
   but documenting it would enshrine a defect. Fix the component instead.
 - **No re-open guard.** An earlier hypothesis — that clicking an open menu's
   trigger light-dismisses and then immediately re-opens — was tested and
-  **refuted**: light dismiss lands on `pointerdown`, before `click`, and the
-  queued `toggle` arrives after it. No guard is needed and none is added.
+  **refuted**: light dismiss lands before the consumer's click handler runs,
+  and the queued `toggle` arrives after it. No guard is needed and none is
+  added.
 
 ## Verification
 
