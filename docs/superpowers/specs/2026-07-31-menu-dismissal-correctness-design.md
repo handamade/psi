@@ -222,3 +222,24 @@ ordering that matters here (`pointerdown` → `beforetoggle` → `click` →
   covered by Playwright VR; it is not. Corrected as part of this work. The
   broader audit — what else the polyfill implies is covered but is not — stays
   open.
+
+- **`FallbackPlacement` still stubs `CSS.supports` realm-wide while mounted.**
+  D58 scopes the story's injected CSS to its own subtree and restores the
+  global on unmount, which shrinks the blast radius from "the rest of the
+  session" to "other menus on the same page, while this story is mounted".
+  It does not reach zero. On the autodocs page, `SwitchingBetweenMenus` mounts
+  after `FallbackPlacement` with its menus closed; `useMenuPlacement`'s effect
+  keys on `open`, so a user who opens one during that window gets the worst
+  pairing — inline `top`/`left` from the JS branch while `position-area` still
+  resolves, the viewport-corner symptom the story's own comment describes.
+
+  The real fix is a seam so the story never touches a global: have
+  `useMenuPlacement` treat an ancestor marker (e.g.
+  `[data-psi-force-js-placement]`) as sub-floor, and delete the stub. That
+  changes production code to serve a test, so it wants its own decision rather
+  than riding along here.
+
+- **`pnpm build` does not typecheck story files.**
+  `packages/react/tsconfig.build.json` excludes `src/**/*.stories.tsx` and the
+  Storybook Vite build transpiles without typechecking, so nothing in CI
+  type-checks a `.stories.tsx`. Not introduced by D58, but surfaced by it.

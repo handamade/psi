@@ -520,6 +520,16 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ### Task 4: Stop `FallbackPlacement` contaminating the preview
 
+> **Corrected during execution (2026-08-01).** Step 1's code comment justifies
+> the render-phase stub by claiming React flushes child effects before parent
+> effects, so a `useLayoutEffect` stub would run too late. **That reasoning is
+> wrong** — `useMenuPlacement` uses a passive `useEffect`, and all layout
+> effects flush before any passive effect, so a decorator `useLayoutEffect`
+> would have won. The render-phase install still ships, for a better reason:
+> it is in place for every phase the story might read it from, and does not
+> couple the story to which effect kind a component internal happens to use.
+> The shipped comment says this; the block below is the historical record.
+
 **Files:**
 - Modify: `packages/react/src/Menu/Menu.stories.tsx` (the `FallbackPlacement`
   decorator, currently lines 78-96 before Task 3's edit shifts them)
