@@ -19,6 +19,14 @@ export interface Store {
 }
 
 const MAX_RESULTS = 20;
+// Slightly smaller than MAX_RESULTS + 10 (the original figure): as the
+// component catalog grows, an overview capped by item *count* alone drifts
+// toward more (verbose) components and fewer (terse) topics, which grows the
+// serialized overview even though the item count doesn't change. Registering
+// D53's three Menu components tipped it over the ~6000-char response budget
+// (docs/superpowers/plans/2026-07-18-agent-access-plan.md); this keeps a
+// margin so the next few components don't repeat the trip.
+const OVERVIEW_LIMIT = MAX_RESULTS + 5;
 
 const TOPIC_SUMMARIES: Record<string, string> = {
   variants: "Variant intent and typical use for all 8 flat variants",
@@ -99,7 +107,7 @@ export function createStore(index: PsiIndex): Store {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
       // Overview: all components, patterns, and topics (tokens are discoverable via query).
-      return briefs.filter((b) => b.kind !== "token").slice(0, MAX_RESULTS + 10);
+      return briefs.filter((b) => b.kind !== "token").slice(0, OVERVIEW_LIMIT);
     }
     return briefs
       .map((b) => ({ b, s: score(b, terms) }))

@@ -1,0 +1,10 @@
+{
+  "slots": [
+    {
+      "name": "items",
+      "accepts": { "components": ["MenuItem", "MenuSeparator"] },
+      "cardinality": "1..*",
+      "order": 1
+    }
+  ]
+}

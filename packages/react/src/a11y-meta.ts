@@ -83,4 +83,24 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "With aria-label it renders role=group so the control cluster announces with a name; unlabeled it is a plain layout div.",
   },
+  Menu: {
+    keyboard: [
+      { keys: "Arrow Down / Arrow Up", behavior: "Moves between enabled items, wrapping at both ends. Disabled items are skipped." },
+      { keys: "Home / End", behavior: "Jumps to the first or last enabled item." },
+      { keys: "A–Z / 0–9", behavior: "Typeahead — focuses the first enabled item whose label starts with the typed prefix; the prefix resets after 500ms." },
+      { keys: "Esc", behavior: "Suppresses the platform's own dismissal and reports onClose(\"esc\"); the menu stays open until the consumer flips `open` (D50)." },
+      { keys: "Enter / Space", behavior: "Activates the focused item (native button behavior)." },
+    ],
+    notes:
+      "Opens on the native top layer via popover=\"auto\", which supplies light dismiss. Controlled-only: every dismissal path (esc, item-select, outside) only reports onClose(reason) — the consumer must flip `open` to actually close it; outside is the one path the platform has already acted on by the time it is reported. Focus returns to the trigger when the menu actually closes, and only if focus is still inside the menu, so a light dismiss onto another control does not steal focus back. Requires an accessible name — pass aria-label. Placement uses CSS anchor positioning where supported and a JS fallback below that floor; below it there is no collision flip.",
+  },
+  MenuItem: {
+    keyboard: [{ keys: "Enter / Space", behavior: "Activates; Menu reports onClose(\"item-select\") but does not close itself." }],
+    notes:
+      "Renders a real <button>. disabled sets aria-disabled (not the disabled attribute) so the item stays discoverable to assistive tech while being skipped by roving navigation. variant=\"danger\" is for destructive actions only.",
+  },
+  MenuSeparator: {
+    keyboard: [],
+    notes: "Decorative rule with role=\"separator\"; never focusable and skipped by roving navigation.",
+  },
 };

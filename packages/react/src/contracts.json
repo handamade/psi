@@ -1,4 +1,4 @@
 {
-  "interactive": ["Button", "IconButton"],
+  "interactive": ["Button", "IconButton", "Menu"],
   "inline-content": ["Tag", "IconButton"]
 }
