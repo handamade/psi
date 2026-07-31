@@ -30,26 +30,33 @@ export const Default: Story = {
   ),
 };
 
-const placements: MenuPlacement[] = ["bottom-start", "bottom-end", "top-start", "top-end"];
-
-export const Placements: Story = {
-  render: () => (
-    <div style={{ display: "grid", gap: 120, gridTemplateColumns: "1fr 1fr", padding: 120 }}>
-      {placements.map((placement) => (
-        <Menu
-          key={placement}
-          open
-          onClose={() => {}}
-          placement={placement}
-          aria-label={placement}
-          trigger={<Button size={32}>{placement}</Button>}
-        >
+/** One story per placement, deliberately NOT combined into a grid.
+ *
+ * popover="auto" mutually dismisses: showing one auto popover closes every
+ * other open one that is not its ancestor, so four sibling menus cannot be
+ * open at once — React runs the four sync effects in tree order and only the
+ * last-mounted survives. The old combined `Placements` story rendered exactly
+ * one menu and looked broken. Verified directly in the browser:
+ *   a.showPopover()  // {a: true,  b: false}
+ *   b.showPopover()  // {a: false, b: true}   <- showing b closed a
+ * Do not merge these back together. (D58) */
+function placementStory(placement: MenuPlacement): Story {
+  return {
+    args: { open: true, onClose: () => {}, placement, "aria-label": `Menu ${placement}` },
+    render: (args) => (
+      <div style={{ padding: 120 }}>
+        <Menu {...args} trigger={<Button size={32}>{placement}</Button>}>
           {items}
         </Menu>
-      ))}
-    </div>
-  ),
-};
+      </div>
+    ),
+  };
+}
+
+export const PlacementBottomStart: Story = placementStory("bottom-start");
+export const PlacementBottomEnd: Story = placementStory("bottom-end");
+export const PlacementTopStart: Story = placementStory("top-start");
+export const PlacementTopEnd: Story = placementStory("top-end");
 
 export const WithDisabledItem: Story = {
   args: { open: true, onClose: () => {}, placement: "bottom-start", "aria-label": "Row actions" },
