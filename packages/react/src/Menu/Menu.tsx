@@ -1,7 +1,16 @@
-import { cloneElement, createContext, isValidElement, useCallback, useEffect, useRef } from "react";
+import {
+  cloneElement,
+  createContext,
+  isValidElement,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+} from "react";
 import type { ReactElement, ReactNode, Ref } from "react";
 import styles from "./menu.module.css";
 import { useMenuKeyboard } from "./useMenuKeyboard.js";
+import { useMenuPlacement } from "./useMenuPlacement.js";
 
 export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end";
 
@@ -80,6 +89,10 @@ export function Menu({
   // Set by the sync effect immediately before its own hidePopover(), and
   // consumed by handleToggle, so a consumer-driven close stays silent.
   const suppressNextCloseRef = useRef(false);
+
+  const anchorName = `--psi-menu-${useId().replace(/:/g, "")}`;
+
+  useMenuPlacement({ popoverRef, triggerRef, open, placement, anchorName });
 
   const setRef = (node: HTMLDivElement | null) => {
     popoverRef.current = node;

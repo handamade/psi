@@ -36,3 +36,12 @@ if (!HTMLElement.prototype.hidePopover) {
     this.dispatchEvent(new Event("toggle"));
   };
 }
+
+// Polyfill CSS.supports for jsdom (D53 — Menu placement). jsdom's CSS global
+// has no `supports`, so useMenuPlacement's floor check throws unless one
+// exists. Default to true (the CSS-anchor branch) so suites that don't
+// exercise placement directly aren't forced to know about the fallback;
+// useMenuPlacement.test.tsx overrides this per test to exercise both branches.
+if (typeof CSS !== "undefined" && typeof CSS.supports !== "function") {
+  CSS.supports = () => true;
+}

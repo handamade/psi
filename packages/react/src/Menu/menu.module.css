@@ -70,3 +70,32 @@
   margin: var(--psi-space-4) 0;
   border-top: 1px solid var(--psi-menu-separator-border);
 }
+
+/* ── Placement (D53) ──────────────────────────────────────────────
+   Above the anchor floor CSS does all the work. Below it, the hook in
+   useMenuPlacement.ts sets inset directly; these rules are inert there
+   because position-area needs an anchor to resolve against. */
+
+@supports (anchor-name: --x) {
+  .menu {
+    position: fixed;
+    margin: var(--psi-space-4);
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+
+  .menu[data-placement="bottom-start"] {
+    position-area: block-end span-inline-end;
+  }
+
+  .menu[data-placement="bottom-end"] {
+    position-area: block-end span-inline-start;
+  }
+
+  .menu[data-placement="top-start"] {
+    position-area: block-start span-inline-end;
+  }
+
+  .menu[data-placement="top-end"] {
+    position-area: block-start span-inline-start;
+  }
+}
