@@ -64,14 +64,27 @@ export const WithDisabledItem: Story = {
 };
 
 /** Forces the sub-anchor-floor branch so VR captures the fallback placement
- * rather than trusting whatever the CI browser happens to support. */
+ * rather than trusting whatever the CI browser happens to support.
+ *
+ * Both halves are needed. Stubbing `CSS.supports` only convinces *our JS* the
+ * feature is missing — the browser still evaluates `@supports (anchor-name:
+ * --x)` itself, and every browser Playwright runs supports it. Without the
+ * style override the two positioning systems both apply and fight, which is
+ * not a state any real browser can be in. Neutralising `position-area` and
+ * `position-try-fallbacks` leaves the JS branch's inline inset as the only
+ * thing placing the popover — which is exactly what a sub-floor browser does. */
 export const FallbackPlacement: Story = {
   decorators: [
     (StoryFn) => {
       const original = CSS.supports.bind(CSS);
       CSS.supports = ((prop: string, value?: string) =>
         prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
-      return <StoryFn />;
+      return (
+        <>
+          <style>{`[data-psi-menu] { position-area: normal; position-try-fallbacks: none; }`}</style>
+          <StoryFn />
+        </>
+      );
     },
   ],
   args: { open: true, onClose: () => {}, placement: "bottom-start", "aria-label": "Row actions" },
