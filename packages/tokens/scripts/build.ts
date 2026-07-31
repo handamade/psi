@@ -31,6 +31,7 @@ import { switchVars } from "../src/components/switch.js";
 import { tagVars } from "../src/components/tag.js";
 import { tooltipVars } from "../src/components/tooltip.js";
 import { cardVars } from "../src/components/card.js";
+import { controlVars } from "../src/components/control.js";
 import { dialogVars } from "../src/components/dialog.js";
 import { navbarVars } from "../src/components/navbar.js";
 import { panelVars } from "../src/components/panel.js";
@@ -73,6 +74,7 @@ const componentVars: Record<string, Record<string, string>> = {
   button: buttonVars,
   card: cardVars,
   checkbox: checkboxVars,
+  control: controlVars,
   dialog: dialogVars,
   field: fieldVars,
   input: inputVars,

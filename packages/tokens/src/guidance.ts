@@ -57,4 +57,29 @@ export const guidance = {
     tagApi:
       'On Tag, subtle is a boolean prop, not part of the variant union: accent-subtle is spelled variant="accent" subtle (Tag variants: neutral | accent | success | warning | danger).',
   },
+  geometry: {
+    sizes: [24, 32, 40, 48],
+    label: {
+      paddingInline: [8, 12, 16, 20],
+      paddingInlineIcon: [6, 8, 12, 16],
+      gap: [4, 8, 8, 8],
+      font: ["12-16-medium", "14-20-medium", "16-24-medium", "18-28-medium"],
+    },
+    value: {
+      paddingInline: [8, 8, 12, 16],
+      font: ["12-16-regular", "14-20-regular", "16-24-regular", "18-28-regular"],
+    },
+    components: {
+      Button: "label",
+      IconButton: "height-only",
+      Input: "value",
+      Select: "value",
+    },
+    note:
+      "Per-size geometry is data, not CSS literals (D54). Arrays are indexed by sizes[]. Read a value as --psi-control-{size}-{prop} for the label ramp and --psi-control-value-{size}-{prop} for the value ramp; components alias these as --psi-{component}-{size}-{prop}, which is the layer to override. The value ramp is one step tighter than the label ramp because a left-aligned value wants less air than a centred label (D55).",
+    iconInset:
+      "A leading icon sits one step closer to the edge than text — an icon is a solid shape with no side bearing (D55). Applied by .size{n}:has(> svg:first-child) on Button. IconButton is height-only: it is square with padding 0, so no padding/gap/font token applies to it.",
+    iconInsetLimits:
+      "The selector matches on element order, and :first-child ignores text nodes. Two consequences. (1) An icon wrapped in a <span> never matches — fails safe, no inset; set --psi-button-{size}-padding-inline-icon yourself. (2) A TRAILING icon (<Button>Next<IconChevronRight /></Button>) makes the svg the first ELEMENT child, so the rule fires and narrows the start (text) side while the icon keeps full padding — the inverse of the intent. CSS cannot tell the two apart without a DOM signal. Put the icon first, or override --psi-button-{size}-padding-inline-icon to match --psi-button-{size}-padding-inline to disable the inset.",
+  },
 } as const;
