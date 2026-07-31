@@ -12,9 +12,10 @@ interface Options {
 }
 
 /** Roving-tabindex keyboard navigation for Menu (D53): Up/Down with wrap,
- * Home/End, character typeahead, Esc with focus return. Disabled items are
- * skipped everywhere. Psi's only keyboard-navigation JS — a deliberate
- * departure from D52, which refused role="toolbar" precisely to avoid it. */
+ * Home/End, character typeahead, Esc, and focus return on close. Disabled
+ * items are skipped everywhere. Psi's only keyboard-navigation JS — a
+ * deliberate departure from D52, which refused role="toolbar" precisely to
+ * avoid it. */
 export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options) {
   const queryRef = useRef("");
   const queryAtRef = useRef(0);
@@ -36,24 +37,37 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options
     [enabledItems],
   );
 
-  /** Moves focus back to the trigger's focusable node. Shared by Esc (which
-   * reports the dismissal but, per D50, does not close the popover — so the
-   * effect cleanup below never runs) and by the close-driven unmount/rerun
-   * path, so both routes return focus the same way. */
+  /** Moves focus back to the trigger's focusable node. */
   const focusTrigger = useCallback(() => {
     const triggerEl = triggerRef.current?.querySelector<HTMLElement>("button, a, [tabindex]");
     triggerEl?.focus();
   }, [triggerRef]);
 
-  // Focus the first enabled item on open; restore focus to the trigger on close.
+  // Focus the first enabled item on open; restore focus to the trigger on
+  // close — but only if focus is still inside the menu.
+  //
+  // Every close route funnels through this one cleanup, because a close is
+  // always the consumer flipping `open` (D50). The three routes differ only
+  // in where focus sits by the time the flip lands:
+  //
+  //   esc / item-select — focus is still on a menu item, so restoring it to
+  //     the trigger is the whole point: the menu is about to disappear from
+  //     under it.
+  //   outside (light dismiss) — the platform already hid the popover and the
+  //     user's click already moved focus somewhere deliberate (a text field,
+  //     say). Yanking it back to the trigger would steal keystrokes from
+  //     whatever they just clicked, so the guard declines.
+  //
+  // The guard reads the DOM rather than a reason flag so it stays correct for
+  // any route, including ones no reason is reported for.
   useEffect(() => {
     if (!open) return;
     const items = enabledItems();
     focusItem(items[0]);
     return () => {
-      focusTrigger();
+      if (popoverRef.current?.contains(document.activeElement)) focusTrigger();
     };
-  }, [open, enabledItems, focusItem, focusTrigger]);
+  }, [open, popoverRef, enabledItems, focusItem, focusTrigger]);
 
   return useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
@@ -65,11 +79,15 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options
       if (event.key === "Escape") {
         event.preventDefault();
         onEsc();
-        // Esc reports the dismissal but leaves the popover open (D50), so
-        // the effect above never re-runs its cleanup for this case. Focus
-        // must return to the trigger here, explicitly, or it would be
-        // stranded on the (still-mounted, now-inert-to-the-user) menu item.
-        focusTrigger();
+        // Focus deliberately stays where it is. Esc only *reports* the
+        // dismissal (D50); the menu is still open and fully interactive until
+        // the consumer flips `open`, at which point the effect cleanup above
+        // returns focus to the trigger. Moving focus here instead would break
+        // the case where the consumer declines to close: focus would sit
+        // outside a still-open menu, arrow keys would no longer reach this
+        // handler, and a second Escape would be taken by the platform's close
+        // watcher — resurfacing as onClose("outside"), the exact
+        // reason-misreporting this hook exists to prevent.
         return;
       }
 
@@ -84,7 +102,11 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options
           return;
         case "ArrowUp":
           event.preventDefault();
-          focusItem(items[(current - 1 + items.length) % items.length]);
+          // `current <= 0`, not a plain modulo: with no item focused
+          // (`current === -1`) the modulo lands on the second-to-last item.
+          // Both "wrapping off the first" and "starting from nothing" mean
+          // the last item.
+          focusItem(items[current <= 0 ? items.length - 1 : current - 1]);
           return;
         case "Home":
           event.preventDefault();
@@ -114,6 +136,6 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options
         focusItem(match);
       }
     },
-    [enabledItems, focusItem, focusTrigger, onEsc],
+    [enabledItems, focusItem, onEsc],
   );
 }
