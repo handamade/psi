@@ -64,14 +64,29 @@ export const WithDisabledItem: Story = {
 };
 
 /** Forces the sub-anchor-floor branch so VR captures the fallback placement
- * rather than trusting whatever the CI browser happens to support. */
+ * rather than trusting whatever the CI browser happens to support.
+ *
+ * Both halves are required, and each was verified in a browser. Stubbing
+ * `CSS.supports` only convinces *our JS* the feature is missing; the browser
+ * still evaluates `@supports (anchor-name: --x)` itself and keeps applying
+ * `position-area`, which overrides the JS branch's inline `top`/`left`. Left
+ * alone, the popover lands at the viewport corner instead of under its
+ * trigger. Two details bite here: `!important` is needed because the CSS
+ * module's `.menu[data-placement="..."]` is specificity (0,2,0), and the
+ * reset value must be `none` — `position-area`'s initial value is `none`, so
+ * `normal` is invalid and gets dropped silently, !important or not. */
 export const FallbackPlacement: Story = {
   decorators: [
     (StoryFn) => {
       const original = CSS.supports.bind(CSS);
       CSS.supports = ((prop: string, value?: string) =>
         prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
-      return <StoryFn />;
+      return (
+        <>
+          <style>{`[data-psi-menu] { position-area: none !important; position-try-fallbacks: none !important; }`}</style>
+          <StoryFn />
+        </>
+      );
     },
   ],
   args: { open: true, onClose: () => {}, placement: "bottom-start", "aria-label": "Row actions" },
