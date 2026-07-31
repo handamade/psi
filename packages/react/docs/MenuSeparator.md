@@ -15,7 +15,7 @@ Hairline rule between Menu item groups. No props by design (D53).
 |---|---|
 
 
-Decorative rule with role="separator"; never focusable and skipped by roving navigation.
+Non-interactive rule with role="separator" — exposed to assistive tech as a separator, never focusable, and skipped by roving navigation.
 
 ## Theming
 

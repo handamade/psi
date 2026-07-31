@@ -29,7 +29,7 @@ export type { TooltipProps } from "./Tooltip/Tooltip.js";
 export { Toolbar } from "./Toolbar/Toolbar.js";
 export type { ToolbarProps } from "./Toolbar/Toolbar.js";
 export { Menu, MenuContext } from "./Menu/Menu.js";
-export type { MenuProps, Placement } from "./Menu/Menu.js";
+export type { MenuProps, MenuPlacement, MenuContextValue } from "./Menu/Menu.js";
 export { MenuItem } from "./Menu/MenuItem.js";
 export type { MenuItemProps } from "./Menu/MenuItem.js";
 export { MenuSeparator } from "./Menu/MenuSeparator.js";

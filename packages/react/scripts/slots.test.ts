@@ -56,7 +56,12 @@ describe("loadSlotContracts", () => {
     const out = loadSlotContracts(src, names);
     expect(out.Dialog.map((s) => s.name)).toEqual(["title", "body", "footer"]);
     expect(out.Button).toEqual([]);
-    expect(out.Menu.map((s) => s.name)).toEqual(["items"]);
+    // `body` is the children slot by convention — scripts/patterns.ts skips
+    // `body` in the prop loop and takes an element's JSX children from it, so
+    // a children slot under any other name would render as a `name={…}` prop.
+    // Every other non-`body` slot (Menu's `trigger`, Dialog's title/footer)
+    // really is a ReactNode prop.
+    expect(out.Menu.map((s) => s.name)).toEqual(["trigger", "body"]);
     expect(out.MenuItem).toEqual([]);
     expect(out.MenuSeparator).toEqual([]);
   });

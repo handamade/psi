@@ -6,9 +6,10 @@ import { createStore, type Store } from "../src/store.js";
 
 const pkgs = fileURLToPath(new URL("../..", import.meta.url));
 let store: Store;
+let index: Awaited<ReturnType<typeof buildIndex>>;
 
 beforeAll(async () => {
-  const index = await buildIndex({
+  index = await buildIndex({
     tokensDist: `${pkgs}tokens/dist`,
     reactDist: `${pkgs}react/dist`,
     reactDocs: `${pkgs}react/docs`,
@@ -49,6 +50,23 @@ describe("search", () => {
     expect(briefs.some((b) => b.kind === "component")).toBe(true);
     expect(briefs.some((b) => b.kind === "topic")).toBe(true);
     expect(briefs.some((b) => b.kind === "pattern")).toBe(true);
+  });
+
+  it("keeps the whole guidance surface in the overview, whatever the catalog size", () => {
+    const briefs = store.search("");
+    // The overview is a consumer agent's first call, and it is budget-capped.
+    // Guidance must never be the thing that falls off the end: topics carry
+    // rules that no keyword query re-derives, and `getting-started` carries
+    // the five required CSS imports. Components are the affordable tail —
+    // search("menu") finds Menu.
+    expect(briefs.some((b) => b.id === "topic:getting-started")).toBe(true);
+    // Not just getting-started: every topic and every pattern the index holds
+    // must survive the budget fill.
+    const ids = new Set(briefs.map((b) => b.id));
+    for (const name of Object.keys(index.topics)) expect(ids.has(`topic:${name}`)).toBe(true);
+    for (const p of index.patterns) expect(ids.has(`pattern:${p.id}`)).toBe(true);
+    // And the overview is still worth calling: it carries components too.
+    expect(briefs.filter((b) => b.kind === "component").length).toBeGreaterThan(5);
   });
 
   it("ranks the destructive-confirm pattern first for 'delete confirmation' (D47)", () => {

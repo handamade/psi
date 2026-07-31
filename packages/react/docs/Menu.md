@@ -21,11 +21,11 @@ Action menu on the native Popover API top layer: the top layer and light dismiss
 |---|---|
 | Arrow Down / Arrow Up | Moves between enabled items, wrapping at both ends. Disabled items are skipped. |
 | Home / End | Jumps to the first or last enabled item. |
-| A–Z / 0–9 | Typeahead — focuses the first enabled item whose label starts with the typed prefix; the prefix resets after 500ms. |
+| Any single printable key | Typeahead — focuses the first enabled item whose label starts with the typed prefix; the prefix resets after 500ms. Keystrokes with Meta/Ctrl/Alt held are ignored. |
 | Esc | Suppresses the platform's own dismissal and reports onClose("esc"); the menu stays open until the consumer flips `open` (D50). |
 | Enter / Space | Activates the focused item (native button behavior). |
 
-Opens on the native top layer via popover="auto", which supplies light dismiss. Controlled-only: every dismissal path (esc, item-select, outside) only reports onClose(reason) — the consumer must flip `open` to actually close it; outside is the one path the platform has already acted on by the time it is reported. Focus returns to the trigger when the menu actually closes, and only if focus is still inside the menu, so a light dismiss onto another control does not steal focus back. Requires an accessible name — pass aria-label. Placement uses CSS anchor positioning where supported and a JS fallback below that floor; below it there is no collision flip.
+Opens on the native top layer via popover="auto", which supplies light dismiss. Controlled-only: every dismissal path (esc, item-select, outside) only reports onClose(reason) — the consumer must flip `open` to actually close it; outside is the one path the platform has already acted on by the time it is reported. Opening moves focus to the first enabled item — Menu takes focus off the trigger as soon as `open` becomes true. Focus returns to the trigger when the menu actually closes, and only if focus is still inside the menu, so a light dismiss onto another control does not steal focus back. Requires an accessible name — pass aria-label. Placement uses CSS anchor positioning where supported and a JS fallback below that floor; below it there is no collision flip.
 
 ## Theming
 

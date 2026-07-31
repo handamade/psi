@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { RefObject } from "react";
-import type { Placement } from "./Menu.js";
+import type { MenuPlacement } from "./Menu.js";
 
 /** True when the browser can place the popover declaratively. Above this
  * floor the hook is inert and CSS does all the work. */
@@ -12,7 +12,7 @@ interface Options {
   popoverRef: RefObject<HTMLDivElement | null>;
   triggerRef: RefObject<HTMLDivElement | null>;
   open: boolean;
-  placement: Placement;
+  placement: MenuPlacement;
   anchorName: string;
 }
 

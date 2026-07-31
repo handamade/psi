@@ -12,7 +12,7 @@ import styles from "./menu.module.css";
 import { useMenuKeyboard } from "./useMenuKeyboard.js";
 import { useMenuPlacement } from "./useMenuPlacement.js";
 
-export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end";
+export type MenuPlacement = "bottom-start" | "bottom-end" | "top-start" | "top-end";
 
 export interface MenuContextValue {
   close: (reason: "item-select") => void;
@@ -41,7 +41,7 @@ export interface MenuProps {
    */
   trigger: ReactElement<Record<string, unknown>>;
   /** Placement relative to the trigger. @default "bottom-start" */
-  placement?: Placement;
+  placement?: MenuPlacement;
   /** Accessible name for the menu when there is no visible label. */
   "aria-label"?: string;
   children: ReactNode;

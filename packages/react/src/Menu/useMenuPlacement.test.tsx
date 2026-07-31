@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
 import { Menu } from "./Menu.js";
-import type { Placement } from "./Menu.js";
+import type { MenuPlacement } from "./Menu.js";
 import { MenuItem } from "./MenuItem.js";
 import { Button } from "../Button/Button.js";
 
 const trigger = <Button size={32}>Actions</Button>;
 
-function renderMenu(placement: Placement = "bottom-start") {
+function renderMenu(placement: MenuPlacement = "bottom-start") {
   return render(
     <Menu open onClose={() => {}} trigger={trigger} placement={placement} aria-label="Actions">
       <MenuItem onSelect={() => {}}>Rename</MenuItem>
@@ -18,7 +18,7 @@ function renderMenu(placement: Placement = "bottom-start") {
 /** Renders with an rtl/ltr ancestor (not the trigger itself), matching how
  * `direction` is actually set in a real document — the hook reads it off the
  * trigger via getComputedStyle, which must pick it up through inheritance. */
-function renderMenuInDir(dir: "ltr" | "rtl", placement: Placement = "bottom-start") {
+function renderMenuInDir(dir: "ltr" | "rtl", placement: MenuPlacement = "bottom-start") {
   return render(
     <div dir={dir}>
       <Menu open onClose={() => {}} trigger={trigger} placement={placement} aria-label="Actions">
@@ -87,7 +87,7 @@ describe("useMenuPlacement", () => {
       CSS.supports = vi.fn().mockReturnValue(false);
     });
 
-    const cases: Array<{ placement: Placement; dir: "ltr" | "rtl"; pinned: "left" | "right" }> = [
+    const cases: Array<{ placement: MenuPlacement; dir: "ltr" | "rtl"; pinned: "left" | "right" }> = [
       { placement: "bottom-start", dir: "ltr", pinned: "left" },
       { placement: "bottom-start", dir: "rtl", pinned: "right" },
       { placement: "bottom-end", dir: "ltr", pinned: "right" },
