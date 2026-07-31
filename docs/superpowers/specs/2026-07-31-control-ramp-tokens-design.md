@@ -59,12 +59,19 @@ primitive to converge on.
                                     "var(--psi-control-value-40-padding-inline)",
   ```
 
-  56 component-alias tokens (Button 20, Select 20, Input 12, IconButton 4),
-  84 new tokens in total. The alias tier is what
-  makes the divergence structurally impossible while keeping per-component
-  *and* per-size brand overrides reachable; binding `--psi-control-*`
-  directly in the CSS Modules would halve the count but surrender D34
-  overrides, which ember uses today. Rejected for that reason.
+  52 component-alias tokens (Button 20, Select 20, Input 12; IconButton adds
+  none — see below), 80 new tokens in total. The alias tier is what makes the
+  divergence structurally impossible while keeping per-component *and*
+  per-size brand overrides reachable; binding `--psi-control-*` directly in
+  the CSS Modules would halve the count but surrender D34 overrides, which
+  ember uses today. Rejected for that reason.
+
+  The alias tier is not merely preferred, it is **enforced**: the
+  `psi/component-tokens-only` stylelint rule permits a module to bind only
+  `--psi-{own-component}-*` or a scale token (`space|size|radius|text|font|
+  duration|ease|z`). `--psi-control-*` is neither, so a CSS Module physically
+  cannot bind the family directly — `pnpm lint` fails. The design and the
+  existing gate agree without either being changed.
 
   **Naming.** Role precedes size (`control-value-40-padding-inline`), matching
   how variant precedes property elsewhere (`button-accent-bg-hover`). `value`
@@ -161,8 +168,13 @@ primitive to converge on.
 
 - **Button** — `height`, `padding-inline`, `padding-inline-icon`, `gap`,
   `font` from `control-*`. Text-only rendering is unchanged at every size.
-- **IconButton** — `height` only. Square, zero padding, single child, so
-  padding/font/gap do not apply.
+- **IconButton** — binds `--psi-button-{n}-height` for both `width` and
+  `height`, and declares no tokens of its own. That is not a shortcut: the
+  stylelint plugin maps `icon-button → button` in its `ALIASES` table, so
+  `icon-button.module.css` may only bind `--psi-button-*`. IconButton already
+  shares Button's namespace for every colour token today; the ramp follows
+  the same rule. Square, zero padding, single child, so padding/font/gap do
+  not apply.
 - **Input** — `height`, `padding-inline`, `font` from `control-value-*`.
   Padding changes at 32/40/48 (8 → 8/12/16); font at 48 becomes `regular`.
 - **Select** — same as Input, plus two Select-local tokens. The chevron is a
