@@ -44,9 +44,9 @@ function isPopoverOpen(el: HTMLElement): boolean {
   return el.hasAttribute("data-open") || el.matches(":popover-open");
 }
 
-/** Action menu on the native Popover API top layer: top layer, light dismiss
- * and Esc come from the platform; roving keyboard, placement and dismissal
- * reasons are Psi's (D53). Controlled-only, like Dialog (D50).
+/** Action menu on the native Popover API top layer: the top layer and light
+ * dismiss come from the platform; Esc, roving keyboard, placement and
+ * dismissal reasons are Psi's (D53). Controlled-only, like Dialog (D50).
  *
  * Controlled-only means Menu does not change its own visibility. Esc and
  * item-select *report* a dismissal via onClose(reason) and leave the popover
@@ -130,9 +130,10 @@ export function Menu({
   );
 
   // `trigger` is typed as a single element, but JS consumers (and `as any`)
-  // can still pass a string, fragment or array — cloneElement would throw on
-  // those. Fall back to rendering it untouched, minus the trigger ARIA, and
-  // say so rather than failing silently or crashing the tree.
+  // can still pass a string or an array — cloneElement would throw on those.
+  // Fall back to rendering it untouched, minus the trigger ARIA, and say so
+  // rather than failing silently or crashing the tree. (A Fragment passes
+  // isValidElement and is not caught here; React's own dev warning covers it.)
   const triggerIsElement = isValidElement(trigger);
 
   useEffect(() => {
