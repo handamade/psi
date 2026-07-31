@@ -28,6 +28,7 @@ export const typographyCombos: TypographyCombo[] = [
   { fontSize: 16, lineHeight: 20, weight: "regular" },
   { fontSize: 16, lineHeight: 24, weight: "regular" },
   { fontSize: 16, lineHeight: 24, weight: "medium" },
+  { fontSize: 18, lineHeight: 28, weight: "regular" },
   { fontSize: 18, lineHeight: 28, weight: "medium" },
   { fontSize: 20, lineHeight: 28, weight: "semibold" },
   { fontSize: 24, lineHeight: 32, weight: "medium" },

@@ -3,7 +3,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { breakpoints, container, zIndex } from "../src/scales/layout.js";
-import { comboName, WEIGHT_VALUES } from "../src/scales/typography.js";
+import { comboName, WEIGHT_VALUES, typographyCombos } from "../src/scales/typography.js";
 import { durationScale, easings } from "../src/scales/motion.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
 
@@ -124,6 +124,17 @@ describe("scales", () => {
       const css = emitUtilitiesCSS();
       expect(css).toContain(".psi-display-56-128-black { font: var(--psi-display-56-128-black); letter-spacing: -0.02em; text-transform: uppercase; }");
       expect(css).toContain(".psi-display-32-32-extrabold { font: var(--psi-display-32-32-extrabold); letter-spacing: -0.01em; text-transform: uppercase; }");
+    });
+
+    it("ships sans 18-28-regular so the value ramp runs regular end to end (D55)", () => {
+      const names = typographyCombos.map(comboName);
+      expect(names).toContain("18-28-regular");
+      expect(names).toContain("18-28-medium");
+    });
+
+    it("has no duplicate combo names", () => {
+      const names = typographyCombos.map(comboName);
+      expect(new Set(names).size).toBe(names.length);
     });
   });
 });
