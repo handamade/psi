@@ -109,11 +109,18 @@ alongside the existing `promo` entry (leave that one alone):
 ```json
 {
   "name": "promo-dev",
-  "runtimeExecutable": "pnpm",
-  "runtimeArgs": ["--dir", "apps/promo", "dev", "--port", "5173", "--strictPort"],
+  "runtimeExecutable": "apps/promo/node_modules/.bin/vite",
+  "runtimeArgs": ["apps/promo", "--port", "5173", "--strictPort"],
   "port": 5173
 }
 ```
+
+**It must not invoke `pnpm`.** `preview_start` spawns its server on **Node 20**,
+and pnpm 11.9 dies there with `ERR_UNKNOWN_BUILTIN_MODULE` (it needs
+`node:sqlite`) — a pnpm-based entry fails every time, which is what the first
+attempt did. Vite itself is fine on Node 20 (verified: `vite/6.4.3
+node-v20.20.2`), so calling its binary directly sidesteps pnpm entirely and
+needs no Node pinning.
 
 - [ ] **Step 2: Verify it starts**
 
