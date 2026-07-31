@@ -56,4 +56,11 @@ export const controlVars: Record<string, string> = {
   "value-32-font": "var(--psi-text-14-20-regular)",
   "value-40-font": "var(--psi-text-16-24-regular)",
   "value-48-font": "var(--psi-text-18-28-regular)",
+
+  // ── Size-invariant ─────────────────────────────────────────────
+  // Radius does not ride the size ramp: border-radius sits on each
+  // component's base rule, not in its .size{n} blocks, and all four sizes
+  // resolve to radius-8 today. One dial keeps it that way and gives a theme
+  // a single control-shape override (D56).
+  radius: "var(--psi-radius-8)",
 };

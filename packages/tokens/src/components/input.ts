@@ -8,6 +8,9 @@ export const inputVars: Record<string, string> = {
   "border-error": "var(--psi-fg-danger)",
   "focus-ring": "var(--psi-border-focus)",
 
+  // ── Shape (D56) ──
+  radius: "var(--psi-control-radius)",
+
   // ── Size ramp (D54) — value ramp, shared with Select ──
   "24-height": "var(--psi-control-24-height)",
   "32-height": "var(--psi-control-32-height)",

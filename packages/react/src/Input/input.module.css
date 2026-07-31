@@ -4,7 +4,7 @@
   display: block;
   width: 100%;
   border: 1px solid var(--psi-input-border);
-  border-radius: var(--psi-radius-8);
+  border-radius: var(--psi-input-radius);
   background: var(--psi-input-bg);
   color: var(--psi-input-fg);
   font-family: var(--psi-font-sans);

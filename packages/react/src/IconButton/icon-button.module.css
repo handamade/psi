@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--psi-radius-8);
+  border-radius: var(--psi-button-radius);
   cursor: pointer;
   padding: 0;
   text-decoration: none;

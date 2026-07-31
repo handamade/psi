@@ -11,7 +11,7 @@
   position: absolute;
   z-index: var(--psi-z-tooltip);
   padding: var(--psi-space-4) var(--psi-space-8);
-  border-radius: var(--psi-radius-6);
+  border-radius: var(--psi-tooltip-radius);
   background: var(--psi-tooltip-bg);
   color: var(--psi-tooltip-fg);
   font: var(--psi-text-12-16-regular);

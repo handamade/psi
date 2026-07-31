@@ -62,6 +62,9 @@ export const buttonVars: Record<string, string> = {
 
   "focus-ring": "var(--psi-border-focus)",
 
+  // ── Shape (D56) — size-invariant; IconButton binds this too ──
+  radius: "var(--psi-control-radius)",
+
   // ── Size ramp (D54) — label ramp; IconButton binds -height for both axes ──
   "24-height": "var(--psi-control-24-height)",
   "32-height": "var(--psi-control-32-height)",
