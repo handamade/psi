@@ -22,6 +22,15 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 ## Workflow
 
 - **Node 24 (`.nvmrc`) — check `node -v` before the first pnpm command.** pnpm 11.9 requires ≥22.13 and dies on Node 20 with `ERR_UNKNOWN_BUILTIN_MODULE` (it needs `node:sqlite`). `~/.zshenv` puts 24 on PATH for fresh shells, but a shell that predates that setup still has 20 first. Fix the shell with `nvm use` (reads `.nvmrc`) — do not prefix individual commands with a PATH override, which fixes one command and leaves the next to fail.
-- Specs and plans live in `docs/superpowers/` (decision log D1–D42 in the specs). Significant changes get a decision number.
+- Specs and plans live in `docs/superpowers/` (decision log D1–D56 in the specs). Significant changes get a decision number — check the highest one in use before claiming the next, since parallel sessions have collided on numbering.
 - Verify with `pnpm build` (the token build is the WCAG AA contrast gate — it throws on failures), `pnpm test`, `pnpm lint`. CI runs all three on every PR.
-- Versioning via changesets; release with `pnpm release` (requires npm auth).
+- **`pnpm vr` only passes in CI.** Baselines are ubuntu-latest renders; a macOS run fails all 180 stories on the `-darwin` snapshot suffix and its default update mode silently writes junk baselines. Let CI's `vr` job be the gate and hold the merge with auto-merge. Details in `apps/storybook/vr/README.md`.
+
+## Branches and releases
+
+- **Branch names, three cases.** Linear issue exists → use Linear's generated name (`dkurkin/han-44-…`), which auto-links the PR to the issue. Decision work with no issue → `d56-control-radius`. Anything else → `fix/`, `docs/`, `chore/`.
+- **One branch, one PR, then delete it.** Squash-merge is the repo default, so a merged branch's commits never appear on `main` by hash — `git branch --merged` will not list them. Use `git cherry -v main <branch>` to tell a squash-merged branch from one carrying real work.
+- **Arm auto-merge at PR creation, then verify it armed.** `gh pr merge <n> --auto --squash` exits 0 and prints nothing while leaving auto-merge OFF. Always read it back with `gh pr view <n> --json autoMergeRequest`; if it says null, use the `enablePullRequestAutoMerge` GraphQL mutation, which does work. This matters because the `protect-main` ruleset sets `strict_required_status_checks_policy`, so a second open PR goes stale and needs a full ~5.5-min `ci` re-run.
+- **Every user-visible change carries a changeset.** `packages/*` are versioned in lockstep at one number.
+- **Cut a release whenever `.changeset/` is non-empty and `main` is green** — don't let them pool. Four accumulated once and left D53 merged-but-unpublished across three decisions.
+- Release: branch `release/psi-x.y.z` → `pnpm changeset version` → PR → merge → `pnpm release` locally (needs npm auth; `tools/release-guard.mjs` refuses anything but a clean, up-to-date `main`) → **`git push --tags`**, which `changeset tag` does not do for you.
