@@ -2,7 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Bring `apps/promo` level with the 0.8.0 packages — manifest-backed
+**Goal:** Bring `apps/promo` level with the shipped packages (**0.8.1** — 0.8.1
+released mid-flight, after this plan was written) — manifest-backed
 counts, a live `--psi-control-radius` dial on the theme cards, a Menu card in
 the playground, two curated update entries, and the theme console named on the
 public roadmap.
@@ -76,7 +77,7 @@ wrong for iterating.
 
 | File | Change | Responsibility |
 | ---- | ------ | -------------- |
-| `.claude/launch.json` | Modify | Add a `promo-dev` dev-server entry (local tooling, not shipped) |
+| `.claude/launch.json` | Modify, **not committed** | `promo-dev` dev-server entry. `.claude/` is gitignored — machine-local by design |
 | `apps/promo/src/sections/Hero.tsx` | Modify (line 5) | Stat strip count |
 | `apps/promo/src/sections/Playground.tsx` | Modify | Counts, version chip, Menu card, index list |
 | `apps/promo/src/sections/Theming.tsx` | Modify | Radius dial + `radius` prop on `ThemePreview` |
@@ -124,14 +125,12 @@ reads "Color isn't picked. It's computed."
 If it fails with a missing `@handamade/psi-tokens` export, the tokens dist is
 stale — run `nvm use && pnpm --dir packages/tokens build` once, then retry.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Do NOT commit it**
 
-```bash
-git add .claude/launch.json
-git commit -m "chore: add promo-dev launch entry for iterating on the promo app
-
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
-```
+`.claude/` is gitignored (`.gitignore`: "local Claude Code session config
+(machine-specific launch.json etc.)"). `git add .claude/launch.json` would
+fail, and the entry is deliberately machine-local — it must not be committed.
+Leave it untracked and move on; `git status` should stay clean.
 
 ---
 
@@ -183,7 +182,7 @@ correct.
 In `apps/promo/src/sections/Playground.tsx`, line 41:
 
 ```tsx
-const INITIAL_FILTERS = ["psi-tokens", "0.8.0", "wcag-aa"] as const;
+const INITIAL_FILTERS = ["psi-tokens", "0.8.1", "wcag-aa"] as const;
 ```
 
 and line 56:
@@ -217,7 +216,7 @@ Reload `http://localhost:5173`.
 
 Expected: hero strip reads "18 components · 22 icons · 4 themes · 0 runtime
 deps · AA enforced at build"; the Components heading reads "Eighteen
-production components."; the Toolbar card's third filter chip reads `0.8.0`.
+production components."; the Toolbar card's third filter chip reads `0.8.1`.
 
 - [ ] **Step 7: Commit**
 
