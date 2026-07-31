@@ -35,8 +35,9 @@ export interface MenuProps {
    * Invariant (D58): a dismissal is only ever reported for a menu that is
    * currently open according to its own `open` prop. The platform can close
    * an auto popover before the consumer's state catches up — clicking another
-   * menu's trigger light-dismisses this one on pointerdown — and a report for
-   * an already-closed menu would clear a selection that has since moved on.
+   * menu's trigger light-dismisses this one before the consumer's click
+   * handler runs — and a report for an already-closed menu would clear a
+   * selection that has since moved on.
    */
   onClose: (reason: "esc" | "outside" | "item-select") => void;
   /**
@@ -95,14 +96,6 @@ export function Menu({
   // Set by the sync effect immediately before its own hidePopover(), and
   // consumed by handleToggle, so a consumer-driven close stays silent.
   const suppressNextCloseRef = useRef(false);
-  // Mirrors `open` for handleToggle, which is memoised on [onClose] and would
-  // otherwise read a stale capture. Updated in an effect, not during render:
-  // React forbids writing refs while rendering, and effects flush long before
-  // the platform's queued `toggle` (measured ~50ms in Chrome 148).
-  const openRef = useRef(open);
-  useEffect(() => {
-    openRef.current = open;
-  }, [open]);
 
   const anchorName = `--psi-menu-${useId().replace(/:/g, "")}`;
 
@@ -136,16 +129,18 @@ export function Menu({
       return;
     }
     if (isPopoverOpen(el)) return; // opening toggle — nothing to report
-    // D58: the platform can close this popover before `open` flips — light
-    // dismiss fires on pointerdown when another menu's trigger is clicked. In
-    // that case the sync effect takes neither branch (the popover is already
-    // closed), so suppressNextCloseRef is never armed. Report a dismissal only
-    // for a menu that is still open according to its own prop; otherwise this
-    // is a stale toggle for a close the consumer already knows about, and
-    // reporting it would clear a selection that has since moved on.
-    if (!openRef.current) return;
+    // D58: the platform can close this popover before `open` flips — clicking
+    // another menu's trigger light-dismisses this one before the consumer's
+    // click handler runs. In that case the sync effect takes neither branch
+    // (the popover is already closed), so suppressNextCloseRef is never armed.
+    // Report a dismissal only for a menu that is still open according to its
+    // own prop; otherwise this is a stale toggle for a close the consumer
+    // already knows about, and reporting it would clear a selection that has
+    // since moved on. React reads this handler off the committed props at
+    // dispatch time, so the closure's `open` is never staler than the DOM.
+    if (!open) return;
     onClose("outside");
-  }, [onClose]);
+  }, [onClose, open]);
 
   // Roving-tabindex keyboard navigation (D53): Up/Down, Home/End, typeahead,
   // and Esc. Esc's own preventDefault() (inside the hook) suppresses the

@@ -236,6 +236,32 @@ describe("Menu", () => {
     expect(onClose).toHaveBeenCalledWith("outside");
   });
 
+  // ── D58: a stale toggle. The platform can light-dismiss this popover before
+  // the consumer's state catches up (clicking another menu's trigger closes
+  // this one before that trigger's click handler runs). By the time the queued
+  // `toggle` arrives, `open` is already false — the close is old news, and
+  // reporting it would clear a selection that has since moved on. ──
+
+  it("does not report a dismissal for a menu whose open prop is already false", () => {
+    const onClose = vi.fn();
+    const view = (open: boolean) => (
+      <Menu open={open} onClose={onClose} trigger={trigger} aria-label="Actions">
+        x
+      </Menu>
+    );
+    const { rerender } = render(view(true));
+    const el = popover();
+    // The platform hid it, not us: no suppression flag is armed on this path,
+    // and the `toggle` it queued has not been delivered yet.
+    el.removeAttribute("data-open");
+    // The consumer's state catches up first (it closed this menu when the
+    // other one opened), and only then does the queued toggle land.
+    rerender(view(false));
+    fireEvent(el, new Event("toggle"));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("reports a dismissal exactly once across the full controlled round trip", () => {
     const onClose = vi.fn();
 

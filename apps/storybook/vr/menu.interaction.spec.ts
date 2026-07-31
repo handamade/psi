@@ -22,15 +22,18 @@ test("switching from one menu to another leaves the new one open @interaction", 
   await expect(page.locator(menu("a"))).toBeVisible();
   await expect(page.locator(menu("b"))).toBeHidden();
 
-  // The regression: the platform light-dismisses A on pointerdown, and A's
-  // late toggle used to report onClose("outside") — clearing openId and
-  // closing B milliseconds after it opened.
+  // The regression: the platform light-dismisses A before the consumer's click
+  // handler runs, and A's late toggle used to report onClose("outside") —
+  // clearing openId and closing B milliseconds after it opened.
   await page.getByRole("button", { name: "B", exact: true }).click();
   await expect(page.locator(menu("b"))).toBeVisible();
   await expect(page.locator(menu("a"))).toBeHidden();
 
-  // A's stale dismissal must not have been reported at all.
+  // A's stale toggle lands ~50ms after the click; outlast it before asserting
+  // that nothing was reported and that B survived it.
+  await page.waitForTimeout(250);
   await expect(page.getByTestId("last-reason")).toHaveText("none");
+  await expect(page.locator(menu("b"))).toBeVisible();
 });
 
 test("a genuine outside click still reports onClose(\"outside\") @interaction", async ({ page }) => {
