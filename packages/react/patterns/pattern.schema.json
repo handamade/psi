@@ -44,8 +44,8 @@
     },
     "content": {
       "type": "object",
-      "description": "Text fills referenced as `{content:key}` (prop/slot positions) or bare keys (node `content`) in `compose`.",
-      "additionalProperties": { "type": "string" }
+      "description": "Text fills referenced as `{content:key}` (prop/slot positions) or bare keys (node `content`) in `compose`. Values must be JSX-safe — no `<` or `{`, which end a JSX text run and would break the generated preset. Mark copy the consumer must replace with [square brackets].",
+      "additionalProperties": { "type": "string", "pattern": "^[^<{]*$" }
     },
     "gaps": {
       "type": "array",

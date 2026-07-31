@@ -21,6 +21,7 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 
 ## Workflow
 
+- **Node 24 (`.nvmrc`) — check `node -v` before the first pnpm command.** pnpm 11.9 requires ≥22.13 and dies on Node 20 with `ERR_UNKNOWN_BUILTIN_MODULE` (it needs `node:sqlite`). `~/.zshenv` puts 24 on PATH for fresh shells, but a shell that predates that setup still has 20 first. Fix the shell with `nvm use` (reads `.nvmrc`) — do not prefix individual commands with a PATH override, which fixes one command and leaves the next to fail.
 - Specs and plans live in `docs/superpowers/` (decision log D1–D42 in the specs). Significant changes get a decision number.
 - Verify with `pnpm build` (the token build is the WCAG AA contrast gate — it throws on failures), `pnpm test`, `pnpm lint`. CI runs all three on every PR.
 - Versioning via changesets; release with `pnpm release` (requires npm auth).

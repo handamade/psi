@@ -105,6 +105,17 @@ never hand-maintain what can drift.
   report, not an error. This mirrors the token build's philosophy: the build
   is the conformance gate, so a green build *is* the conformance claim.
 
+  *Amended 2026-07-31 (error class 9):* a pattern's fill text — every
+  `content` value and every literal (non-placeholder) slot text fill — must
+  be JSX-safe, i.e. contain neither `<` nor `{`. Both end a JSX text run, so
+  the original angle-bracket fill convention (`"confirm-label": "<verb the
+  object>"`) rendered `<Button>` children that a JSX parser reads as an
+  unclosed `<verb>` element: all three seed presets shipped unparseable.
+  Copy the consumer must replace is marked with `[square brackets]` instead.
+  The class exists because the emitted preset is the product — validating the
+  recipe while emitting code that does not parse is the same silent-pass
+  failure the D53 review flagged.
+
 ## Architecture
 
 ### Authoring surfaces (all in `src`, all human-authored)
@@ -173,7 +184,7 @@ Pattern (abridged):
   "parameters": [
     { "key": "size", "ask": "Button size?", "options": [32, 40], "default": 32 }
   ],
-  "content": { "cancel-label": "Cancel", "confirm-label": "<verb the object>" },
+  "content": { "cancel-label": "Cancel", "confirm-label": "[verb the object]" },
   "gaps": ["Dialog"]
 }
 ```

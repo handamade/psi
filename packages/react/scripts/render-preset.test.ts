@@ -43,10 +43,10 @@ describe("renderPreset", () => {
     },
     parameters: [{ key: "size", ask: "Button size?", options: [32, 40], default: 32 }],
     content: {
-      title: "<Delete the object?>",
-      consequence: "<what is permanently lost>",
+      title: "[Delete the object?]",
+      consequence: "[what is permanently lost]",
       "cancel-label": "Cancel",
-      "confirm-label": "<verb the object>",
+      "confirm-label": "[verb the object]",
     },
     gaps: [],
   };
@@ -57,11 +57,11 @@ describe("renderPreset", () => {
 `<Dialog
   footer={<>
     <Button size={32} variant="ghost">Cancel</Button>
-    <Button size={32} variant="danger"><verb the object></Button>
+    <Button size={32} variant="danger">[verb the object]</Button>
   </>}
-  title="<Delete the object?>"
+  title="[Delete the object?]"
 >
-  <what is permanently lost>
+  [what is permanently lost]
 </Dialog>
 `);
   });
