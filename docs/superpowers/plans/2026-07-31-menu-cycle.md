@@ -37,7 +37,7 @@ Pure indirection onto the D51 surface family, exactly like `panel.ts` and `dialo
 - Test: `packages/tokens/__tests__/menu-tokens.test.ts`
 
 **Interfaces:**
-- Consumes: `emitComponentVarsCSS(name, vars)` from `packages/tokens/scripts/emit-components.js`; `--psi-surface-bg`, `--psi-surface-border`, `--psi-surface-radius` (D51); `--psi-fill-neutral3`, `--psi-fill-neutral4`, `--psi-fg-primary`, `--psi-fg-danger`, `--psi-fg-muted`.
+- Consumes: `emitComponentVarsCSS(name, vars)` from `packages/tokens/scripts/emit-components.js`; `--psi-surface-bg`, `--psi-surface-border`, `--psi-surface-radius` (D51); `--psi-fill-neutral3`, `--psi-fill-neutral4`, `--psi-fg-primary`, `--psi-fg-danger`, `--psi-fg-quaternary`.
 - Produces: `menuVars: Record<string, string>`, emitted as `--psi-menu-*` custom properties. Task 5's CSS binds only these.
 
 - [ ] **Step 1: Write the failing test**
@@ -61,7 +61,7 @@ describe("menu tokens", () => {
       "item-bg-active": "var(--psi-fill-neutral4)",
       "item-fg": "var(--psi-fg-primary)",
       "item-fg-danger": "var(--psi-fg-danger)",
-      "item-fg-disabled": "var(--psi-fg-muted)",
+      "item-fg-disabled": "var(--psi-fg-quaternary)",
       "separator-border": "var(--psi-border-faint)",
     });
   });
@@ -104,7 +104,7 @@ export const menuVars: Record<string, string> = {
   "item-bg-active": "var(--psi-fill-neutral4)",
   "item-fg": "var(--psi-fg-primary)",
   "item-fg-danger": "var(--psi-fg-danger)",
-  "item-fg-disabled": "var(--psi-fg-muted)",
+  "item-fg-disabled": "var(--psi-fg-quaternary)",
   "separator-border": "var(--psi-border-faint)",
 };
 ```
