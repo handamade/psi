@@ -1,5 +1,22 @@
 # @handamade/tokens
 
+## 0.7.2
+
+### Patch Changes
+
+- 939e323: D46 follow-up (HAN-21): `accent-color` joins the `surface` property group in
+  the scope vocabulary (it was a legitimate binding stylelint couldn't name), and
+  the token build gains a scale-prefix guard — no semantic token's kebab name may
+  start with a scale-family prefix (`space-|size-|radius-|text-|font-|duration-|ease-|z-`),
+  closing the latent lookup-precedence shadow in both gates. llms.txt now states
+  precisely what the stylelint rule covers (first-party CSS) and points external
+  consumers at `dist/scope-map.json`.
+- Declare the MIT license. All three packages were published with no `license`
+  field, which npm reads as all-rights-reserved — the packages were installable
+  but not legally reusable, contradicting the open-core intent. Adds
+  `"license": "MIT"` to each package and an MIT `LICENSE` at the repo root
+  (npm includes it in every published tarball automatically).
+
 ## 0.7.1
 
 ### Patch Changes
