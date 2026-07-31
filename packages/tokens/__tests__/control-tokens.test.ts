@@ -45,9 +45,13 @@ describe("controlVars", () => {
     expect(controlVars["value-48-font"]).toBe("var(--psi-text-18-28-regular)");
   });
 
+  it("declares a size-invariant radius (D56)", () => {
+    expect(controlVars.radius).toBe("var(--psi-radius-8)");
+  });
+
   it("binds only scale tokens — the family aliases nothing component-level", () => {
     for (const value of Object.values(controlVars)) {
-      expect(value).toMatch(/^var\(--psi-(size|space|text)-[a-z0-9-]+\)$/);
+      expect(value).toMatch(/^var\(--psi-(size|space|text|radius)-[a-z0-9-]+\)$/);
     }
   });
 
@@ -65,8 +69,8 @@ describe("controlVars", () => {
     expect(css).toContain("--psi-control-value-48-font: var(--psi-text-18-28-regular)");
   });
 
-  it("has exactly 28 tokens", () => {
-    expect(Object.keys(controlVars)).toHaveLength(28);
+  it("has exactly 29 tokens", () => {
+    expect(Object.keys(controlVars)).toHaveLength(29);
   });
 });
 
