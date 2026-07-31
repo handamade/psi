@@ -153,10 +153,23 @@ primitive to converge on.
   today's padding, a text-only Button renders pixel-identical to what ships
   now and only icon-bearing ones change.
 
-  **Documented limitation:** `:has(> svg:first-child)` matches a Psi icon
-  passed as a direct child. A consumer wrapping their icon in a `<span>` gets
-  no optical inset and can set `--psi-button-40-padding-inline-icon`
-  themselves — which is what the token tier exists for.
+  **Documented limitations — the selector matches on element order, and
+  `:first-child` ignores text nodes.** Two consequences, and only the first
+  was recognised when this spec was written:
+
+  1. *Wrapped icon — fails safe.* A consumer wrapping their icon in a
+     `<span>` gets no optical inset, and can set
+     `--psi-button-40-padding-inline-icon` themselves.
+  2. *Trailing icon — fails wrong.* In
+     `<Button>Next<IconChevronRight /></Button>` the svg is the first
+     **element** child, so the rule fires and narrows the *start* (text)
+     side while the icon keeps full padding — the inverse of the law above.
+     CSS cannot distinguish this from a leading icon without a DOM signal,
+     and adding one means the API change (`icon` prop, or wrapping text)
+     that this decision exists to avoid. Accepted, not solved: put the icon
+     first, or set `--psi-button-{n}-padding-inline-icon` equal to
+     `--psi-button-{n}-padding-inline` to switch the inset off. Recorded in
+     `guidance.geometry.iconInsetLimits` so agents inherit the caveat.
 
   Convergence note, recorded because it bears on how much weight to give the
   source material: this rule is independently the same as concentric's
@@ -200,9 +213,23 @@ shipping the tokens without the answer would leave the promise half-kept.
 - Token test asserting the family's exact shape and that each component
   aliases the correct ramp — same shape as `menu-tokens.test.ts` (D53).
 - **Anti-drift test:** `Input` and `Select` must resolve to the *same*
-  `control-value-*` token at every size. This is what makes the D54 defect
-  unrepeatable rather than merely fixed, and it is the acceptance test for
-  the cycle.
+  `control-value-*` token at every size.
+
+  **Scope of that guarantee — corrected after the whole-branch review.** It
+  gates the *token* layer only: it stops someone editing `input.ts` to a
+  literal. It does **not** gate the layer the original defect actually lived
+  in, which was `padding-inline: var(--psi-space-8)` sitting in
+  `input.module.css`. Nothing on this branch closes that: the stylelint rule
+  explicitly allows `--psi-space-*`, the build's scope gate skips geometry by
+  design (`keyGroup` returns `undefined` — the same property that makes the
+  family legal), and no test reads a CSS Module. A contributor can revert a
+  module to a raw scale literal and the full gate chain still passes. VR
+  detects *change*, not *wrongness* — a new component landing with its own
+  divergent flat padding gets a fresh baseline approved on sight, which is
+  how the 8-vs-20 divergence shipped in the first place. Closing it needs a
+  test that parses the four `.module.css` files and asserts each `.size{n}`
+  block binds only `--psi-{component}-{n}-*` for height/padding/gap/font.
+  Filed as a follow-up; this cycle does not claim it.
 - CSS output snapshots updated.
 - Existing Button/IconButton/Input/Select unit + axe tests pass unchanged —
   no behavioural change, no API change.
