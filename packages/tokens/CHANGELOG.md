@@ -1,4 +1,86 @@
-# @handamade/tokens
+# @handamade/psi-tokens
+
+## 0.8.0
+
+### Minor Changes
+
+- dedb5b2: Control radius is now a token (D56)
+
+  `border-radius` on Button, IconButton, Input, Select, Checkbox and Tooltip
+  moves off the raw rungs and onto the `--psi-control-*` family introduced by
+  D54–D55, completing it. One size-invariant dial, `--psi-control-radius`
+  (default `var(--psi-radius-8)`), drives every control. The layer to
+  override per component: `--psi-button-radius` (Button, and IconButton via
+  the same token), `--psi-input-radius`, `--psi-select-radius`,
+  `--psi-checkbox-box-radius`, and `--psi-tooltip-radius`.
+
+  **No visible change.** Every default resolves to its current value, so the
+  change is a rendered no-op by construction — CI's VR gate is what confirms
+  that before merge.
+
+  **What this unlocks.** A theme can retune control shape in one line, which
+  the `Palette` + `SlotMap` contract could not express before:
+
+  ```css
+  [data-psi-theme="acme"] {
+    --psi-control-radius: var(--psi-radius-4);
+  }
+  ```
+
+  Checkbox and Tooltip cap themselves — `min(var(--psi-control-radius),
+var(--psi-radius-4))` and `min(…, var(--psi-radius-6))` — so neither ever
+  over-rounds a small object. The published radius scale's floor is
+  `radius-4`, so Checkbox's cap is a no-op for every on-scale value a theme
+  can set; it only bites if a theme reaches for an off-scale value like
+  `0px`. Tooltip's higher ceiling does track a sharper theme, down to
+  `radius-4`. Tag and Switch keep `--psi-radius-full`: pill-ness is component
+  identity, not theme expression.
+
+- e851be0: Control ramp: per-size geometry is now tokens (D54–D55)
+
+  Height, padding, gap and font for Button, IconButton, Input and Select move
+  out of CSS Modules into a shared `--psi-control-*` family, aliased per
+  component as `--psi-{component}-{size}-{prop}` — the layer to override.
+
+  **Visible changes.** Input and Select were flat at 8px inline padding at
+  every size while Button scaled 8/12/16/20. They now bind a shared value ramp:
+
+  | size | Input/Select padding | was |
+  | ---- | -------------------- | --- |
+  | 24   | 8                    | 8   |
+  | 32   | 8                    | 8   |
+  | 40   | 12                   | 8   |
+  | 48   | 16                   | 8   |
+
+  Input and Select at 48 also switch from `medium` to `regular`, now that
+  `--psi-text-18-28-regular` exists.
+
+  Buttons with a leading icon gain an optical inset — the icon sits one step
+  closer to the edge than text (12 [icon] 8 [label] 16 at size 40) — and the
+  icon/label gap now scales (4/8/8/8) instead of a flat 6px.
+
+  Text-only Buttons are pixel-identical. `--psi-button-font` still overrides
+  typography across all sizes.
+
+- 44d7112: D53 — Menu, the overlay tier. `Menu` + `MenuItem` + `MenuSeparator` on the
+  native Popover API: `popover="auto"` supplies the top layer and light dismiss;
+  Psi supplies roving-tabindex keyboard navigation with typeahead, focus
+  return, and dismissal reasons via `onClose("esc" | "outside" | "item-select")`.
+  Controlled-only, like Dialog (D50): Esc and item activation only _report_ a
+  dismissal — the popover stays open until the consumer flips `open`. Light
+  dismiss (an outside click) is the one asymmetry, forced by the platform: the
+  browser hides the popover itself before Menu can intervene, so `open` must
+  still be flipped to keep React's state in sync. Zero new dependencies.
+
+  Placement is CSS anchor positioning above the anchor floor (Chrome 125+ /
+  Firefox 132+ / Safari 18.2+) and a `CSS.supports`-gated JS branch below it — a
+  top-layer element's containing block is the viewport, so the fallback cannot be
+  declarative. No collision flip below the anchor floor. Psi's documented browser
+  floor is unchanged.
+
+  New `--psi-menu-*` token family, pure indirection onto the D51 surface family,
+  so brands retuning `--psi-surface-*` get Menu for free. New `row-actions`
+  pattern takes the pattern index to four, all unblocked.
 
 ## 0.7.2
 
