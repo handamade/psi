@@ -1,6 +1,6 @@
 # Control ramp — per-size geometry as tokens (D54–D55)
 
-Date: 2026-07-31. Status: **Draft** — targets 0.7.3.
+Date: 2026-07-31. Status: **Draft** — targets 0.8.0.
 
 Provenance: the 2026-07-31 analysis of the BuninUX token/geometry skills
 (`bunind/gtc-tokens`, `bunind/concentric`) against Psi. Two ideas in those
@@ -203,10 +203,13 @@ shipping the tokens without the answer would leave the promise half-kept.
 
 ## Release, consumers, process
 
-- One release: `@handamade/psi-tokens` and `@handamade/psi-react` 0.7.3.
-  Patch, with the before/after ramp in the changeset note. Input and Select
-  padding is a visible change for consumers; text-only Buttons are
-  pixel-identical; icon-bearing Buttons shift by design.
+- One release: `@handamade/psi-tokens` and `@handamade/psi-react` 0.8.0.
+  Minor at 0.x — the slot for a new feature or a visible change; 1.0.0 is the
+  only major. Chosen over a patch deliberately: `^0.7.2` resolves to `<0.8.0`,
+  so a patch would land the Input/Select padding change on consumers' next
+  install without them opting in. The changeset note carries the before/after
+  ramp. Text-only Buttons are pixel-identical; icon-bearing Buttons shift by
+  design.
 - **Sequencing with D53.** Branched off `main` while the Menu cycle is still
   in flight. The only shared file is `packages/tokens/scripts/build.ts` (two
   lines in the component registry); implementation lands after D53 merges,
