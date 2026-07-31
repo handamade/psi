@@ -1,0 +1,23 @@
+/* packages/react/src/Menu/menu.module.css */
+/* ── Trigger wrapper ──────────────────────────────────────────── */
+
+.trigger {
+  display: inline-flex;
+}
+
+/* ── Popover surface ──────────────────────────────────────────── */
+
+.menu {
+  min-width: 180px;
+  margin: 0;
+  padding: var(--psi-space-4);
+  border: 1px solid var(--psi-menu-border);
+  border-radius: var(--psi-menu-radius);
+  background: var(--psi-menu-bg);
+  color: var(--psi-menu-fg);
+  font: var(--psi-text-14-20-regular);
+}
+
+.menu:not([data-open]):not(:popover-open) {
+  display: none;
+}
