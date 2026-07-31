@@ -48,26 +48,18 @@ where *Menu* drives the close. Here the *platform* drove it.
   closed.** `handleToggle` gains a guard on the current `open` value:
 
   ```tsx
-  // Mirrors `open` for handleToggle, which is memoised on [onClose] and so
-  // would otherwise read a stale capture. The toggle event this guards is
-  // queued by the platform and arrives after the consumer's re-render.
-  const openRef = useRef(open);
-  useEffect(() => {
-    openRef.current = open;
-  }, [open]);
-  ```
-
-  ```tsx
   if (isPopoverOpen(el)) return;  // opening toggle — nothing to report
-  if (!openRef.current) return;   // already controlled-closed: a stale light
+  if (!open) return;              // already controlled-closed: a stale light
                                   // dismiss the consumer already knows about
   onClose("outside");
+  }, [onClose, open]);
   ```
 
-  The ref is updated in an effect rather than during render: React's rules
-  forbid writing refs while rendering, and effects flush long before a queued
-  `toggle` (measured ~50ms). Declaration order puts it before the existing
-  sync effect, so both are settled in the same commit.
+  `open` is read straight from the closure, with `open` added to
+  `handleToggle`'s `useCallback` deps. No ref is involved: React resolves
+  `onToggle` via the props stamped onto the DOM node during the **mutation**
+  phase of commit, so the handler that runs is never staler than the last
+  commit — and the guard therefore depends on no effect-flush timing at all.
 
   This states an invariant worth naming in the `onClose` doc comment: *a
   dismissal is only ever reported for a menu that is currently open according
@@ -187,11 +179,20 @@ ordering that matters here (`pointerdown` → `beforetoggle` → `click` →
 
 ## Rejected alternatives
 
-- **Adding `open` to `handleToggle`'s dependency array** instead of a ref.
-  Works in the measured ordering and is more idiomatic, but it makes
-  correctness depend on React having re-rendered before the queued `toggle`
-  arrives. A latest-value ref reads the current value whenever the event lands,
-  which is the invariant the guard actually wants.
+- ~~**A latest-value `useRef` mirroring `open`**, instead of reading `open`
+  from the closure.~~ **Reversed during implementation, 2026-08-01.** This
+  spec originally mandated the ref and rejected the closure read on the
+  grounds that the closure "makes correctness depend on React having
+  re-rendered before the queued `toggle` arrives". That rationale was
+  backwards, and it is recorded here rather than quietly deleted because the
+  reasoning is easy to re-derive wrongly.
+
+  Both approaches depend on the re-render. The ref depends on *more*: it is
+  written in a passive effect, which React schedules as a separate task after
+  commit, so there is a window in which the committed props already say
+  `open: false` while `openRef.current` is still `true`. A `toggle` landing in
+  that window defeats the guard. The closure read has no such window, and is
+  eight lines shorter.
 - **Switching to `popover="manual"`.** Would let sibling popovers coexist and
   make `Placements` renderable as written, but it forfeits the platform's light
   dismiss — the single largest thing D53 gets for free — and Menu would have to

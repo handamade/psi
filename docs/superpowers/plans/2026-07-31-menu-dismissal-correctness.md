@@ -240,6 +240,13 @@ instead of `none`. The second and third tests should already PASS.
 If the first test passes here, **stop and report**: the bug did not reproduce
 in this browser, and the fix below would be unverifiable.
 
+> **Superseded during execution (2026-08-01).** Step 5 below prescribes a
+> `useRef` mirror; review found a passive effect can lag React's committed
+> props, so the guard ships reading `open` from the closure with
+> `useCallback` deps `[onClose, open]`. See the D58 spec's Decisions and
+> Rejected-alternatives sections for the corrected reasoning. Steps 5-6 are
+> left as written for the historical record.
+
 - [ ] **Step 5: Apply the guard**
 
 In `packages/react/src/Menu/Menu.tsx`, add the ref immediately after the
