@@ -14,7 +14,7 @@
 
 Every task's requirements implicitly include this section.
 
-- **Node 24 for all tooling.** Local `pnpm` 11.9 requires `node:sqlite` and dies on Node 20. Prefix commands with `export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"` or use `nvm use 24`.
+- **Node 24 is required and is now the default.** `pnpm` 11.9 needs `node:sqlite` and dies on Node 20. `nvm alias default` is `24` and `~/.zshenv` resolves it by glob, so fresh shells — interactive, login and non-interactive alike — already get v24.16.0; no prefix needed. Verify with `node -v` before starting. If it reports v20 you are in a shell process that predates that setup: open a new one rather than prefixing commands.
 - **Zero new runtime dependencies.** `packages/react/package.json` `dependencies` stays `{}`.
 - **Sizes are px numbers** (`24 | 32 | 40 | 48`), never S/M/L. Scale names are pixel-true (`psi-gap-8` = 8px).
 - **Variants are flat:** `accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline`. No primary/secondary. `danger` only for destructive actions.
@@ -80,7 +80,7 @@ describe("menu tokens", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/tokens/__tests__/menu-tokens.test.ts
+pnpm vitest run packages/tokens/__tests__/menu-tokens.test.ts
 ```
 
 Expected: FAIL — `Cannot find module '../src/components/menu.js'`.
@@ -126,7 +126,7 @@ And add the registry entry in `componentVars`, keeping alphabetical order (after
 - [ ] **Step 5: Run the test and the token build**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/tokens/__tests__/menu-tokens.test.ts && pnpm --filter @handamade/psi-tokens build
+pnpm vitest run packages/tokens/__tests__/menu-tokens.test.ts && pnpm --filter @handamade/psi-tokens build
 ```
 
 Expected: test PASS; build prints no gamut warnings and exits 0. The build is the WCAG AA contrast gate and the D46 scope gate — if a token name or binding is wrong it throws here, not later.
@@ -185,7 +185,7 @@ describe("jsdom popover polyfill", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/popover-polyfill.test.tsx
+pnpm vitest run packages/react/src/Menu/popover-polyfill.test.tsx
 ```
 
 Expected: FAIL — `expected "undefined" to be "function"`.
@@ -217,7 +217,7 @@ if (!HTMLElement.prototype.hidePopover) {
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/popover-polyfill.test.tsx
+pnpm vitest run packages/react/src/Menu/popover-polyfill.test.tsx
 ```
 
 Expected: PASS.
@@ -225,7 +225,7 @@ Expected: PASS.
 - [ ] **Step 5: Confirm nothing else broke**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm test
+pnpm test
 ```
 
 Expected: all suites pass (448 + 1 new).
@@ -320,7 +320,7 @@ describe("Menu", () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/Menu.test.tsx
+pnpm vitest run packages/react/src/Menu/Menu.test.tsx
 ```
 
 Expected: FAIL — `Cannot find module './Menu.js'`.
@@ -478,7 +478,7 @@ export function Menu({
 - [ ] **Step 5: Run tests to verify they pass**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/Menu.test.tsx
+pnpm vitest run packages/react/src/Menu/Menu.test.tsx
 ```
 
 Expected: PASS, 6 tests.
@@ -488,7 +488,7 @@ Note on the `aria-haspopup` test: it asserts the attribute lands on the trigger 
 - [ ] **Step 6: Lint (the stylelint plugin gates the CSS)**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm lint
+pnpm lint
 ```
 
 Expected: exit 0. If stylelint reports a non-`--psi-menu-*` colour binding, the CSS is wrong — component CSS may bind only its own family plus scale tokens.
@@ -587,7 +587,7 @@ describe("MenuItem", () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/MenuItem.test.tsx
+pnpm vitest run packages/react/src/Menu/MenuItem.test.tsx
 ```
 
 Expected: FAIL — `Cannot find module './MenuItem.js'`.
@@ -705,7 +705,7 @@ Append to `packages/react/src/Menu/menu.module.css`:
 - [ ] **Step 6: Run tests to verify they pass**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/
+pnpm vitest run packages/react/src/Menu/
 ```
 
 Expected: PASS, all Menu suites.
@@ -713,7 +713,7 @@ Expected: PASS, all Menu suites.
 - [ ] **Step 7: Lint and commit**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm lint
+pnpm lint
 git add packages/react/src/Menu/
 git commit -m "feat(react): MenuItem and MenuSeparator (D53)"
 ```
@@ -828,7 +828,7 @@ describe("useMenuKeyboard", () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/useMenuKeyboard.test.tsx
+pnpm vitest run packages/react/src/Menu/useMenuKeyboard.test.tsx
 ```
 
 Expected: FAIL — first item does not receive focus.
@@ -968,7 +968,7 @@ Delete the previous `const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>
 - [ ] **Step 5: Run tests to verify they pass**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/
+pnpm vitest run packages/react/src/Menu/
 ```
 
 Expected: PASS, all Menu suites including the 9 keyboard tests.
@@ -1070,7 +1070,7 @@ describe("useMenuPlacement", () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/useMenuPlacement.test.tsx
+pnpm vitest run packages/react/src/Menu/useMenuPlacement.test.tsx
 ```
 
 Expected: FAIL — `Cannot find module './useMenuPlacement.js'`, plus missing `anchor-name`.
@@ -1198,7 +1198,7 @@ Append to `packages/react/src/Menu/menu.module.css`:
 - [ ] **Step 6: Run tests to verify they pass**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm vitest run packages/react/src/Menu/
+pnpm vitest run packages/react/src/Menu/
 ```
 
 Expected: PASS, all Menu suites.
@@ -1206,7 +1206,7 @@ Expected: PASS, all Menu suites.
 - [ ] **Step 7: Lint and commit**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm lint
+pnpm lint
 git add packages/react/src/Menu/
 git commit -m "feat(react): Menu placement — anchor CSS with a gated JS fallback (D53)"
 ```
@@ -1317,7 +1317,7 @@ In `packages/react/src/contracts.json`, add `"Menu"` to the `interactive` set so
 - [ ] **Step 7: Rebuild and verify the manifest picked everything up**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm build
+pnpm build
 node -e "const m=require('./packages/react/dist/manifest.json'); const n=m.components?m.components:m; console.log(Object.keys(n).filter(k=>k.startsWith('Menu')))"
 ```
 
@@ -1326,7 +1326,7 @@ Expected: `[ 'Menu', 'MenuItem', 'MenuSeparator' ]`. If the manifest is keyed di
 - [ ] **Step 8: Run the full gate chain**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm build && pnpm test && pnpm lint
+pnpm build && pnpm test && pnpm lint
 ```
 
 Expected: all green. The docs-drift check runs inside `pnpm test`; if it fails it means generated docs need regenerating — follow the error's instructions rather than hand-editing anything under `dist`.
@@ -1402,7 +1402,7 @@ Create `packages/react/patterns/row-actions.json`:
 - [ ] **Step 3: Run the validator**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm build
+pnpm build
 ```
 
 Expected: exit 0. The D48 validator checks every `component` against the manifest and every prop against that component's declared props — so a typo in `variant` or a missing manifest entry fails here. If it reports an unknown component, Task 7 did not land correctly.
@@ -1536,7 +1536,7 @@ export const FallbackPlacement: Story = {
 - [ ] **Step 3: Verify the stories build**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm --filter ds-storybook build
+pnpm --filter ds-storybook build
 ```
 
 Expected: "Storybook build completed successfully".
@@ -1593,7 +1593,7 @@ pattern takes the pattern index to four, all unblocked.
 - [ ] **Step 6: Final gate chain**
 
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH" && pnpm build && pnpm test && pnpm lint
+pnpm build && pnpm test && pnpm lint
 ```
 
 Expected: all green.
