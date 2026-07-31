@@ -57,4 +57,27 @@ export const guidance = {
     tagApi:
       'On Tag, subtle is a boolean prop, not part of the variant union: accent-subtle is spelled variant="accent" subtle (Tag variants: neutral | accent | success | warning | danger).',
   },
+  geometry: {
+    sizes: [24, 32, 40, 48],
+    label: {
+      paddingInline: [8, 12, 16, 20],
+      paddingInlineIcon: [6, 8, 12, 16],
+      gap: [4, 8, 8, 8],
+      font: ["12-16-medium", "14-20-medium", "16-24-medium", "18-28-medium"],
+    },
+    value: {
+      paddingInline: [8, 8, 12, 16],
+      font: ["12-16-regular", "14-20-regular", "16-24-regular", "18-28-regular"],
+    },
+    components: {
+      Button: "label",
+      IconButton: "label",
+      Input: "value",
+      Select: "value",
+    },
+    note:
+      "Per-size geometry is data, not CSS literals (D54). Arrays are indexed by sizes[]. Read a value as --psi-control-{size}-{prop} for the label ramp and --psi-control-value-{size}-{prop} for the value ramp; components alias these as --psi-{component}-{size}-{prop}, which is the layer to override. The value ramp is one step tighter than the label ramp because a left-aligned value wants less air than a centred label (D55).",
+    iconInset:
+      "A leading icon sits one step closer to the edge than text — an icon is a solid shape with no side bearing (D55). Applied by .size{n}:has(> svg:first-child) on Button; an icon wrapped in a <span> does not match, and the consumer sets --psi-button-{size}-padding-inline-icon instead.",
+  },
 } as const;
