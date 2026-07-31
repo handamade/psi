@@ -38,7 +38,7 @@ const INITIAL_TAGS = [
   { label: "zero-deps", variant: "neutral" },
 ] as const;
 
-const INITIAL_FILTERS = ["psi-tokens", "0.7.0", "wcag-aa"] as const;
+const INITIAL_FILTERS = ["psi-tokens", "0.8.1", "wcag-aa"] as const;
 
 export function Playground() {
   const [tags, setTags] = useState<readonly (typeof INITIAL_TAGS)[number][]>(
@@ -53,7 +53,7 @@ export function Playground() {
       <div className="container">
         <div className="section-head">
           <span className="annot annot--accent">02 · Components</span>
-          <h2>Fifteen production components. All live — try them.</h2>
+          <h2>Eighteen production components. All live — try them.</h2>
           <p className="lede">
             React 19, zero runtime dependencies, CSS Modules over
             component-level tokens. Every prop below ships in a

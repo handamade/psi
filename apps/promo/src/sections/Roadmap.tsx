@@ -1,7 +1,7 @@
 import { IconCheck, IconChevronRight, Panel } from "@handamade/psi-react";
 
 const SHIPPED = [
-  ["15 components, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, Panel, NavBar, Toolbar, AspectRatio, Field, Dialog"],
+  ["18 components, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, Panel, NavBar, Toolbar, AspectRatio, Field, Dialog, Menu, MenuItem, MenuSeparator"],
   ["4 themes", "light, dark and two customer brands (acme, ember) — plus `pnpm new-theme --base dark`"],
   ["Contrast gate", "WCAG AA validated per theme, at build time"],
   ["Visual regression", "Playwright screenshots per component, light + ember, gated in CI"],
