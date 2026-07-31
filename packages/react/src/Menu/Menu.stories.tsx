@@ -85,33 +85,43 @@ export const WithDisabledItem: Story = {
 export const FallbackPlacement: Story = {
   decorators: [
     (StoryFn) => {
-      // The stub MUST be installed during render, not in an effect: React
-      // flushes child effects before parent ones, so useMenuPlacement's
-      // effects inside the story would run against the native CSS.supports
-      // and take the anchor branch — defeating the whole story. Only the
-      // *restore* can be deferred. (D58)
+      // The stub is installed during render so it is in place for every
+      // phase the story might read it from — render, layout effect, or
+      // passive effect. Installing it in an effect would couple this story
+      // to which effect kind useMenuPlacement happens to use internally,
+      // and would silently stop forcing the fallback branch if that ever
+      // changed. Only the *restore* can be deferred. (D58)
       const originalRef = React.useRef<typeof CSS.supports | null>(null);
+      const stubRef = React.useRef<typeof CSS.supports | null>(null);
       if (originalRef.current === null) {
         const original = CSS.supports.bind(CSS);
         originalRef.current = original;
-        CSS.supports = ((prop: string, value?: string) =>
+        const stub = ((prop: string, value?: string) =>
           prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
+        stubRef.current = stub;
+        CSS.supports = stub;
       }
       // Storybook keeps ONE preview iframe for the whole session, so an
       // unrestored CSS.supports leaks into every later story and into the
-      // autodocs page (tags: ["autodocs"] is global in preview.ts). (D58)
+      // autodocs page (tags: ["autodocs"] is global in preview.ts). Restore
+      // only if CSS.supports is still exactly the stub this instance
+      // installed — if a concurrent instance's stub is in place instead
+      // (e.g. StrictMode double-render remounting hooks), overwriting it
+      // would stomp that instance's install rather than being a no-op. (D58)
       React.useEffect(
         () => () => {
-          if (originalRef.current) CSS.supports = originalRef.current;
+          if (originalRef.current && CSS.supports === stubRef.current) {
+            CSS.supports = originalRef.current;
+          }
         },
         [],
       );
       return (
-        <div className="psi-fallback-probe">
+        <div data-psi-fallback-probe>
           {/* Scoped to this story's subtree, not the document: the old
               [data-psi-menu] selector killed position-area for every menu on
               the autodocs page. (D58) */}
-          <style>{`.psi-fallback-probe [data-psi-menu] { position-area: none !important; position-try-fallbacks: none !important; }`}</style>
+          <style>{`[data-psi-fallback-probe] [data-psi-menu] { position-area: none !important; position-try-fallbacks: none !important; }`}</style>
           <StoryFn />
         </div>
       );
