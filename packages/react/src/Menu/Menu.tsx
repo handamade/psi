@@ -1,6 +1,7 @@
 import { cloneElement, createContext, isValidElement, useCallback, useEffect, useRef } from "react";
-import type { KeyboardEvent, ReactElement, ReactNode, Ref } from "react";
+import type { ReactElement, ReactNode, Ref } from "react";
 import styles from "./menu.module.css";
+import { useMenuKeyboard } from "./useMenuKeyboard.js";
 
 export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end";
 
@@ -111,13 +112,16 @@ export function Menu({
     onClose("outside");
   }, [onClose]);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Escape") return;
-    // Suppresses the platform's native popover Escape dismissal, so the
-    // popover stays open until the consumer flips `open`.
-    event.preventDefault();
-    onClose("esc");
-  };
+  // Roving-tabindex keyboard navigation (D53): Up/Down, Home/End, typeahead,
+  // and Esc. Esc's own preventDefault() (inside the hook) suppresses the
+  // platform's native popover Escape dismissal, so the popover stays open
+  // until the consumer flips `open`.
+  const handleKeyDown = useMenuKeyboard({
+    popoverRef,
+    triggerRef,
+    open,
+    onEsc: () => onClose("esc"),
+  });
 
   // Consumed by Task 4's MenuItem via MenuContext, so item selection can
   // report "item-select" without prop drilling. Reports only — the popover

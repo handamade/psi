@@ -70,4 +70,28 @@ describe("MenuItem", () => {
     // { hidden: true }: jsdom workaround, see file header.
     expect(screen.getByRole("separator", { hidden: true })).toBeInTheDocument();
   });
+
+  // ── D53 query surface: useMenuKeyboard (Task 5) finds items via
+  // [data-psi-menu-item]:not([aria-disabled="true"]) and relies on every item
+  // starting outside the tab order until the hook makes one current. Nothing
+  // asserted that surface before, so a regression here would silently break
+  // the keyboard hook without failing any MenuItem test.
+  //
+  // Rendered standalone rather than via open()'s real Menu: MenuContext has a
+  // default value, so MenuItem works outside a Menu, and this is the only way
+  // to see the item's *own* default markup — inside a real, open Menu the
+  // keyboard hook runs on mount and immediately sets the first item's
+  // tabIndex to 0, which would make a same-assertion-for-every-item test
+  // fail on item zero. No `{ hidden: true }` needed here either: unlike
+  // open()'s cases, this element isn't a descendant of a `[popover]`. ──
+
+  it("carries the data-psi-menu-item marker the keyboard hook queries for", () => {
+    render(<MenuItem onSelect={() => {}}>Rename</MenuItem>);
+    expect(screen.getByRole("menuitem")).toHaveAttribute("data-psi-menu-item");
+  });
+
+  it("starts out of the tab order (tabIndex=-1) before the keyboard hook runs", () => {
+    render(<MenuItem onSelect={() => {}}>Rename</MenuItem>);
+    expect(screen.getByRole("menuitem")).toHaveAttribute("tabindex", "-1");
+  });
 });
