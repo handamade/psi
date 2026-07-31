@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { controlVars } from "../src/components/control.js";
+import { inputVars } from "../src/components/input.js";
+import { selectVars } from "../src/components/select.js";
 import { emitComponentVarsCSS } from "../scripts/emit-components.js";
 import { keyGroup } from "../src/scopes.js";
 
@@ -65,5 +67,39 @@ describe("controlVars", () => {
 
   it("has exactly 28 tokens", () => {
     expect(Object.keys(controlVars)).toHaveLength(28);
+  });
+});
+
+describe("value-ramp consumers cannot drift (D54 acceptance)", () => {
+  const SIZES = [24, 32, 40, 48] as const;
+
+  it("Input and Select resolve to the SAME value-ramp token at every size", () => {
+    for (const n of SIZES) {
+      expect(inputVars[`${n}-padding-inline`]).toBe(`var(--psi-control-value-${n}-padding-inline)`);
+      expect(selectVars[`${n}-padding-inline`]).toBe(inputVars[`${n}-padding-inline`]);
+      expect(inputVars[`${n}-font`]).toBe(`var(--psi-control-value-${n}-font)`);
+      expect(selectVars[`${n}-font`]).toBe(inputVars[`${n}-font`]);
+      expect(inputVars[`${n}-height`]).toBe(`var(--psi-control-${n}-height)`);
+      expect(selectVars[`${n}-height`]).toBe(inputVars[`${n}-height`]);
+    }
+  });
+
+  it("neither text control binds the label ramp", () => {
+    for (const vars of [inputVars, selectVars]) {
+      for (const [key, value] of Object.entries(vars)) {
+        if (!/-padding-inline$|-font$/.test(key) || !/^\d\d-/.test(key)) continue;
+        expect(value).toContain("--psi-control-value-");
+      }
+    }
+  });
+
+  it("Select's chevron well derives from the value ramp, not a literal", () => {
+    for (const n of SIZES) {
+      expect(selectVars[`${n}-chevron-offset`]).toBe(`var(--psi-control-value-${n}-padding-inline)`);
+      // 12px glyph + 4px breathing; 28 is not on the spacing scale, hence calc.
+      expect(selectVars[`${n}-padding-inline-end`]).toBe(
+        `calc(var(--psi-control-value-${n}-padding-inline) + var(--psi-space-16))`,
+      );
+    }
   });
 });
