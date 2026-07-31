@@ -21,6 +21,9 @@ const COMPONENTS = [
   "Tooltip",
   "NavBar",
   "AspectRatio",
+  "Menu",
+  "MenuItem",
+  "MenuSeparator",
 ];
 
 // Keep a prop when it is declared on the component's own props interface
@@ -54,6 +57,20 @@ const PASSTHROUGH_DESCRIPTIONS: Record<string, string> = {
   placeholder: "Native placeholder text shown while the field is empty (only on components whose host element supports it).",
 };
 
+// Most components live at src/<Name>/<Name>.tsx. A few are child components
+// that share their parent's folder instead of getting one of their own
+// (Menu's item and separator live in Menu/, not MenuItem/ or MenuSeparator/).
+const COMPONENT_DIR: Record<string, string> = {
+  MenuItem: "Menu",
+  MenuSeparator: "Menu",
+};
+
+// Components with zero props by design (documented as such in their own
+// JSDoc) — an explicit opt-out from the "no props extracted" guard below, so
+// that guard still catches real parse failures (a missing/renamed file, or a
+// propFilter regression) for every other component.
+const NO_PROPS_COMPONENTS = ["MenuSeparator"];
+
 /** Renders a prop's type as a single string, expanding literal unions. */
 function typeToString(p: { type: { name: string; value?: { value: string }[] } }): string {
   if (p.type.name === "enum" && Array.isArray(p.type.value)) {
@@ -65,8 +82,10 @@ function typeToString(p: { type: { name: string; value?: { value: string }[] } }
 const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS);
 
 const manifest = COMPONENTS.map((name) => {
-  const [doc] = parser.parse(join(root, "src", name, `${name}.tsx`));
-  if (!doc || Object.keys(doc.props ?? {}).length === 0) {
+  const dir = COMPONENT_DIR[name] ?? name;
+  const [doc] = parser.parse(join(root, "src", dir, `${name}.tsx`));
+  const hasNoProps = Object.keys(doc?.props ?? {}).length === 0;
+  if (!doc || (hasNoProps && !NO_PROPS_COMPONENTS.includes(name))) {
     throw new Error(
       `emit-manifest: no props extracted for ${name} — file moved/renamed or docgen parse failure`,
     );

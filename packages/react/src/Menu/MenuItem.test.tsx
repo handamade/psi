@@ -1,0 +1,97 @@
+// jsdom's default stylesheet forces `display: none` on every `[popover]`
+// element (its CSS engine has no real popover-open state, so
+// `:not(:popover-open)` always matches regardless of our `data-open`
+// polyfill attribute). Testing Library's default role queries filter to the
+// accessibility tree, so anything inside an open Menu is invisible to them
+// unless `{ hidden: true }` is passed. Task 3 (Menu.test.tsx) hit the same
+// limitation and used the same workaround. Each query below that needs it is
+// commented at the call site.
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Menu } from "./Menu.js";
+import { MenuItem } from "./MenuItem.js";
+import { MenuSeparator } from "./MenuSeparator.js";
+import { Button } from "../Button/Button.js";
+
+const trigger = <Button size={32}>Actions</Button>;
+
+function open(onClose = () => {}, onSelect = () => {}) {
+  return render(
+    <Menu open onClose={onClose} trigger={trigger} aria-label="Actions">
+      <MenuItem onSelect={onSelect}>Rename</MenuItem>
+      <MenuSeparator />
+      <MenuItem onSelect={onSelect} variant="danger">Delete</MenuItem>
+      <MenuItem onSelect={onSelect} disabled>Archive</MenuItem>
+    </Menu>,
+  );
+}
+
+describe("MenuItem", () => {
+  it("renders items with role=menuitem", () => {
+    open();
+    // { hidden: true }: jsdom workaround, see file header.
+    expect(screen.getAllByRole("menuitem", { hidden: true })).toHaveLength(3);
+  });
+
+  it("clicking an item fires onSelect and closes with 'item-select'", async () => {
+    const onClose = vi.fn();
+    const onSelect = vi.fn();
+    open(onClose, onSelect);
+    // { hidden: true }: jsdom workaround, see file header.
+    await userEvent.click(screen.getByRole("menuitem", { name: "Rename", hidden: true }));
+    expect(onSelect).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledWith("item-select");
+  });
+
+  it("a disabled item is aria-disabled and fires neither callback", async () => {
+    const onClose = vi.fn();
+    const onSelect = vi.fn();
+    open(onClose, onSelect);
+    // { hidden: true }: jsdom workaround, see file header.
+    const archive = screen.getByRole("menuitem", { name: "Archive", hidden: true });
+    expect(archive).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(archive);
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("marks the danger variant on the element for styling", () => {
+    open();
+    // { hidden: true }: jsdom workaround, see file header.
+    expect(screen.getByRole("menuitem", { name: "Delete", hidden: true })).toHaveAttribute(
+      "data-variant",
+      "danger",
+    );
+  });
+
+  it("renders a separator with role=separator", () => {
+    open();
+    // { hidden: true }: jsdom workaround, see file header.
+    expect(screen.getByRole("separator", { hidden: true })).toBeInTheDocument();
+  });
+
+  // ── D53 query surface: useMenuKeyboard (Task 5) finds items via
+  // [data-psi-menu-item]:not([aria-disabled="true"]) and relies on every item
+  // starting outside the tab order until the hook makes one current. Nothing
+  // asserted that surface before, so a regression here would silently break
+  // the keyboard hook without failing any MenuItem test.
+  //
+  // Rendered standalone rather than via open()'s real Menu: MenuContext has a
+  // default value, so MenuItem works outside a Menu, and this is the only way
+  // to see the item's *own* default markup — inside a real, open Menu the
+  // keyboard hook runs on mount and immediately sets the first item's
+  // tabIndex to 0, which would make a same-assertion-for-every-item test
+  // fail on item zero. No `{ hidden: true }` needed here either: unlike
+  // open()'s cases, this element isn't a descendant of a `[popover]`. ──
+
+  it("carries the data-psi-menu-item marker the keyboard hook queries for", () => {
+    render(<MenuItem onSelect={() => {}}>Rename</MenuItem>);
+    expect(screen.getByRole("menuitem")).toHaveAttribute("data-psi-menu-item");
+  });
+
+  it("starts out of the tab order (tabIndex=-1) before the keyboard hook runs", () => {
+    render(<MenuItem onSelect={() => {}}>Rename</MenuItem>);
+    expect(screen.getByRole("menuitem")).toHaveAttribute("tabindex", "-1");
+  });
+});

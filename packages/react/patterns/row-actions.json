@@ -1,0 +1,35 @@
+{
+  "id": "row-actions",
+  "intent": "List or table row with a labelled actions menu, including a destructive item — hand the destructive item's confirmation off to the destructive-confirm pattern. The trigger is a text Button, not an icon-only kebab: IconButton cannot carry an accessible name through the manifest, so it is not composable in a pattern yet",
+  "match": ["row actions", "per-row actions", "table row menu", "actions menu", "row action list"],
+  "compose": {
+    "component": "Menu",
+    "props": { "placement": "{param:placement}", "aria-label": "{content:trigger-label}" },
+    "slots": {
+      "trigger": [
+        { "component": "Button", "props": { "variant": "ghost" }, "content": "trigger-label" }
+      ],
+      "body": [
+        { "component": "MenuItem", "content": "edit-label" },
+        { "component": "MenuItem", "content": "duplicate-label" },
+        { "component": "MenuSeparator" },
+        { "component": "MenuItem", "props": { "variant": "danger" }, "content": "delete-label" }
+      ]
+    }
+  },
+  "parameters": [
+    {
+      "key": "placement",
+      "ask": "Which side should the menu open on?",
+      "options": ["bottom-start", "bottom-end"],
+      "default": "bottom-end"
+    }
+  ],
+  "content": {
+    "trigger-label": "Actions",
+    "edit-label": "Edit",
+    "duplicate-label": "Duplicate",
+    "delete-label": "Delete"
+  },
+  "gaps": []
+}

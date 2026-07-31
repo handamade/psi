@@ -1,0 +1,16 @@
+{
+  "slots": [
+    {
+      "name": "trigger",
+      "accepts": { "contracts": ["interactive"] },
+      "cardinality": "1..1",
+      "order": 1
+    },
+    {
+      "name": "body",
+      "accepts": { "components": ["MenuItem", "MenuSeparator"] },
+      "cardinality": "1..*",
+      "order": 2
+    }
+  ]
+}

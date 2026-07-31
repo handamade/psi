@@ -1,0 +1,105 @@
+/* packages/react/src/Menu/menu.module.css */
+/* ── Trigger wrapper ──────────────────────────────────────────── */
+
+.trigger {
+  display: inline-flex;
+}
+
+/* ── Popover surface ──────────────────────────────────────────── */
+
+.menu {
+  min-width: 180px;
+  /* Gap between trigger and menu (D53). Applies below the anchor floor too:
+     the @supports block re-asserts this same value for the anchor-positioned
+     path, but without it here the fallback path (useMenuPlacement.ts) would
+     sit flush against its trigger. */
+  margin: var(--psi-space-4);
+  padding: var(--psi-space-4);
+  border: 1px solid var(--psi-menu-border);
+  border-radius: var(--psi-menu-radius);
+  background: var(--psi-menu-bg);
+  color: var(--psi-menu-fg);
+  font: var(--psi-text-14-20-regular);
+}
+
+.menu:not([data-open]):not(:popover-open) {
+  display: none;
+}
+
+/* ── Items ────────────────────────────────────────────────────── */
+
+.item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: var(--psi-space-8) var(--psi-space-12);
+  border: 0;
+  border-radius: var(--psi-radius-6);
+  background: var(--psi-menu-item-bg);
+  color: var(--psi-menu-item-fg);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--psi-menu-item-bg-hover);
+}
+
+.item:active {
+  background: var(--psi-menu-item-bg-active);
+}
+
+.item[data-variant="danger"] {
+  color: var(--psi-menu-item-fg-danger);
+}
+
+.item[aria-disabled="true"] {
+  color: var(--psi-menu-item-fg-disabled);
+  cursor: default;
+}
+
+.item[aria-disabled="true"]:hover {
+  background: var(--psi-menu-item-bg);
+}
+
+/* ── Separator ────────────────────────────────────────────────── */
+
+.separator {
+  /* border-top, not background: --psi-menu-separator-border is scoped to
+     [border] by the token build (packages/tokens/src/components/menu.ts) —
+     the stylelint psi/token-scopes rule rejects a background binding. The
+     brief's draft CSS used background; this is the corrected form. */
+  height: 0;
+  margin: var(--psi-space-4) 0;
+  border-top: 1px solid var(--psi-menu-separator-border);
+}
+
+/* ── Placement (D53) ──────────────────────────────────────────────
+   Above the anchor floor CSS does all the work. Below it, the hook in
+   useMenuPlacement.ts sets inset directly; these rules are inert there
+   because position-area needs an anchor to resolve against. */
+
+@supports (anchor-name: --x) {
+  .menu {
+    position: fixed;
+    margin: var(--psi-space-4);
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+
+  .menu[data-placement="bottom-start"] {
+    position-area: block-end span-inline-end;
+  }
+
+  .menu[data-placement="bottom-end"] {
+    position-area: block-end span-inline-start;
+  }
+
+  .menu[data-placement="top-start"] {
+    position-area: block-start span-inline-end;
+  }
+
+  .menu[data-placement="top-end"] {
+    position-area: block-start span-inline-start;
+  }
+}

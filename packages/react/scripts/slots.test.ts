@@ -52,9 +52,17 @@ describe("loadSlotContracts", () => {
 
   it("real src: Dialog carries its three authored slots, leaves get []", () => {
     const src = join(fileURLToPath(new NodeURL("..", import.meta.url)), "src");
-    const names = ["Button", "IconButton", "Card", "Input", "Select", "Field", "Dialog", "Checkbox", "Switch", "Tag", "Tooltip", "NavBar", "AspectRatio"];
+    const names = ["Button", "IconButton", "Card", "Input", "Select", "Field", "Dialog", "Checkbox", "Switch", "Tag", "Tooltip", "NavBar", "AspectRatio", "Menu", "MenuItem", "MenuSeparator"];
     const out = loadSlotContracts(src, names);
     expect(out.Dialog.map((s) => s.name)).toEqual(["title", "body", "footer"]);
     expect(out.Button).toEqual([]);
+    // `body` is the children slot by convention — scripts/patterns.ts skips
+    // `body` in the prop loop and takes an element's JSX children from it, so
+    // a children slot under any other name would render as a `name={…}` prop.
+    // Every other non-`body` slot (Menu's `trigger`, Dialog's title/footer)
+    // really is a ReactNode prop.
+    expect(out.Menu.map((s) => s.name)).toEqual(["trigger", "body"]);
+    expect(out.MenuItem).toEqual([]);
+    expect(out.MenuSeparator).toEqual([]);
   });
 });

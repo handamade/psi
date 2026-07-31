@@ -1,4 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+// Import node's URL under its own name: the package's jsdom test environment
+// makes a bare `new URL(...)` resolve against a fake browser location instead
+// of `import.meta.url`'s file: base (same reason as scripts/slots.test.ts).
+import { fileURLToPath, URL as NodeURL } from "node:url";
 import { renderPreset } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
 
@@ -72,6 +77,67 @@ describe("renderPreset", () => {
     expect(renderPreset({ ...confirm, gaps: ["Toolbar"] }, components)).toBeNull();
     const noDefault: Pattern = { ...confirm, parameters: [{ key: "size", ask: "?", options: [32] }] };
     expect(renderPreset(noDefault, components)).toBeNull();
+  });
+
+  // Guards the D53 slot contract against the shape it originally shipped with
+  // (a children slot named `items`). renderPreset takes an element's JSX
+  // children from `body` alone and turns every other slot into a prop, so a
+  // Menu whose children slot were named anything else would emit
+  // `<Menu items={<>…</>} />` — a prop Menu does not have, and no children.
+  // The slot names come from the real src/Menu/slots.json, so a rename there
+  // fails this test rather than silently breaking pattern composition.
+  it("composes Menu with children from `body` and the trigger as a prop (D53)", () => {
+    const menuSlots = (
+      JSON.parse(
+        readFileSync(fileURLToPath(new NodeURL("../src/Menu/slots.json", import.meta.url)), "utf8"),
+      ) as { slots: ManifestComponent["slots"] }
+    ).slots;
+    expect(menuSlots.map((s) => s.name)).toEqual(["trigger", "body"]);
+
+    const menuComponents: ManifestComponent[] = [
+      ...components,
+      {
+        name: "Menu",
+        slots: menuSlots,
+        props: [{ name: "placement", type: '"bottom-start" | "bottom-end"', required: false, default: "bottom-start" }],
+      },
+      { name: "MenuItem", slots: [], props: [{ name: "variant", type: '"neutral" | "danger"', required: false, default: "neutral" }] },
+      { name: "MenuSeparator", slots: [], props: [] },
+    ];
+
+    const rowActions: Pattern = {
+      id: "menu-compose-test",
+      intent: "Overflow action menu",
+      match: ["row actions"],
+      compose: {
+        component: "Menu",
+        props: { placement: "{param:placement}" },
+        slots: {
+          trigger: [{ component: "Button", props: { variant: "ghost", size: 32 }, content: "trigger-label" }],
+          body: [
+            { component: "MenuItem", content: "edit-label" },
+            { component: "MenuSeparator" },
+            { component: "MenuItem", props: { variant: "danger" }, content: "delete-label" },
+          ],
+        },
+      },
+      parameters: [
+        { key: "placement", ask: "Which corner?", options: ["bottom-start", "bottom-end"], default: "bottom-end" },
+      ],
+      content: { "trigger-label": "Actions", "edit-label": "Edit", "delete-label": "Delete" },
+      gaps: [],
+    };
+
+    expect(renderPreset(rowActions, menuComponents)).toBe(
+`<Menu
+  placement="bottom-end"
+  trigger={<Button size={32} variant="ghost">Actions</Button>}
+>
+  <MenuItem>Edit</MenuItem>
+  <MenuSeparator />
+  <MenuItem variant="danger">Delete</MenuItem>
+</Menu>
+`);
   });
 
   it('escapes " as &quot; in an attribute position, leaves it raw as a text child', () => {

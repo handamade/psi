@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
+  Menu, MenuItem, MenuSeparator,
 } from "./index.js";
 
 const cases: Array<[string, React.ReactElement]> = [
@@ -29,6 +30,8 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Tooltip", <Tooltip content="Info"><button>Trigger</button></Tooltip>],
   ["Toolbar labeled", <Toolbar aria-label="Filters"><label>Search<Input size={32} /></label><Tag variant="neutral">Active</Tag></Toolbar>],
   ["Toolbar unlabeled", <Toolbar><Button size={32} variant="ghost">Clear</Button></Toolbar>],
+  ["Menu open", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Row actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuSeparator /><MenuItem onSelect={() => {}} variant="danger">Delete</MenuItem></Menu>],
+  ["Menu with a disabled item", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuItem onSelect={() => {}} disabled>Archive</MenuItem></Menu>],
 ];
 
 describe("axe: no violations in rendered components", () => {

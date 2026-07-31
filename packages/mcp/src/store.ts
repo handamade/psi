@@ -20,6 +20,30 @@ export interface Store {
 
 const MAX_RESULTS = 20;
 
+/** Documented search-response budget: "serialized result <= 6000 characters
+ * (~1.5k tokens)" (docs/superpowers/plans/2026-07-18-agent-access-plan.md),
+ * asserted by __tests__/store.test.ts's "stays within the response budget". */
+const RESPONSE_BUDGET = 6000;
+
+/** Order the empty-query overview is filled in. Guidance first, catalog last,
+ * because the two grow and cost very differently:
+ *
+ *   topics   — a fixed, slow-growing set of terse briefs (~90 chars each).
+ *              Carries the rules an agent cannot guess, `getting-started`
+ *              (the five required CSS imports) above all.
+ *   patterns — a handful of composition recipes, moderately sized.
+ *   components — verbose (up to 220 chars each) and the only axis that grows
+ *              with every release. Also the axis a keyword query recovers
+ *              best: search("menu") finds Menu; no query re-derives a house
+ *              rule an agent doesn't know exists.
+ *
+ * Capping by item *count* (the previous scheme) evicted the tail, and since
+ * components were emitted first the tail was always topics — so registering
+ * D53's Menu components silently dropped eight topics including
+ * `getting-started`. Filling by serialized *length* in this order instead
+ * degrades only the component tail, which is the cheap thing to lose. */
+const OVERVIEW_KIND_ORDER: Array<Brief["kind"]> = ["topic", "pattern", "component"];
+
 const TOPIC_SUMMARIES: Record<string, string> = {
   variants: "Variant intent and typical use for all 8 flat variants",
   rules: "House rules: accent budget, sizing, color binding",
@@ -98,8 +122,22 @@ export function createStore(index: PsiIndex): Store {
   function search(query: string): Brief[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
-      // Overview: all components, patterns, and topics (tokens are discoverable via query).
-      return briefs.filter((b) => b.kind !== "token").slice(0, MAX_RESULTS + 10);
+      // Overview: topics, then patterns, then as many components as the
+      // response budget still affords (tokens are discoverable via query).
+      // Filled by serialized length, not item count, so the thing that gets
+      // dropped is always the component tail — never the guidance surface.
+      const candidates = OVERVIEW_KIND_ORDER.flatMap((kind) =>
+        briefs.filter((b) => b.kind === kind),
+      );
+      const out: Brief[] = [];
+      for (const brief of candidates) {
+        out.push(brief);
+        if (JSON.stringify(out).length > RESPONSE_BUDGET) {
+          out.pop();
+          break;
+        }
+      }
+      return out;
     }
     return briefs
       .map((b) => ({ b, s: score(b, terms) }))
