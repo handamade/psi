@@ -43,11 +43,18 @@ export function useMenuPlacement({ popoverRef, triggerRef, open, placement, anch
       const rect = trigger.getBoundingClientRect();
       const below = placement.startsWith("bottom");
       const alignEnd = placement.endsWith("end");
+      // getBoundingClientRect() is always physical, but "-start"/"-end" are
+      // logical: "-start" pins the left edge in LTR and the right edge in
+      // RTL; "-end" is the mirror. Read direction off the trigger (the
+      // natural place to ask, since it's the element the menu is anchored
+      // to) and flip which physical edge we pin accordingly.
+      const rtl = getComputedStyle(trigger).direction === "rtl";
+      const pinRight = alignEnd !== rtl;
       popover.style.position = "fixed";
       popover.style.top = below ? `${rect.bottom}px` : "";
       popover.style.bottom = below ? "" : `${window.innerHeight - rect.top}px`;
-      popover.style.left = alignEnd ? "" : `${rect.left}px`;
-      popover.style.right = alignEnd ? `${window.innerWidth - rect.right}px` : "";
+      popover.style.left = pinRight ? "" : `${rect.left}px`;
+      popover.style.right = pinRight ? `${window.innerWidth - rect.right}px` : "";
     };
 
     place();

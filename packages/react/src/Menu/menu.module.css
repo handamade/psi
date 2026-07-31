@@ -9,7 +9,11 @@
 
 .menu {
   min-width: 180px;
-  margin: 0;
+  /* Gap between trigger and menu (D53). Applies below the anchor floor too:
+     the @supports block re-asserts this same value for the anchor-positioned
+     path, but without it here the fallback path (useMenuPlacement.ts) would
+     sit flush against its trigger. */
+  margin: var(--psi-space-4);
   padding: var(--psi-space-4);
   border: 1px solid var(--psi-menu-border);
   border-radius: var(--psi-menu-radius);
