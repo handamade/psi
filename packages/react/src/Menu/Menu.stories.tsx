@@ -30,26 +30,33 @@ export const Default: Story = {
   ),
 };
 
-const placements: MenuPlacement[] = ["bottom-start", "bottom-end", "top-start", "top-end"];
-
-export const Placements: Story = {
-  render: () => (
-    <div style={{ display: "grid", gap: 120, gridTemplateColumns: "1fr 1fr", padding: 120 }}>
-      {placements.map((placement) => (
-        <Menu
-          key={placement}
-          open
-          onClose={() => {}}
-          placement={placement}
-          aria-label={placement}
-          trigger={<Button size={32}>{placement}</Button>}
-        >
+/** One story per placement, deliberately NOT combined into a grid.
+ *
+ * popover="auto" mutually dismisses: showing one auto popover closes every
+ * other open one that is not its ancestor, so four sibling menus cannot be
+ * open at once — React runs the four sync effects in tree order and only the
+ * last-mounted survives. The old combined `Placements` story rendered exactly
+ * one menu and looked broken. Verified directly in the browser:
+ *   a.showPopover()  // {a: true,  b: false}
+ *   b.showPopover()  // {a: false, b: true}   <- showing b closed a
+ * Do not merge these back together. (D58) */
+function placementStory(placement: MenuPlacement): Story {
+  return {
+    args: { open: true, onClose: () => {}, placement, "aria-label": `Menu ${placement}` },
+    render: (args) => (
+      <div style={{ padding: 120 }}>
+        <Menu {...args} trigger={<Button size={32}>{placement}</Button>}>
           {items}
         </Menu>
-      ))}
-    </div>
-  ),
-};
+      </div>
+    ),
+  };
+}
+
+export const PlacementBottomStart: Story = placementStory("bottom-start");
+export const PlacementBottomEnd: Story = placementStory("bottom-end");
+export const PlacementTopStart: Story = placementStory("top-start");
+export const PlacementTopEnd: Story = placementStory("top-end");
 
 export const WithDisabledItem: Story = {
   args: { open: true, onClose: () => {}, placement: "bottom-start", "aria-label": "Row actions" },
@@ -78,14 +85,54 @@ export const WithDisabledItem: Story = {
 export const FallbackPlacement: Story = {
   decorators: [
     (StoryFn) => {
-      const original = CSS.supports.bind(CSS);
-      CSS.supports = ((prop: string, value?: string) =>
-        prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
+      // The stub is installed during render so it is in place for every
+      // phase the story might read it from — render, layout effect, or
+      // passive effect. Installing it in an effect would couple this story
+      // to which effect kind useMenuPlacement happens to use internally,
+      // and would silently stop forcing the fallback branch if that ever
+      // changed. Only the *restore* can be deferred. (D58)
+      const originalRef = React.useRef<typeof CSS.supports | null>(null);
+      const stubRef = React.useRef<typeof CSS.supports | null>(null);
+      if (originalRef.current === null) {
+        const original = CSS.supports.bind(CSS);
+        originalRef.current = original;
+        const stub = ((prop: string, value?: string) =>
+          prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
+        stubRef.current = stub;
+        CSS.supports = stub;
+      }
+      // Storybook keeps ONE preview iframe for the whole session, so an
+      // unrestored CSS.supports leaks into every later story and into the
+      // autodocs page (tags: ["autodocs"] is global in preview.ts). Restore
+      // only if CSS.supports is still exactly the stub this instance
+      // installed — if a concurrent instance's stub is in place instead
+      // (e.g. StrictMode double-render remounting hooks), overwriting it
+      // would stomp that instance's install rather than being a no-op. (D58)
+      // The converse hazard: under a StrictMode remount, this cleanup also
+      // fires for the *first* mount's effect while the story is still
+      // mounted (mount → cleanup → mount is how StrictMode probes for
+      // missing cleanup), restoring native CSS.supports and silently
+      // un-forcing the fallback branch before the story that needs it ever
+      // renders visibly. Storybook does not enable StrictMode today
+      // (apps/storybook/.storybook/main.ts sets no `reactStrictMode`), so
+      // this is currently inert — noted so it isn't rediscovered the hard
+      // way if that ever changes.
+      React.useEffect(
+        () => () => {
+          if (originalRef.current && CSS.supports === stubRef.current) {
+            CSS.supports = originalRef.current;
+          }
+        },
+        [],
+      );
       return (
-        <>
-          <style>{`[data-psi-menu] { position-area: none !important; position-try-fallbacks: none !important; }`}</style>
+        <div data-psi-fallback-probe>
+          {/* Scoped to this story's subtree, not the document: the old
+              [data-psi-menu] selector killed position-area for every menu on
+              the autodocs page. (D58) */}
+          <style>{`[data-psi-fallback-probe] [data-psi-menu] { position-area: none !important; position-try-fallbacks: none !important; }`}</style>
           <StoryFn />
-        </>
+        </div>
       );
     },
   ],
@@ -93,4 +140,45 @@ export const FallbackPlacement: Story = {
   render: (args) => (
     <Menu {...args} trigger={<Button size={32}>Actions</Button>}>{items}</Menu>
   ),
+};
+
+/** Two menus sharing one `openId` — the shape of the `row-actions` pattern.
+ *  Exists to pin D58: switching from A to B must leave B open. `onClose` is
+ *  written the naive way on purpose; the component, not the consumer, is what
+ *  has to make that correct. Driven by `apps/storybook/vr/menu.interaction.spec.ts`. */
+function SwitchingDemo() {
+  const [openId, setOpenId] = React.useState<string | null>(null);
+  const [lastReason, setLastReason] = React.useState<string>("none");
+
+  return (
+    <div style={{ display: "flex", gap: 24, padding: 40, alignItems: "flex-start" }}>
+      {(["a", "b"] as const).map((id) => (
+        <Menu
+          key={id}
+          open={openId === id}
+          onClose={(reason) => {
+            setLastReason(reason);
+            setOpenId(null);
+          }}
+          aria-label={`Menu ${id}`}
+          trigger={
+            <Button
+              size={32}
+              onClick={() => setOpenId((current) => (current === id ? null : id))}
+            >
+              {id.toUpperCase()}
+            </Button>
+          }
+        >
+          <MenuItem onSelect={() => {}}>Edit</MenuItem>
+          <MenuItem onSelect={() => {}}>Duplicate</MenuItem>
+        </Menu>
+      ))}
+      <span data-testid="last-reason">{lastReason}</span>
+    </div>
+  );
+}
+
+export const SwitchingBetweenMenus: Story = {
+  render: () => <SwitchingDemo />,
 };
