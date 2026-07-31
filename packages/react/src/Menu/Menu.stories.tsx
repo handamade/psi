@@ -85,14 +85,35 @@ export const WithDisabledItem: Story = {
 export const FallbackPlacement: Story = {
   decorators: [
     (StoryFn) => {
-      const original = CSS.supports.bind(CSS);
-      CSS.supports = ((prop: string, value?: string) =>
-        prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
+      // The stub MUST be installed during render, not in an effect: React
+      // flushes child effects before parent ones, so useMenuPlacement's
+      // effects inside the story would run against the native CSS.supports
+      // and take the anchor branch — defeating the whole story. Only the
+      // *restore* can be deferred. (D58)
+      const originalRef = React.useRef<typeof CSS.supports | null>(null);
+      if (originalRef.current === null) {
+        const original = CSS.supports.bind(CSS);
+        originalRef.current = original;
+        CSS.supports = ((prop: string, value?: string) =>
+          prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
+      }
+      // Storybook keeps ONE preview iframe for the whole session, so an
+      // unrestored CSS.supports leaks into every later story and into the
+      // autodocs page (tags: ["autodocs"] is global in preview.ts). (D58)
+      React.useEffect(
+        () => () => {
+          if (originalRef.current) CSS.supports = originalRef.current;
+        },
+        [],
+      );
       return (
-        <>
-          <style>{`[data-psi-menu] { position-area: none !important; position-try-fallbacks: none !important; }`}</style>
+        <div className="psi-fallback-probe">
+          {/* Scoped to this story's subtree, not the document: the old
+              [data-psi-menu] selector killed position-area for every menu on
+              the autodocs page. (D58) */}
+          <style>{`.psi-fallback-probe [data-psi-menu] { position-area: none !important; position-try-fallbacks: none !important; }`}</style>
           <StoryFn />
-        </>
+        </div>
       );
     },
   ],
