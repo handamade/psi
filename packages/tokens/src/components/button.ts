@@ -61,4 +61,30 @@ export const buttonVars: Record<string, string> = {
   "outline-border": "var(--psi-border-strong)",
 
   "focus-ring": "var(--psi-border-focus)",
+
+  // ── Size ramp (D54) — label ramp; IconButton binds -height for both axes ──
+  "24-height": "var(--psi-control-24-height)",
+  "32-height": "var(--psi-control-32-height)",
+  "40-height": "var(--psi-control-40-height)",
+  "48-height": "var(--psi-control-48-height)",
+
+  "24-padding-inline": "var(--psi-control-24-padding-inline)",
+  "32-padding-inline": "var(--psi-control-32-padding-inline)",
+  "40-padding-inline": "var(--psi-control-40-padding-inline)",
+  "48-padding-inline": "var(--psi-control-48-padding-inline)",
+
+  "24-padding-inline-icon": "var(--psi-control-24-padding-inline-icon)",
+  "32-padding-inline-icon": "var(--psi-control-32-padding-inline-icon)",
+  "40-padding-inline-icon": "var(--psi-control-40-padding-inline-icon)",
+  "48-padding-inline-icon": "var(--psi-control-48-padding-inline-icon)",
+
+  "24-gap": "var(--psi-control-24-gap)",
+  "32-gap": "var(--psi-control-32-gap)",
+  "40-gap": "var(--psi-control-40-gap)",
+  "48-gap": "var(--psi-control-48-gap)",
+
+  "24-font": "var(--psi-control-24-font)",
+  "32-font": "var(--psi-control-32-font)",
+  "40-font": "var(--psi-control-40-font)",
+  "48-font": "var(--psi-control-48-font)",
 };

@@ -35,23 +35,23 @@
 /* ── Sizes (square: width = height) ──────────────────────────── */
 
 .size24 {
-  width: var(--psi-size-24);
-  height: var(--psi-size-24);
+  width: var(--psi-button-24-height);
+  height: var(--psi-button-24-height);
 }
 
 .size32 {
-  width: var(--psi-size-32);
-  height: var(--psi-size-32);
+  width: var(--psi-button-32-height);
+  height: var(--psi-button-32-height);
 }
 
 .size40 {
-  width: var(--psi-size-40);
-  height: var(--psi-size-40);
+  width: var(--psi-button-40-height);
+  height: var(--psi-button-40-height);
 }
 
 .size48 {
-  width: var(--psi-size-48);
-  height: var(--psi-size-48);
+  width: var(--psi-button-48-height);
+  height: var(--psi-button-48-height);
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */

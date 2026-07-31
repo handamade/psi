@@ -110,4 +110,26 @@ describe("buttonVars", () => {
     expect(buttonVars["outline-border"]).toBe("var(--psi-border-strong)");
     expect(BUTTON_VARIANTS).toContain("outline");
   });
+
+  describe("size ramp (D54)", () => {
+    const SIZES = [24, 32, 40, 48] as const;
+
+    it("aliases the control family for every ramp property", () => {
+      for (const n of SIZES) {
+        expect(buttonVars[`${n}-height`]).toBe(`var(--psi-control-${n}-height)`);
+        expect(buttonVars[`${n}-padding-inline`]).toBe(`var(--psi-control-${n}-padding-inline)`);
+        expect(buttonVars[`${n}-padding-inline-icon`]).toBe(`var(--psi-control-${n}-padding-inline-icon)`);
+        expect(buttonVars[`${n}-gap`]).toBe(`var(--psi-control-${n}-gap)`);
+        expect(buttonVars[`${n}-font`]).toBe(`var(--psi-control-${n}-font)`);
+      }
+    });
+
+    it("binds the label ramp, never the value ramp", () => {
+      const ramp = Object.entries(buttonVars).filter(([k]) => /^\d\d-/.test(k));
+      expect(ramp).toHaveLength(20);
+      for (const [, value] of ramp) {
+        expect(value).not.toContain("--psi-control-value-");
+      }
+    });
+  });
 });

@@ -4,7 +4,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--psi-space-6);
   border: none;
   border-radius: var(--psi-radius-8);
   cursor: pointer;
@@ -36,28 +35,50 @@
 
 /* ── Sizes ────────────────────────────────────────────────────── */
 
+/* Optical inset (D55): an icon is a solid shape with no side bearing, so a
+   leading icon sits closer to the edge than text does. :has() replaces the
+   Figma construction (container + text wrapper inset) with no DOM wrapper —
+   identical pixels, no API change. A consumer who wraps their icon in a
+   <span> gets no inset and can set --psi-button-{n}-padding-inline-icon. */
+
 .size24 {
-  height: var(--psi-size-24);
-  padding-inline: var(--psi-space-8);
-  font: var(--psi-button-font, var(--psi-text-12-16-medium));
+  height: var(--psi-button-24-height);
+  padding-inline: var(--psi-button-24-padding-inline);
+  gap: var(--psi-button-24-gap);
+  font: var(--psi-button-font, var(--psi-button-24-font));
+}
+.size24:has(> svg:first-child) {
+  padding-inline-start: var(--psi-button-24-padding-inline-icon);
 }
 
 .size32 {
-  height: var(--psi-size-32);
-  padding-inline: var(--psi-space-12);
-  font: var(--psi-button-font, var(--psi-text-14-20-medium));
+  height: var(--psi-button-32-height);
+  padding-inline: var(--psi-button-32-padding-inline);
+  gap: var(--psi-button-32-gap);
+  font: var(--psi-button-font, var(--psi-button-32-font));
+}
+.size32:has(> svg:first-child) {
+  padding-inline-start: var(--psi-button-32-padding-inline-icon);
 }
 
 .size40 {
-  height: var(--psi-size-40);
-  padding-inline: var(--psi-space-16);
-  font: var(--psi-button-font, var(--psi-text-16-24-medium));
+  height: var(--psi-button-40-height);
+  padding-inline: var(--psi-button-40-padding-inline);
+  gap: var(--psi-button-40-gap);
+  font: var(--psi-button-font, var(--psi-button-40-font));
+}
+.size40:has(> svg:first-child) {
+  padding-inline-start: var(--psi-button-40-padding-inline-icon);
 }
 
 .size48 {
-  height: var(--psi-size-48);
-  padding-inline: var(--psi-space-20);
-  font: var(--psi-button-font, var(--psi-text-18-28-medium));
+  height: var(--psi-button-48-height);
+  padding-inline: var(--psi-button-48-padding-inline);
+  gap: var(--psi-button-48-gap);
+  font: var(--psi-button-font, var(--psi-button-48-font));
+}
+.size48:has(> svg:first-child) {
+  padding-inline-start: var(--psi-button-48-padding-inline-icon);
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */
