@@ -10,9 +10,14 @@ const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf
 const patterns = loadPatterns(join(root, "patterns"));
 
 describe("seed patterns against the real manifest", () => {
-  it("all three load, validate, and none are gapped (Toolbar landed — D52)", () => {
+  it("all four load, validate, and none are gapped (Menu's row-actions landed — D53)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts);
-    expect(patterns.map((p) => p.id).sort()).toEqual(["destructive-confirm", "filter-toolbar", "settings-form-row"]);
+    expect(patterns.map((p) => p.id).sort()).toEqual([
+      "destructive-confirm",
+      "filter-toolbar",
+      "row-actions",
+      "settings-form-row",
+    ]);
     expect(gaps).toEqual({});
   });
   it("Field declares its prop-slots in the manifest", () => {
