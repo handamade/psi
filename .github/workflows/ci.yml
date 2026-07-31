@@ -18,9 +18,10 @@ jobs:
       # pnpm version comes from the packageManager field in package.json
       - uses: pnpm/action-setup@v4
 
+      # Node version comes from .nvmrc — one source of truth with local dev
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile

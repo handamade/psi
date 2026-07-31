@@ -14,7 +14,7 @@
 
 Every task's requirements implicitly include this section.
 
-- **Node 24 is required and is now the default.** `pnpm` 11.9 needs `node:sqlite` and dies on Node 20. `nvm alias default` is `24` and `~/.zshenv` resolves it by glob, so fresh shells — interactive, login and non-interactive alike — already get v24.16.0; no prefix needed. Verify with `node -v` before starting. If it reports v20 you are in a shell process that predates that setup: open a new one rather than prefixing commands.
+- **Node 24 is required** (`.nvmrc`; `engines.node` is `>=22.13`, pnpm 11.9's floor — it needs `node:sqlite` and dies on Node 20 with `ERR_UNKNOWN_BUILTIN_MODULE`). `nvm alias default` is `24` and `~/.zshenv` resolves it by glob, so fresh shells — interactive, login and non-interactive alike — already get v24.16.0. Verify with `node -v` before starting. If it reports v20 you are in a shell process that predates that setup: run `nvm use` (reads `.nvmrc`) to fix that shell, rather than prefixing individual commands with a PATH override.
 - **Zero new runtime dependencies.** `packages/react/package.json` `dependencies` stays `{}`.
 - **Sizes are px numbers** (`24 | 32 | 40 | 48`), never S/M/L. Scale names are pixel-true (`psi-gap-8` = 8px).
 - **Variants are flat:** `accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline`. No primary/secondary. `danger` only for destructive actions.
