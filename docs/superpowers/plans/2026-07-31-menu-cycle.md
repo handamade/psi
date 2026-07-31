@@ -1361,6 +1361,8 @@ cat packages/react/patterns/filter-toolbar.json
 
 Every field used below must exist in the schema. If `pattern.schema.json` has `additionalProperties: false` at the root, do not invent fields.
 
+Fill text the consumer must replace goes in `[square brackets]`. Never `<angle brackets>` or `{braces}`: both end a JSX text run, so the generated preset would not parse. D48 error class 9 rejects them at build time — this is the same silent-pass failure class as Task 7's contract.
+
 - [ ] **Step 2: Author the pattern**
 
 Create `packages/react/patterns/row-actions.json`:
@@ -1393,7 +1395,7 @@ Create `packages/react/patterns/row-actions.json`:
   "content": {
     "edit-label": "Edit",
     "duplicate-label": "Duplicate",
-    "delete-label": "<verb the object>"
+    "delete-label": "[verb the object]"
   },
   "gaps": []
 }

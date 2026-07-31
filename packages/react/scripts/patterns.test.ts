@@ -138,6 +138,18 @@ describe("validatePatterns (one case per D48 error class)", () => {
     expect(() => ok(base({ content: { orphan: "x" } }))).toThrow(/content "orphan".*never referenced/);
   });
 
+  it("9: fill text must be JSX-safe — the preset renders it into a text child", () => {
+    const content = (v: string) => base({ compose: { component: "Button", content: "label" }, content: { label: v } });
+    expect(() => ok(content("<verb the object>"))).toThrow(/content "label" contains "<"/);
+    expect(() => ok(content("{{verb the object}}"))).toThrow(/content "label" contains "\{"/);
+    expect(() => ok(content("[verb the object]"))).not.toThrow();
+    // Literal (non-placeholder) slot fills are rendered verbatim too — including
+    // a near-miss placeholder, which would otherwise reach the preset as text.
+    const fill = (v: string) => base({ compose: { component: "Button", slots: { body: [v] } } });
+    expect(() => ok(fill("<what is permanently lost>"))).toThrow(/slot text fill.*contains "<"/);
+    expect(() => ok(fill("{content:Nope}"))).toThrow(/slot text fill.*contains "\{"/);
+  });
+
   it("gap-node props still track {content:} placeholders (review fix: gap props were skipped entirely)", () => {
     const p = base({
       gaps: ["Toolbar"],

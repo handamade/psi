@@ -89,10 +89,21 @@ const PARAM_RE = /^\{param:([a-z0-9-]+)\}$/;
 const CONTENT_RE = /^\{content:([a-z0-9-]+)\}$/;
 const CANONICAL_CARDINALITIES = new Set(["0..1", "1..1", "0..*", "1..*"]);
 
+/** Characters that end a JSX text run: `<` opens an element, `{` opens an
+ * expression container. Fill text carrying either one renders into a preset
+ * that does not parse — the original angle-bracket placeholder convention
+ * (`<verb the object>`) emitted `<Button><verb the object></Button>`, which
+ * a JSX parser reads as an unclosed `<verb>` element. Checked on every
+ * `content` value, not only the ones that reach a text position: whether a
+ * key lands in a child or an attribute depends on the compose tree, and fill
+ * text is prose either way. Use bracketed prose (`[verb the object]`). */
+const JSX_UNSAFE_TEXT = /[<{]/;
+
 /** Validates every pattern's compose tree against the manifest and the D45
- * slot contracts (D48 error classes 1-8). Throws on the first violation
- * found; returns the gap map (patternId -> gap component names actually
- * used) when every pattern is clean. */
+ * slot contracts (D48 error classes 1-8, plus class 9: fill text must be
+ * JSX-safe so `renderPreset` can only emit a parseable preset). Throws on
+ * the first violation found; returns the gap map (patternId -> gap component
+ * names actually used) when every pattern is clean. */
 export function validatePatterns(
   patterns: Pattern[],
   components: ManifestComponent[],
@@ -107,6 +118,15 @@ export function validatePatterns(
     // gap-node site (no manifest prop to check a union against — unconstrained).
     const paramSites = new Map<string, Array<Array<string | number> | null>>();
     const referencedContent = new Set<string>();
+
+    const assertJsxSafeText = (value: string, what: string) => {
+      const bad = JSX_UNSAFE_TEXT.exec(value);
+      if (bad) {
+        throw new Error(
+          `${prefix}${what} contains "${bad[0]}" — fill text can land in a JSX text child, where "<" and "{" break the emitted preset; use bracketed prose like "[verb the object]"`,
+        );
+      }
+    };
 
     // Legal in prop positions: both {param:key} and {content:key}.
     const trackPropPlaceholders = (value: unknown) => {
@@ -127,7 +147,15 @@ export function validatePatterns(
         );
       }
       const contentMatch = CONTENT_RE.exec(value);
-      if (contentMatch) referencedContent.add(contentMatch[1]);
+      if (contentMatch) {
+        referencedContent.add(contentMatch[1]);
+        return;
+      }
+      // Not a placeholder — a literal text fill, rendered into the preset
+      // verbatim, so it has to be JSX-safe on its own (this also catches a
+      // near-miss placeholder like `{content:Foo}`, which would otherwise be
+      // emitted as literal text).
+      assertJsxSafeText(value, `slot text fill "${value}"`);
     };
 
     const walk = (node: PatternNode, path: string) => {
@@ -297,10 +325,11 @@ export function validatePatterns(
       }
     }
 
-    for (const key of Object.keys(pattern.content)) {
+    for (const [key, value] of Object.entries(pattern.content)) {
       if (!referencedContent.has(key)) {
         throw new Error(`${prefix}content "${key}" declared but never referenced`);
       }
+      assertJsxSafeText(value, `content "${key}"`);
     }
     for (const key of referencedContent) {
       if (!(key in pattern.content)) {

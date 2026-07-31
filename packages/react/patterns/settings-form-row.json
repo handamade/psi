@@ -15,9 +15,9 @@
   },
   "parameters": [],
   "content": {
-    "row-label": "<setting name>",
-    "control-label": "<what turning it on does>",
-    "row-description": "<one-line consequence of the setting>"
+    "row-label": "[setting name]",
+    "control-label": "[what turning it on does]",
+    "row-description": "[one-line consequence of the setting]"
   },
   "gaps": []
 }

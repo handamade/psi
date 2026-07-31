@@ -17,10 +17,10 @@
     { "key": "size", "ask": "Button size?", "options": [32, 40], "default": 32 }
   ],
   "content": {
-    "title": "<Delete the object?>",
-    "consequence": "<what is permanently lost>",
+    "title": "[Delete the object?]",
+    "consequence": "[what is permanently lost]",
     "cancel-label": "Cancel",
-    "confirm-label": "<verb the object>"
+    "confirm-label": "[verb the object]"
   },
   "gaps": []
 }

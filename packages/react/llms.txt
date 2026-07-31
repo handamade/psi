@@ -14,6 +14,7 @@
 - variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline.
 - One accent per visual group. danger only for destructive actions.
 - Before composing multi-component UI, consult dist/patterns.json (or psi-mcp search) for a matching pattern and honor its clarifying parameters; presets are copy-paste JSX generated from the compose tree.
+- Pattern `content` text in `[square brackets]` is a placeholder to replace with real copy. Never `<angle brackets>` or `{braces}` — those do not parse as JSX text, so the build rejects them (D48 class 9).
 
 ## Button: href + outline (D33/D34)
 - Button renders as an <a> when given `href` (plus optional `target`/`rel`); disabled anchors get aria-disabled, no href attribute, and pointer-events: none instead of the disabled attribute.
