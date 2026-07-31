@@ -94,3 +94,44 @@ export const FallbackPlacement: Story = {
     <Menu {...args} trigger={<Button size={32}>Actions</Button>}>{items}</Menu>
   ),
 };
+
+/** Two menus sharing one `openId` — the shape of the `row-actions` pattern.
+ *  Exists to pin D58: switching from A to B must leave B open. `onClose` is
+ *  written the naive way on purpose; the component, not the consumer, is what
+ *  has to make that correct. Driven by `apps/storybook/vr/menu.interaction.spec.ts`. */
+function SwitchingDemo() {
+  const [openId, setOpenId] = React.useState<string | null>(null);
+  const [lastReason, setLastReason] = React.useState<string>("none");
+
+  return (
+    <div style={{ display: "flex", gap: 24, padding: 40, alignItems: "flex-start" }}>
+      {(["a", "b"] as const).map((id) => (
+        <Menu
+          key={id}
+          open={openId === id}
+          onClose={(reason) => {
+            setLastReason(reason);
+            setOpenId(null);
+          }}
+          aria-label={`Menu ${id}`}
+          trigger={
+            <Button
+              size={32}
+              onClick={() => setOpenId((current) => (current === id ? null : id))}
+            >
+              {id.toUpperCase()}
+            </Button>
+          }
+        >
+          <MenuItem onSelect={() => {}}>Edit</MenuItem>
+          <MenuItem onSelect={() => {}}>Duplicate</MenuItem>
+        </Menu>
+      ))}
+      <span data-testid="last-reason">{lastReason}</span>
+    </div>
+  );
+}
+
+export const SwitchingBetweenMenus: Story = {
+  render: () => <SwitchingDemo />,
+};
