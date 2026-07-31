@@ -1,7 +1,7 @@
 {
   "id": "row-actions",
-  "intent": "List or table row with an overflow menu of per-row actions, including a destructive one — hand the destructive item's confirmation off to the destructive-confirm pattern",
-  "match": ["row actions", "overflow menu", "kebab menu", "per-row actions", "table row menu"],
+  "intent": "List or table row with a labelled actions menu, including a destructive item — hand the destructive item's confirmation off to the destructive-confirm pattern. The trigger is a text Button, not an icon-only kebab: IconButton cannot carry an accessible name through the manifest, so it is not composable in a pattern yet",
+  "match": ["row actions", "per-row actions", "table row menu", "actions menu", "row action list"],
   "compose": {
     "component": "Menu",
     "props": { "placement": "{param:placement}", "aria-label": "{content:trigger-label}" },
