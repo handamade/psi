@@ -15,7 +15,8 @@
   field, which npm reads as all-rights-reserved — the packages were installable
   but not legally reusable, contradicting the open-core intent. Adds
   `"license": "MIT"` to each package and an MIT `LICENSE` at the repo root
-  (npm includes it in every published tarball automatically).
+  (a copy also sits in each package directory — npm only auto-includes a LICENSE
+  from the package's own folder, not the monorepo root).
 
 ## 0.7.1
 
