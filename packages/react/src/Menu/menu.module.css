@@ -3,6 +3,12 @@
 
 .trigger {
   display: inline-flex;
+  /* A grid item (justify-self: stretch) or a flex-column item
+     (align-items: stretch) is stretched to its cell by default, and this
+     wrapper is the anchor box for BOTH placement paths — anchor-name is set
+     on it and the JS fallback measures it. Without this the menu anchors to
+     the cell edge instead of the trigger (D58). */
+  width: fit-content;
 }
 
 /* ── Popover surface ──────────────────────────────────────────── */
