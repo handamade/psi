@@ -1,5 +1,22 @@
 # @handamade/psi-mcp
 
+## 0.7.2
+
+### Patch Changes
+
+- Rebuild the served index against tokens/react 0.7.2. `psi-mcp` bakes its
+  search index at build time from `packages/react/dist/manifest.json` and
+  `packages/tokens/dist/*` (`index-builder.ts`), so the published artifact goes
+  stale whenever either upstream package changes — the D46 follow-up moved
+  `accent-color` into the `surface` property group, which flows into the
+  resolved-token scopes the index serves. No source change; this keeps the three
+  packages on the lockstep the 0.7.1 release established.
+- Declare the MIT license. All three packages were published with no `license`
+  field, which npm reads as all-rights-reserved — the packages were installable
+  but not legally reusable, contradicting the open-core intent. Adds
+  `"license": "MIT"` to each package and an MIT `LICENSE` at the repo root
+  (npm includes it in every published tarball automatically).
+
 ## 0.7.1
 
 ### Patch Changes

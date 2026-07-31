@@ -1,5 +1,20 @@
 # @handamade/react
 
+## 0.7.2
+
+### Patch Changes
+
+- Declare the MIT license. All three packages were published with no `license`
+  field, which npm reads as all-rights-reserved — the packages were installable
+  but not legally reusable, contradicting the open-core intent. Adds
+  `"license": "MIT"` to each package and an MIT `LICENSE` at the repo root
+  (npm includes it in every published tarball automatically).
+- cac00e2: NavBar: fix missing gutter padding and typeface (HAN-40). The inner layout div
+  still used the pre-D42 `ds-container` class — renamed to `psi-container` so the
+  gutter padding and max-width centering apply again. NavBar now also sets
+  `font: var(--psi-text-14-20-medium)` like every other text-bearing component
+  instead of inheriting the page font (UA serif on hosts that don't set one).
+
 ## 0.7.1
 
 ### Patch Changes

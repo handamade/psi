@@ -1,6 +1,7 @@
 {
   "name": "@handamade/psi-tokens",
-  "version": "0.7.1",
+  "version": "0.7.2",
+  "license": "MIT",
   "type": "module",
   "exports": {
     "./*.css": "./dist/*.css",
