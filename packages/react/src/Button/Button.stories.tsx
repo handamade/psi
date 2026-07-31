@@ -1,6 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Button } from "./Button.js";
+import { IconPlus } from "../icons/IconPlus.js";
 
 const meta: Meta<typeof Button> = {
   title: "Components/Button",
@@ -99,6 +100,20 @@ export const AllSizes: Story = {
       <Button variant="accent" size={32}>Size 32</Button>
       <Button variant="accent" size={40}>Size 40</Button>
       <Button variant="accent" size={48}>Size 48</Button>
+    </div>
+  ),
+};
+
+/** D55 optical inset: a leading icon sits one step closer to the edge than
+ * text does (12 [icon] 8 [label] 16 at size 40). Compare against AllSizes,
+ * whose text-only buttons must stay pixel-identical to pre-D54 output. */
+export const IconLeading: Story = {
+  render: () => (
+    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      <Button variant="accent" size={24}><IconPlus size={12} />Add item</Button>
+      <Button variant="accent" size={32}><IconPlus size={14} />Add item</Button>
+      <Button variant="accent" size={40}><IconPlus size={18} />Add item</Button>
+      <Button variant="accent" size={48}><IconPlus size={21} />Add item</Button>
     </div>
   ),
 };
