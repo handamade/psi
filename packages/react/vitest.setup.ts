@@ -21,8 +21,12 @@ if (!HTMLDialogElement.prototype.close) {
 
 // Polyfill Popover API for jsdom (D53 — Menu). Mirrors the dialog polyfill
 // above: enough surface for controlled open/close assertions, not a spec
-// implementation. Real browsers use the native API; the top layer, light
-// dismiss and Esc are exercised in Playwright VR, not here.
+// implementation. It dispatches `toggle` SYNCHRONOUSLY and implements neither
+// light dismiss nor the mutual dismissal of popover="auto", so anything that
+// depends on real dismissal ordering is invisible here — D58 was shipped
+// because of exactly that gap. Those paths are covered by
+// apps/storybook/vr/menu.interaction.spec.ts in a real browser; VR itself
+// only takes screenshots and exercises no interaction.
 if (!HTMLElement.prototype.showPopover) {
   HTMLElement.prototype.showPopover = function () {
     this.setAttribute("data-open", "");
