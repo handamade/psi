@@ -1,5 +1,11 @@
 # @handamade/psi-tokens
 
+## 0.8.1
+
+Version bump only — no change to this package. `@handamade/psi-*` are released
+in lockstep at one version number, so a fix in any one of them bumps all three.
+The 0.8.1 fix is in `@handamade/psi-react` (Menu dismissal correctness, D58).
+
 ## 0.8.0
 
 ### Minor Changes
