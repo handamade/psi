@@ -346,12 +346,23 @@ Expected: `--psi-button-radius: var(--psi-control-radius);` and `--psi-checkbox-
 Run: `pnpm test`
 Expected: PASS.
 
-- [ ] **Step 6: Run the visual regression gate**
+- [ ] **Step 6: Run the visual regression gate — on Linux, not macOS**
 
-Run: `pnpm vr`
-Expected: PASS with **zero diff pixels** and **zero updated snapshots**.
+The committed baselines in `stories.spec.ts-snapshots/` are Linux renders. Playwright suffixes snapshot names by platform, so a bare `pnpm vr` on macOS finds no `-darwin` baselines, fails every test as "snapshot doesn't exist", and — worse — its default update mode silently writes 152 `-darwin.png` files into the snapshot directory. See `apps/storybook/vr/README.md`.
 
-This is the acceptance criterion for the whole plan. A non-zero diff means a default changed — most likely a `min()` typo, or a component token pointing at the wrong rung. Do not run with `--update-snapshots`; do not accept a diff as "close enough". Diagnose and fix, then re-run.
+Build first, then run the suite inside the Playwright Linux image:
+
+```bash
+pnpm build
+docker run --rm -v "$PWD":/w -w /w mcr.microsoft.com/playwright:v1.61.1-jammy \
+  bash -c 'corepack enable && corepack prepare pnpm@11.9.0 --activate && pnpm vr --update-snapshots=none'
+```
+
+Expected: PASS, **zero diff pixels, zero updated snapshots**. `pnpm build` must run before the container so `storybook-static/` contains this task's CSS.
+
+This is the acceptance criterion for the whole plan. A non-zero diff means a default changed — most likely a `min()` typo, or a component token pointing at the wrong rung. Never pass `--update-snapshots` in a mode that writes, and never commit `-darwin.png` files. Diagnose and fix, then re-run.
+
+If Docker is unavailable, skip this step, say so explicitly in the report, and let CI's `vr` job be the gate on the PR — do not substitute a macOS run and call it a pass.
 
 - [ ] **Step 7: Commit**
 
