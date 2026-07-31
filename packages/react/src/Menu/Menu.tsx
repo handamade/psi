@@ -1,5 +1,5 @@
-import { createContext, useCallback, useEffect, useRef } from "react";
-import type { KeyboardEvent, ReactNode, Ref } from "react";
+import { cloneElement, createContext, isValidElement, useCallback, useEffect, useRef } from "react";
+import type { KeyboardEvent, ReactElement, ReactNode, Ref } from "react";
 import styles from "./menu.module.css";
 
 export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end";
@@ -13,10 +13,23 @@ export const MenuContext = createContext<MenuContextValue>({ close: () => {} });
 export interface MenuProps {
   /** Controlled open state; syncs to showPopover()/hidePopover(). */
   open: boolean;
-  /** Called once per dismissal with its source; the consumer flips `open`. */
+  /**
+   * Called when a dismissal is *requested*; the consumer flips `open`.
+   *
+   * Menu never closes itself on `"esc"` or `"item-select"` — the popover stays
+   * open until `open` becomes false (D50). `"outside"` is the one exception:
+   * light dismiss is performed by the browser before it tells us, so by the
+   * time that reason is reported the popover is already closed. Flipping
+   * `open` to false is still required, to keep React's state in step.
+   */
   onClose: (reason: "esc" | "outside" | "item-select") => void;
-  /** Rendered by Menu, which owns its trigger wrapper and aria-haspopup wiring. */
-  trigger: ReactNode;
+  /**
+   * The trigger element. Must be a single React element that spreads unknown
+   * props onto a focusable node (a Psi `Button`, say): Menu clones it to add
+   * `aria-haspopup="menu"` and `aria-expanded`, so assistive tech associates
+   * the menu with the control users actually focus.
+   */
+  trigger: ReactElement<Record<string, unknown>>;
   /** Placement relative to the trigger. @default "bottom-start" */
   placement?: Placement;
   /** Accessible name for the menu when there is no visible label. */
@@ -35,16 +48,22 @@ function isPopoverOpen(el: HTMLElement): boolean {
  * and Esc come from the platform; roving keyboard, placement and dismissal
  * reasons are Psi's (D53). Controlled-only, like Dialog (D50).
  *
- * `toggle` fires on every popover state change — ours (Esc, item-select) and
- * the platform's (outside click) alike — so it is the single place onClose
- * is called from. Esc and item-select never call onClose directly: they
- * attribute a reason via `reasonRef` and ask the popover to hide, and the
- * `toggle` that hide raises is what actually reports the dismissal. That
- * keeps a dismissal reported exactly once even after the consumer's `open`
- * prop comes back around and the sync effect below re-observes it — by then
- * the popover is already closed, so the effect is a no-op instead of a second
- * hidePopover() call that would otherwise raise a second, unattributed
- * "outside" toggle for the same dismissal. */
+ * Controlled-only means Menu does not change its own visibility. Esc and
+ * item-select *report* a dismissal via onClose(reason) and leave the popover
+ * open; only the consumer flipping `open` to false actually closes it. Esc
+ * calls preventDefault() to suppress the platform's own popover dismissal,
+ * which is what makes that possible.
+ *
+ * Light dismiss (outside click) is the one asymmetry, and it is forced by the
+ * platform: the browser hides the popover itself and the hide-side
+ * `beforetoggle` is not cancelable, so the popover is already closed by the
+ * time the resulting `toggle` lets us report onClose("outside"). The consumer
+ * must still flip `open` to false so React's state matches the DOM.
+ *
+ * `toggle` therefore reports only that one reason. A close driven by the
+ * consumer (`open` true -> false) runs through the sync effect's own
+ * hidePopover(), which raises a `toggle` too — that one is suppressed, because
+ * a programmatic close is not a dismissal and must not call onClose. */
 export function Menu({
   open,
   onClose,
@@ -57,7 +76,9 @@ export function Menu({
 }: MenuProps) {
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLDivElement | null>(null);
-  const reasonRef = useRef<"esc" | "item-select" | null>(null);
+  // Set by the sync effect immediately before its own hidePopover(), and
+  // consumed by handleToggle, so a consumer-driven close stays silent.
+  const suppressNextCloseRef = useRef(false);
 
   const setRef = (node: HTMLDivElement | null) => {
     popoverRef.current = node;
@@ -70,53 +91,69 @@ export function Menu({
     if (!el) return;
     const isOpen = isPopoverOpen(el);
     if (open && !isOpen) el.showPopover();
-    else if (!open && isOpen) el.hidePopover();
+    else if (!open && isOpen) {
+      suppressNextCloseRef.current = true;
+      el.hidePopover();
+    }
   }, [open]);
 
   const handleToggle = useCallback(() => {
     const el = popoverRef.current;
     if (!el) return;
+    // Checked before the open/closed test on purpose: the flag must be
+    // consumed by the very next toggle whatever the element's state reads as
+    // by then, or a later genuine dismissal would inherit the suppression.
+    if (suppressNextCloseRef.current) {
+      suppressNextCloseRef.current = false;
+      return;
+    }
     if (isPopoverOpen(el)) return; // opening toggle — nothing to report
-    const attributed = reasonRef.current;
-    reasonRef.current = null;
-    onClose(attributed ?? "outside");
+    onClose("outside");
   }, [onClose]);
-
-  // Attribute `reason`, then ask the popover to hide (no-op if it already
-  // is). hidePopover() dispatches `toggle` synchronously, consumed by
-  // handleToggle above — the only place onClose is actually called.
-  const closeWith = useCallback((reason: "esc" | "item-select") => {
-    const el = popoverRef.current;
-    if (!el || !isPopoverOpen(el)) return;
-    reasonRef.current = reason;
-    el.hidePopover();
-  }, []);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Escape") return;
+    // Suppresses the platform's native popover Escape dismissal, so the
+    // popover stays open until the consumer flips `open`.
     event.preventDefault();
-    closeWith("esc");
+    onClose("esc");
   };
 
   // Consumed by Task 4's MenuItem via MenuContext, so item selection can
-  // report "item-select" without prop drilling.
+  // report "item-select" without prop drilling. Reports only — the popover
+  // stays open until the consumer flips `open`.
   const close = useCallback(
     (reason: "item-select") => {
-      closeWith(reason);
+      onClose(reason);
     },
-    [closeWith],
+    [onClose],
   );
+
+  // `trigger` is typed as a single element, but JS consumers (and `as any`)
+  // can still pass a string, fragment or array — cloneElement would throw on
+  // those. Fall back to rendering it untouched, minus the trigger ARIA, and
+  // say so rather than failing silently or crashing the tree.
+  const triggerIsElement = isValidElement(trigger);
+
+  useEffect(() => {
+    if (triggerIsElement) return;
+    console.warn(
+      "Psi Menu: `trigger` must be a single React element that forwards props to a focusable " +
+        "node. Menu clones it to attach aria-haspopup and aria-expanded; a string, fragment or " +
+        "array cannot carry them, so the menu renders without its trigger ARIA.",
+    );
+  }, [triggerIsElement]);
+
+  const triggerEl = triggerIsElement
+    ? cloneElement(trigger, { "aria-haspopup": "menu", "aria-expanded": open })
+    : trigger;
 
   return (
     <>
-      <div
-        ref={triggerRef}
-        className={styles.trigger}
-        data-psi-menu-trigger
-        aria-haspopup="menu"
-        aria-expanded={open}
-      >
-        {trigger}
+      {/* The wrapper stays: Task 6 uses it as the anchor box for CSS anchor
+          positioning. Only the ARIA lives on the trigger element itself. */}
+      <div ref={triggerRef} className={styles.trigger} data-psi-menu-trigger>
+        {triggerEl}
       </div>
       <div
         {...rest}
