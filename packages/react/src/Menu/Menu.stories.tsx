@@ -81,7 +81,10 @@ export const FallbackPlacement: Story = {
         prop === "anchor-name" ? false : original(prop, value as string)) as typeof CSS.supports;
       return (
         <>
-          <style>{`[data-psi-menu] { position-area: normal; position-try-fallbacks: none; }`}</style>
+          {/* !important is load-bearing: the CSS module's
+              `.menu[data-placement="…"]` is specificity (0,2,0) and would
+              otherwise beat this selector's (0,1,0). */}
+          <style>{`[data-psi-menu] { position-area: normal !important; position-try-fallbacks: none !important; }`}</style>
           <StoryFn />
         </>
       );
