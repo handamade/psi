@@ -13,9 +13,14 @@ const SHIPPED = [
   ["Composition patterns", "parametrized recipes with clarifying questions agents ask before generating (D47), validated at build (D48)"],
   ["Surface family", "shared --psi-surface-* recipe; Panel primitive, Dialog rebinds on it (D51)"],
   ["Toolbar", "unblocks the filter-toolbar composition pattern (D52)"],
+  ["Menu", "action menu on the native Popover API — top layer and light dismiss from the platform, roving keyboard and dismissal reasons from Psi (D53)"],
+  ["Control ramp", "height, padding, gap and font for Button, IconButton, Input and Select are per-size tokens, not CSS literals (D54–D55)"],
+  ["Control radius", "one size-invariant dial, --psi-control-radius, drives control shape across six components (D56)"],
+  ["MIT licensed", "open core — all three packages declare MIT and ship a LICENSE in their own tarball"],
 ] as const;
 
 const NEXT = [
+  ["Theme console", "a prompt in, a real customers/<name>.ts out — Palette, SlotMap and control radius, applied live"],
   ["Custom listbox Select", "v1 ships a styled native <select>; a fully custom listbox is v2"],
   ["Tooltip on the Popover API", "native anchor positioning once support settles"],
 ] as const;
