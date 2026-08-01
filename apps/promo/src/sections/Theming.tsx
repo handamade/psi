@@ -1,3 +1,4 @@
+import { useState, type CSSProperties } from "react";
 import { Button, IconCheck, Switch, Tag } from "@handamade/psi-react";
 
 import type { ThemeName } from "../theme";
@@ -17,10 +18,25 @@ export const acmeSlots: SlotMap = {
   warning: "gold",   danger: "crimson",
 };`;
 
-function ThemePreview({ name }: { name: ThemeName }) {
+/** The published radius scale — packages/tokens/src/scales/radius.ts.
+ *  The dial steps rungs, never free pixels: a theme sets a rung. */
+const RADIUS_RUNGS = [4, 6, 8, 12] as const;
+const DEFAULT_RUNG = 2; // radius-8, the --psi-control-radius default
+
+function ThemePreview({ name, radius }: { name: ThemeName; radius: number }) {
   return (
     <figure className="theme-card">
-      <div className="theme-card-ui" data-psi-theme={name}>
+      {/* The inline custom property MUST sit on this element, not a wrapper:
+          components.css declares --psi-control-radius under
+          :where(:root, [data-psi-theme]), so this node re-declares the
+          default on itself and would override anything inherited. */}
+      <div
+        className="theme-card-ui"
+        data-psi-theme={name}
+        style={
+          { "--psi-control-radius": `var(--psi-radius-${radius})` } as CSSProperties
+        }
+      >
         <header>
           <strong>Invoices</strong>
           <Tag variant="success" subtle>
@@ -33,12 +49,20 @@ function ThemePreview({ name }: { name: ThemeName }) {
           <Button variant="accent">New invoice</Button>
         </div>
       </div>
-      <figcaption className="annot">data-psi-theme=&quot;{name}&quot;</figcaption>
+      <figcaption className="annot">
+        data-psi-theme=&quot;{name}&quot; · --psi-control-radius: radius-
+        {radius}
+      </figcaption>
     </figure>
   );
 }
 
 export function Theming() {
+  // Annotated: DEFAULT_RUNG has the literal type 2, and an explicit <number>
+  // keeps setRung from narrowing to it.
+  const [rung, setRung] = useState<number>(DEFAULT_RUNG);
+  const radius = RADIUS_RUNGS[rung];
+
   return (
     <section className="section" id="theming">
       <div className="container">
@@ -52,10 +76,26 @@ export function Theming() {
           </p>
         </div>
 
+        <div className="shape-dial">
+          <span className="annot">
+            <code>--psi-control-radius</code>
+          </span>
+          <input
+            type="range"
+            min={0}
+            max={RADIUS_RUNGS.length - 1}
+            step={1}
+            value={rung}
+            aria-label="Control radius"
+            onChange={(event) => setRung(Number(event.target.value))}
+          />
+          <output className="annot annot--accent">radius-{radius}</output>
+        </div>
+
         <div className="theme-grid">
-          <ThemePreview name="light" />
-          <ThemePreview name="dark" />
-          <ThemePreview name="acme" />
+          <ThemePreview name="light" radius={radius} />
+          <ThemePreview name="dark" radius={radius} />
+          <ThemePreview name="acme" radius={radius} />
         </div>
 
         <div className="theming-cols">
@@ -73,6 +113,19 @@ export function Theming() {
               <span>
                 <strong>Six OKLCH anchors + six slots</strong> — that is the
                 entire cost of onboarding a customer brand.
+              </span>
+            </li>
+            <li>
+              <IconCheck size={16} aria-hidden="true" />
+              <span>
+                <strong>…and one dial for shape.</strong> Drag it above:{" "}
+                <code>
+                  [data-psi-theme=&quot;acme&quot;] {"{"} --psi-control-radius:
+                  var(--psi-radius-4); {"}"}
+                </code>{" "}
+                re-rounds every control at once. Tag and Switch stay pill on
+                purpose — pill-ness is component identity, not theme
+                expression.
               </span>
             </li>
             <li>
