@@ -335,6 +335,21 @@ section {
   accent-color: var(--psi-fill-accent);
 }
 
+.shape-dial {
+  display: flex;
+  align-items: center;
+  gap: var(--psi-space-12);
+  margin-bottom: var(--psi-space-20);
+  flex-wrap: wrap;
+}
+
+.shape-dial input[type="range"] {
+  flex: 1;
+  min-width: 160px;
+  max-width: 320px;
+  accent-color: var(--psi-fill-accent);
+}
+
 /* -------------------------------------------------------------- sections */
 
 .section {
@@ -445,6 +460,10 @@ section {
 }
 
 .pg-surface {
+  grid-column: span 12;
+}
+
+.pg-menu {
   grid-column: span 12;
 }
 

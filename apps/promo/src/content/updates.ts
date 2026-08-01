@@ -15,6 +15,19 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-07-31",
+    tag: "release",
+    title: "0.8.0 — Menu, and shape becomes themeable",
+    body: "Menu lands on the native Popover API: the top layer and light dismiss come from the platform, the roving keyboard and dismissal reasons from Psi. And the --psi-control-* family completes — height, padding, gap and font became tokens (D54–D55), then radius (D56). A customer theme can now retune control shape in one line, which Palette + SlotMap could not express before.",
+    link: { label: "Browse the Storybook", href: "/storybook/" },
+  },
+  {
+    date: "2026-07-31",
+    tag: "release",
+    title: "0.7.2 — MIT, declared",
+    body: "All three packages had been published with no license field, which npm reads as all-rights-reserved: installable, but not legally reusable — the opposite of the intent. Every package now declares MIT and ships a LICENSE in its own tarball.",
+  },
+  {
     date: "2026-07-21",
     tag: "release",
     title: "0.7.0 — Panel, Toolbar, and the surface family",

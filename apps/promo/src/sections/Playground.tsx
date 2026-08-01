@@ -7,6 +7,9 @@ import {
   IconSearch,
   IconSettings,
   Input,
+  Menu,
+  MenuItem,
+  MenuSeparator,
   Panel,
   Select,
   Switch,
@@ -38,7 +41,7 @@ const INITIAL_TAGS = [
   { label: "zero-deps", variant: "neutral" },
 ] as const;
 
-const INITIAL_FILTERS = ["psi-tokens", "0.7.0", "wcag-aa"] as const;
+const INITIAL_FILTERS = ["psi-tokens", "0.8.1", "wcag-aa"] as const;
 
 export function Playground() {
   const [tags, setTags] = useState<readonly (typeof INITIAL_TAGS)[number][]>(
@@ -48,12 +51,23 @@ export function Playground() {
     ...INITIAL_FILTERS,
   ]);
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [lastReason, setLastReason] = useState<string | null>(null);
+  const [lastAction, setLastAction] = useState<string | null>(null);
+
+  const closeMenu = (reason: "item-select" | "esc" | "outside") => {
+    setLastReason(reason);
+    setMenuOpen(false);
+  };
+
+  const toggleMenu = () => setMenuOpen((open) => !open);
+
   return (
     <section className="section" id="components">
       <div className="container">
         <div className="section-head">
           <span className="annot annot--accent">02 · Components</span>
-          <h2>Fifteen production components. All live — try them.</h2>
+          <h2>Eighteen production components. All live — try them.</h2>
           <p className="lede">
             React 19, zero runtime dependencies, CSS Modules over
             component-level tokens. Every prop below ships in a
@@ -227,6 +241,53 @@ export function Playground() {
               patterns.json, live: dismiss a filter and the Toolbar reflows.
             </p>
           </Panel>
+
+          <Panel className="card pg-menu">
+            <h3>
+              Menu · the 0.8 overlay tier
+              <a className="sb-link" href={storybookDocs("Components/Menu")}>
+                storybook →
+              </a>
+            </h3>
+            <div className="pg-row">
+              <Menu
+                open={menuOpen}
+                onClose={closeMenu}
+                aria-label="Row actions"
+                trigger={
+                  <IconButton
+                    aria-label="Row actions"
+                    variant="neutral"
+                    size={32}
+                    onClick={toggleMenu}
+                  >
+                    <IconSettings />
+                  </IconButton>
+                }
+              >
+                <MenuItem onSelect={() => setLastAction("Edit")}>Edit</MenuItem>
+                <MenuItem onSelect={() => setLastAction("Duplicate")}>
+                  Duplicate
+                </MenuItem>
+                <MenuSeparator />
+                <MenuItem variant="danger" onSelect={() => setLastAction("Delete")}>
+                  Delete
+                </MenuItem>
+              </Menu>
+              <span className="annot" aria-live="polite">
+                {lastReason
+                  ? `onClose("${lastReason}")${lastAction ? ` · ${lastAction}` : ""}`
+                  : "no dismissal yet"}
+              </span>
+            </div>
+            <p className="annot pg-note">
+              Native Popover API: the top layer and light dismiss come from the
+              browser, the roving keyboard and dismissal reasons from Psi.
+              Controlled-only — Esc and item-select only <em>report</em> a
+              dismissal; this card is what flips <code>open</code>. Try all
+              three: Esc, a click outside, and picking an item.
+            </p>
+          </Panel>
         </div>
 
         <p className="pg-index annot">
@@ -242,6 +303,7 @@ export function Playground() {
             "Tooltip",
             "Field",
             "Dialog",
+            "Menu",
             "Panel",
             "Toolbar",
           ].map((name, index) => (
