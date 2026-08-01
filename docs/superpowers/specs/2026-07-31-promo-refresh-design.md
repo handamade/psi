@@ -120,7 +120,7 @@ worth telling the outside world:
 - **2026-07-31 · `release` · "0.8.0 — Menu, and shape becomes themeable"** —
   Menu on the native Popover API, and the `--psi-control-*` family completed
   by D54–D56, so a customer theme retunes control shape in one line.
-- **2026-07-21 · `release` · "0.7.2 — MIT, declared"** — all three packages
+- **2026-07-31 · `release` · "0.7.2 — MIT, declared"** — all three packages
   published with no `license` field, which npm reads as all-rights-reserved.
   Installable but not legally reusable, contradicting the open-core intent.
   That is a fact outside consumers need.
@@ -158,7 +158,7 @@ controls while the surfaces around them stay rounded. Two distinct causes:
    generated theme will strand Card — recorded in the D56 spec's carries as
    D57's first problem.
 2. `apps/promo`'s own `.theme-card-ui` hardcodes `border-radius:
-   var(--psi-radius-12)` (`promo.css:510`), independent of any Psi token.
+   var(--psi-radius-12)` (`promo.css:529`), independent of any Psi token.
 
 Both are out of scope by explicit decision. Recorded here so D57 inherits the
 whole picture rather than only the first half.
@@ -169,7 +169,9 @@ whole picture rather than only the first half.
   `.nvmrc`; run `nvm use` before the first pnpm command.
 - Browser, via the promo dev server:
   - Dial each of the four rungs. All three theme cards re-round together;
-    Tag and Switch stay pill at every rung; Checkbox holds its floor.
+    Tag and Switch stay pill at every rung. (Checkbox's `min()` floor is NOT
+    observable here — no `ThemePreview` card contains a Checkbox. It is
+    covered by the token tests, not by this page.)
   - Open the Menu and dismiss it three ways — Esc, outside click, item
     select — confirming each reports its own reason and the menu actually
     closes (i.e. the card flips `open`).

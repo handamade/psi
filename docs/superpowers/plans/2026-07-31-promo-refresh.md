@@ -964,6 +964,14 @@ bundled into this branch (`CLAUDE.md`: one branch, one PR).
 
 ## Related Menu bugs — separate branch, not this one
 
+> **CLOSED 2026-08-01, before this branch's base.** All four faults below were
+> fixed by D58 and shipped in 0.8.1 (`93f5399` → `670e90e`), both of which
+> precede this branch's base commit `848f5cb`. Task 3's Chrome-148 caveat about
+> `toggle`-vs-`click` ordering is moot for the same reason — `Menu.tsx` now
+> carries the D58 invariant explicitly. **This is a historical register, not an
+> open-bugs list; do not act on it.** The one item still live is the test-gap
+> note at the end about `vitest.setup.ts`'s polyfill.
+
 A browser investigation on 2026-07-31 (Chrome 148) found four real faults in
 `packages/react/src/Menu`. **None of them block this plan** — the promo card
 is a single Menu inside a flex row with `align-items: center`, which hits
