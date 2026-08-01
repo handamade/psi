@@ -463,6 +463,10 @@ section {
   grid-column: span 12;
 }
 
+.pg-menu {
+  grid-column: span 12;
+}
+
 .pg-row {
   display: flex;
   flex-wrap: wrap;
