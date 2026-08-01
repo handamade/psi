@@ -14,7 +14,7 @@ const SHIPPED = [
   ["Surface family", "shared --psi-surface-* recipe; Panel primitive, Dialog rebinds on it (D51)"],
   ["Toolbar", "unblocks the filter-toolbar composition pattern (D52)"],
   ["Menu", "action menu on the native Popover API — top layer and light dismiss from the platform, roving keyboard and dismissal reasons from Psi (D53)"],
-  ["Control ramp", "height, padding, gap and font for Button, IconButton, Input and Select are per-size tokens, not CSS literals (D54–D55)"],
+  ["Control ramp", "per-size height, padding, gap and font are tokens — Button's full ramp, with IconButton, Input and Select binding the same family (D54–D55)"],
   ["Control radius", "one size-invariant dial, --psi-control-radius, drives control shape across six components (D56)"],
   ["MIT licensed", "open core — all three packages declare MIT and ship a LICENSE in their own tarball"],
 ] as const;

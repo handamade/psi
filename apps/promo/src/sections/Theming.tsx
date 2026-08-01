@@ -87,9 +87,12 @@ export function Theming() {
             step={1}
             value={rung}
             aria-label="Control radius"
+            aria-valuetext={`radius-${radius}`}
             onChange={(event) => setRung(Number(event.target.value))}
           />
-          <output className="annot annot--accent">radius-{radius}</output>
+          <output className="annot annot--accent" aria-hidden="true">
+            radius-{radius}
+          </output>
         </div>
 
         <div className="theme-grid">

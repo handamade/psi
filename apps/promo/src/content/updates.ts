@@ -22,7 +22,7 @@ export const UPDATES: UpdateEntry[] = [
     link: { label: "Browse the Storybook", href: "/storybook/" },
   },
   {
-    date: "2026-07-21",
+    date: "2026-07-31",
     tag: "release",
     title: "0.7.2 — MIT, declared",
     body: "All three packages had been published with no license field, which npm reads as all-rights-reserved: installable, but not legally reusable — the opposite of the intent. Every package now declares MIT and ships a LICENSE in its own tarball.",
