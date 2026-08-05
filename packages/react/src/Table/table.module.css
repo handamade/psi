@@ -24,3 +24,19 @@
   text-align: end;
   font-variant-numeric: var(--psi-font-variant-numeric);
 }
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--psi-space-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sortIndicator {
+  color: var(--psi-table-sort-indicator-fg);
+}
