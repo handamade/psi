@@ -25,28 +25,32 @@ const MAX_RESULTS = 20;
  * asserted by __tests__/store.test.ts's "stays within the response budget". */
 const RESPONSE_BUDGET = 6000;
 
-/** Order the empty-query overview is filled in. Guidance first, catalog last,
- * because the two grow and cost very differently:
+/** How the empty-query overview divides its budget across kinds. Topics,
+ * patterns, and components grow and cost very differently:
  *
  *   topics   — a fixed, slow-growing set of terse briefs (~90 chars each).
  *              Carries the rules an agent cannot guess, `getting-started`
- *              (the five required CSS imports) above all.
- *   patterns — composition recipes; their stored summaries carry match
- *              phrases for keyword ranking and can run long, so the
- *              overview projects a trimmed copy (see overviewBrief) capped
- *              near topic size — the stored, untrimmed brief is still what
- *              score() ranks against.
+ *              (the five required CSS imports) above all. Takes its full
+ *              cost, unconditionally.
  *   components — verbose (up to 220 chars each) and the only axis that grows
  *              with every release. Also the axis a keyword query recovers
  *              best: search("menu") finds Menu; no query re-derives a house
- *              rule an agent doesn't know exists.
+ *              rule an agent doesn't know exists. Reserved a floor of
+ *              `COMPONENT_FLOOR` items before patterns spend the remainder,
+ *              so catalog growth cannot starve them below the floor.
+ *   patterns — composition recipes; their stored summaries carry match
+ *              phrases for keyword ranking and can run long, so the overview
+ *              projects a trimmed copy (see overviewBrief) at a *derived*
+ *              per-call cap — the largest that lets every pattern fit
+ *              alongside topics and the component floor. The stored,
+ *              untrimmed brief is still what score() ranks against.
  *
- * Capping by item *count* (the previous scheme) evicted the tail, and since
- * components were emitted first the tail was always topics — so registering
- * D53's Menu components silently dropped eight topics including
- * `getting-started`. Filling by serialized *length* in this order instead
- * degrades only the component tail, which is the cheap thing to lose. */
-const OVERVIEW_KIND_ORDER: Array<Brief["kind"]> = ["topic", "pattern", "component"];
+ * Previously the overview filled topics, then patterns, then components
+ * until the budget ran out, so whichever kind was filled last absorbed all
+ * catalog growth — three more patterns was enough to starve components from
+ * six down to four (D61). Allocating by kind first means catalog growth
+ * shortens pattern summaries instead of evicting items off the tail. */
+const COMPONENT_FLOOR = 8;
 
 const TOPIC_SUMMARIES: Record<string, string> = {
   variants: "Variant intent and typical use for all 8 flat variants",
@@ -83,12 +87,11 @@ function patternSummary(p: PatternEntry): string {
   return summary;
 }
 
-/** Overview-only cap on the *intro* portion of a pattern summary (intent +
- * match phrases + parameter count), comparable to a topic brief (~100
- * bytes). The stored `Brief.summary` built by patternSummary() above stays
- * full-length — score() reads it for keyword ranking (the match phrases are
- * what let "delete confirmation" find destructive-confirm) — so this only
- * shapes a copy used when search("") projects the overview list.
+/** Most an overview pattern intro (intent + match phrases + parameter count)
+ * may cost. The effective limit is derived per-call (see the empty-query
+ * branch): patterns take whatever the budget leaves after topics and the
+ * component floor, so a growing catalog shortens summaries instead of
+ * evicting items (D61).
  *
  * The `, blocked (gaps: …)` tail is never subject to this cap: it is the
  * backlog signal this cycle exists to publish, and patternSummary() puts it
@@ -97,7 +100,7 @@ function patternSummary(p: PatternEntry): string {
  * 120 chars), which is exactly the bug this trims to avoid. So the overview
  * projects a pattern's summary from the underlying PatternEntry directly:
  * trim the intro, then always append the tail. */
-const OVERVIEW_PATTERN_INTRO_LIMIT = 100;
+const OVERVIEW_PATTERN_INTRO_MAX = 120;
 
 /** Trims `s` to at most `limit` chars, backing off to the last word boundary
  * and marking the cut with an ellipsis — never a mid-word fragment that
@@ -109,10 +112,10 @@ function truncateAtWord(s: string, limit: number): string {
   return `${lastSpace > 0 ? cut.slice(0, lastSpace) : cut}…`;
 }
 
-function overviewPatternSummary(p: PatternEntry): string {
+function overviewPatternSummary(p: PatternEntry, limit: number): string {
   const intro = truncateAtWord(
     `${p.intent} — ${p.match.join(", ")}, ${p.parameters.length} parameters`,
-    OVERVIEW_PATTERN_INTRO_LIMIT,
+    limit,
   );
   return p.blocked ? `${intro}, blocked (gaps: ${p.gaps.join(", ")})` : intro;
 }
@@ -126,12 +129,14 @@ export function createStore(index: PsiIndex): Store {
    * already-assembled, full-length `Brief.summary` — so the `blocked (gaps:
    * …)` tail always survives the overview's trim. Always a shallow copy for
    * patterns: the stored brief kept in `briefs` (and used by score()) is
-   * never mutated. */
-  function overviewBrief(b: Brief): Brief {
+   * never mutated. `limit` is derived per-call by the empty-query branch
+   * (D61), not a module constant, so a growing catalog shortens summaries
+   * instead of evicting items. */
+  function overviewBrief(b: Brief, limit: number): Brief {
     if (b.kind !== "pattern") return b;
     const pattern = patternsById.get(b.title);
     if (!pattern) return b;
-    return { ...b, summary: overviewPatternSummary(pattern) };
+    return { ...b, summary: overviewPatternSummary(pattern, limit) };
   }
 
   const briefs: Brief[] = [
@@ -176,16 +181,28 @@ export function createStore(index: PsiIndex): Store {
   function search(query: string): Brief[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
-      // Overview: topics, then patterns, then as many components as the
-      // response budget still affords (tokens are discoverable via query).
-      // Filled by serialized length, not item count, so the thing that gets
-      // dropped is always the component tail — never the guidance surface.
-      const candidates = OVERVIEW_KIND_ORDER.flatMap((kind) =>
-        briefs.filter((b) => b.kind === kind),
-      );
-      const out: Brief[] = [];
-      for (const brief of candidates) {
-        out.push(overviewBrief(brief));
+      // D61: allocate before filling. Topics take their full cost, components
+      // are reserved a floor, and patterns take the remainder via a derived
+      // cap — so catalog growth shortens summaries instead of evicting the
+      // tail. Whichever kind was filled last used to absorb all growth;
+      // that was the bug. (Tokens are omitted; they are discoverable via
+      // query.)
+      const topics = briefs.filter((b) => b.kind === "topic");
+      const patterns = briefs.filter((b) => b.kind === "pattern");
+      const components = briefs.filter((b) => b.kind === "component");
+
+      const reserve = JSON.stringify(components.slice(0, COMPONENT_FLOOR)).length;
+      const fits = (limit: number) =>
+        JSON.stringify([...topics, ...patterns.map((b) => overviewBrief(b, limit))]).length +
+          reserve <=
+        RESPONSE_BUDGET;
+
+      let limit = OVERVIEW_PATTERN_INTRO_MAX;
+      while (limit > 0 && !fits(limit)) limit -= 10;
+
+      const out: Brief[] = [...topics, ...patterns.map((b) => overviewBrief(b, limit))];
+      for (const component of components) {
+        out.push(component);
         if (JSON.stringify(out).length > RESPONSE_BUDGET) {
           out.pop();
           break;
