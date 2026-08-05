@@ -23,7 +23,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 
 ## Layout (--psi-container-max, --psi-gutter, --psi-z-*)
 - .psi-container: max-width 1312px, gutter 40px stepping to 24px under the md breakpoint.
-- --psi-z-nav (100), --psi-z-overlay (1000), --psi-z-tooltip (1100).
+- --psi-z-sticky (1), --psi-z-nav (100), --psi-z-overlay (1000), --psi-z-tooltip (1100). sticky is for elements that stack within their own local scroll container (e.g. a sticky table header), not above page chrome.
 - Breakpoints (sm 560 / md 960) are build-time constants (D31), not CSS vars: `import { breakpoints } from "@handamade/psi-tokens/types"` for any @media-driven JS/CSS-in-JS.
 
 ## Typography: display, serif, mono

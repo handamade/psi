@@ -91,6 +91,6 @@
 .sticky .headerCell {
   position: sticky;
   inset-block-start: 0;
-  z-index: var(--psi-table-header-z-index);
+  z-index: var(--psi-z-sticky);
   background: var(--psi-table-bg);
 }

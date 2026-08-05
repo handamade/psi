@@ -10,7 +10,6 @@ describe("table tokens", () => {
       radius: "var(--psi-surface-radius)",
       fg: "var(--psi-fg-primary)",
       "header-fg": "var(--psi-fg-secondary)",
-      "header-z-index": "1",
       "cell-border": "var(--psi-border-faint)",
       "row-bg": "transparent",
       "row-bg-hover": "var(--psi-fill-neutral3)",

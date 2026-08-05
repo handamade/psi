@@ -65,13 +65,14 @@ describe("scales", () => {
     it("layout constants match spec (WS4, D31)", () => {
       expect(breakpoints).toEqual({ sm: 560, md: 960 });
       expect(container).toEqual({ max: 1312, gutter: 40, gutterNarrow: 24 });
-      expect(zIndex).toEqual({ nav: 100, overlay: 1000, tooltip: 1100 });
+      expect(zIndex).toEqual({ sticky: 1, nav: 100, overlay: 1000, tooltip: 1100 });
     });
 
     it("emits container, gutter, and z vars (WS4)", () => {
       const css = emitScaleVarsCSS();
       expect(css).toContain("--psi-container-max: 82rem;");
       expect(css).toContain("--psi-gutter: 2.5rem;");
+      expect(css).toContain("--psi-z-sticky: 1;");
       expect(css).toContain("--psi-z-nav: 100;");
       expect(css).toContain("--psi-z-tooltip: 1100;");
     });
