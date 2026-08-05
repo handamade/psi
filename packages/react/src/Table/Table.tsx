@@ -1,4 +1,4 @@
-import { Children, isValidElement, useMemo } from "react";
+import { Children, Fragment, isValidElement, useMemo } from "react";
 import type { ReactNode, Ref } from "react";
 import styles from "./table.module.css";
 import { EMPTY_SELECTION, TableContext, TableRowIdsContext } from "./TableContext.js";
@@ -20,8 +20,13 @@ export interface TableSortState {
  * the only place this can be computed and provided from (D62 review). */
 function collectRowIds(children: ReactNode): string[] {
   const ids: string[] = [];
-  Children.forEach(children, (child) => {
-    if (!isValidElement(child) || child.type !== TableBody) return;
+  Children.forEach(children, function walk(child) {
+    if (!isValidElement(child)) return;
+    if (child.type === Fragment) {
+      Children.forEach((child.props as { children?: ReactNode }).children, walk);
+      return;
+    }
+    if (child.type !== TableBody) return;
     const bodyChildren = (child.props as { children?: ReactNode }).children;
     Children.forEach(bodyChildren, (row) => {
       if (!isValidElement(row)) return;
@@ -76,11 +81,12 @@ export function Table({
   ref,
 }: TableProps) {
   const cls = [styles.table, stickyHeader && styles.sticky, className].filter(Boolean).join(" ");
+  const rowIds = useMemo(() => collectRowIds(children), [children]);
   if (process.env.NODE_ENV !== "production") {
     if (sortable && !onSortChange) console.warn("Psi Table: `sortable` is set without `onSortChange`; sorting will not respond.");
     if (selectable && !onSelectionChange) console.warn("Psi Table: `selectable` is set without `onSelectionChange`; selection will not respond.");
+    if (selectable && rowIds.length === 0) console.warn("Psi Table: `selectable` is set but no row ids were found; if `TableBody` is wrapped in a component other than a Fragment, `Table` cannot see its rows and select-all will clear the selection.");
   }
-  const rowIds = useMemo(() => collectRowIds(children), [children]);
   return (
     <TableContext.Provider value={{ size, sortable, sort, onSortChange, selectable, selected, onSelectionChange }}>
       <TableRowIdsContext.Provider value={rowIds}>

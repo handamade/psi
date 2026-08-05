@@ -83,4 +83,44 @@ describe("Table selection", () => {
     );
     expect(screen.queryByRole("checkbox")).toBeNull();
   });
+
+  it("finds rows through a TableBody wrapped in a Fragment", async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <Table selectable selected={new Set()} onSelectionChange={onSelectionChange}>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>Date</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <>
+          <TableBody>
+            <TableRow rowId="t1" selectLabel="Select 2026-08-05 Acme"><TableCell>a</TableCell></TableRow>
+            <TableRow rowId="t2" selectLabel="Select 2026-08-06 Globex"><TableCell>b</TableCell></TableRow>
+          </TableBody>
+        </>
+      </Table>,
+    );
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select all rows" }));
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set(["t1", "t2"]));
+  });
+
+  it("keeps select-all unchecked and non-indeterminate when the body has no rows, and does not throw on click", async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <Table selectable selected={new Set()} onSelectionChange={onSelectionChange}>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>Date</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody></TableBody>
+      </Table>,
+    );
+    const all = screen.getByRole("checkbox", { name: "Select all rows" }) as HTMLInputElement;
+    expect(all.checked).toBe(false);
+    expect(all.indeterminate).toBe(false);
+    await expect(userEvent.click(all)).resolves.not.toThrow();
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set());
+  });
 });
