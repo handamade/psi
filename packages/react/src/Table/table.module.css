@@ -1,0 +1,26 @@
+/* packages/react/src/Table/table.module.css */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--psi-table-bg);
+  color: var(--psi-table-fg);
+  font: var(--psi-text-14-20-regular);
+}
+
+.headerCell {
+  color: var(--psi-table-header-fg);
+  font: var(--psi-text-14-20-medium);
+  text-align: start;
+}
+
+.cell,
+.headerCell {
+  border-bottom: 1px solid var(--psi-table-cell-border);
+}
+
+.cell[data-numeric],
+.headerCell[data-numeric] {
+  text-align: end;
+  font-variant-numeric: var(--psi-font-variant-numeric);
+}
