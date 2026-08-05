@@ -6,6 +6,8 @@
   background: var(--psi-table-bg);
   color: var(--psi-table-fg);
   font: var(--psi-text-14-20-regular);
+  border: 1px solid var(--psi-table-border);
+  border-radius: var(--psi-table-radius);
 }
 
 .headerCell {
@@ -37,14 +39,13 @@
   cursor: pointer;
 }
 
-.sortIndicator {
-  color: var(--psi-table-sort-indicator-fg);
+.sortButton:focus-visible {
+  outline: 2px solid var(--psi-table-focus-ring);
+  outline-offset: 2px;
 }
 
-.selectCell {
-  width: 1%;
-  padding-inline-end: 0;
-  border-bottom: 1px solid var(--psi-table-cell-border);
+.sortIndicator {
+  color: var(--psi-table-sort-indicator-fg);
 }
 
 /* ── Size ramp (D62) ──────────────────────────────────────────────
@@ -69,14 +70,27 @@
   padding-inline: var(--psi-table-48-cell-padding-x);
 }
 
-/* ── Row states ───────────────────────────────────────────────────
-   data-selected wins over hover: a hovered selected row stays selected. */
+/* Only the two properties the checkbox column needs beyond the shared
+   `.cell`/`.headerCell` rules (border, height, padding-inline, header
+   fg/weight) it now also carries via those classes. Matched in specificity
+   to the size-ramp block above (`.table[data-size] .cell` = class+attr+class)
+   and placed after it in source order, so this padding-inline-end override
+   wins the cascade tie against the ramp's padding-inline shorthand. */
+.table[data-size] .selectCell {
+  width: 1%;
+  padding-inline-end: 0;
+}
 
-.row:hover {
+/* ── Row states ───────────────────────────────────────────────────
+   data-selected wins over hover: a hovered selected row stays selected.
+   Scoped to .body: TableRow is also used (unstyled-for-hover) inside
+   TableHead, and a hovered header row tinting like a data row is wrong. */
+
+.body .row:hover {
   background: var(--psi-table-row-bg-hover);
 }
 
-.row[data-selected]:hover {
+.body .row[data-selected]:hover {
   background: var(--psi-table-row-bg-selected);
 }
 
@@ -84,13 +98,20 @@
   background: var(--psi-table-row-bg-selected);
 }
 
+.row {
+  background: var(--psi-table-row-bg);
+}
+
 /* ── Sticky header ────────────────────────────────────────────────
    Needs no ARIA. The background is required: a transparent sticky header
-   would let body rows show through as they scroll under it. */
+   would let body rows show through as they scroll under it. border-bottom
+   does not paint on a sticky <th> under border-collapse: collapse in
+   Chromium/WebKit, so the bottom edge is drawn with box-shadow instead. */
 
 .sticky .headerCell {
   position: sticky;
   inset-block-start: 0;
   z-index: var(--psi-z-sticky);
   background: var(--psi-table-bg);
+  box-shadow: inset 0 -1px 0 var(--psi-table-cell-border);
 }

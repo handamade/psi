@@ -15,6 +15,7 @@ describe("table tokens", () => {
       "row-bg-hover": "var(--psi-fill-neutral3)",
       "row-bg-selected": "var(--psi-fill-tint-accent)",
       "sort-indicator-fg": "var(--psi-fg-accent)",
+      "focus-ring": "var(--psi-border-focus)",
       "32-row-height": "var(--psi-control-32-height)",
       "40-row-height": "var(--psi-control-40-height)",
       "48-row-height": "var(--psi-control-48-height)",
