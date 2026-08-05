@@ -5,6 +5,12 @@ export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "placeholder"> {
   /** Label text. */
   children?: React.ReactNode;
+  /**
+   * Accessible name when there is no visible label — a table's row-selection
+   * checkbox, say. Optional, unlike IconButton's required form (D60): a
+   * labelled checkbox is still the common case.
+   */
+  "aria-label"?: string;
   /** Forwarded ref to the underlying `<input type="checkbox">` element. */
   ref?: Ref<HTMLInputElement>;
 }
