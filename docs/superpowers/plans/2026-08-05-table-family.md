@@ -22,6 +22,7 @@
   ```
 - **`pnpm vr` only passes in CI.** Never run it locally — its default update mode silently writes junk `-darwin` baselines.
 - **Test commands.** Neither `packages/tokens` nor `packages/react` defines a `test` script; only the root does (`vitest run`). `pnpm --filter <pkg> test …` therefore **exits 0 having run nothing** — a green light that means nothing. Always use `pnpm exec vitest run <pattern>` for a focused run, or `pnpm test` for the full suite (~8s). Never trust a test step that produced no test output.
+- **`packages/react/docs/*.md` are generated AND tracked in git.** `pnpm --filter @handamade/psi-react build` regenerates them via `emit-docs.ts`. Any task that changes a component's props — or adds a component — must `git add` the affected `packages/react/docs/*.md` in the same commit. Precedent: the IconButton D60 commit `1b7cf8d` carried `docs/IconButton.md` and `docs/Input.md` alongside the source. **`check-docs-drift.mjs` will not catch this** — it only compares aggregate component/pattern counts, never individual prop tables, so all four gates pass green while the tracked docs are stale.
 
 ---
 
