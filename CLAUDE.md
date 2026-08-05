@@ -16,7 +16,7 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 - Variants are flat: `accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline` — no primary/secondary. One accent per visual group; `danger` only for destructive actions.
 - Never hardcode colors in component CSS — bind `var(--psi-*)` (the custom stylelint plugin enforces this).
 - Semantic colors are OKLCH formulas, not swatch ladders. New values go in `packages/tokens/src`, never in dist (dist is generated).
-- Consumers import all four token CSS files: `base.css`, one theme css, `components.css`, `utilities.css` (utilities is REQUIRED — `.psi-container` + reduced-motion zeroing live there).
+- Consumers import **five** stylesheets, not four: the four token CSS files `base.css`, one theme css, `components.css`, `utilities.css` (utilities is REQUIRED — `.psi-container` + reduced-motion zeroing live there), **plus `@handamade/psi-react/styles`**, which carries the component class rules. Omitting the fifth renders every component unstyled while the build stays green. This rule previously said "all four" and cost the D62 ledger app its only improvisation; `packages/react/llms.txt` and `packages/react/README.md` had it right all along.
 - Breakpoints are build-time JS constants (D31) — baked into media queries, not CSS vars.
 
 ## Workflow
