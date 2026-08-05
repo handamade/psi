@@ -1148,8 +1148,8 @@ export function TableRow({ rowId, selectLabel, children, className }: TableRowPr
 Replace `packages/react/src/Table/TableHead.tsx`:
 
 ```tsx
-import { useContext } from "react";
-import type { ReactNode } from "react";
+import { Children, cloneElement, isValidElement, useContext } from "react";
+import type { ReactElement, ReactNode } from "react";
 import styles from "./table.module.css";
 import { TableContext } from "./TableContext.js";
 import { TableSelectAllCell } from "./TableSelectionCell.js";
@@ -1159,26 +1159,32 @@ export interface TableHeadProps {
   className?: string;
 }
 
-/** `<thead>`. Prepends the select-all cell when the table is selectable, so
- * the header's column count matches the body's. */
+/** `<thead>`. When the table is selectable, prepends the select-all cell to
+ * the FIRST header row so the header's column count matches the body's — the
+ * checkbox column is Table's, not the consumer's schema. Clones the row
+ * rather than rebuilding it, so the consumer's own props on that `TableRow`
+ * survive. */
 export function TableHead({ children, className }: TableHeadProps) {
   const { selectable } = useContext(TableContext);
-  return (
-    <thead className={[styles.head, className].filter(Boolean).join(" ")}>
-      {selectable ? <SelectAllRow>{children}</SelectAllRow> : children}
-    </thead>
-  );
-}
 
-/** Injects the select-all cell into the header row without the consumer
- * declaring it — the checkbox column is Table's, not the schema's. */
-function SelectAllRow({ children }: { children: ReactNode }) {
-  return (
-    <tr className={styles.row}>
-      <TableSelectAllCell />
-      {(children as { props?: { children?: ReactNode } })?.props?.children}
-    </tr>
-  );
+  let injected = false;
+  const rows = selectable
+    ? Children.map(children, (child) => {
+        if (injected || !isValidElement(child)) return child;
+        injected = true;
+        const row = child as ReactElement<{ children?: ReactNode }>;
+        return cloneElement(
+          row,
+          undefined,
+          <>
+            <TableSelectAllCell />
+            {row.props.children}
+          </>,
+        );
+      })
+    : children;
+
+  return <thead className={[styles.head, className].filter(Boolean).join(" ")}>{rows}</thead>;
 }
 ```
 
@@ -1244,7 +1250,7 @@ it("applies the sticky class only when stickyHeader is set", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `pnpm --filter @handamade/psi-react test -- Table`
-Expected: PASS or FAIL depending on whether `styles.sticky` resolves — CSS Modules are hashed in test, and an undefined class yields the same string. If it PASSES already, the class exists; proceed to Step 3 regardless, since the CSS itself is the deliverable.
+Expected: FAIL. `.sticky` does not exist in the CSS module yet, so `styles.sticky` is `undefined`; `stickyHeader && styles.sticky` yields `undefined`, which `.filter(Boolean)` drops — leaving the sticky table's className identical to the plain one, so `expect(stickyCls).not.toBe(plainCls)` fails.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -2333,4 +2339,4 @@ git push
 
 **Type consistency.** `TableSortState` is defined in `Table.tsx` (Task 4) and imported by `TableContext.ts` (Task 5), the tests, the stories and the app — one definition, one name throughout. `paginationRange` keeps the same signature in its test and its implementation. `selected` is `ReadonlySet<string>` everywhere, never `Set<string>` or `string[]`. `rowId` is the selection key in `TableRow`, `TableBody`'s registry and the app.
 
-**Known ordering hazard.** Task 6's `TableHead` reads `children.props.children` to inject the select-all cell. That assumes the consumer passes exactly one `TableRow`. If a subagent finds this brittle when writing a multi-row header, the fix is `Children.map` over the head's rows and prepending to the first — not changing the public API.
+**Resolved before execution.** An earlier draft of Task 6 had `TableHead` reach into `children.props.children` through a type cast, which assumed exactly one header row and discarded any props the consumer set on it. It now uses `Children.map` + `cloneElement` over the head's rows, injecting into the first only. Task 7's Step 2 previously stated an ambiguous expectation ("PASS or FAIL depending on…"); it now states the single expected failure and why.
