@@ -124,6 +124,80 @@ describe("Table selection", () => {
     expect(onSelectionChange).toHaveBeenCalledWith(new Set());
   });
 
+  it("select-all preserves a selection outside the currently rendered rows (e.g. another page)", async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <Table selectable selected={new Set(["off-page"])} onSelectionChange={onSelectionChange}>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>Date</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow rowId="t1" selectLabel="Select 2026-08-05 Acme"><TableCell>a</TableCell></TableRow>
+          <TableRow rowId="t2" selectLabel="Select 2026-08-06 Globex"><TableCell>b</TableCell></TableRow>
+        </TableBody>
+      </Table>,
+    );
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select all rows" }));
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set(["off-page", "t1", "t2"]));
+  });
+
+  it("unselect-all preserves a selection outside the currently rendered rows (e.g. another page)", async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <Table selectable selected={new Set(["off-page", "t1", "t2"])} onSelectionChange={onSelectionChange}>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>Date</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow rowId="t1" selectLabel="Select 2026-08-05 Acme"><TableCell>a</TableCell></TableRow>
+          <TableRow rowId="t2" selectLabel="Select 2026-08-06 Globex"><TableCell>b</TableCell></TableRow>
+        </TableBody>
+      </Table>,
+    );
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select all rows" }));
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set(["off-page"]));
+  });
+
+  it("finds rows through a Fragment inside TableBody's own children", async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <Table selectable selected={new Set()} onSelectionChange={onSelectionChange}>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>Date</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <>
+            <TableRow rowId="t1" selectLabel="Select 2026-08-05 Acme"><TableCell>a</TableCell></TableRow>
+            <TableRow rowId="t2" selectLabel="Select 2026-08-06 Globex"><TableCell>b</TableCell></TableRow>
+          </>
+        </TableBody>
+      </Table>,
+    );
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select all rows" }));
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set(["t1", "t2"]));
+  });
+
+  it("warns when selectable but a row in TableBody has no rowId", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(
+      <Table selectable selected={new Set()} onSelectionChange={() => {}}>
+        <TableHead><TableRow><TableHeaderCell>Date</TableHeaderCell></TableRow></TableHead>
+        <TableBody>
+          <TableRow rowId="t1"><TableCell>a</TableCell></TableRow>
+          <TableRow><TableCell>b</TableCell></TableRow>
+        </TableBody>
+      </Table>,
+    );
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("no `rowId`"));
+    warn.mockRestore();
+  });
+
   it("does not warn for a legitimately empty body — only when no TableBody is visible", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 

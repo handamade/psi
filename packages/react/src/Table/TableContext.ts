@@ -24,6 +24,6 @@ export const TableContext = createContext<TableContextValue>({
   selected: EMPTY_SELECTION,
 });
 
-/** Row ids in document order, published by TableBody so the select-all
+/** Row ids in document order, published by Table so the select-all
  * checkbox can compute all/some without the consumer restating them. */
 export const TableRowIdsContext = createContext<string[]>([]);

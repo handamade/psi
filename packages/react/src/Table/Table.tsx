@@ -18,9 +18,30 @@ export interface TableSortState {
  * inside `TableBody` only reaches `TableBody`'s own descendants, never a
  * sibling subtree. `Table` is the nearest common ancestor of both, so it is
  * the only place this can be computed and provided from (D62 review). */
-function collectRowIds(children: ReactNode): { ids: string[]; sawBody: boolean } {
+function collectRowIds(children: ReactNode): { ids: string[]; sawBody: boolean; hasRowWithoutId: boolean } {
   const ids: string[] = [];
   let sawBody = false;
+  let hasRowWithoutId = false;
+
+  // Recurses through Fragments among `TableBody`'s own children too — not
+  // just at the `Table` level — so a row list wrapped in a `<>...</>` (e.g.
+  // to key a mapped group, or interleave a section header) is still found.
+  // Without this, `sawBody` stays true (the body itself is visible) so the
+  // "no TableBody visible" warning never fires, and the rows inside the
+  // Fragment silently vanish from select-all instead (final review finding).
+  const walkBodyChildren = (bodyChildren: ReactNode) => {
+    Children.forEach(bodyChildren, function walkRow(row) {
+      if (!isValidElement(row)) return;
+      if (row.type === Fragment) {
+        Children.forEach((row.props as { children?: ReactNode }).children, walkRow);
+        return;
+      }
+      const rowId = (row.props as { rowId?: string }).rowId;
+      if (typeof rowId === "string") ids.push(rowId);
+      else hasRowWithoutId = true;
+    });
+  };
+
   Children.forEach(children, function walk(child) {
     if (!isValidElement(child)) return;
     if (child.type === Fragment) {
@@ -29,18 +50,13 @@ function collectRowIds(children: ReactNode): { ids: string[]; sawBody: boolean }
     }
     if (child.type !== TableBody) return;
     sawBody = true;
-    const bodyChildren = (child.props as { children?: ReactNode }).children;
-    Children.forEach(bodyChildren, (row) => {
-      if (!isValidElement(row)) return;
-      const rowId = (row.props as { rowId?: string }).rowId;
-      if (typeof rowId === "string") ids.push(rowId);
-    });
+    walkBodyChildren((child.props as { children?: ReactNode }).children);
   });
   // `sawBody` separates a structurally invisible body from a legitimately
   // empty one. A selectable table whose filters match nothing renders a real
   // but empty `TableBody` every day — warning on that would be noise, and a
   // warning that cries wolf gets ignored when it matters.
-  return { ids, sawBody };
+  return { ids, sawBody, hasRowWithoutId };
 }
 
 export interface TableProps {
@@ -87,11 +103,12 @@ export function Table({
   ref,
 }: TableProps) {
   const cls = [styles.table, stickyHeader && styles.sticky, className].filter(Boolean).join(" ");
-  const { ids: rowIds, sawBody } = useMemo(() => collectRowIds(children), [children]);
+  const { ids: rowIds, sawBody, hasRowWithoutId } = useMemo(() => collectRowIds(children), [children]);
   if (process.env.NODE_ENV !== "production") {
     if (sortable && !onSortChange) console.warn("Psi Table: `sortable` is set without `onSortChange`; sorting will not respond.");
     if (selectable && !onSelectionChange) console.warn("Psi Table: `selectable` is set without `onSelectionChange`; selection will not respond.");
     if (selectable && !sawBody) console.warn("Psi Table: `selectable` is set but no `TableBody` is visible to `Table`. Wrapping `TableBody` in a component other than a Fragment hides its rows, and select-all will clear the selection instead of filling it.");
+    if (selectable && hasRowWithoutId) console.warn("Psi Table: `selectable` is set but a row in `TableBody` has no `rowId`. That row will render without a selection checkbox and select-all will not include it.");
   }
   return (
     <TableContext.Provider value={{ size, sortable, sort, onSortChange, selectable, selected, onSelectionChange }}>

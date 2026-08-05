@@ -30,6 +30,7 @@
             "body": [
               {
                 "component": "TableRow",
+                "props": { "rowId": "row-id" },
                 "slots": {
                   "body": [
                     { "component": "TableCell", "content": "date-cell" },
