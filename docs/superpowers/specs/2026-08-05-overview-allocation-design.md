@@ -67,6 +67,42 @@ patterns alongside every new component, so this fails on schedule.
   reads keeps its full text — overview trimming is a projection applied only
   in the empty-query branch, never to the briefs used for keyword ranking.
 
+## Operating envelope
+
+The three guarantees are not universal, and this spec states where they end
+rather than implying they hold forever. Measured against the real index (13
+topics, components averaging ~275 bytes):
+
+| patterns | all shown? | components | bytes |
+|---|---|---|---|
+| 13 (0.9.0) | yes | **8** | 5926 |
+| 19 | yes | **8** | 5842 |
+| 25 | yes | **8** | 5995 |
+| 29 | yes | 6 | 5769 |
+| 33 | yes | 5 | 5814 |
+| 39 | yes | 3 | 5740 |
+
+**All three guarantees hold to roughly 25–28 patterns** — about double the
+0.9.0 catalog — at which point the arithmetic runs out: the irreducible
+per-pattern cost (`id`, `kind`, `title`, and the never-capped gaps suffix)
+plus the component reserve exceeds 6000 no matter how short the intros get.
+
+Past the envelope the design **degrades gracefully rather than breaking**:
+every pattern is still listed, every blocked pattern still discloses its gaps,
+and components decline one at a time from the floor. Nothing vanishes silently
+and the backlog is never lost.
+
+For scale: the D59 ledger arc is expected to add five to nine patterns across
+cycles 2–5, landing near 18–22 — inside the envelope. Closing a gap also
+*returns* budget (the `blocked (gaps: …)` suffix goes away), so shipping the
+backlog pushes the ceiling further out rather than nearer.
+
+**Exceeding the envelope is the signal to change the overview's shape**, not
+to tune constants — see the second rejected alternative below. The store test
+asserts the guarantees at 26 patterns and separately asserts the graceful
+degradation at 39, so the boundary is documented in executable form rather
+than in prose alone.
+
 ## Alternatives rejected
 
 - **Raise the budget.** 6000 is a published contract with its own test, and
@@ -82,12 +118,18 @@ patterns alongside every new component, so this fails on schedule.
 
 ## Testing
 
-The store test gains an assertion that the guarantee holds under growth, not
-just at today's catalog size: with patterns synthetically multiplied, all
-topics and all patterns must still appear, at least `COMPONENT_FLOOR`
-components must appear, and every blocked pattern must still disclose its
-gaps. That last one is the assertion whose absence let the 120-character cap
-ship.
+The store test gains two assertions about growth, not just today's catalog:
+
+- **Inside the envelope (26 patterns, double 0.9.0):** all topics and all
+  patterns appear, at least `COMPONENT_FLOOR` components appear, and every
+  blocked pattern still discloses its gaps. That last one is the assertion
+  whose absence let the 120-character cap ship a truncated backlog.
+- **Past the envelope (39 patterns):** the response stays within budget, all
+  patterns still appear, and every blocked pattern still discloses its gaps —
+  but the component floor is *not* asserted, because it provably cannot hold
+  there. This test exists to pin the degradation as deliberate rather than
+  accidental; if a future change makes patterns start vanishing instead, it
+  fails.
 
 The existing assertions stay as they are: response ≤ 6000, every topic and
 pattern present, `destructive-confirm` still ranks first for "delete
