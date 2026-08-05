@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-18 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+25 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -38,6 +38,12 @@
 
 ## Icons (22)
 - Full icon set: IconPlus, IconMinus, IconCheck, IconClose, IconChevronDown, IconChevronRight, IconSearch, IconSettings, IconUser, IconEye, IconEyeOff, IconEdit, IconCopy, IconTrash, IconLoader, IconExternalLink, plus D36 additions — arrows IconArrowDown and IconArrowUpRight, and social glyphs IconLinkedIn, IconGitHub, IconX, IconInstagram.
+
+## Table family (6)
+- `<Table>` wraps the table and binds density, sortable column tracking, and selection state. `<TableHead>`, `<TableBody>`, `<TableRow>` follow native semantics. `<TableHeaderCell>` renders `<th>` with optional sort UI (D55). `<TableCell>` renders `<td>`. Supports sticky headers, row selection (checkbox), sort indicators, and row hover states — consult dist/patterns.json for the data-table pattern.
+
+## Pagination
+- `<Pagination page={n} onPageChange={...} pageCount={total}>`: renders prev/next buttons + optional page number input. Syncs with a Table via its `page` state. Button sizes and accessibility via aria-label.
 
 ## Compositions (recipes for what has no component yet)
 
