@@ -9,36 +9,52 @@ function range(start: number, end: number): number[] {
 /** Pages to render, with "ellipsis" marking an elided run. Pure and exported
  * so the truncation math is testable without rendering.
  *
- * Note: an earlier version of this used a single symmetric window
- * (`[page - siblingCount, page + siblingCount]`, clamped at the edges) and
- * did not compensate when clamping shrank the window near the last page —
- * `paginationRange(13, 13, 1)` came out as `[1, "ellipsis", 12, 13]` instead
- * of `[1, "ellipsis", 11, 12, 13]`. This version widens the surviving side
- * to a full `2 * siblingCount + 1` run whenever only one ellipsis is shown,
- * matching the symmetric case that already worked near the first page. */
+ * Anchored on the real `leftSibling`/`rightSibling` for the current page —
+ * not a page-count-independent fixed span. An earlier version's two
+ * single-ellipsis branches used a fixed window (`range(1, windowSize)` /
+ * `range(pageCount - windowSize + 1, pageCount)`) that didn't move with
+ * `page` at all, so `paginationRange(3, 13, 1)` came out as
+ * `[1, 2, 3, "ellipsis", 13]`, silently dropping true sibling page 4.
+ *
+ * Each single-ellipsis branch instead widens only as far as `max(sibling,
+ * windowSize)` / `min(sibling, pageCount - windowSize + 1)` — enough to
+ * always include the real sibling, while still padding out to a full
+ * `2 * siblingCount + 1` run when clamping at an edge would otherwise
+ * shrink it (e.g. `paginationRange(13, 13, 1)` needs `11, 12, 13`, not
+ * just `12, 13`).
+ *
+ * An ellipsis is only rendered where it elides at least two pages — a
+ * single hidden page is rendered directly instead, since an ellipsis
+ * standing in for one number is worse than the number. */
 export function paginationRange(
   page: number,
   pageCount: number,
   siblingCount: number,
 ): Array<number | "ellipsis"> {
-  // first + last + current + 2 siblings + 2 ellipses
-  const maxSlots = siblingCount * 2 + 5;
+  const siblings = Math.max(0, siblingCount);
+  const windowSize = siblings * 2 + 1;
+
+  // first + last + current window + 2 ellipses
+  const maxSlots = windowSize + 4;
   if (pageCount <= maxSlots) {
     return range(1, pageCount);
   }
 
-  const leftSibling = Math.max(page - siblingCount, 1);
-  const rightSibling = Math.min(page + siblingCount, pageCount);
-  const showLeftEllipsis = leftSibling > 2;
-  const showRightEllipsis = rightSibling < pageCount - 1;
-  const windowSize = siblingCount * 2 + 1;
+  const leftSibling = Math.max(page - siblings, 1);
+  const rightSibling = Math.min(page + siblings, pageCount);
+  // leftSibling > 3 / rightSibling < pageCount - 2 means at least two pages
+  // would be hidden on that side — the minimum that justifies an ellipsis.
+  const showLeftEllipsis = leftSibling > 3;
+  const showRightEllipsis = rightSibling < pageCount - 2;
 
   if (!showLeftEllipsis && showRightEllipsis) {
-    return [...range(1, windowSize), "ellipsis", pageCount];
+    const end = Math.max(rightSibling, windowSize);
+    return [...range(1, end), "ellipsis", pageCount];
   }
 
   if (showLeftEllipsis && !showRightEllipsis) {
-    return [1, "ellipsis", ...range(pageCount - windowSize + 1, pageCount)];
+    const start = Math.min(leftSibling, pageCount - windowSize + 1);
+    return [1, "ellipsis", ...range(start, pageCount)];
   }
 
   if (showLeftEllipsis && showRightEllipsis) {

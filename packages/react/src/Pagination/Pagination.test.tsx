@@ -31,6 +31,72 @@ describe("paginationRange", () => {
   it("widens with siblingCount", () => {
     expect(paginationRange(50, 100, 2)).toEqual([1, "ellipsis", 48, 49, 50, 51, 52, "ellipsis", 100]);
   });
+
+  // Regression: the fixed-window bug in the two single-ellipsis branches
+  // dropped a true sibling of the current page on ordinary inputs — one
+  // click past the start was enough to trigger it.
+  it("does not drop the right sibling one click past the start (regression)", () => {
+    expect(paginationRange(3, 13, 1)).toEqual([1, 2, 3, 4, "ellipsis", 13]);
+  });
+
+  it("does not drop the left sibling one click before the end (regression)", () => {
+    expect(paginationRange(11, 13, 1)).toEqual([1, "ellipsis", 10, 11, 12, 13]);
+  });
+
+  it("clamps a negative siblingCount instead of producing adjacent ellipses", () => {
+    expect(paginationRange(7, 13, -1)).toEqual([1, "ellipsis", 7, "ellipsis", 13]);
+  });
+
+  describe("sibling invariant sweep", () => {
+    // Sweeps pageCount 1-30 x siblingCount 1-3 x every page, and asserts the
+    // contract paginationRange must hold for all valid inputs:
+    //   1. every true sibling of `page` within pageCount bounds appears
+    //   2. page 1 and pageCount always appear
+    //   3. an ellipsis elides at least two pages (never stands in for one)
+    //   4. output is strictly ascending, no duplicates, no adjacent ellipses
+    // This is the test that would have caught the fixed-window bug: case 4
+    // (2, 13, 1) already passed under the old code, but case 3 (3, 13, 1)
+    // is what exposed the drop.
+    for (let pageCount = 1; pageCount <= 30; pageCount++) {
+      for (let siblingCount = 1; siblingCount <= 3; siblingCount++) {
+        for (let page = 1; page <= pageCount; page++) {
+          it(`holds for page=${page} pageCount=${pageCount} siblingCount=${siblingCount}`, () => {
+            const out = paginationRange(page, pageCount, siblingCount);
+
+            // Invariant 1: every true sibling is present.
+            const wantLo = Math.max(page - siblingCount, 1);
+            const wantHi = Math.min(page + siblingCount, pageCount);
+            for (let p = wantLo; p <= wantHi; p++) {
+              expect(out).toContain(p);
+            }
+
+            // Invariant 2: first and last page always present.
+            expect(out).toContain(1);
+            expect(out).toContain(pageCount);
+
+            // Invariants 3 & 4: ellipsis elides >=2, strictly ascending,
+            // no duplicates, no adjacent ellipses.
+            let lastNum = -Infinity;
+            for (let i = 0; i < out.length; i++) {
+              const item = out[i];
+              if (item === "ellipsis") {
+                expect(out[i + 1]).not.toBe("ellipsis");
+                const prev = out[i - 1];
+                const next = out[i + 1];
+                expect(typeof prev).toBe("number");
+                expect(typeof next).toBe("number");
+                const hidden = (next as number) - (prev as number) - 1;
+                expect(hidden).toBeGreaterThanOrEqual(2);
+              } else {
+                expect(item).toBeGreaterThan(lastNum);
+                lastNum = item;
+              }
+            }
+          });
+        }
+      }
+    }
+  });
 });
 
 describe("Pagination", () => {
