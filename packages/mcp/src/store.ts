@@ -31,7 +31,11 @@ const RESPONSE_BUDGET = 6000;
  *   topics   — a fixed, slow-growing set of terse briefs (~90 chars each).
  *              Carries the rules an agent cannot guess, `getting-started`
  *              (the five required CSS imports) above all.
- *   patterns — a handful of composition recipes, moderately sized.
+ *   patterns — composition recipes; their stored summaries carry match
+ *              phrases for keyword ranking and can run long, so the
+ *              overview projects a trimmed copy (see overviewBrief) capped
+ *              near topic size — the stored, untrimmed brief is still what
+ *              score() ranks against.
  *   components — verbose (up to 220 chars each) and the only axis that grows
  *              with every release. Also the axis a keyword query recovers
  *              best: search("menu") finds Menu; no query re-derives a house
@@ -77,6 +81,19 @@ function patternSummary(p: PatternEntry): string {
   let summary = `${p.intent} — ${p.match.join(", ")}, ${p.parameters.length} parameters`;
   if (p.blocked) summary += `, blocked (gaps: ${p.gaps.join(", ")})`;
   return summary;
+}
+
+/** Overview-only cap on pattern summaries, comparable to a topic brief
+ * (~120 bytes). The stored `Brief.summary` built by patternSummary() above
+ * stays full-length — score() reads it for keyword ranking (the match
+ * phrases are what let "delete confirmation" find destructive-confirm) — so
+ * this trims a copy used only when search("") projects the overview list,
+ * never the briefs kept for querying. */
+const OVERVIEW_PATTERN_SUMMARY_LIMIT = 120;
+
+function overviewBrief(b: Brief): Brief {
+  if (b.kind !== "pattern" || b.summary.length <= OVERVIEW_PATTERN_SUMMARY_LIMIT) return b;
+  return { ...b, summary: b.summary.slice(0, OVERVIEW_PATTERN_SUMMARY_LIMIT) };
 }
 
 export function createStore(index: PsiIndex): Store {
@@ -131,7 +148,7 @@ export function createStore(index: PsiIndex): Store {
       );
       const out: Brief[] = [];
       for (const brief of candidates) {
-        out.push(brief);
+        out.push(overviewBrief(brief));
         if (JSON.stringify(out).length > RESPONSE_BUDGET) {
           out.pop();
           break;
