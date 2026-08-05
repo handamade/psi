@@ -1,6 +1,8 @@
+import { Children, isValidElement, useMemo } from "react";
 import type { ReactNode, Ref } from "react";
 import styles from "./table.module.css";
-import { TableContext } from "./TableContext.js";
+import { EMPTY_SELECTION, TableContext, TableRowIdsContext } from "./TableContext.js";
+import { TableBody } from "./TableBody.js";
 
 export type TableSize = 32 | 40 | 48;
 
@@ -10,7 +12,25 @@ export interface TableSortState {
   direction: "asc" | "desc";
 }
 
-const EMPTY_SELECTION: ReadonlySet<string> = new Set<string>();
+/** Row ids in document order, read off the `TableBody` child's rows.
+ * Computed here — not inside `TableBody` — because the select-all checkbox
+ * lives in `TableHead`, `TableBody`'s sibling: a context provider mounted
+ * inside `TableBody` only reaches `TableBody`'s own descendants, never a
+ * sibling subtree. `Table` is the nearest common ancestor of both, so it is
+ * the only place this can be computed and provided from (D62 review). */
+function collectRowIds(children: ReactNode): string[] {
+  const ids: string[] = [];
+  Children.forEach(children, (child) => {
+    if (!isValidElement(child) || child.type !== TableBody) return;
+    const bodyChildren = (child.props as { children?: ReactNode }).children;
+    Children.forEach(bodyChildren, (row) => {
+      if (!isValidElement(row)) return;
+      const rowId = (row.props as { rowId?: string }).rowId;
+      if (typeof rowId === "string") ids.push(rowId);
+    });
+  });
+  return ids;
+}
 
 export interface TableProps {
   /** Row height in px. @default 40 */
@@ -60,11 +80,14 @@ export function Table({
     if (sortable && !onSortChange) console.warn("Psi Table: `sortable` is set without `onSortChange`; sorting will not respond.");
     if (selectable && !onSelectionChange) console.warn("Psi Table: `selectable` is set without `onSelectionChange`; selection will not respond.");
   }
+  const rowIds = useMemo(() => collectRowIds(children), [children]);
   return (
     <TableContext.Provider value={{ size, sortable, sort, onSortChange, selectable, selected, onSelectionChange }}>
-      <table ref={ref} className={cls} data-size={size}>
-        {children}
-      </table>
+      <TableRowIdsContext.Provider value={rowIds}>
+        <table ref={ref} className={cls} data-size={size}>
+          {children}
+        </table>
+      </TableRowIdsContext.Provider>
     </TableContext.Provider>
   );
 }

@@ -40,3 +40,13 @@
 .sortIndicator {
   color: var(--psi-table-sort-indicator-fg);
 }
+
+.selectCell {
+  width: 1%;
+  padding-inline-end: 0;
+  border-bottom: 1px solid var(--psi-table-cell-border);
+}
+
+.row[data-selected] {
+  background: var(--psi-table-row-bg-selected);
+}

@@ -1,6 +1,11 @@
 import { createContext } from "react";
 import type { TableSize, TableSortState } from "./Table.js";
 
+/** Shared empty-selection sentinel — the one place an unselected `selected`
+ * set is constructed, so `Table`'s default prop and this context's default
+ * value can't drift into two different empty sets (D62 review). */
+export const EMPTY_SELECTION: ReadonlySet<string> = new Set<string>();
+
 export interface TableContextValue {
   size: TableSize;
   sortable: boolean;
@@ -16,5 +21,9 @@ export const TableContext = createContext<TableContextValue>({
   sortable: false,
   sort: null,
   selectable: false,
-  selected: new Set<string>(),
+  selected: EMPTY_SELECTION,
 });
+
+/** Row ids in document order, published by TableBody so the select-all
+ * checkbox can compute all/some without the consumer restating them. */
+export const TableRowIdsContext = createContext<string[]>([]);
