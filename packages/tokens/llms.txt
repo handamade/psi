@@ -37,6 +37,9 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 ## Media tint (--psi-media-tint, .psi-media-tint)
 - --psi-media-tint is a brand-defined filter chain (D35); apply the .psi-media-tint utility class to media elements to get a tinted-at-rest, true-color-on-hover/focus treatment, transitioning over --psi-duration-450 / --psi-ease-soft.
 
+## Tabular numerals (--psi-font-variant-numeric, .psi-tabular)
+- --psi-font-variant-numeric is tabular-nums (D62); apply the .psi-tabular utility class to numeric content for fixed-width digits that don't jitter between rows. Table's own numeric columns (TableCell/TableHeaderCell `numeric` prop) bind the token directly in CSS — reach for the utility class for numeric content outside Table.
+
 ## Dark-first brands
 - A brand theme can declare `base: "dark"` (see ember) so its formulas derive from the dark palette instead of light — use this for brands whose primary surface is a dark canvas rather than treating dark as an inverted afterthought.
 

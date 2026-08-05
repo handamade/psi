@@ -44,6 +44,7 @@ export const guidance = {
   },
   recipes: {
     mediaTint: "Apply .psi-media-tint to media elements; the brand defines --psi-media-tint (D35). Hover/focus reveals true color over --psi-duration-450 --psi-ease-soft.",
+    tabularNumerals: "Apply .psi-tabular to numeric content for fixed-width digits; --psi-font-variant-numeric is tabular-nums (D62). Table's numeric columns bind the token directly rather than via the utility class.",
     sectionHeader: "SectionHeader ships as a recipe, not a component (v1.2 non-goal): baseline-aligned flex row — mono annotation (--psi-text-mono-14-20-regular, --psi-fg-accent) + h2 (.psi-display-32-32-extrabold) + optional trailing meta, border-bottom 1px var(--psi-border-faint), padding-bottom var(--psi-space-20).",
   },
   tags: {
