@@ -73,28 +73,47 @@ The three guarantees are not universal, and this spec states where they end
 rather than implying they hold forever.
 
 **The envelope is a function of per-pattern cost, not of pattern count.** The
-capped intro is only part of what a pattern brief costs; its `id`, `kind`,
-`title` and never-capped gaps suffix are not compressible, so patterns with
+capped intro is only part of what a pattern brief costs: a brief stores its id
+twice (`id: "pattern:<id>"` and `title: "<id>"`), and neither copy — nor
+`kind`, nor the never-capped gaps suffix — is compressible, so patterns with
 longer ids and gap lists exhaust the budget sooner. Measured against the real
-index (13 topics, components averaging ~275 bytes), sweeping pattern count at
-two synthetic id lengths — components shown at each size:
+index (13 topics, components averaging 275 bytes), sweeping pattern count at
+two synthetic id lengths — components / serialized bytes at each size:
 
-| total patterns | short ids (~5 chars) | realistic ids (~20 chars) |
+| total patterns | short ids (`syn-0`, 5 chars) | realistic ids (`synthetic-pattern-0`, 19 chars) |
 |---|---|---|
-| 13 (0.9.0) | **8** | **8** |
-| 19 | **8** | **8** |
-| 21 | **8** | **8** |
-| 23 | **8** | 7 |
-| 25 | **8** | 6 |
-| 29 | 6 | 5 |
-| 33 | 5 | 3 |
+| 13 (0.9.0) | **8** / 5926 | **8** / 5926 |
+| 19 | **8** / 5842 | **8** / 5856 |
+| 21 | **8** / 5845 | **8** / 5913 |
+| 23 | **8** / 5999 | 7 / 5814 |
+| 25 | **8** / 5995 | 6 / 5743 |
+| 29 | 6 / 5769 | 5 / 5950 |
+| 33 | 5 / 5814 | 3 / 5818 |
+| 39 | 3 / 5740 | 1 / 5970 |
+
+Bold marks the sizes where the eight-component floor still holds. Reproduce
+the whole sweep with:
+
+```bash
+pnpm --filter @handamade/psi-mcp exec tsx scripts/measure-overview-envelope.ts
+```
+
+It walks every size from 13 to 39 in both columns and prints where each floor
+breaks. Its synthesis matches the store test's helper — cyclic duplication of
+the real catalog (`index.patterns[n % len]`) with a fresh id — so every
+synthetic pattern carries a real intent, match phrases and `blocked`/`gaps`
+tail rather than being a stub. Byte totals are not monotonic in pattern count:
+the derived intro cap steps down in tens, so each step hands back a chunk of
+budget and the total sawtooths just under 6000. Read the component column, not
+the byte column, for where the envelope ends.
 
 Psi's real ids (`date-range-filter`, `settings-form-row`,
-`tabbed-workspace`, …) average ~15 characters, so **the realistic column is
-the one that governs: the floor holds to roughly 21–22 patterns.** An earlier
-draft of this spec claimed 25–28 — that figure came from a sweep using short
-synthetic ids and was optimistic. Treat ~21 as the planning number and
-re-measure rather than trusting it if pattern ids or gap lists grow.
+`tabbed-workspace`, …) average 14.4 characters, so **the realistic column is
+the one that governs: the floor holds through 21 patterns and first breaks at
+22.** An earlier draft of this spec claimed 25–28 — that is the short-id
+column, reproduced above byte-for-byte, and it is optimistic for ids the
+length of Psi's own. Treat 21 as the planning number and re-measure rather
+than trusting it if pattern ids or gap lists grow.
 
 Past that the arithmetic runs out: the irreducible per-pattern cost plus the
 component reserve exceeds 6000 no matter how short the intros get.
@@ -105,25 +124,31 @@ and components decline one at a time from the floor. Nothing vanishes silently
 and the backlog is never lost.
 
 For scale: the D59 ledger arc is expected to add five to nine patterns across
-cycles 2–5, landing near 18–22. That is **inside the envelope but not
-comfortably so** — the upper end of the arc's own projection sits on the
-boundary, which is worth knowing before cycle 2 rather than after.
+cycles 2–5, landing near 18–22. **Most of that range is inside the envelope;
+the top of it is not.** 18–21 hold the floor; 22 — the arc's own upper
+projection — is exactly the first size that breaks it, at 7 components. So the
+arc is not on course to overrun the envelope, but it has no margin at its
+upper end, which is worth knowing before cycle 2 rather than after.
 
 Two things buy the margin back. Closing a gap *returns* budget: the
 `blocked (gaps: …)` suffix disappears, and it is the most expensive
 uncompressible part of a blocked pattern's brief — measured, closing all five
-gaps at today's catalog moves components from 6 to 7. Since the arc's whole
-purpose is closing those five gaps, the catalog gets cheaper per pattern as it
-grows. And a pattern that needs no new component costs less than one that
-does. If cycle 4 or 5 finds the floor yielding anyway, that is the signal for
+of today's gaps moves the edge from 22 to 24, so the floor holds through 23
+instead of through 21. At today's 13 patterns it changes nothing (8 components
+either way): the buy-back only shows up once the budget is actually tight,
+which is precisely where it is needed. Since the arc's whole purpose is
+closing those five gaps, the catalog gets cheaper per pattern as it grows. And
+a pattern that needs no new component costs less than one that does. If cycle
+4 or 5 finds the floor yielding anyway, that is the signal for
 the shape change in the rejected alternatives, on schedule rather than as a
 surprise.
 
 **Exceeding the envelope is the signal to change the overview's shape**, not
 to tune constants — see the second rejected alternative below. The store test
-asserts the guarantees at 26 patterns and separately asserts the graceful
-degradation at 39, so the boundary is documented in executable form rather
-than in prose alone.
+asserts the guarantees at 19 patterns — two below 21, the last size that holds
+the floor — and separately asserts the graceful degradation at 39, so the
+boundary is documented in executable form rather than in prose alone. Both
+tests use the long synthetic ids, i.e. the conservative column.
 
 ## Alternatives rejected
 
