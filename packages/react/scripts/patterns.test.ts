@@ -167,4 +167,9 @@ describe("validatePatterns (one case per D48 error class)", () => {
     });
     expect(() => ok(p)).not.toThrow();
   });
+
+  it("10: a declared gap that now resolves in the manifest throws — the ledger must self-clear", () => {
+    const p = base({ gaps: ["Tag"], compose: { component: "Button" } });
+    expect(() => ok(p)).toThrow(/pattern "p".*gap "Tag" is no longer missing — remove it from gaps/);
+  });
 });

@@ -1,0 +1,25 @@
+{
+  "id": "bulk-action-bar",
+  "intent": "Bar that appears when table rows are selected: selection count, bulk actions, and a clear-selection control",
+  "match": ["bulk actions", "selection bar", "batch actions", "selected rows toolbar"],
+  "compose": {
+    "component": "Toolbar",
+    "props": { "gap": 12 },
+    "slots": {
+      "body": [
+        { "component": "Tag", "props": { "variant": "accent", "subtle": true }, "content": "count-label" },
+        { "component": "Button", "props": { "variant": "neutral" }, "content": "export-label" },
+        { "component": "Button", "props": { "variant": "danger-subtle" }, "content": "delete-label" },
+        { "component": "Button", "props": { "variant": "ghost" }, "content": "clear-label" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "count-label": "[n] selected",
+    "export-label": "Export",
+    "delete-label": "Delete",
+    "clear-label": "Clear selection"
+  },
+  "gaps": []
+}

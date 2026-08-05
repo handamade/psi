@@ -75,4 +75,14 @@ describe("Input", () => {
     await user.keyboard("Dmytro");
     expect(screen.getByLabelText("Name")).toHaveValue("Dmytro");
   });
+
+  it("passes type through to the native input", () => {
+    render(<Input type="date" aria-label="From" />);
+    expect(screen.getByLabelText("From")).toHaveAttribute("type", "date");
+  });
+
+  it("defaults type to text when no type prop is given", () => {
+    render(<Input aria-label="Name" />);
+    expect(screen.getByLabelText("Name")).toHaveAttribute("type", "text");
+  });
 });

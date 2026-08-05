@@ -11,6 +11,10 @@ type Size = 24 | 32 | 40 | 48;
 
 export interface IconButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Accessible name for the icon-only control. Required: an IconButton has
+   * no text to name it, so omitting this ships an unnameable button (D60).
+   * If you also pass `aria-labelledby`, that wins per the accname algorithm. */
+  "aria-label": string;
   /** Visual variant. @default "neutral" */
   variant?: Variant;
   /** Square size in px (24 | 32 | 40 | 48). @default 32 */

@@ -1,0 +1,19 @@
+{
+  "id": "data-table",
+  "intent": "Sortable, selectable table of records with numeric columns and a per-row actions menu — compose the row menu from the row-actions pattern",
+  "match": ["data table", "transactions table", "sortable table", "records table", "list of transactions"],
+  "compose": {
+    "component": "Table",
+    "props": { "selectable": true, "sortable": true },
+    "slots": {
+      "head": ["{content:columns-note}"],
+      "body": ["{content:rows-note}"]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "columns-note": "[one header cell per column; numeric columns align right]",
+    "rows-note": "[one row per record; put the row-actions menu in the last cell]"
+  },
+  "gaps": ["Table"]
+}
