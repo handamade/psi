@@ -21,6 +21,7 @@
   pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint
   ```
 - **`pnpm vr` only passes in CI.** Never run it locally — its default update mode silently writes junk `-darwin` baselines.
+- **Test commands.** Neither `packages/tokens` nor `packages/react` defines a `test` script; only the root does (`vitest run`). `pnpm --filter <pkg> test …` therefore **exits 0 having run nothing** — a green light that means nothing. Always use `pnpm exec vitest run <pattern>` for a focused run, or `pnpm test` for the full suite (~8s). Never trust a test step that produced no test output.
 
 ---
 
@@ -60,7 +61,7 @@ import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-tokens test -- emit-css`
+Run: `pnpm exec vitest run emit-css`
 Expected: FAIL — both assertions report the substring is absent.
 
 - [ ] **Step 3: Write minimal implementation**
@@ -82,7 +83,7 @@ In the utilities emitter, after the `.psi-text-*` loop (~line 131):
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-tokens test -- emit-css`
+Run: `pnpm exec vitest run emit-css`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -149,7 +150,7 @@ describe("table tokens", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-tokens test -- table-tokens`
+Run: `pnpm exec vitest run table-tokens`
 Expected: FAIL — `Cannot find module '../src/components/table.js'`
 
 - [ ] **Step 3: Write minimal implementation**
@@ -202,7 +203,7 @@ and register it in `componentVars`, keeping alphabetical order (after `switch`, 
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-tokens test -- table-tokens`
+Run: `pnpm exec vitest run table-tokens`
 Expected: PASS
 
 - [ ] **Step 5: Add the new contrast pair**
@@ -225,7 +226,7 @@ If it **throws** on the new pair, that is the gate working. Do not weaken `minRa
 
 - [ ] **Step 7: Run the full token suite**
 
-Run: `pnpm --filter @handamade/psi-tokens test`
+Run: `pnpm test`
 Expected: PASS — including the D46 scope-gate tests, which the new family must satisfy.
 
 - [ ] **Step 8: Commit**
@@ -269,7 +270,7 @@ it("renders no label text when only aria-label is given", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- Checkbox`
+Run: `pnpm exec vitest run Checkbox`
 
 Expected: the two runtime tests **PASS** already (host props pass through `...rest`). That is the point — the defect is in the *manifest*, not the runtime. Confirm the real failure with:
 
@@ -301,7 +302,7 @@ export interface CheckboxProps
 Run: `pnpm --filter @handamade/psi-react build && node -e "const m=require('./packages/react/dist/manifest.json');const c=(m.components||m).find(x=>x.name==='Checkbox');console.log(c.props.map(p=>p.name).join(', '))"`
 Expected: PASS — the list now contains `aria-label`.
 
-Run: `pnpm --filter @handamade/psi-react test -- Checkbox`
+Run: `pnpm exec vitest run Checkbox`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -397,7 +398,7 @@ describe("Table", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- Table`
+Run: `pnpm exec vitest run Table`
 Expected: FAIL — `Cannot find module './Table.js'`
 
 - [ ] **Step 3: Write minimal implementation**
@@ -599,7 +600,7 @@ export type { TableCellProps } from "./Table/TableCell.js";
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-react test -- Table`
+Run: `pnpm exec vitest run Table`
 Expected: PASS (4 tests)
 
 - [ ] **Step 5: Commit**
@@ -707,7 +708,7 @@ describe("Table sorting", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- TableSort`
+Run: `pnpm exec vitest run TableSort`
 Expected: FAIL — no `aria-sort` attribute and no button is rendered.
 
 - [ ] **Step 3: Write minimal implementation**
@@ -894,10 +895,10 @@ Append to `table.module.css`:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-react test -- TableSort`
+Run: `pnpm exec vitest run TableSort`
 Expected: PASS (7 tests)
 
-Run: `pnpm --filter @handamade/psi-react test -- Table`
+Run: `pnpm exec vitest run Table`
 Expected: PASS — Task 4's tests still green.
 
 - [ ] **Step 5: Commit**
@@ -1015,7 +1016,7 @@ describe("Table selection", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- TableSelection`
+Run: `pnpm exec vitest run TableSelection`
 Expected: FAIL — no checkboxes are rendered.
 
 - [ ] **Step 3: Write minimal implementation**
@@ -1204,10 +1205,10 @@ Append to `table.module.css`:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-react test -- TableSelection`
+Run: `pnpm exec vitest run TableSelection`
 Expected: PASS (9 tests)
 
-Run: `pnpm --filter @handamade/psi-react test -- Table`
+Run: `pnpm exec vitest run Table`
 Expected: PASS — Tasks 4 and 5 still green. If Task 4's `getAllByRole("row")` count changed, that is a real regression: `SelectAllRow` must not add a row, only a cell.
 
 - [ ] **Step 5: Commit**
@@ -1249,7 +1250,7 @@ it("applies the sticky class only when stickyHeader is set", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- Table`
+Run: `pnpm exec vitest run Table`
 Expected: FAIL. `.sticky` does not exist in the CSS module yet, so `styles.sticky` is `undefined`; `stickyHeader && styles.sticky` yields `undefined`, which `.filter(Boolean)` drops — leaving the sticky table's className identical to the plain one, so `expect(stickyCls).not.toBe(plainCls)` fails.
 
 - [ ] **Step 3: Write the implementation**
@@ -1307,7 +1308,7 @@ Append to `packages/react/src/Table/table.module.css`:
 Run: `pnpm lint:css`
 Expected: PASS. If it reports binding a non-own-component token, you have written `--psi-control-*` or `--psi-surface-*` directly — route it through `--psi-table-*` in `packages/tokens/src/components/table.ts` instead.
 
-Run: `pnpm --filter @handamade/psi-react test -- Table`
+Run: `pnpm exec vitest run Table`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1415,7 +1416,7 @@ describe("Pagination", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- Pagination`
+Run: `pnpm exec vitest run Pagination`
 Expected: FAIL — `Cannot find module './Pagination.js'`
 
 - [ ] **Step 3: Write minimal implementation**
@@ -1566,7 +1567,7 @@ export type { PaginationProps } from "./Pagination/Pagination.js";
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-react test -- Pagination`
+Run: `pnpm exec vitest run Pagination`
 Expected: PASS (14 tests)
 
 - [ ] **Step 5: Commit**
@@ -1615,7 +1616,7 @@ Add to the `cases` array in `packages/react/src/a11y.axe.test.tsx` (and extend t
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- a11y`
+Run: `pnpm exec vitest run a11y`
 Expected: FAIL — the imports do not resolve until `index.ts` exports exist (they do, from Tasks 4 and 8), so the real signal here is any axe violation. A missing accessible name on a row checkbox surfaces as `aria-input-field-name` or `label`.
 
 - [ ] **Step 3: Fix any violation and add the slot contract**
@@ -1639,7 +1640,7 @@ If axe reported a violation, fix the component rather than the test. Do **not** 
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-react test -- a11y`
+Run: `pnpm exec vitest run a11y`
 Expected: PASS — every case reports `[]` violations.
 
 - [ ] **Step 5: Write the stories**
@@ -1783,7 +1784,7 @@ Use whatever the file already calls its built-pattern array; if it builds inline
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @handamade/psi-react test -- patterns`
+Run: `pnpm exec vitest run patterns`
 Expected: FAIL — either `gaps` still lists `Table`, or the validator throws `unknown slot "head"`.
 
 - [ ] **Step 3: Write the implementation**
@@ -1858,7 +1859,7 @@ In `packages/react/patterns/table-pagination.json`, change only the last line:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @handamade/psi-react test -- patterns`
+Run: `pnpm exec vitest run patterns`
 Expected: PASS
 
 Run: `pnpm build && node -e "const p=require('./packages/react/dist/patterns.json');const l=Array.isArray(p)?p:(p.patterns||Object.values(p));console.log(l.filter(x=>x.blocked).map(x=>x.id).join(', ')||'none blocked')"`
