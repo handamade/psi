@@ -1,0 +1,14 @@
+/* packages/react/src/Pagination/pagination.module.css
+   No --psi-pagination-* family: every visual comes from Button and
+   IconButton, which already bind their own tokens. Adding a family here
+   would be indirection with nothing behind it. */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--psi-space-4);
+}
+
+.ellipsis {
+  padding-inline: var(--psi-space-4);
+}
