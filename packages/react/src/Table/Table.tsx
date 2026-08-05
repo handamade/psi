@@ -18,8 +18,9 @@ export interface TableSortState {
  * inside `TableBody` only reaches `TableBody`'s own descendants, never a
  * sibling subtree. `Table` is the nearest common ancestor of both, so it is
  * the only place this can be computed and provided from (D62 review). */
-function collectRowIds(children: ReactNode): string[] {
+function collectRowIds(children: ReactNode): { ids: string[]; sawBody: boolean } {
   const ids: string[] = [];
+  let sawBody = false;
   Children.forEach(children, function walk(child) {
     if (!isValidElement(child)) return;
     if (child.type === Fragment) {
@@ -27,6 +28,7 @@ function collectRowIds(children: ReactNode): string[] {
       return;
     }
     if (child.type !== TableBody) return;
+    sawBody = true;
     const bodyChildren = (child.props as { children?: ReactNode }).children;
     Children.forEach(bodyChildren, (row) => {
       if (!isValidElement(row)) return;
@@ -34,7 +36,11 @@ function collectRowIds(children: ReactNode): string[] {
       if (typeof rowId === "string") ids.push(rowId);
     });
   });
-  return ids;
+  // `sawBody` separates a structurally invisible body from a legitimately
+  // empty one. A selectable table whose filters match nothing renders a real
+  // but empty `TableBody` every day — warning on that would be noise, and a
+  // warning that cries wolf gets ignored when it matters.
+  return { ids, sawBody };
 }
 
 export interface TableProps {
@@ -81,11 +87,11 @@ export function Table({
   ref,
 }: TableProps) {
   const cls = [styles.table, stickyHeader && styles.sticky, className].filter(Boolean).join(" ");
-  const rowIds = useMemo(() => collectRowIds(children), [children]);
+  const { ids: rowIds, sawBody } = useMemo(() => collectRowIds(children), [children]);
   if (process.env.NODE_ENV !== "production") {
     if (sortable && !onSortChange) console.warn("Psi Table: `sortable` is set without `onSortChange`; sorting will not respond.");
     if (selectable && !onSelectionChange) console.warn("Psi Table: `selectable` is set without `onSelectionChange`; selection will not respond.");
-    if (selectable && rowIds.length === 0) console.warn("Psi Table: `selectable` is set but no row ids were found; if `TableBody` is wrapped in a component other than a Fragment, `Table` cannot see its rows and select-all will clear the selection.");
+    if (selectable && !sawBody) console.warn("Psi Table: `selectable` is set but no `TableBody` is visible to `Table`. Wrapping `TableBody` in a component other than a Fragment hides its rows, and select-all will clear the selection instead of filling it.");
   }
   return (
     <TableContext.Provider value={{ size, sortable, sort, onSortChange, selectable, selected, onSelectionChange }}>

@@ -123,4 +123,31 @@ describe("Table selection", () => {
     await expect(userEvent.click(all)).resolves.not.toThrow();
     expect(onSelectionChange).toHaveBeenCalledWith(new Set());
   });
+
+  it("does not warn for a legitimately empty body — only when no TableBody is visible", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    render(
+      <Table selectable selected={new Set()} onSelectionChange={() => {}}>
+        <TableHead><TableRow><TableHeaderCell>Date</TableHeaderCell></TableRow></TableHead>
+        <TableBody></TableBody>
+      </Table>,
+    );
+    expect(warn).not.toHaveBeenCalled();
+
+    // A wrapper other than a Fragment hides the body, which IS worth warning
+    // about: select-all would clear the selection rather than fill it.
+    const Wrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+    render(
+      <Table selectable selected={new Set()} onSelectionChange={() => {}}>
+        <TableHead><TableRow><TableHeaderCell>Date</TableHeaderCell></TableRow></TableHead>
+        <Wrapper>
+          <TableBody><TableRow rowId="t1"><TableCell>a</TableCell></TableRow></TableBody>
+        </Wrapper>
+      </Table>,
+    );
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("no `TableBody` is visible"));
+
+    warn.mockRestore();
+  });
 });
