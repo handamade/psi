@@ -70,22 +70,34 @@ patterns alongside every new component, so this fails on schedule.
 ## Operating envelope
 
 The three guarantees are not universal, and this spec states where they end
-rather than implying they hold forever. Measured against the real index (13
-topics, components averaging ~275 bytes):
+rather than implying they hold forever.
 
-| patterns | all shown? | components | bytes |
-|---|---|---|---|
-| 13 (0.9.0) | yes | **8** | 5926 |
-| 19 | yes | **8** | 5842 |
-| 25 | yes | **8** | 5995 |
-| 29 | yes | 6 | 5769 |
-| 33 | yes | 5 | 5814 |
-| 39 | yes | 3 | 5740 |
+**The envelope is a function of per-pattern cost, not of pattern count.** The
+capped intro is only part of what a pattern brief costs; its `id`, `kind`,
+`title` and never-capped gaps suffix are not compressible, so patterns with
+longer ids and gap lists exhaust the budget sooner. Measured against the real
+index (13 topics, components averaging ~275 bytes), sweeping pattern count at
+two synthetic id lengths — components shown at each size:
 
-**All three guarantees hold to roughly 25–28 patterns** — about double the
-0.9.0 catalog — at which point the arithmetic runs out: the irreducible
-per-pattern cost (`id`, `kind`, `title`, and the never-capped gaps suffix)
-plus the component reserve exceeds 6000 no matter how short the intros get.
+| total patterns | short ids (~5 chars) | realistic ids (~20 chars) |
+|---|---|---|
+| 13 (0.9.0) | **8** | **8** |
+| 19 | **8** | **8** |
+| 21 | **8** | **8** |
+| 23 | **8** | 7 |
+| 25 | **8** | 6 |
+| 29 | 6 | 5 |
+| 33 | 5 | 3 |
+
+Psi's real ids (`date-range-filter`, `settings-form-row`,
+`tabbed-workspace`, …) average ~15 characters, so **the realistic column is
+the one that governs: the floor holds to roughly 21–22 patterns.** An earlier
+draft of this spec claimed 25–28 — that figure came from a sweep using short
+synthetic ids and was optimistic. Treat ~21 as the planning number and
+re-measure rather than trusting it if pattern ids or gap lists grow.
+
+Past that the arithmetic runs out: the irreducible per-pattern cost plus the
+component reserve exceeds 6000 no matter how short the intros get.
 
 Past the envelope the design **degrades gracefully rather than breaking**:
 every pattern is still listed, every blocked pattern still discloses its gaps,
@@ -93,9 +105,19 @@ and components decline one at a time from the floor. Nothing vanishes silently
 and the backlog is never lost.
 
 For scale: the D59 ledger arc is expected to add five to nine patterns across
-cycles 2–5, landing near 18–22 — inside the envelope. Closing a gap also
-*returns* budget (the `blocked (gaps: …)` suffix goes away), so shipping the
-backlog pushes the ceiling further out rather than nearer.
+cycles 2–5, landing near 18–22. That is **inside the envelope but not
+comfortably so** — the upper end of the arc's own projection sits on the
+boundary, which is worth knowing before cycle 2 rather than after.
+
+Two things buy the margin back. Closing a gap *returns* budget: the
+`blocked (gaps: …)` suffix disappears, and it is the most expensive
+uncompressible part of a blocked pattern's brief — measured, closing all five
+gaps at today's catalog moves components from 6 to 7. Since the arc's whole
+purpose is closing those five gaps, the catalog gets cheaper per pattern as it
+grows. And a pattern that needs no new component costs less than one that
+does. If cycle 4 or 5 finds the floor yielding anyway, that is the signal for
+the shape change in the rejected alternatives, on schedule rather than as a
+surprise.
 
 **Exceeding the envelope is the signal to change the overview's shape**, not
 to tune constants — see the second rejected alternative below. The store test
