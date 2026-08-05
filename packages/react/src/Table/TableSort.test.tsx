@@ -62,6 +62,12 @@ describe("Table sorting", () => {
     expect(onSortChange).toHaveBeenCalledWith({ key: "date", direction: "desc" });
   });
 
+  it("toggles a descending column back to ascending", async () => {
+    const { onSortChange } = sortable({ key: "date", direction: "desc" });
+    await userEvent.click(screen.getByRole("button", { name: /Date/ }));
+    expect(onSortChange).toHaveBeenCalledWith({ key: "date", direction: "asc" });
+  });
+
   it("renders no sort button when the table is not sortable", () => {
     render(
       <Table>
