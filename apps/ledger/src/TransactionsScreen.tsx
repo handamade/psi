@@ -7,8 +7,12 @@ import {
 import type { TableSortState } from "@handamade/psi-react";
 import { TRANSACTIONS, currency } from "./fixture.js";
 
+// Derived from the fixture, not hardcoded — stays correct if the dataset changes.
+const CATEGORIES = Array.from(new Set(TRANSACTIONS.map((t) => t.category))).sort();
+
 export function TransactionsScreen() {
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
   const [sort, setSort] = useState<TableSortState | null>({ key: "date", direction: "desc" });
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [pageSize, setPageSize] = useState(10);
@@ -20,9 +24,11 @@ export function TransactionsScreen() {
   // against a server that does all three.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const rows = q
-      ? TRANSACTIONS.filter((t) => t.payee.toLowerCase().includes(q) || t.category.toLowerCase().includes(q))
-      : TRANSACTIONS;
+    const rows = TRANSACTIONS.filter((t) => {
+      const matchesQuery = !q || t.payee.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
+      const matchesCategory = !category || t.category === category;
+      return matchesQuery && matchesCategory;
+    });
     if (!sort) return rows;
     const dir = sort.direction === "asc" ? 1 : -1;
     return [...rows].sort((a, b) => {
@@ -31,7 +37,7 @@ export function TransactionsScreen() {
       if (typeof av === "number" && typeof bv === "number") return (av - bv) * dir;
       return String(av).localeCompare(String(bv)) * dir;
     });
-  }, [query, sort]);
+  }, [query, category, sort]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const current = Math.min(page, pageCount);
@@ -50,6 +56,24 @@ export function TransactionsScreen() {
             onChange={(e) => { setQuery(e.currentTarget.value); setPage(1); }}
           />
         </Field>
+        <Field label="Category">
+          <Select
+            size={32}
+            value={category}
+            onChange={(e) => { setCategory(e.currentTarget.value); setPage(1); }}
+          >
+            <option value="">All categories</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </Select>
+        </Field>
+        {query.trim() && (
+          <Tag onDismiss={() => { setQuery(""); setPage(1); }}>Search: {query.trim()}</Tag>
+        )}
+        {category && (
+          <Tag onDismiss={() => { setCategory(""); setPage(1); }}>Category: {category}</Tag>
+        )}
       </Toolbar>
 
       {/* bulk-action-bar */}
@@ -67,7 +91,7 @@ export function TransactionsScreen() {
         <Panel padding={24}>
           <p>Nothing matches these filters.</p>
           <p>Try a broader search — the dataset has {TRANSACTIONS.length} transactions.</p>
-          <Button variant="neutral" onClick={() => { setQuery(""); setPage(1); }}>Clear filters</Button>
+          <Button variant="neutral" onClick={() => { setQuery(""); setCategory(""); setPage(1); }}>Clear filters</Button>
         </Panel>
       ) : (
         <>
