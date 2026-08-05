@@ -154,4 +154,13 @@ describe("IconButton", () => {
     await userEvent.click(a).catch(() => {});
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it("exposes its accessible name from aria-label", () => {
+    render(
+      <IconButton aria-label="Row actions">
+        <svg aria-hidden="true" />
+      </IconButton>,
+    );
+    expect(screen.getByRole("button", { name: "Row actions" })).toBeInTheDocument();
+  });
 });

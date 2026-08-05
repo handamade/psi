@@ -31,7 +31,11 @@ const RESPONSE_BUDGET = 6000;
  *   topics   — a fixed, slow-growing set of terse briefs (~90 chars each).
  *              Carries the rules an agent cannot guess, `getting-started`
  *              (the five required CSS imports) above all.
- *   patterns — a handful of composition recipes, moderately sized.
+ *   patterns — composition recipes; their stored summaries carry match
+ *              phrases for keyword ranking and can run long, so the
+ *              overview projects a trimmed copy (see overviewBrief) capped
+ *              near topic size — the stored, untrimmed brief is still what
+ *              score() ranks against.
  *   components — verbose (up to 220 chars each) and the only axis that grows
  *              with every release. Also the axis a keyword query recovers
  *              best: search("menu") finds Menu; no query re-derives a house
@@ -79,7 +83,57 @@ function patternSummary(p: PatternEntry): string {
   return summary;
 }
 
+/** Overview-only cap on the *intro* portion of a pattern summary (intent +
+ * match phrases + parameter count), comparable to a topic brief (~100
+ * bytes). The stored `Brief.summary` built by patternSummary() above stays
+ * full-length — score() reads it for keyword ranking (the match phrases are
+ * what let "delete confirmation" find destructive-confirm) — so this only
+ * shapes a copy used when search("") projects the overview list.
+ *
+ * The `, blocked (gaps: …)` tail is never subject to this cap: it is the
+ * backlog signal this cycle exists to publish, and patternSummary() puts it
+ * at the END of the string — a length-based slice of the assembled summary
+ * would silently drop it for every one of the 13 patterns (all longer than
+ * 120 chars), which is exactly the bug this trims to avoid. So the overview
+ * projects a pattern's summary from the underlying PatternEntry directly:
+ * trim the intro, then always append the tail. */
+const OVERVIEW_PATTERN_INTRO_LIMIT = 100;
+
+/** Trims `s` to at most `limit` chars, backing off to the last word boundary
+ * and marking the cut with an ellipsis — never a mid-word fragment that
+ * could read as a complete (if coincidental) match phrase. */
+function truncateAtWord(s: string, limit: number): string {
+  if (s.length <= limit) return s;
+  const cut = s.slice(0, limit);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${lastSpace > 0 ? cut.slice(0, lastSpace) : cut}…`;
+}
+
+function overviewPatternSummary(p: PatternEntry): string {
+  const intro = truncateAtWord(
+    `${p.intent} — ${p.match.join(", ")}, ${p.parameters.length} parameters`,
+    OVERVIEW_PATTERN_INTRO_LIMIT,
+  );
+  return p.blocked ? `${intro}, blocked (gaps: ${p.gaps.join(", ")})` : intro;
+}
+
 export function createStore(index: PsiIndex): Store {
+  const patternsById = new Map(index.patterns.map((p) => [p.id, p]));
+
+  /** Overview-only projection: returns `b` unchanged for every kind except
+   * pattern, where it re-derives the summary from the underlying
+   * `PatternEntry` (via `overviewPatternSummary`) rather than slicing the
+   * already-assembled, full-length `Brief.summary` — so the `blocked (gaps:
+   * …)` tail always survives the overview's trim. Always a shallow copy for
+   * patterns: the stored brief kept in `briefs` (and used by score()) is
+   * never mutated. */
+  function overviewBrief(b: Brief): Brief {
+    if (b.kind !== "pattern") return b;
+    const pattern = patternsById.get(b.title);
+    if (!pattern) return b;
+    return { ...b, summary: overviewPatternSummary(pattern) };
+  }
+
   const briefs: Brief[] = [
     ...index.components.map((c) => ({
       id: `component:${c.name}`,
@@ -131,7 +185,7 @@ export function createStore(index: PsiIndex): Store {
       );
       const out: Brief[] = [];
       for (const brief of candidates) {
-        out.push(brief);
+        out.push(overviewBrief(brief));
         if (JSON.stringify(out).length > RESPONSE_BUDGET) {
           out.pop();
           break;

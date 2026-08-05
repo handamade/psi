@@ -1,0 +1,24 @@
+{
+  "id": "table-pagination",
+  "intent": "Page-size selector and page range control beneath a data table",
+  "match": ["pagination", "table pagination", "page controls", "rows per page", "paging"],
+  "compose": {
+    "component": "Toolbar",
+    "props": { "gap": 12 },
+    "slots": {
+      "body": [
+        {
+          "component": "Field",
+          "slots": {
+            "label": ["{content:page-size-label}"],
+            "body": [{ "component": "Select", "props": { "size": 32 } }]
+          }
+        },
+        { "component": "Pagination" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": { "page-size-label": "Rows per page" },
+  "gaps": ["Pagination"]
+}

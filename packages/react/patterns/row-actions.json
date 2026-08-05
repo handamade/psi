@@ -1,13 +1,17 @@
 {
   "id": "row-actions",
-  "intent": "List or table row with a labelled actions menu, including a destructive item — hand the destructive item's confirmation off to the destructive-confirm pattern. The trigger is a text Button, not an icon-only kebab: IconButton cannot carry an accessible name through the manifest, so it is not composable in a pattern yet",
+  "intent": "List or table row with an icon-only actions menu, including a destructive item — hand the destructive item's confirmation off to the destructive-confirm pattern",
   "match": ["row actions", "per-row actions", "table row menu", "actions menu", "row action list"],
   "compose": {
     "component": "Menu",
     "props": { "placement": "{param:placement}", "aria-label": "{content:trigger-label}" },
     "slots": {
       "trigger": [
-        { "component": "Button", "props": { "variant": "ghost" }, "content": "trigger-label" }
+        {
+          "component": "IconButton",
+          "props": { "variant": "ghost", "aria-label": "{content:trigger-label}" },
+          "content": "trigger-icon"
+        }
       ],
       "body": [
         { "component": "MenuItem", "content": "edit-label" },
@@ -27,6 +31,7 @@
   ],
   "content": {
     "trigger-label": "Actions",
+    "trigger-icon": "[icon]",
     "edit-label": "Edit",
     "duplicate-label": "Duplicate",
     "delete-label": "Delete"

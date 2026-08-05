@@ -92,6 +92,21 @@ was working on things with no completion criterion.
   `Checkbox` and `Switch` alike. Verified against `dist/manifest.json`
   rather than the eval prose.
 
+  The cycle's three promotions ended up in three different shapes —
+  `Menu`'s optional `"aria-label"?: string`, `IconButton`'s required
+  `"aria-label": string`, and `Input`'s narrowed `type?: InputType` behind
+  an `Omit<InputHTMLAttributes<HTMLInputElement>, "type">` — and that
+  variance is the mechanism, not an inconsistency to clean up. The rule: if
+  the redeclared type is assignable to the inherited native type, declare
+  it directly on the component's own props interface, as `Menu` and
+  `IconButton` do (narrowing an inherited optional prop to required is
+  compatible, since every value that satisfies the required prop also
+  satisfies the optional one it replaces). If the redeclared type narrows
+  to something the inherited type doesn't accept — `Input`'s curated
+  literal union against the native `HTMLInputTypeAttribute` — the inherited
+  key has to be `Omit`ted first, or the two declarations conflict and
+  TypeScript rejects the interface.
+
   This is an AI-native correctness fix surfaced by the coverage work rather
   than competing with it: the manifest is the artifact the entire agent
   story rests on, and for icon-only controls it has been omitting the

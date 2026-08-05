@@ -1,0 +1,26 @@
+{
+  "id": "tabbed-workspace",
+  "intent": "Tab set switching between sibling views of the same workspace, such as accounts or saved filters",
+  "match": ["tabs", "tabbed view", "switch between accounts", "tab bar", "segmented views"],
+  "compose": {
+    "component": "Tabs",
+    "props": { "orientation": "{param:orientation}" },
+    "slots": {
+      "list": ["{content:tabs-note}"],
+      "panels": ["{content:panels-note}"]
+    }
+  },
+  "parameters": [
+    {
+      "key": "orientation",
+      "ask": "How should the tab list be laid out?",
+      "options": ["horizontal", "vertical"],
+      "default": "horizontal"
+    }
+  ],
+  "content": {
+    "tabs-note": "[one tab per view; keep labels to one or two words]",
+    "panels-note": "[one panel per tab, in the same order]"
+  },
+  "gaps": ["Tabs"]
+}

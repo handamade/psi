@@ -10,15 +10,30 @@ const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf
 const patterns = loadPatterns(join(root, "patterns"));
 
 describe("seed patterns against the real manifest", () => {
-  it("all four load, validate, and none are gapped (Menu's row-actions landed — D53)", () => {
+  it("all thirteen load and validate; five are gapped on the Table and overlay/feedback tiers (D59)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts);
     expect(patterns.map((p) => p.id).sort()).toEqual([
+      "action-feedback",
+      "bulk-action-bar",
+      "data-table",
+      "date-range-filter",
       "destructive-confirm",
+      "detail-drawer",
+      "empty-state",
       "filter-toolbar",
       "row-actions",
       "settings-form-row",
+      "summary-tiles",
+      "tabbed-workspace",
+      "table-pagination",
     ]);
-    expect(gaps).toEqual({});
+    expect(gaps).toEqual({
+      "action-feedback": ["Toast"],
+      "data-table": ["Table"],
+      "detail-drawer": ["Drawer"],
+      "tabbed-workspace": ["Tabs"],
+      "table-pagination": ["Pagination"],
+    });
   });
   it("Field declares its prop-slots in the manifest", () => {
     const field = manifest.components.find((c: { name: string }) => c.name === "Field");
@@ -33,8 +48,12 @@ describe("seed patterns against the real manifest", () => {
   // parse. The angle-bracket fill convention (`<verb the object>`) shipped
   // presets whose text children read as unclosed elements; class 9 now blocks
   // that at the validator, and this parses the real emitted string to prove it.
-  it("every shipped preset parses as JSX", () => {
+  // Gapped patterns (D59) are excluded: renderPreset intentionally returns
+  // null for those (no manifest component to render), which emit-patterns.ts
+  // surfaces as blocked: true / preset: null rather than a parse failure.
+  it("every shipped ungapped preset parses as JSX", () => {
     for (const pattern of patterns) {
+      if (pattern.gaps.length > 0) continue;
       const preset = renderPreset(pattern, manifest.components);
       expect(preset, `${pattern.id} has no preset`).not.toBeNull();
       const { diagnostics } = ts.transpileModule(`const _ = (\n${preset});\n`, {
