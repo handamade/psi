@@ -7,17 +7,20 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 7 patterns sorted by id, two blocked on Table-tier gaps (D59)", () => {
+  it("writes dist/patterns.json: 10 patterns sorted by id, five blocked on gaps (D59)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
     expect(output.patterns.map((p: { id: string }) => p.id)).toEqual([
+      "action-feedback",
       "data-table",
       "date-range-filter",
       "destructive-confirm",
+      "detail-drawer",
       "filter-toolbar",
       "row-actions",
       "settings-form-row",
+      "tabbed-workspace",
       "table-pagination",
     ]);
 
@@ -30,6 +33,21 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(tablePagination.blocked).toBe(true);
     expect(tablePagination.gaps).toEqual(["Pagination"]);
     expect(tablePagination.preset).toBeNull();
+
+    const actionFeedback = output.patterns.find((p: { id: string }) => p.id === "action-feedback");
+    expect(actionFeedback.blocked).toBe(true);
+    expect(actionFeedback.gaps).toEqual(["Toast"]);
+    expect(actionFeedback.preset).toBeNull();
+
+    const detailDrawer = output.patterns.find((p: { id: string }) => p.id === "detail-drawer");
+    expect(detailDrawer.blocked).toBe(true);
+    expect(detailDrawer.gaps).toEqual(["Drawer"]);
+    expect(detailDrawer.preset).toBeNull();
+
+    const tabbedWorkspace = output.patterns.find((p: { id: string }) => p.id === "tabbed-workspace");
+    expect(tabbedWorkspace.blocked).toBe(true);
+    expect(tabbedWorkspace.gaps).toEqual(["Tabs"]);
+    expect(tabbedWorkspace.preset).toBeNull();
 
     const destructiveConfirm = output.patterns.find((p: { id: string }) => p.id === "destructive-confirm");
     expect(destructiveConfirm.blocked).toBe(false);

@@ -1,0 +1,26 @@
+{
+  "id": "action-feedback",
+  "intent": "Transient confirmation after a completed action, with an optional undo affordance",
+  "match": ["toast", "snackbar", "action feedback", "confirmation message", "undo toast"],
+  "compose": {
+    "component": "Toast",
+    "props": { "variant": "{param:variant}" },
+    "slots": {
+      "body": ["{content:message}"],
+      "action": [{ "component": "Button", "props": { "variant": "ghost" }, "content": "undo-label" }]
+    }
+  },
+  "parameters": [
+    {
+      "key": "variant",
+      "ask": "What kind of outcome is being confirmed?",
+      "options": ["success", "danger", "neutral"],
+      "default": "success"
+    }
+  ],
+  "content": {
+    "message": "[what just happened]",
+    "undo-label": "Undo"
+  },
+  "gaps": ["Toast"]
+}

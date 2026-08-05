@@ -1,0 +1,32 @@
+{
+  "id": "detail-drawer",
+  "intent": "Side sheet showing one record's detail, opened from a table row, with its primary actions in a footer",
+  "match": ["detail drawer", "side sheet", "row detail", "slide-over", "record detail panel"],
+  "compose": {
+    "component": "Drawer",
+    "props": { "side": "{param:side}" },
+    "slots": {
+      "title": ["{content:title}"],
+      "body": ["{content:body-note}"],
+      "footer": [
+        { "component": "Button", "props": { "variant": "accent" }, "content": "primary-label" },
+        { "component": "Button", "props": { "variant": "neutral" }, "content": "dismiss-label" }
+      ]
+    }
+  },
+  "parameters": [
+    {
+      "key": "side",
+      "ask": "Which edge should the drawer open from?",
+      "options": ["end", "start"],
+      "default": "end"
+    }
+  ],
+  "content": {
+    "title": "[record title]",
+    "body-note": "[key-value summary of the selected record]",
+    "primary-label": "Save",
+    "dismiss-label": "Close"
+  },
+  "gaps": ["Drawer"]
+}
