@@ -7,7 +7,7 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 13 patterns sorted by id, five blocked on gaps (D59)", () => {
+  it("writes dist/patterns.json: 13 patterns sorted by id, three blocked on gaps (D62-D63)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
@@ -28,14 +28,15 @@ describe("emitPatterns (real-dist posture)", () => {
     ]);
 
     const dataTable = output.patterns.find((p: { id: string }) => p.id === "data-table");
-    expect(dataTable.blocked).toBe(true);
-    expect(dataTable.gaps).toEqual(["Table"]);
-    expect(dataTable.preset).toBeNull();
+    expect(dataTable.blocked).toBe(false);
+    expect(dataTable.gaps).toEqual([]);
+    expect(dataTable.preset).toContain("<Table");
+    expect(dataTable.preset).toContain("<TableHeaderCell");
 
     const tablePagination = output.patterns.find((p: { id: string }) => p.id === "table-pagination");
-    expect(tablePagination.blocked).toBe(true);
-    expect(tablePagination.gaps).toEqual(["Pagination"]);
-    expect(tablePagination.preset).toBeNull();
+    expect(tablePagination.blocked).toBe(false);
+    expect(tablePagination.gaps).toEqual([]);
+    expect(tablePagination.preset).toContain("<Pagination");
 
     const actionFeedback = output.patterns.find((p: { id: string }) => p.id === "action-feedback");
     expect(actionFeedback.blocked).toBe(true);

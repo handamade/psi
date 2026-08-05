@@ -24,6 +24,13 @@ const COMPONENTS = [
   "Menu",
   "MenuItem",
   "MenuSeparator",
+  "Table",
+  "TableHead",
+  "TableBody",
+  "TableRow",
+  "TableHeaderCell",
+  "TableCell",
+  "Pagination",
 ];
 
 // Keep a prop when it is declared on the component's own props interface
@@ -63,6 +70,11 @@ const PASSTHROUGH_DESCRIPTIONS: Record<string, string> = {
 const COMPONENT_DIR: Record<string, string> = {
   MenuItem: "Menu",
   MenuSeparator: "Menu",
+  TableHead: "Table",
+  TableBody: "Table",
+  TableRow: "Table",
+  TableHeaderCell: "Table",
+  TableCell: "Table",
 };
 
 // Components with zero props by design (documented as such in their own
@@ -83,7 +95,13 @@ const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS);
 
 const manifest = COMPONENTS.map((name) => {
   const dir = COMPONENT_DIR[name] ?? name;
-  const [doc] = parser.parse(join(root, "src", dir, `${name}.tsx`));
+  // A source file may export more than one thing docgen can see (e.g.
+  // Pagination.tsx also exports the pure `paginationRange` helper) — docgen
+  // returns one doc per export, in file order, so blindly taking the first
+  // silently grabbed the wrong one once a helper preceded the component.
+  // Match by displayName instead of positionally destructuring.
+  const docs = parser.parse(join(root, "src", dir, `${name}.tsx`));
+  const doc = docs.find((d) => d.displayName === name) ?? docs[0];
   const hasNoProps = Object.keys(doc?.props ?? {}).length === 0;
   if (!doc || (hasNoProps && !NO_PROPS_COMPONENTS.includes(name))) {
     throw new Error(

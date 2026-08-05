@@ -4,6 +4,7 @@ import axe from "axe-core";
 import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator,
+  Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination,
 } from "./index.js";
 
 const cases: Array<[string, React.ReactElement]> = [
@@ -32,6 +33,23 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Toolbar unlabeled", <Toolbar><Button size={32} variant="ghost">Clear</Button></Toolbar>],
   ["Menu open", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Row actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuSeparator /><MenuItem onSelect={() => {}} variant="danger">Delete</MenuItem></Menu>],
   ["Menu with a disabled item", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuItem onSelect={() => {}} disabled>Archive</MenuItem></Menu>],
+  ["Table plain", (
+    <Table>
+      <TableHead><TableRow><TableHeaderCell>Date</TableHeaderCell><TableHeaderCell numeric>Amount</TableHeaderCell></TableRow></TableHead>
+      <TableBody><TableRow rowId="t1"><TableCell>2026-08-05</TableCell><TableCell numeric>1,240.00</TableCell></TableRow></TableBody>
+    </Table>
+  )],
+  ["Table sortable + selectable", (
+    <Table sortable selectable sort={{ key: "date", direction: "asc" }} onSortChange={() => {}} selected={new Set(["t1"])} onSelectionChange={() => {}}>
+      <TableHead><TableRow><TableHeaderCell sortKey="date">Date</TableHeaderCell><TableHeaderCell sortKey="amount" numeric>Amount</TableHeaderCell></TableRow></TableHead>
+      <TableBody>
+        <TableRow rowId="t1" selectLabel="Select 2026-08-05 Acme"><TableCell>2026-08-05</TableCell><TableCell numeric>1,240.00</TableCell></TableRow>
+        <TableRow rowId="t2" selectLabel="Select 2026-08-06 Globex"><TableCell>2026-08-06</TableCell><TableCell numeric>98.50</TableCell></TableRow>
+      </TableBody>
+    </Table>
+  )],
+  ["Pagination", <Pagination page={4} pageCount={13} onPageChange={() => {}} />],
+  ["Pagination single page", <Pagination page={1} pageCount={1} onPageChange={() => {}} />],
 ];
 
 describe("axe: no violations in rendered components", () => {

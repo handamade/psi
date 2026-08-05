@@ -1,0 +1,10 @@
+{
+  "slots": [
+    {
+      "name": "body",
+      "accepts": { "components": ["TableHead", "TableBody"] },
+      "cardinality": "1..*",
+      "order": 1
+    }
+  ]
+}
