@@ -56,4 +56,16 @@ describe("Table", () => {
     );
     expect(container.querySelector("table")?.getAttribute("data-size")).toBe("32");
   });
+
+  it("applies the sticky class only when stickyHeader is set", () => {
+    const { container: plain } = render(
+      <Table><TableBody><TableRow><TableCell>a</TableCell></TableRow></TableBody></Table>,
+    );
+    const { container: sticky } = render(
+      <Table stickyHeader><TableBody><TableRow><TableCell>a</TableCell></TableRow></TableBody></Table>,
+    );
+    const plainCls = plain.querySelector("table")!.className;
+    const stickyCls = sticky.querySelector("table")!.className;
+    expect(stickyCls).not.toBe(plainCls);
+  });
 });

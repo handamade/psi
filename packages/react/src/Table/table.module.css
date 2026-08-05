@@ -47,6 +47,50 @@
   border-bottom: 1px solid var(--psi-table-cell-border);
 }
 
+/* ── Size ramp (D62) ──────────────────────────────────────────────
+   Row height and cell inset alias the D54/D55 control ramp through
+   --psi-table-*, so a 32px row and a 32px Button are the same 32px. */
+
+.table[data-size="32"] .cell,
+.table[data-size="32"] .headerCell {
+  height: var(--psi-table-32-row-height);
+  padding-inline: var(--psi-table-32-cell-padding-x);
+}
+
+.table[data-size="40"] .cell,
+.table[data-size="40"] .headerCell {
+  height: var(--psi-table-40-row-height);
+  padding-inline: var(--psi-table-40-cell-padding-x);
+}
+
+.table[data-size="48"] .cell,
+.table[data-size="48"] .headerCell {
+  height: var(--psi-table-48-row-height);
+  padding-inline: var(--psi-table-48-cell-padding-x);
+}
+
+/* ── Row states ───────────────────────────────────────────────────
+   data-selected wins over hover: a hovered selected row stays selected. */
+
+.row:hover {
+  background: var(--psi-table-row-bg-hover);
+}
+
+.row[data-selected]:hover {
+  background: var(--psi-table-row-bg-selected);
+}
+
 .row[data-selected] {
   background: var(--psi-table-row-bg-selected);
+}
+
+/* ── Sticky header ────────────────────────────────────────────────
+   Needs no ARIA. The background is required: a transparent sticky header
+   would let body rows show through as they scroll under it. */
+
+.sticky .headerCell {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--psi-table-header-z-index);
+  background: var(--psi-table-bg);
 }
