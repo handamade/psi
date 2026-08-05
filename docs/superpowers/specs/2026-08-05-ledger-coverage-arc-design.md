@@ -74,14 +74,23 @@ was working on things with no completion criterion.
   |---|---|---|
   | `IconButton` | `aria-label` | The component is unusable without it, and undiscoverable. Blocks the `row-actions` pattern, which documents the limitation in prose. |
   | `Input` | `type` | `<Input type="date">` is invisible, so date filtering reads as a missing component. |
-  | `Tag` | `children` | Checkbox/Switch declare `children`; Tag does not, though all three accept it. Flagged as a stumble risk by the 2026-07-21 eval. |
 
   The fix is **per-component promotion**, not blanket declaration: a
-  component opts specific native props into its manifest entry with a
-  description, and may mark them required. `IconButton` promotes
-  `aria-label` as **required**; `Input` promotes `type`; `Tag` promotes
-  `children`. Blanket declaration is rejected — it floods the manifest and
-  defeats the original intent.
+  component opts a native prop in by **declaring it on its own props
+  interface**, which lifts it past the `propFilter` in `emit-manifest.ts`
+  (the parent file is then the component's own source, not `node_modules`).
+  `Menu` already does exactly this with `"aria-label"?: string`
+  (`Menu.tsx:53`), so this decision names an existing mechanism rather than
+  inventing one — **no build-script change is required**. `IconButton`
+  promotes `aria-label` as **required**; `Input` promotes `type` as a
+  curated literal union. Blanket declaration is rejected — it floods the
+  manifest and defeats the original intent.
+
+  *Not in scope, contrary to an earlier draft of this spec:* `Tag`
+  `children`. The 2026-07-21 eval flagged it, but it was fixed in #44 in
+  that same cycle — the current manifest lists `children` on `Tag`,
+  `Checkbox` and `Switch` alike. Verified against `dist/manifest.json`
+  rather than the eval prose.
 
   This is an AI-native correctness fix surfaced by the coverage work rather
   than competing with it: the manifest is the artifact the entire agent
