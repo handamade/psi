@@ -1580,6 +1580,19 @@ git commit -m "feat(react): Pagination — numbered pager with ellipsis truncati
 
 ---
 
+> **SEQUENCING CORRECTION (found during Task 4 — Tasks 9 and 10 must land as ONE commit).**
+> Manifest inclusion is gated by an explicit `COMPONENTS` array at
+> `packages/react/scripts/emit-manifest.ts:8`; exporting from `index.ts` is not
+> enough. The moment `Table` is added there, `data-table.json`'s declared gap
+> `["Table"]` stops suppressing validation (cycle 1 made that throw rather than
+> silently skip), so its `head` slot immediately fails `patterns.ts:276` with
+> `unknown slot "head"`. Removing `head` first is equally broken, because the
+> pattern would then compose a component the manifest does not have.
+> **They are atomically coupled: adding Table + Pagination to `COMPONENTS` and
+> revising both pattern JSONs must happen in the same task and the same commit.**
+> Execute Task 9 and Task 10 together, and run the build only once both edits are
+> in place.
+
 ### Task 9: Slot contracts, stories, and axe cases
 
 **Files:**
