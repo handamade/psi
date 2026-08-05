@@ -10,7 +10,7 @@ const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf
 const patterns = loadPatterns(join(root, "patterns"));
 
 describe("seed patterns against the real manifest", () => {
-  it("all thirteen load and validate; five are gapped on the Table and overlay/feedback tiers (D59)", () => {
+  it("all thirteen load and validate; three remain gapped on the overlay/feedback tiers (D62-D63)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
@@ -29,10 +29,8 @@ describe("seed patterns against the real manifest", () => {
     ]);
     expect(gaps).toEqual({
       "action-feedback": ["Toast"],
-      "data-table": ["Table"],
       "detail-drawer": ["Drawer"],
       "tabbed-workspace": ["Tabs"],
-      "table-pagination": ["Pagination"],
     });
   });
   it("Field declares its prop-slots in the manifest", () => {

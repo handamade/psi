@@ -8,6 +8,7 @@ Native checkbox with a built-in label; for independent binary choices.
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
 | `children` | `ReactNode` | — | no | Label text. |
+| `aria-label` | `string` | — | no | Accessible name when there is no visible label — a table's row-selection checkbox, say. Optional, unlike IconButton's required form (D60): a labelled checkbox is still the common case. |
 | `ref` | `Ref<HTMLInputElement>` | — | no | Forwarded ref to the underlying `<input type="checkbox">` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 

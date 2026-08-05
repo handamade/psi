@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadPatterns, parseLiteralUnion, validatePatterns } from "./patterns.js";
+import { loadPatterns, parseLiteralUnion, renderPreset, validatePatterns } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
 
 const button: ManifestComponent = {
@@ -171,5 +171,34 @@ describe("validatePatterns (one case per D48 error class)", () => {
   it("10: a declared gap that now resolves in the manifest throws — the ledger must self-clear", () => {
     const p = base({ gaps: ["Tag"], compose: { component: "Button" } });
     expect(() => ok(p)).toThrow(/pattern "p".*gap "Tag" is no longer missing — remove it from gaps/);
+  });
+});
+
+describe("real patterns/ + real dist/manifest.json (D62-D63)", () => {
+  it("data-table and table-pagination are unblocked once Table and Pagination ship", () => {
+    const root = join(import.meta.dirname, "..");
+    const manifest = JSON.parse(readFileSync(join(root, "dist", "manifest.json"), "utf8")) as {
+      components: ManifestComponent[];
+    };
+    const contracts = JSON.parse(readFileSync(join(root, "src", "contracts.json"), "utf8")) as Record<
+      string,
+      string[]
+    >;
+    const patterns = loadPatterns(join(root, "patterns"));
+    validatePatterns(patterns, manifest.components, contracts);
+    const builtPatterns = patterns.map((p) => ({
+      id: p.id,
+      gaps: p.gaps,
+      blocked: p.gaps.length > 0,
+      preset: p.gaps.length > 0 ? null : renderPreset(p, manifest.components),
+    }));
+    const byId = Object.fromEntries(builtPatterns.map((p) => [p.id, p]));
+    expect(byId["data-table"].gaps).toEqual([]);
+    expect(byId["data-table"].blocked).toBe(false);
+    expect(byId["data-table"].preset).toContain("<Table");
+    expect(byId["data-table"].preset).toContain("<TableHeaderCell");
+    expect(byId["table-pagination"].gaps).toEqual([]);
+    expect(byId["table-pagination"].blocked).toBe(false);
+    expect(byId["table-pagination"].preset).toContain("<Pagination");
   });
 });

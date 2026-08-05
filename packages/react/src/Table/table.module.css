@@ -1,0 +1,117 @@
+/* packages/react/src/Table/table.module.css */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--psi-table-bg);
+  color: var(--psi-table-fg);
+  font: var(--psi-text-14-20-regular);
+  border: 1px solid var(--psi-table-border);
+  border-radius: var(--psi-table-radius);
+}
+
+.headerCell {
+  color: var(--psi-table-header-fg);
+  font: var(--psi-text-14-20-medium);
+  text-align: start;
+}
+
+.cell,
+.headerCell {
+  border-bottom: 1px solid var(--psi-table-cell-border);
+}
+
+.cell[data-numeric],
+.headerCell[data-numeric] {
+  text-align: end;
+  font-variant-numeric: var(--psi-font-variant-numeric);
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--psi-space-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sortButton:focus-visible {
+  outline: 2px solid var(--psi-table-focus-ring);
+  outline-offset: 2px;
+}
+
+.sortIndicator {
+  color: var(--psi-table-sort-indicator-fg);
+}
+
+/* ── Size ramp (D62) ──────────────────────────────────────────────
+   Row height and cell inset alias the D54/D55 control ramp through
+   --psi-table-*, so a 32px row and a 32px Button are the same 32px. */
+
+.table[data-size="32"] .cell,
+.table[data-size="32"] .headerCell {
+  height: var(--psi-table-32-row-height);
+  padding-inline: var(--psi-table-32-cell-padding-x);
+}
+
+.table[data-size="40"] .cell,
+.table[data-size="40"] .headerCell {
+  height: var(--psi-table-40-row-height);
+  padding-inline: var(--psi-table-40-cell-padding-x);
+}
+
+.table[data-size="48"] .cell,
+.table[data-size="48"] .headerCell {
+  height: var(--psi-table-48-row-height);
+  padding-inline: var(--psi-table-48-cell-padding-x);
+}
+
+/* Only the two properties the checkbox column needs beyond the shared
+   `.cell`/`.headerCell` rules (border, height, padding-inline, header
+   fg/weight) it now also carries via those classes. Matched in specificity
+   to the size-ramp block above (`.table[data-size] .cell` = class+attr+class)
+   and placed after it in source order, so this padding-inline-end override
+   wins the cascade tie against the ramp's padding-inline shorthand. */
+.table[data-size] .selectCell {
+  width: 1%;
+  padding-inline-end: 0;
+}
+
+/* ── Row states ───────────────────────────────────────────────────
+   data-selected wins over hover: a hovered selected row stays selected.
+   Scoped to .body: TableRow is also used (unstyled-for-hover) inside
+   TableHead, and a hovered header row tinting like a data row is wrong. */
+
+.body .row:hover {
+  background: var(--psi-table-row-bg-hover);
+}
+
+.body .row[data-selected]:hover {
+  background: var(--psi-table-row-bg-selected);
+}
+
+.row[data-selected] {
+  background: var(--psi-table-row-bg-selected);
+}
+
+.row {
+  background: var(--psi-table-row-bg);
+}
+
+/* ── Sticky header ────────────────────────────────────────────────
+   Needs no ARIA. The background is required: a transparent sticky header
+   would let body rows show through as they scroll under it. border-bottom
+   does not paint on a sticky <th> under border-collapse: collapse in
+   Chromium/WebKit, so the bottom edge is drawn with box-shadow instead. */
+
+.sticky .headerCell {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--psi-z-sticky);
+  background: var(--psi-table-bg);
+  box-shadow: inset 0 -1px 0 var(--psi-table-cell-border);
+}

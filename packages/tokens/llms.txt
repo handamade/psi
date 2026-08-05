@@ -23,7 +23,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 
 ## Layout (--psi-container-max, --psi-gutter, --psi-z-*)
 - .psi-container: max-width 1312px, gutter 40px stepping to 24px under the md breakpoint.
-- --psi-z-nav (100), --psi-z-overlay (1000), --psi-z-tooltip (1100).
+- --psi-z-sticky (1), --psi-z-nav (100), --psi-z-overlay (1000), --psi-z-tooltip (1100). sticky is for elements that stack within their own local scroll container (e.g. a sticky table header), not above page chrome.
 - Breakpoints (sm 560 / md 960) are build-time constants (D31), not CSS vars: `import { breakpoints } from "@handamade/psi-tokens/types"` for any @media-driven JS/CSS-in-JS.
 
 ## Typography: display, serif, mono
@@ -36,6 +36,9 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 
 ## Media tint (--psi-media-tint, .psi-media-tint)
 - --psi-media-tint is a brand-defined filter chain (D35); apply the .psi-media-tint utility class to media elements to get a tinted-at-rest, true-color-on-hover/focus treatment, transitioning over --psi-duration-450 / --psi-ease-soft.
+
+## Tabular numerals (--psi-font-variant-numeric, .psi-tabular)
+- --psi-font-variant-numeric is tabular-nums (D62); apply the .psi-tabular utility class to numeric content for fixed-width digits that don't jitter between rows. Table's own numeric columns (TableCell/TableHeaderCell `numeric` prop) bind the token directly in CSS — reach for the utility class for numeric content outside Table.
 
 ## Dark-first brands
 - A brand theme can declare `base: "dark"` (see ember) so its formulas derive from the dark palette instead of light — use this for brands whose primary surface is a dark canvas rather than treating dark as an inverted afterthought.

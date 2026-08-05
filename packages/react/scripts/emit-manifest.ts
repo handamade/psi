@@ -24,6 +24,13 @@ const COMPONENTS = [
   "Menu",
   "MenuItem",
   "MenuSeparator",
+  "Table",
+  "TableHead",
+  "TableBody",
+  "TableRow",
+  "TableHeaderCell",
+  "TableCell",
+  "Pagination",
 ];
 
 // Keep a prop when it is declared on the component's own props interface
@@ -63,6 +70,11 @@ const PASSTHROUGH_DESCRIPTIONS: Record<string, string> = {
 const COMPONENT_DIR: Record<string, string> = {
   MenuItem: "Menu",
   MenuSeparator: "Menu",
+  TableHead: "Table",
+  TableBody: "Table",
+  TableRow: "Table",
+  TableHeaderCell: "Table",
+  TableCell: "Table",
 };
 
 // Components with zero props by design (documented as such in their own
@@ -83,9 +95,26 @@ const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS);
 
 const manifest = COMPONENTS.map((name) => {
   const dir = COMPONENT_DIR[name] ?? name;
-  const [doc] = parser.parse(join(root, "src", dir, `${name}.tsx`));
-  const hasNoProps = Object.keys(doc?.props ?? {}).length === 0;
-  if (!doc || (hasNoProps && !NO_PROPS_COMPONENTS.includes(name))) {
+  // A source file may export more than one thing docgen can see (e.g.
+  // Pagination.tsx also exports the pure `paginationRange` helper) — docgen
+  // returns one doc per export, in file order, so blindly taking the first
+  // silently grabbed the wrong one once a helper preceded the component.
+  // Match by displayName instead of positionally destructuring.
+  const docs = parser.parse(join(root, "src", dir, `${name}.tsx`));
+  const doc = docs.find((d) => d.displayName === name);
+  // No positional fallback: falling back to docs[0] is what produced the bug
+  // this match replaced, and it fails silently — the manifest would simply
+  // describe the wrong export. The manifest is the artifact agents read, so a
+  // mismatch must be loud.
+  if (!doc) {
+    throw new Error(
+      `emit-manifest: no export named "${name}" in ${dir}/${name}.tsx — docgen saw [${docs
+        .map((d) => d.displayName)
+        .join(", ")}]`,
+    );
+  }
+  const hasNoProps = Object.keys(doc.props ?? {}).length === 0;
+  if (hasNoProps && !NO_PROPS_COMPONENTS.includes(name)) {
     throw new Error(
       `emit-manifest: no props extracted for ${name} — file moved/renamed or docgen parse failure`,
     );

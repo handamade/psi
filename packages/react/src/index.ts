@@ -33,6 +33,20 @@ export type { MenuProps, MenuPlacement, MenuContextValue } from "./Menu/Menu.js"
 export { MenuItem } from "./Menu/MenuItem.js";
 export type { MenuItemProps } from "./Menu/MenuItem.js";
 export { MenuSeparator } from "./Menu/MenuSeparator.js";
+export { Table } from "./Table/Table.js";
+export type { TableProps, TableSize, TableSortState } from "./Table/Table.js";
+export { TableHead } from "./Table/TableHead.js";
+export type { TableHeadProps } from "./Table/TableHead.js";
+export { TableBody } from "./Table/TableBody.js";
+export type { TableBodyProps } from "./Table/TableBody.js";
+export { TableRow } from "./Table/TableRow.js";
+export type { TableRowProps } from "./Table/TableRow.js";
+export { TableHeaderCell } from "./Table/TableHeaderCell.js";
+export type { TableHeaderCellProps } from "./Table/TableHeaderCell.js";
+export { TableCell } from "./Table/TableCell.js";
+export type { TableCellProps } from "./Table/TableCell.js";
+export { Pagination } from "./Pagination/Pagination.js";
+export type { PaginationProps } from "./Pagination/Pagination.js";
 export {
   IconPlus,
   IconMinus,

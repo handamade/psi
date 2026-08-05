@@ -43,6 +43,37 @@ importers:
         specifier: ^3.2.0
         version: 3.2.6(@types/node@20.19.43)(jsdom@29.1.1)(tsx@4.22.4)
 
+  apps/ledger:
+    dependencies:
+      '@handamade/psi-react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@handamade/psi-tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
+      react:
+        specifier: ^19.2.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.2.3(@types/react@19.2.17)
+      '@vitejs/plugin-react':
+        specifier: ^4.4.1
+        version: 4.7.0(vite@6.4.3(@types/node@20.19.43)(tsx@4.22.4))
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.3(@types/node@20.19.43)(tsx@4.22.4)
+
   apps/promo:
     dependencies:
       '@handamade/psi-react':

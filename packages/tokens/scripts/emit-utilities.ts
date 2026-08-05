@@ -79,6 +79,13 @@ export function emitScaleVarsCSS(): string {
   lines.push(`    --psi-font-serif: Georgia, "Times New Roman", Times, serif;`);
   lines.push(`    --psi-font-display: var(--psi-font-sans);`);
 
+  lines.push("");
+
+  // Numeral rendering (D62). A token rather than a literal in table.module.css:
+  // a literal would be invisible to the manifest, MCP, DTCG and Figma, and
+  // unreachable by componentOverrides — the D54/D55 failure mode.
+  lines.push(`    --psi-font-variant-numeric: tabular-nums;`);
+
   return lines.join("\n");
 }
 
@@ -130,6 +137,11 @@ export function emitUtilitiesCSS(): string {
   for (const c of typographyCombos) {
     lines.push(`  .psi-text-${comboName(c)} { font: var(--psi-text-${comboName(c)}); }`);
   }
+
+  lines.push("");
+
+  // Tabular numerals (D62)
+  lines.push(`  .psi-tabular { font-variant-numeric: var(--psi-font-variant-numeric); }`);
 
   lines.push("");
 

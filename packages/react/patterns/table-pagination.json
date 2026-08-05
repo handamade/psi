@@ -20,5 +20,5 @@
   },
   "parameters": [],
   "content": { "page-size-label": "Rows per page" },
-  "gaps": ["Pagination"]
+  "gaps": []
 }

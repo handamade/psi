@@ -66,4 +66,16 @@ describe("Checkbox", () => {
     await user.keyboard(" ");
     expect(screen.getByRole("checkbox")).toBeChecked();
   });
+
+  it("accepts aria-label as its own declared prop for label-less use (D60)", () => {
+    render(<Checkbox aria-label="Select transaction 2026-08-05 Acme Corp" />);
+    expect(
+      screen.getByRole("checkbox", { name: "Select transaction 2026-08-05 Acme Corp" }),
+    ).toBeTruthy();
+  });
+
+  it("renders no label text when only aria-label is given", () => {
+    const { container } = render(<Checkbox aria-label="Select row" />);
+    expect(container.textContent).toBe("");
+  });
 });
