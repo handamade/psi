@@ -3,7 +3,7 @@ import { emitBaseCSS, emitThemeCSS } from "../scripts/emit-css.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { acmePalette, acmeSlots } from "../src/themes/customers/acme.js";
-import { emitScaleVarsCSS } from "../scripts/emit-utilities.js";
+import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
 import { token, slot } from "../src/dsl/builders.js";
 
 describe("emitBaseCSS", () => {
@@ -100,5 +100,17 @@ describe("base.css assembly no longer bundles customer palettes", () => {
     for (const name of acmeOnlyNames) {
       expect(baseCSS).not.toContain(`--psi-palette-${name}`);
     }
+  });
+});
+
+describe("tabular numerals (D62)", () => {
+  it("emits the numeric-variant scale token", () => {
+    expect(emitScaleVarsCSS()).toContain("--psi-font-variant-numeric: tabular-nums;");
+  });
+
+  it("emits a .psi-tabular utility bound to the token", () => {
+    expect(emitUtilitiesCSS()).toContain(
+      ".psi-tabular { font-variant-numeric: var(--psi-font-variant-numeric); }",
+    );
   });
 });
