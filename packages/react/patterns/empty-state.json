@@ -1,0 +1,23 @@
+{
+  "id": "empty-state",
+  "intent": "Placeholder shown when a list has no results, distinguishing an empty filter from an empty dataset",
+  "match": ["empty state", "no results", "nothing here", "zero state", "no data"],
+  "compose": {
+    "component": "Panel",
+    "props": { "padding": 24 },
+    "slots": {
+      "body": [
+        "{content:headline}",
+        "{content:explanation}",
+        { "component": "Button", "props": { "variant": "neutral" }, "content": "reset-label" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "headline": "[nothing matches these filters]",
+    "explanation": "[say whether the dataset is empty or the filters are too narrow]",
+    "reset-label": "Clear filters"
+  },
+  "gaps": []
+}

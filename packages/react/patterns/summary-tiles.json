@@ -1,0 +1,18 @@
+{
+  "id": "summary-tiles",
+  "intent": "Row of headline figures above a ledger — balances or totals, one Card per figure",
+  "match": ["summary tiles", "stat cards", "kpi row", "balance cards", "totals row"],
+  "compose": {
+    "component": "Toolbar",
+    "props": { "gap": 16 },
+    "slots": {
+      "body": [
+        { "component": "Card", "props": { "variant": "stacked" }, "content": "tile-note" },
+        { "component": "Card", "props": { "variant": "stacked" }, "content": "tile-note" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": { "tile-note": "[label above, figure below]" },
+  "gaps": []
+}

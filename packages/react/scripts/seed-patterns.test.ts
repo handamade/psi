@@ -10,17 +10,20 @@ const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf
 const patterns = loadPatterns(join(root, "patterns"));
 
 describe("seed patterns against the real manifest", () => {
-  it("all ten load and validate; five are gapped on the Table and overlay/feedback tiers (D59)", () => {
+  it("all thirteen load and validate; five are gapped on the Table and overlay/feedback tiers (D59)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
+      "bulk-action-bar",
       "data-table",
       "date-range-filter",
       "destructive-confirm",
       "detail-drawer",
+      "empty-state",
       "filter-toolbar",
       "row-actions",
       "settings-form-row",
+      "summary-tiles",
       "tabbed-workspace",
       "table-pagination",
     ]);
