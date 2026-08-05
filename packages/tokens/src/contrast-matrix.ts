@@ -141,6 +141,11 @@ export const wcagAAPairs: ContrastPair[] = [
   { fg: "fgSuccess", bg: "fillTintSuccess", minRatio: 4.5 },
   { fg: "fgWarning", bg: "fillTintWarning", minRatio: 4.5 },
   { fg: "fgDanger", bg: "fillTintDanger", minRatio: 4.5 },
+
+  // Primary text on a selected table row's accent wash (D62). Distinct from
+  // the fgAccent/fillTintAccent pair above: a selected row keeps ordinary
+  // body text, it does not recolor it to the accent.
+  { fg: "fgPrimary", bg: "fillTintAccent", minRatio: 4.5 },
 ];
 
 /** Solid component-variant labels on their variant backgrounds (spec: "every

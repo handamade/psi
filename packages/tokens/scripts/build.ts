@@ -28,6 +28,7 @@ import { selectVars } from "../src/components/select.js";
 import { surfaceVars } from "../src/components/surface.js";
 import { checkboxVars } from "../src/components/checkbox.js";
 import { switchVars } from "../src/components/switch.js";
+import { tableVars } from "../src/components/table.js";
 import { tagVars } from "../src/components/tag.js";
 import { tooltipVars } from "../src/components/tooltip.js";
 import { cardVars } from "../src/components/card.js";
@@ -85,6 +86,7 @@ const componentVars: Record<string, Record<string, string>> = {
   select: selectVars,
   surface: surfaceVars,
   switch: switchVars,
+  table: tableVars,
   tag: tagVars,
   tooltip: tooltipVars,
 };
