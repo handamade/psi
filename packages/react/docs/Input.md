@@ -7,6 +7,7 @@ Single-line text input with pixel-true heights (24–48) and an error state. Ins
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `type` | `"number" \| "text" \| "search" \| "email" \| "tel" \| "url" \| "password" \| "date"` | "text" | no | Input type. |
 | `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Height in px (24 \| 32 \| 40 \| 48). |
 | `error` | `boolean` | false | no | Show error styling. Inside a Field, the Field's error also lights this. |
 | `ref` | `Ref<HTMLInputElement>` | — | no | Forwarded ref to the underlying `<input>` element. |

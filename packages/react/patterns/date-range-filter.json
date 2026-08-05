@@ -1,0 +1,30 @@
+{
+  "id": "date-range-filter",
+  "intent": "From/to date pair for narrowing a dated list — native date inputs, no calendar widget",
+  "match": ["date range filter", "from to date", "date filter", "period filter", "filter by date"],
+  "compose": {
+    "component": "Toolbar",
+    "props": { "gap": 12 },
+    "slots": {
+      "body": [
+        {
+          "component": "Field",
+          "slots": {
+            "label": ["{content:from-label}"],
+            "body": [{ "component": "Input", "props": { "type": "date", "size": 32 } }]
+          }
+        },
+        {
+          "component": "Field",
+          "slots": {
+            "label": ["{content:to-label}"],
+            "body": [{ "component": "Input", "props": { "type": "date", "size": 32 } }]
+          }
+        }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": { "from-label": "From", "to-label": "To" },
+  "gaps": []
+}

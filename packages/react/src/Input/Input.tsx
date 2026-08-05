@@ -5,7 +5,22 @@ import styles from "./input.module.css";
 
 type Size = 24 | 32 | 40 | 48;
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+/** Input types Psi's Input supports. Deliberately narrower than the native
+ * `HTMLInputTypeAttribute`: checkbox/radio/file/submit are separate controls
+ * (Checkbox, Switch, Button), not variants of a text field (D60). */
+export type InputType =
+  | "text"
+  | "search"
+  | "email"
+  | "tel"
+  | "url"
+  | "password"
+  | "number"
+  | "date";
+
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+  /** Input type. @default "text" */
+  type?: InputType;
   /** Height in px (24 | 32 | 40 | 48). @default 32 */
   size?: Size;
   /** Show error styling. Inside a Field, the Field's error also lights this. @default false */

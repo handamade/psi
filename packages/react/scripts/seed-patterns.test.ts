@@ -10,9 +10,10 @@ const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf
 const patterns = loadPatterns(join(root, "patterns"));
 
 describe("seed patterns against the real manifest", () => {
-  it("all four load, validate, and none are gapped (Menu's row-actions landed — D53)", () => {
+  it("all five load, validate, and none are gapped (date-range-filter landed — D60)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts);
     expect(patterns.map((p) => p.id).sort()).toEqual([
+      "date-range-filter",
       "destructive-confirm",
       "filter-toolbar",
       "row-actions",
