@@ -1,5 +1,17 @@
 # @handamade/psi-tokens
 
+## 0.9.0
+
+### Minor Changes
+
+- 1b7cf8d: No changes in this release.
+
+  `@handamade/psi-tokens` is versioned in lockstep with `@handamade/psi-react`
+  and `@handamade/psi-mcp`, so its version moves with theirs even when nothing
+  in this package changed. Nothing in the token DSL, the palettes, the themes,
+  the scales or the emitted CSS was touched — see the `psi-react` entry for
+  what 0.9.0 actually contains.
+
 ## 0.8.1
 
 Version bump only — no change to this package. `@handamade/psi-*` are released
