@@ -29,7 +29,15 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 ## Branches and releases
 
 - **Branch names, three cases.** Linear issue exists → use Linear's generated name (`dkurkin/han-44-…`), which auto-links the PR to the issue. Decision work with no issue → `d56-control-radius`. Anything else → `fix/`, `docs/`, `chore/`.
-- **One branch, one PR, then delete it.** Squash-merge is the repo default, so a merged branch's commits never appear on `main` by hash — `git branch --merged` will not list them. **Before deleting, scope the diff to the files the branch touched:** `git diff main <branch> -- $(git diff --name-only main...<branch>)` — empty output means every file the branch touched is identical on `main`, so the branch is safe to delete. Two checks that look right and are not: `git cherry -v main <branch>` (the squashed commit's patch-id matches no individual commit, so every commit shows `+` and a fully-merged branch reads as if it still carries work — confirmed on a 13-commit branch), and an **unscoped** `git diff main <branch>` (non-empty whenever `main` has merely moved ahead — it reported 1379 deletions on a branch that was fully absorbed).
+- **One branch, one PR, then delete it.** Squash-merge is the repo default, so a merged branch's commits never appear on `main` by hash — `git branch --merged` will not list them. **Before deleting, fetch, then scope the diff to the files the branch touched, against `origin/main`:**
+
+  ```bash
+  git fetch origin && git diff origin/main <branch> -- $(git diff --name-only origin/main...<branch>)
+  ```
+
+  Empty output means every file the branch touched is identical on `origin/main`, so the branch is safe to delete. **Read the output before deleting** — the check is worthless if the delete runs regardless.
+
+  Three checks that look right and are not. `git cherry -v main <branch>`: the squashed commit's patch-id matches no individual commit, so every commit shows `+` and a fully-merged branch reads as if it still carries work (confirmed on a 13-commit branch). An **unscoped** `git diff`: non-empty whenever `main` has merely moved ahead — 1379 deletions on a fully absorbed branch. And the scoped diff against **local `main` instead of `origin/main`**: a stale local `main` reports a fully-absorbed branch as carrying work — 47606 bytes on a branch whose content was already on `origin/main`, because local `main` sat 3 commits behind. Local `main` is stale by default whenever PRs merge remotely, which is every time.
 - **Arm auto-merge at PR creation, then verify it armed.** `gh pr merge <n> --auto --squash` exits 0 and prints nothing while leaving auto-merge OFF. Always read it back with `gh pr view <n> --json autoMergeRequest`; if it says null, use the `enablePullRequestAutoMerge` GraphQL mutation, which does work. This matters because the `protect-main` ruleset sets `strict_required_status_checks_policy`, so a second open PR goes stale and needs a full ~5.5-min `ci` re-run.
 - **Every user-visible change carries a changeset.** `packages/*` are versioned in lockstep at one number.
 - **Cut a release whenever `.changeset/` is non-empty and `main` is green** — don't let them pool. Four accumulated once and left D53 merged-but-unpublished across three decisions.
