@@ -1,5 +1,31 @@
 # @handamade/psi-mcp
 
+## 0.9.0
+
+### Minor Changes
+
+- 1b7cf8d: The served catalog grows to 13 patterns, and the search overview no longer drops components (D59–D60)
+
+  The index this server bakes at publish now carries **13 composition
+  patterns**, five of which declare a component gap — `Table`, `Pagination`,
+  `Drawer`, `Toast`, `Tabs`. Consuming agents can read the design system's
+  own backlog for the first time, rather than inferring it.
+
+  That growth exposed a bug here. `search("")` fills its response by kind —
+  topics, then patterns, then as many components as the 6000-character budget
+  affords — so nine new patterns pushed the component tail off the end, down
+  from more than five to three. Pattern summaries are now trimmed in the
+  overview projection only, and always retain their `blocked (gaps: …)`
+  suffix, so the backlog survives the trim. The stored summaries that feed
+  keyword ranking are untouched: search results and result ordering are
+  unchanged. The overview now carries all 13 topics, all 13 patterns and 6
+  components.
+
+  The served manifest also reflects two prop changes in `psi-react`:
+  `IconButton.aria-label` is now a required, discoverable prop, and
+  `Input.type` is a curated union. See the `psi-react` entry for the
+  consumer-facing impact of those.
+
 ## 0.8.1
 
 Version bump only — no change to this package. `@handamade/psi-*` are released
