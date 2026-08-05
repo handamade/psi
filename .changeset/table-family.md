@@ -24,7 +24,9 @@ column that aligns but whose digits jitter between rows defeats the purpose.
 `Pagination` is a standalone numbered pager with ellipsis truncation,
 `aria-current="page"`, a labelled `nav` landmark, and an inert ellipsis. It is
 not a Table family member: the `table-pagination` pattern composes it as a
-Toolbar sibling of a page-size `Select`.
+Toolbar sibling of a page-size `Select`. `onPageChange` is required — unlike
+Table's `onSortChange`/`onSelectionChange`, nothing gates whether it matters,
+so an omitted handler is a dead control, not a documented no-op.
 
 `Checkbox` now declares `aria-label` on its own props interface (applying D60),
 so a table's row-selection checkbox — which has no visible label — is both

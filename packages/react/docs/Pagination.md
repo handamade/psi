@@ -9,7 +9,7 @@ Numbered pager with ellipsis truncation (D63). Standalone rather than a Table fa
 |---|---|---|---|---|
 | `page` | `number` | — | yes | Current page, 1-based. |
 | `pageCount` | `number` | — | yes | Total number of pages. |
-| `onPageChange` | `((page: number) => void)` | — | no | Called with the requested page. Optional for the same docgen reason as Table's handlers (D62). |
+| `onPageChange` | `(page: number) => void` | — | yes | Called with the requested page. Required — unlike Table's `onSortChange`/ `onSelectionChange`, which are optional because `sortable`/`selectable` gate whether they're meaningful, `Pagination` has no such gating boolean: the prop is unconditionally meaningful, so a `Pagination` without it is a dead control (final review finding, D62). |
 | `siblingCount` | `number` | 1 | no | Pages shown either side of the current one before truncating. |
 | `aria-label` | `string` | Pagination | no | Accessible name for the nav landmark. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |

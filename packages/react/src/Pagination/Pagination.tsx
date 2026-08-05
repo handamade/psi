@@ -71,8 +71,14 @@ export interface PaginationProps {
   page: number;
   /** Total number of pages. */
   pageCount: number;
-  /** Called with the requested page. Optional for the same docgen reason as Table's handlers (D62). */
-  onPageChange?: (page: number) => void;
+  /**
+   * Called with the requested page. Required — unlike Table's `onSortChange`/
+   * `onSelectionChange`, which are optional because `sortable`/`selectable`
+   * gate whether they're meaningful, `Pagination` has no such gating boolean:
+   * the prop is unconditionally meaningful, so a `Pagination` without it is a
+   * dead control (final review finding, D62).
+   */
+  onPageChange: (page: number) => void;
   /** Pages shown either side of the current one before truncating. @default 1 */
   siblingCount?: number;
   /** Accessible name for the nav landmark. @default "Pagination" */
@@ -99,7 +105,7 @@ export function Pagination({
         size={32}
         variant="ghost"
         disabled={page <= 1}
-        onClick={() => onPageChange?.(page - 1)}
+        onClick={() => onPageChange(page - 1)}
       >
         <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16">
           <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
@@ -117,7 +123,7 @@ export function Pagination({
             size={32}
             variant={item === page ? "accent-subtle" : "ghost"}
             aria-current={item === page ? "page" : undefined}
-            onClick={() => onPageChange?.(item)}
+            onClick={() => onPageChange(item)}
           >
             {String(item)}
           </Button>
@@ -129,7 +135,7 @@ export function Pagination({
         size={32}
         variant="ghost"
         disabled={page >= pageCount}
-        onClick={() => onPageChange?.(page + 1)}
+        onClick={() => onPageChange(page + 1)}
       >
         <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16">
           <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
