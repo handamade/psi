@@ -101,9 +101,20 @@ const manifest = COMPONENTS.map((name) => {
   // silently grabbed the wrong one once a helper preceded the component.
   // Match by displayName instead of positionally destructuring.
   const docs = parser.parse(join(root, "src", dir, `${name}.tsx`));
-  const doc = docs.find((d) => d.displayName === name) ?? docs[0];
-  const hasNoProps = Object.keys(doc?.props ?? {}).length === 0;
-  if (!doc || (hasNoProps && !NO_PROPS_COMPONENTS.includes(name))) {
+  const doc = docs.find((d) => d.displayName === name);
+  // No positional fallback: falling back to docs[0] is what produced the bug
+  // this match replaced, and it fails silently — the manifest would simply
+  // describe the wrong export. The manifest is the artifact agents read, so a
+  // mismatch must be loud.
+  if (!doc) {
+    throw new Error(
+      `emit-manifest: no export named "${name}" in ${dir}/${name}.tsx — docgen saw [${docs
+        .map((d) => d.displayName)
+        .join(", ")}]`,
+    );
+  }
+  const hasNoProps = Object.keys(doc.props ?? {}).length === 0;
+  if (hasNoProps && !NO_PROPS_COMPONENTS.includes(name)) {
     throw new Error(
       `emit-manifest: no props extracted for ${name} — file moved/renamed or docgen parse failure`,
     );
