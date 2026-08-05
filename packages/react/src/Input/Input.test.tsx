@@ -80,4 +80,9 @@ describe("Input", () => {
     render(<Input type="date" aria-label="From" />);
     expect(screen.getByLabelText("From")).toHaveAttribute("type", "date");
   });
+
+  it("defaults type to text when no type prop is given", () => {
+    render(<Input aria-label="Name" />);
+    expect(screen.getByLabelText("Name")).toHaveAttribute("type", "text");
+  });
 });

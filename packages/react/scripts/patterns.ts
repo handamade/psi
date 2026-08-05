@@ -113,6 +113,18 @@ export function validatePatterns(
 
   for (const pattern of patterns) {
     const prefix = `pattern "${pattern.id}": `;
+
+    // A declared gap suppresses prop/slot validation for that node (see the
+    // "gap listing always wins" comment below) so the ledger can go stale
+    // silently once the component ships — this is the check that lets it
+    // self-clear instead: a gap that now resolves in the manifest must be
+    // removed from `gaps`, not left validated-around forever.
+    for (const gapName of pattern.gaps) {
+      if (byName.has(gapName)) {
+        throw new Error(`${prefix}gap "${gapName}" is no longer missing — remove it from gaps`);
+      }
+    }
+
     const referencedParams = new Set<string>();
     // param key -> literal union of every prop site it fills; `null` marks a
     // gap-node site (no manifest prop to check a union against — unconstrained).

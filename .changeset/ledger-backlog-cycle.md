@@ -16,7 +16,10 @@ the point — the previous state shipped unnameable buttons silently.
 `Input` now declares `type` as a curated union (`text | search | email | tel
 | url | password | number | date`), deliberately narrower than the native
 attribute: checkbox, radio, file and submit are separate Psi controls, so
-those values were never meaningful here.
+those values were never meaningful here. This is also a type-level breaking
+change: TypeScript consumers currently passing `type="checkbox"`, `type="radio"`,
+`type="file"`, or `type="submit"` to `Input` will now see a new TypeScript
+error.
 
 Nine new ledger patterns are authored, taking the catalog from 4 to 13.
 `dist/patterns.json` now carries a machine-readable component backlog for

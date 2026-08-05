@@ -9,7 +9,8 @@
       "trigger": [
         {
           "component": "IconButton",
-          "props": { "variant": "ghost", "aria-label": "{content:trigger-label}" }
+          "props": { "variant": "ghost", "aria-label": "{content:trigger-label}" },
+          "content": "trigger-icon"
         }
       ],
       "body": [
@@ -30,6 +31,7 @@
   ],
   "content": {
     "trigger-label": "Actions",
+    "trigger-icon": "[icon]",
     "edit-label": "Edit",
     "duplicate-label": "Duplicate",
     "delete-label": "Delete"

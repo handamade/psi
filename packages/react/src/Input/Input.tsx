@@ -39,7 +39,7 @@ const sizeClass: Record<Size, string> = {
 /** Single-line text input with pixel-true heights (24–48) and an error state.
  * Inside a Field, id/aria-describedby/aria-invalid/required are wired
  * automatically (D49). */
-export function Input({ size = 32, error = false, className, ref, ...rest }: InputProps) {
+export function Input({ size = 32, error = false, type = "text", className, ref, ...rest }: InputProps) {
   const field = useContext(FieldContext);
   const invalid = error || (field?.invalid ?? false);
   const describedBy =
@@ -56,6 +56,7 @@ export function Input({ size = 32, error = false, className, ref, ...rest }: Inp
       id={rest.id ?? field?.id}
       required={rest.required ?? (field?.required || undefined)}
       aria-invalid={field?.invalid || undefined}
+      type={type}
       {...rest}
       aria-describedby={describedBy}
     />
