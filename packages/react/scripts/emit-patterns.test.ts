@@ -7,17 +7,29 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 5 patterns sorted by id, all unblocked with presets (D60)", () => {
+  it("writes dist/patterns.json: 7 patterns sorted by id, two blocked on Table-tier gaps (D59)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
     expect(output.patterns.map((p: { id: string }) => p.id)).toEqual([
+      "data-table",
       "date-range-filter",
       "destructive-confirm",
       "filter-toolbar",
       "row-actions",
       "settings-form-row",
+      "table-pagination",
     ]);
+
+    const dataTable = output.patterns.find((p: { id: string }) => p.id === "data-table");
+    expect(dataTable.blocked).toBe(true);
+    expect(dataTable.gaps).toEqual(["Table"]);
+    expect(dataTable.preset).toBeNull();
+
+    const tablePagination = output.patterns.find((p: { id: string }) => p.id === "table-pagination");
+    expect(tablePagination.blocked).toBe(true);
+    expect(tablePagination.gaps).toEqual(["Pagination"]);
+    expect(tablePagination.preset).toBeNull();
 
     const destructiveConfirm = output.patterns.find((p: { id: string }) => p.id === "destructive-confirm");
     expect(destructiveConfirm.blocked).toBe(false);
