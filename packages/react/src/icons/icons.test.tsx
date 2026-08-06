@@ -9,6 +9,9 @@ import { IconLinkedIn } from "./IconLinkedIn.js";
 import { IconGitHub } from "./IconGitHub.js";
 import { IconX } from "./IconX.js";
 import { IconInstagram } from "./IconInstagram.js";
+import { IconInfo } from "./IconInfo.js";
+import { IconAlertTriangle } from "./IconAlertTriangle.js";
+import { IconAlertCircle } from "./IconAlertCircle.js";
 
 describe("Icons", () => {
   it("renders with aria-hidden by default", () => {
@@ -73,5 +76,35 @@ describe("Icons", () => {
       expect(svg).toHaveAttribute("width", "20");
       expect(svg).toHaveAttribute("height", "20");
     });
+  });
+
+  // D64 — Toast's status icons. IconCheck already serves `success`.
+  it("renders the status icons", () => {
+    const icons = [
+      <IconInfo key="info" />,
+      <IconAlertTriangle key="alert-triangle" />,
+      <IconAlertCircle key="alert-circle" />,
+    ];
+    icons.forEach((icon) => {
+      const { container } = render(icon);
+      const svg = container.querySelector("svg")!;
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg).toHaveAttribute("width", "20");
+      expect(svg).toHaveAttribute("height", "20");
+    });
+  });
+
+  it("gives each status icon a distinct shape", () => {
+    const shapes = [<IconInfo key="i" />, <IconAlertTriangle key="t" />, <IconAlertCircle key="c" />].map(
+      (icon) => render(icon).container.querySelector("svg")!.innerHTML,
+    );
+    expect(new Set(shapes).size).toBe(3);
+  });
+
+  it("honours a custom size on the status icons", () => {
+    const { container } = render(<IconAlertCircle size={16} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg).toHaveAttribute("width", "16");
+    expect(svg).toHaveAttribute("height", "16");
   });
 });

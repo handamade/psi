@@ -70,4 +70,7 @@ export {
   IconGitHub,
   IconX,
   IconInstagram,
+  IconInfo,
+  IconAlertTriangle,
+  IconAlertCircle,
 } from "./icons/index.js";
