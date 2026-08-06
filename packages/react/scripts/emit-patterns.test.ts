@@ -7,7 +7,7 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 13 patterns sorted by id, one blocked on gaps (D66)", () => {
+  it("writes dist/patterns.json: 13 patterns sorted by id, none blocked (D67)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
@@ -55,9 +55,17 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(detailDrawer.preset).toContain('placement="inline-end"');
 
     const tabbedWorkspace = output.patterns.find((p: { id: string }) => p.id === "tabbed-workspace");
-    expect(tabbedWorkspace.blocked).toBe(true);
-    expect(tabbedWorkspace.gaps).toEqual(["Tabs"]);
-    expect(tabbedWorkspace.preset).toBeNull();
+    expect(tabbedWorkspace.blocked).toBe(false);
+    expect(tabbedWorkspace.gaps).toEqual([]);
+    expect(tabbedWorkspace.preset).toContain("<TabList");
+
+    // The coverage arc's milestone (D59): the backlog was derived from what the
+    // authored patterns declared, and it is now spent — every pattern composes
+    // only components that exist. Note this is not the arc's completion
+    // criterion, which is the retargeted eval's improvisation count; a pattern
+    // set can be fully satisfied and still miss what a real screen needs.
+    expect(output.patterns.filter((p: { gaps: string[] }) => p.gaps.length > 0)).toEqual([]);
+    expect(output.patterns.every((p: { preset: string | null }) => p.preset !== null)).toBe(true);
 
     const destructiveConfirm = output.patterns.find((p: { id: string }) => p.id === "destructive-confirm");
     expect(destructiveConfirm.blocked).toBe(false);

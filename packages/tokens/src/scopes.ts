@@ -14,6 +14,14 @@ export const PROPERTY_GROUPS: Record<string, readonly string[]> = {
     "box-shadow",
     "border-top", "border-right", "border-bottom", "border-left",
     "border-inline", "border-block",
+    // Logical longhands. The group already carried every physical longhand and
+    // both logical shorthands, so their absence was an omission rather than a
+    // rule: a vertical Tabs list binding --psi-tabs-list-border to
+    // border-inline-start is exactly the case the group exists to allow, and
+    // the logical form is the one that survives RTL. Found by the D46 gate
+    // itself during D67.
+    "border-inline-start", "border-inline-end",
+    "border-block-start", "border-block-end",
   ],
   gap: [
     "gap", "row-gap", "column-gap",

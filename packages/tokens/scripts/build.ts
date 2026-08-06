@@ -39,6 +39,7 @@ import { panelVars } from "../src/components/panel.js";
 import { mediaVars } from "../src/components/media.js";
 import { menuVars } from "../src/components/menu.js";
 import { toastVars } from "../src/components/toast.js";
+import { tabsVars } from "../src/components/tabs.js";
 import { fieldVars } from "../src/components/field.js";
 import { guidance } from "../src/guidance.js";
 
@@ -88,6 +89,7 @@ const componentVars: Record<string, Record<string, string>> = {
   surface: surfaceVars,
   switch: switchVars,
   table: tableVars,
+  tabs: tabsVars,
   tag: tagVars,
   toast: toastVars,
   tooltip: tooltipVars,

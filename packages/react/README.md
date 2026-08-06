@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-28 React 19 components consuming @handamade/psi-tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
+32 React 19 components consuming @handamade/psi-tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
 
 ## Installation
 

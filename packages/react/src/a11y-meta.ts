@@ -125,4 +125,32 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Owns the queue, the auto-dismiss timers and the single ToastRegion (D65). Timers pause while the pointer or focus is inside the region and resume with the time remaining, satisfying WCAG 2.2.1 for content that disappears on a timer. Toasts carrying an action get a longer default lifetime, so the affordance cannot vanish before it is reached. useToast() throws outside a provider rather than silently no-opping.",
   },
+  Tabs: {
+    keyboard: [
+      { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },
+    ],
+    notes:
+      "Controlled-only (D67): value and onValueChange are required and Tabs never selects itself. Tab and TabPanel pair by string value, not index, so their source order need not match. Every panel renders and unselected ones carry `hidden`, so aria-controls always resolves and panel DOM state survives a switch.",
+  },
+  TabList: {
+    keyboard: [
+      { keys: "Arrow Left / Arrow Right", behavior: "Horizontal orientation: moves to the previous/next enabled tab, wrapping at both ends. Selection follows focus (automatic activation)." },
+      { keys: "Arrow Up / Arrow Down", behavior: "Vertical orientation: the same, on the block axis. The cross-axis arrows are ignored rather than swallowed." },
+      { keys: "Home / End", behavior: "Jumps to the first or last enabled tab." },
+    ],
+    notes:
+      "Renders role=\"tablist\" with aria-orientation. Requires an accessible name — pass aria-label, which is promoted onto its own props interface (D60) so the manifest shows it. Owns the roving tabindex: exactly one tab is in the page tab order at a time.",
+  },
+  Tab: {
+    keyboard: [{ keys: "Enter / Space", behavior: "Activates (native button behavior); arrow keys already select on focus." }],
+    notes:
+      "Renders a real <button> with role=\"tab\", aria-selected and aria-controls. disabled sets aria-disabled (not the disabled attribute) so the tab stays discoverable to assistive tech while being skipped by roving navigation and refused for selection — the same choice MenuItem made in D53.",
+  },
+  TabPanel: {
+    keyboard: [
+      { keys: "Tab", behavior: "The panel itself is a tab stop (tabIndex=0), so a panel whose content has no focusable element is still reachable." },
+    ],
+    notes:
+      "Renders role=\"tabpanel\" with aria-labelledby pointing back at its tab. Unselected panels stay in the DOM with `hidden`.",
+  },
 };

@@ -1,0 +1,104 @@
+/* packages/react/src/Tabs/tabs.module.css */
+/* One module serves Tabs, TabList, Tab and TabPanel — the stylelint plugin
+   derives the allowed namespace from the filename, so every custom property
+   here must be --psi-tabs-* or a global scale prefix. Aliasing to
+   --psi-control-* and the semantic layer happens in
+   packages/tokens/src/components/tabs.ts, never here. */
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-16);
+}
+
+.tabs[data-orientation="vertical"] {
+  flex-direction: row;
+  gap: var(--psi-space-24);
+}
+
+/* ── Tab list ─────────────────────────────────────────────────── */
+
+.list {
+  display: flex;
+  /* A short list wraps rather than scrolling. Overflow scrolling and a
+     priority-plus collapse are out of scope (and deferred for Toolbar too). */
+  flex-wrap: wrap;
+  gap: var(--psi-space-4);
+  border-bottom: 1px solid var(--psi-tabs-list-border);
+}
+
+.tabs[data-orientation="vertical"] .list {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  border-bottom: none;
+  border-inline-start: 1px solid var(--psi-tabs-list-border);
+}
+
+/* ── Tab ──────────────────────────────────────────────────────── */
+
+.tab {
+  position: relative;
+  appearance: none;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  height: var(--psi-tabs-40-height);
+  padding-inline: var(--psi-tabs-40-padding-x);
+  font: var(--psi-text-14-20-medium);
+  color: var(--psi-tabs-fg);
+
+  transition: color var(--psi-duration-150) var(--psi-ease-standard);
+}
+
+.tab:hover:not([aria-disabled="true"]) {
+  background: var(--psi-tabs-bg-hover);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--psi-tabs-focus-ring);
+  outline-offset: -2px;
+}
+
+.tab[aria-disabled="true"] {
+  color: var(--psi-tabs-fg-disabled);
+  cursor: default;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--psi-tabs-fg-selected);
+}
+
+/* The selected indicator rides the list's edge, so it reads as one rule with
+   a highlighted segment rather than a detached underline. */
+.tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--psi-tabs-indicator);
+}
+
+.tabs[data-orientation="vertical"] .tab {
+  text-align: start;
+}
+
+.tabs[data-orientation="vertical"] .tab[aria-selected="true"]::after {
+  inset-inline: auto;
+  inset-block: 0;
+  inset-inline-start: -1px;
+  width: 2px;
+  height: auto;
+}
+
+/* ── Panel ────────────────────────────────────────────────────── */
+
+.panel {
+  min-width: 0;
+}
+
+.panel:focus-visible {
+  outline: 2px solid var(--psi-tabs-focus-ring);
+  outline-offset: 2px;
+}
