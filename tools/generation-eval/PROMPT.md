@@ -16,7 +16,7 @@ improvisations**.
 
 ## The prompt
 
-You are working in the `ds` design system repo. You may reach the design system **only**
+You are working in the Psi (Ψ) design system repo. You may reach the design system **only**
 through its machine-readable trail:
 
 - Start at `llms.txt` (repo root) and follow it wherever it points — `packages/tokens/llms.txt`,
