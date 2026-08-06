@@ -84,3 +84,75 @@ describe("Dialog", () => {
     expect(screen.getByRole("dialog").className).toContain("w400");
   });
 });
+
+describe("Dialog placement (D66 — a drawer is a placement, not a component)", () => {
+  it("defaults to center", () => {
+    render(<Dialog open onClose={() => {}} title="T">Body</Dialog>);
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-placement", "center");
+  });
+
+  it.each(["center", "inline-start", "inline-end"] as const)(
+    "reflects placement %s and applies a distinct class",
+    (placement) => {
+      render(
+        <Dialog open onClose={() => {}} placement={placement} title="T">
+          Body
+        </Dialog>,
+      );
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveAttribute("data-placement", placement);
+      expect(dialog.className).not.toBe("");
+    },
+  );
+
+  it("gives each placement a different class so the CSS can differ", () => {
+    const classes = (["center", "inline-start", "inline-end"] as const).map((placement) => {
+      const { container, unmount } = render(
+        <Dialog open onClose={() => {}} placement={placement} title="T">
+          Body
+        </Dialog>,
+      );
+      const cls = container.querySelector("dialog")!.className;
+      unmount();
+      return cls;
+    });
+    expect(new Set(classes).size).toBe(3);
+  });
+
+  it("keeps the dismissal contract under every placement", async () => {
+    // The reason plumbing is Dialog's, not the placement's — an edge-pinned
+    // panel changes which coordinates are backdrop, never what a backdrop
+    // click means.
+    for (const placement of ["center", "inline-start", "inline-end"] as const) {
+      const onClose = vi.fn();
+      const { unmount } = render(
+        <Dialog open onClose={onClose} placement={placement} title="T">
+          Body
+        </Dialog>,
+      );
+      const dialog = screen.getByRole("dialog");
+
+      fireEvent(dialog, new Event("cancel", { bubbles: false, cancelable: true }));
+      expect(onClose, `esc under ${placement}`).toHaveBeenCalledWith("esc");
+
+      fireEvent.click(dialog);
+      expect(onClose, `backdrop under ${placement}`).toHaveBeenCalledWith("backdrop");
+
+      await userEvent.click(screen.getByRole("button", { name: "Close dialog" }));
+      expect(onClose, `close-button under ${placement}`).toHaveBeenCalledWith("close-button");
+
+      unmount();
+    }
+  });
+
+  it("still merges className alongside the placement class", () => {
+    const { container } = render(
+      <Dialog open onClose={() => {}} placement="inline-end" className="custom" title="T">
+        Body
+      </Dialog>,
+    );
+    const cls = container.querySelector("dialog")!.className;
+    expect(cls).toContain("custom");
+    expect(cls.split(" ").length).toBeGreaterThan(1);
+  });
+});

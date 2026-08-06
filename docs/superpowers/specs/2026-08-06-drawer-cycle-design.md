@@ -126,9 +126,17 @@ whatever the placement. `a11yMeta.Dialog` gains one sentence noting that
 `placement` moves the panel without altering any of it.
 
 One real consideration: a full-height drawer is more likely than a centered
-dialog to overflow. The panel scrolls internally (`overflow-y: auto` on the
-body region) so the footer stays reachable — a footer scrolled out of a modal
-with no other exit is a trap when `dismissible` is `false`.
+dialog to overflow, and a footer that cannot be reached is a trap when
+`dismissible={false}` leaves it as the only exit.
+
+**The whole panel scrolls, rather than an inner body region.** An earlier draft
+of this section said "`overflow-y: auto` on the body region" — there is no such
+region. `children` renders as direct grid items of `.panel`, so creating one
+would mean wrapping `children` in a new element, which changes the *centered*
+dialog's DOM and shifts its existing VR baselines for no benefit. Scrolling the
+panel keeps the footer reachable but does not pin it; that is the accepted cost
+of leaving `center` byte-identical. A sticky footer is available later as its
+own change, at the price of that DOM shift.
 
 ## Pattern revisions
 

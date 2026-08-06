@@ -12,20 +12,73 @@
   background: var(--psi-dialog-backdrop);
 }
 
-.dialog[open] {
-  animation: dialog-enter var(--psi-duration-200) var(--psi-ease-soft);
-}
-
 .dialog[open]::backdrop {
   animation: backdrop-enter var(--psi-duration-200) var(--psi-ease-soft);
+}
+
+@keyframes backdrop-enter {
+  from { opacity: 0; }
+}
+
+/* ── Placement (D66) ──────────────────────────────────────────────
+   A drawer is a Dialog pinned full-height to an inline edge, not a
+   sibling component: modality, the focus trap, aria-modal, focus restore
+   and the dismissal reasons all stay the platform's and Dialog's.
+
+   Logical margins, so an RTL theme flips with no second code path. The
+   geometry was measured before it was written — at a 1000x800 viewport a
+   560px inline-end drawer probes at x:440 (flush right), height 800. */
+
+.center[open] {
+  animation: dialog-enter var(--psi-duration-200) var(--psi-ease-soft);
 }
 
 @keyframes dialog-enter {
   from { opacity: 0; transform: scale(0.97); }
 }
 
-@keyframes backdrop-enter {
-  from { opacity: 0; }
+.inlineStart,
+.inlineEnd {
+  margin-block: 0;
+  height: 100dvh;
+  max-height: 100dvh;
+  /* The base rule's calc(100vw - space-32) gutter is right for a centered
+     panel and wrong for an edge-pinned one, which must reach the edge. */
+  max-width: 100vw;
+  border-radius: 0;
+}
+
+.inlineEnd {
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+  border-start-start-radius: var(--psi-dialog-radius);
+  border-end-start-radius: var(--psi-dialog-radius);
+}
+
+.inlineStart {
+  margin-inline-start: 0;
+  margin-inline-end: auto;
+  border-start-end-radius: var(--psi-dialog-radius);
+  border-end-end-radius: var(--psi-dialog-radius);
+}
+
+.inlineEnd[open] {
+  animation: drawer-enter-end var(--psi-duration-200) var(--psi-ease-soft);
+}
+
+.inlineStart[open] {
+  animation: drawer-enter-start var(--psi-duration-200) var(--psi-ease-soft);
+}
+
+/* Physical translate on purpose: CSS cannot express a direction-relative
+   slide from one declaration, and a wrong-way slide under dir="rtl" is a
+   smaller defect than a second code path. Revisit if an RTL brand ships. */
+@keyframes drawer-enter-end {
+  from { transform: translateX(100%); }
+}
+
+@keyframes drawer-enter-start {
+  from { transform: translateX(-100%); }
 }
 
 .w400 { width: 400px; }
@@ -36,6 +89,20 @@
   display: grid;
   gap: var(--psi-space-16);
   padding: var(--psi-space-24);
+}
+
+/* A full-height drawer overflows far more readily than a centered dialog, and
+   a footer that cannot be reached is a trap when dismissible={false} leaves it
+   as the only exit. The whole panel scrolls rather than an inner body region:
+   `children` is rendered as direct grid items, so introducing a wrapper to
+   scroll would change the centered dialog's DOM and shift its VR baselines for
+   no benefit. Scrolling the panel keeps the footer reachable; it does not pin
+   it, which is the accepted cost of leaving `center` untouched. */
+.inlineStart .panel,
+.inlineEnd .panel {
+  height: 100%;
+  overflow-y: auto;
+  align-content: start;
 }
 
 .header {
