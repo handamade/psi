@@ -47,6 +47,8 @@ export { TableCell } from "./Table/TableCell.js";
 export type { TableCellProps } from "./Table/TableCell.js";
 export { Pagination } from "./Pagination/Pagination.js";
 export type { PaginationProps } from "./Pagination/Pagination.js";
+export { Toast } from "./Toast/Toast.js";
+export type { ToastProps, ToastVariant } from "./Toast/Toast.js";
 export {
   IconPlus,
   IconMinus,
