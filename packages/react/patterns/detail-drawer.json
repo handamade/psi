@@ -3,8 +3,8 @@
   "intent": "Side sheet showing one record's detail, opened from a table row, with its primary actions in a footer",
   "match": ["detail drawer", "side sheet", "row detail", "slide-over", "record detail panel"],
   "compose": {
-    "component": "Drawer",
-    "props": { "side": "{param:side}" },
+    "component": "Dialog",
+    "props": { "placement": "{param:placement}" },
     "slots": {
       "title": ["{content:title}"],
       "body": ["{content:body-note}"],
@@ -16,10 +16,10 @@
   },
   "parameters": [
     {
-      "key": "side",
+      "key": "placement",
       "ask": "Which edge should the drawer open from?",
-      "options": ["end", "start"],
-      "default": "end"
+      "options": ["inline-end", "inline-start"],
+      "default": "inline-end"
     }
   ],
   "content": {
@@ -28,5 +28,5 @@
     "primary-label": "Save",
     "dismiss-label": "Close"
   },
-  "gaps": ["Drawer"]
+  "gaps": []
 }

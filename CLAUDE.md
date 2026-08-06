@@ -22,7 +22,7 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 ## Workflow
 
 - **Node 24 (`.nvmrc`) — check `node -v` before the first pnpm command.** pnpm 11.9 requires ≥22.13 and dies on Node 20 with `ERR_UNKNOWN_BUILTIN_MODULE` (it needs `node:sqlite`). `~/.zshenv` puts 24 on PATH for fresh shells, but a shell that predates that setup still has 20 first. Fix the shell with `nvm use` (reads `.nvmrc`) — do not prefix individual commands with a PATH override, which fixes one command and leaves the next to fail.
-- Specs and plans live in `docs/superpowers/` (decision log **D1–D60** in the specs). Significant changes get a decision number — check the highest one in use before claiming the next, since parallel sessions have collided on numbering. **A grep alone over-reads**: it returns numbers that are merely *mentioned* or reserved forward (the D59 arc spec says later cycles "claim decision numbers from D61 onward", so `D61` greps as taken while nothing owns it). Confirm a number is actually claimed by a `## Decisions` entry in a spec, not just referenced in prose.
+- Specs and plans live in `docs/superpowers/` (decision log **D1–D65** in the specs). Significant changes get a decision number — check the highest one in use before claiming the next, since parallel sessions have collided on numbering. **A grep alone over-reads**: it returns numbers that are merely *mentioned* or reserved forward (the D59 arc spec says later cycles "claim decision numbers from D61 onward", so `D61` greps as taken while nothing owns it). Confirm a number is actually claimed by a `## Decisions` entry in a spec, not just referenced in prose.
 - **Verify with all four gates, not three:**
 
   ```bash

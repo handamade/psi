@@ -49,7 +49,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Tab", behavior: "Focus is trapped inside by the native <dialog> top layer; restored on close." },
     ],
     notes:
-      "Rendered with showModal(): aria-modal, inert background and focus restore come from the platform. title wires aria-labelledby; without title, pass aria-label. Backdrop click dismisses only when dismissible.",
+      "Rendered with showModal(): aria-modal, inert background and focus restore come from the platform. title wires aria-labelledby; without title, pass aria-label. Backdrop click dismisses only when dismissible. placement=\"inline-start\"/\"inline-end\" pins the panel full-height to that edge — that is Psi's drawer, and it changes nothing about modality, the focus trap, focus restore or the dismissal reasons (D66). A drawer's panel scrolls internally so a dismissible={false} footer stays reachable.",
   },
   Checkbox: {
     keyboard: [{ keys: "Space", behavior: "Toggles. Native <input type=checkbox> underneath (visually hidden)." }],

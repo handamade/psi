@@ -6,6 +6,12 @@ import styles from "./dialog.module.css";
 
 type Width = 400 | 560 | 720;
 
+/** Where the panel sits. `inline-*` pin it full-height to that edge — that is
+ * a drawer / side sheet, and D66 is the decision that it is a placement rather
+ * than a sibling component. Logical, not `left`/`right`, so RTL flips without a
+ * second code path. */
+export type DialogPlacement = "center" | "inline-start" | "inline-end";
+
 export interface DialogProps
   extends Omit<DialogHTMLAttributes<HTMLDialogElement>, "title" | "onClose" | "open"> {
   /** Controlled open state; syncs to showModal()/close(). */
@@ -16,8 +22,12 @@ export interface DialogProps
   title?: ReactNode;
   /** Action row (Buttons — one accent per group, danger for destructive). */
   footer?: ReactNode;
-  /** Panel width in px (400 | 560 | 720). @default 560 */
+  /** Panel width in px (400 | 560 | 720). For an `inline-*` placement this is
+   * the drawer's width; the height is always the full viewport. @default 560 */
   width?: Width;
+  /** Where the panel sits. `inline-start` / `inline-end` pin it full-height to
+   * that edge, making it a drawer (D66). @default "center" */
+  placement?: DialogPlacement;
   /** false = no close button, Esc and backdrop swallowed — footer is the only exit. @default true */
   dismissible?: boolean;
   /** Forwarded ref to the underlying <dialog> element. */
@@ -30,15 +40,28 @@ const widthClass: Record<Width, string> = {
   720: styles.w720,
 };
 
+const placementClass: Record<DialogPlacement, string> = {
+  center: styles.center,
+  "inline-start": styles.inlineStart,
+  "inline-end": styles.inlineEnd,
+};
+
 /** Modal dialog on the native <dialog> top layer: focus trap, aria-modal and
  * focus restore come from the platform; title/footer slots, Esc/backdrop/
- * close-button dismissal via onClose(reason) (D50). */
+ * close-button dismissal via onClose(reason) (D50).
+ *
+ * `placement` moves the panel and nothing else (D66): an `inline-start` /
+ * `inline-end` Dialog is a drawer, pinned full-height to that edge, with the
+ * same modality, focus trap, focus restore and dismissal reasons as a centered
+ * one. There is deliberately no separate Drawer component — a sibling would
+ * have to duplicate or wrap all of that. */
 export function Dialog({
   open,
   onClose,
   title,
   footer,
   width = 560,
+  placement = "center",
   dismissible = true,
   className,
   children,
@@ -79,12 +102,15 @@ export function Dialog({
     if (dismissible && e.target === innerRef.current) onClose("backdrop");
   };
 
-  const cls = [styles.dialog, widthClass[width], className].filter(Boolean).join(" ");
+  const cls = [styles.dialog, widthClass[width], placementClass[placement], className]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <dialog
       ref={setRef}
       className={cls}
+      data-placement={placement}
       aria-labelledby={title != null ? titleId : undefined}
       onCancel={handleCancel}
       onClick={handleClick}
