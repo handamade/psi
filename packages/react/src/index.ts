@@ -51,6 +51,10 @@ export { Toast } from "./Toast/Toast.js";
 export type { ToastProps, ToastVariant } from "./Toast/Toast.js";
 export { ToastRegion } from "./Toast/ToastRegion.js";
 export type { ToastRegionProps, ToastPlacement } from "./Toast/ToastRegion.js";
+export { ToastProvider } from "./Toast/ToastProvider.js";
+export type { ToastProviderProps } from "./Toast/ToastProvider.js";
+export { useToast, ToastContext } from "./Toast/useToast.js";
+export type { ToastHandle, ToastOptions } from "./Toast/useToast.js";
 export {
   IconPlus,
   IconMinus,
