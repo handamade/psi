@@ -1,0 +1,6 @@
+{
+  "slots": [
+    { "name": "body", "accepts": {}, "cardinality": "1..*", "order": 1 },
+    { "name": "action", "accepts": { "components": ["Button"], "contracts": ["inline-content"] }, "cardinality": "0..1", "order": 2 }
+  ]
+}

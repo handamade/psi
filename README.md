@@ -17,7 +17,7 @@ OKLCH-based design system for web applications, built on four core principles:
 ## Workspace
 
 - **packages/tokens** — Formula DSL, token definitions, codegen, CSS + JSON artifacts
-- **packages/react** — 25 React 19 components (Button, IconButton, Card, Panel, Toolbar, NavBar, AspectRatio, Input, Select, Field, Dialog, Checkbox, Switch, Tag, Tooltip, Menu, MenuItem, MenuSeparator, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination) + 22 icons
+- **packages/react** — 28 React 19 components (Button, IconButton, Card, Panel, Toolbar, NavBar, AspectRatio, Input, Select, Field, Dialog, Checkbox, Switch, Tag, Tooltip, Menu, MenuItem, MenuSeparator, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination, Toast, ToastRegion, ToastProvider) + 25 icons
 - **packages/figma-plugin** — In-repo Figma plugin syncing resolved tokens
 - **apps/storybook** — Workbench and generated component documentation
 - **apps/promo** — Public website (promo one-pager + update feed), built with Psi itself

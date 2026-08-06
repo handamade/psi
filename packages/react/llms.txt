@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-25 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+28 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -36,8 +36,8 @@
 ## AspectRatio
 - <AspectRatio ratio={16/10}>{children}</AspectRatio>: a frame div with CSS aspect-ratio set from the numeric ratio prop — wrap images/media to reserve layout space before load. Combine with the .psi-media-tint utility for the brand media-tint treatment.
 
-## Icons (22)
-- Full icon set: IconPlus, IconMinus, IconCheck, IconClose, IconChevronDown, IconChevronRight, IconSearch, IconSettings, IconUser, IconEye, IconEyeOff, IconEdit, IconCopy, IconTrash, IconLoader, IconExternalLink, plus D36 additions — arrows IconArrowDown and IconArrowUpRight, and social glyphs IconLinkedIn, IconGitHub, IconX, IconInstagram.
+## Icons (25)
+- Full icon set: IconPlus, IconMinus, IconCheck, IconClose, IconChevronDown, IconChevronRight, IconSearch, IconSettings, IconUser, IconEye, IconEyeOff, IconEdit, IconCopy, IconTrash, IconLoader, IconExternalLink, plus D36 additions — arrows IconArrowDown and IconArrowUpRight, and social glyphs IconLinkedIn, IconGitHub, IconX, IconInstagram — plus the D64 status glyphs IconInfo, IconAlertTriangle and IconAlertCircle.
 
 ## Table family (6)
 - `<Table>` renders `<table>` and is **controlled-only** — it holds no state (D62). Sorting is `sort={{key, direction}}` + `onSortChange`; selection is `selected` (a `ReadonlySet<string>` keyed by each `<TableRow rowId>`) + `onSelectionChange`. `sortable` and `selectable` only enable the affordances. `size` is `32 | 40 | 48` px (default 40) and `stickyHeader` pins the header. It does no filtering, sorting or slicing of rows — the consumer does that.
@@ -47,6 +47,12 @@
 ## Pagination
 - `<Pagination page={n} pageCount={total} onPageChange={...}>`: a numbered pager with ellipsis truncation (`‹ 1 … 4 5 6 … 13 ›`), built from Button/IconButton (D63). `siblingCount` (default 1) sets how many pages flank the current one before truncating; `aria-current="page"` marks the active page and the ellipsis is inert.
 - It is **standalone, not a Table family member** and has no connection to `Table` — `Table` has no `page` prop. The `table-pagination` pattern composes it as a `Toolbar` sibling of a page-size `Select`; the consumer owns page state and slices the rows.
+
+## Toast family (3) + useToast
+- `<Toast variant="neutral|success|warning|danger" action={...} onDismiss={...}>message</Toast>` is presentational and **controlled** (D64): it holds no state, runs no timer and never removes itself — `onDismiss` reports and the owner disposes. Variants are Tag's **status** axis, not the flat action variants; there is deliberately no `accent`. The variant's meaning is announced by a visually hidden status word, so never rely on the icon colour alone.
+- `<ToastRegion placement="bottom-end">` is the positioned container and must wrap every toast. It renders **two always-present live wrappers** (`role="status"` polite, `role="alert"` assertive) and routes each toast by variant — neutral/success polite, warning/danger assertive. It sits on the native top layer via `popover="manual"`, so a toast raised from inside a modal `Dialog` stays visible.
+- `<ToastProvider limit={3} duration={5000} actionDuration={10000}>` owns the queue, the timers and the single region — the library's **one stateful container** (D65), and opt-in. Inside it, `const toast = useToast()` gives `show({variant, message, action}) => id`, `dismiss(id)` and `clear()`. Timers pause while the pointer or focus is in the region and resume with the time remaining (WCAG 2.2.1); toasts carrying an action get the longer lifetime.
+- **Do not hand-roll a queue or a `setTimeout`** — that is what `ToastProvider` is for. Do not render a bare `<Toast>` outside a `ToastRegion`: it would announce nothing. `useToast()` throws outside a provider rather than silently doing nothing.
 
 ## Compositions (recipes for what has no component yet)
 

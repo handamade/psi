@@ -17,6 +17,7 @@ export interface ToastProviderProps {
   actionDuration?: number;
   /** Corner the stack occupies. @default "bottom-end" */
   placement?: ToastPlacement;
+  /** The subtree that may call `useToast()`. The region is rendered alongside it. */
   children: ReactNode;
 }
 

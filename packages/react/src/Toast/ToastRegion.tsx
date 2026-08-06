@@ -11,6 +11,7 @@ export interface ToastRegionProps {
   placement?: ToastPlacement;
   /** Accessible name for the region. @default "Notifications" */
   "aria-label"?: string;
+  /** The toast stack — `Toast` elements, routed to a live wrapper by variant. */
   children: ReactNode;
   className?: string;
   /** Forwarded ref to the region element. */
