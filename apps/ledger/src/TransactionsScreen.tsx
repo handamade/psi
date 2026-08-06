@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import {
   Button, Field, Input, Menu, MenuItem, MenuSeparator, IconButton, Pagination,
   Panel, Select, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow,
-  Tag, Toolbar,
+  Tag, Toolbar, useToast,
 } from "@handamade/psi-react";
 import type { TableSortState } from "@handamade/psi-react";
 import { TRANSACTIONS, currency } from "./fixture.js";
@@ -18,6 +18,38 @@ export function TransactionsScreen() {
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [voided, setVoided] = useState<ReadonlySet<string>>(new Set());
+  const toast = useToast();
+
+  // action-feedback: voiding is destructive and instant, so the confirmation
+  // carries its own reversal. show() returns the toast's id, which lets Undo
+  // clear the toast it lives in rather than leaving it to time out after the
+  // action it offers has already been taken.
+  const voidTransaction = (id: string, payee: string) => {
+    setVoided((prev) => new Set(prev).add(id));
+    setOpenMenu(null);
+    let toastId = "";
+    toastId = toast.show({
+      variant: "success",
+      message: `Voided ${payee}.`,
+      action: (
+        <Button
+          variant="ghost"
+          size={32}
+          onClick={() => {
+            setVoided((prev) => {
+              const next = new Set(prev);
+              next.delete(id);
+              return next;
+            });
+            toast.dismiss(toastId);
+          }}
+        >
+          Undo
+        </Button>
+      ),
+    });
+  };
 
   // Table renders what it is given; filtering, sorting and slicing are the
   // app's. This is what controlled-only buys — the same code works unchanged
@@ -27,7 +59,7 @@ export function TransactionsScreen() {
     const rows = TRANSACTIONS.filter((t) => {
       const matchesQuery = !q || t.payee.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
       const matchesCategory = !category || t.category === category;
-      return matchesQuery && matchesCategory;
+      return matchesQuery && matchesCategory && !voided.has(t.id);
     });
     if (!sort) return rows;
     const dir = sort.direction === "asc" ? 1 : -1;
@@ -37,7 +69,7 @@ export function TransactionsScreen() {
       if (typeof av === "number" && typeof bv === "number") return (av - bv) * dir;
       return String(av).localeCompare(String(bv)) * dir;
     });
-  }, [query, category, sort]);
+  }, [query, category, sort, voided]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const current = Math.min(page, pageCount);
@@ -144,7 +176,7 @@ export function TransactionsScreen() {
                     >
                       <MenuItem onSelect={() => setOpenMenu(null)}>View details</MenuItem>
                       <MenuSeparator />
-                      <MenuItem variant="danger" onSelect={() => setOpenMenu(null)}>Void</MenuItem>
+                      <MenuItem variant="danger" onSelect={() => voidTransaction(t.id, t.payee)}>Void</MenuItem>
                     </Menu>
                   </TableCell>
                 </TableRow>
