@@ -7,7 +7,7 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 13 patterns sorted by id, two blocked on gaps (D64-D65)", () => {
+  it("writes dist/patterns.json: 13 patterns sorted by id, one blocked on gaps (D66)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
@@ -45,10 +45,14 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(actionFeedback.gaps).toEqual([]);
     expect(actionFeedback.preset).toContain("<Toast");
 
+    // D66 — unblocked without a Drawer component ever existing: a drawer is a
+    // Dialog placement, so the pattern composes Dialog and the gap is removed
+    // because the capability arrived, not because a named component did.
     const detailDrawer = output.patterns.find((p: { id: string }) => p.id === "detail-drawer");
-    expect(detailDrawer.blocked).toBe(true);
-    expect(detailDrawer.gaps).toEqual(["Drawer"]);
-    expect(detailDrawer.preset).toBeNull();
+    expect(detailDrawer.blocked).toBe(false);
+    expect(detailDrawer.gaps).toEqual([]);
+    expect(detailDrawer.preset).toContain("<Dialog");
+    expect(detailDrawer.preset).toContain('placement="inline-end"');
 
     const tabbedWorkspace = output.patterns.find((p: { id: string }) => p.id === "tabbed-workspace");
     expect(tabbedWorkspace.blocked).toBe(true);

@@ -10,7 +10,7 @@ const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf
 const patterns = loadPatterns(join(root, "patterns"));
 
 describe("seed patterns against the real manifest", () => {
-  it("all thirteen load and validate; two remain gapped on the overlay tier (D64-D65)", () => {
+  it("all thirteen load and validate; one remains gapped, on Tabs (D66)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
@@ -28,7 +28,6 @@ describe("seed patterns against the real manifest", () => {
       "table-pagination",
     ]);
     expect(gaps).toEqual({
-      "detail-drawer": ["Drawer"],
       "tabbed-workspace": ["Tabs"],
     });
   });

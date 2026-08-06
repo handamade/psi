@@ -24,7 +24,7 @@ Modal dialog on the native <dialog> top layer: focus trap, aria-modal and focus 
 | Esc | Dismisses via onClose('esc') when dismissible; swallowed otherwise. |
 | Tab | Focus is trapped inside by the native <dialog> top layer; restored on close. |
 
-Rendered with showModal(): aria-modal, inert background and focus restore come from the platform. title wires aria-labelledby; without title, pass aria-label. Backdrop click dismisses only when dismissible.
+Rendered with showModal(): aria-modal, inert background and focus restore come from the platform. title wires aria-labelledby; without title, pass aria-label. Backdrop click dismisses only when dismissible. placement="inline-start"/"inline-end" pins the panel full-height to that edge — that is Psi's drawer, and it changes nothing about modality, the focus trap, focus restore or the dismissal reasons (D66). A drawer's panel scrolls internally so a dismissible={false} footer stays reachable.
 
 ## Theming
 
