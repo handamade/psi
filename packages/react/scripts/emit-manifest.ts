@@ -34,6 +34,10 @@ const COMPONENTS = [
   "Toast",
   "ToastRegion",
   "ToastProvider",
+  "Tabs",
+  "TabList",
+  "Tab",
+  "TabPanel",
 ];
 
 // Keep a prop when it is declared on the component's own props interface
@@ -80,6 +84,9 @@ const COMPONENT_DIR: Record<string, string> = {
   TableCell: "Table",
   ToastRegion: "Toast",
   ToastProvider: "Toast",
+  TabList: "Tabs",
+  Tab: "Tabs",
+  TabPanel: "Tabs",
 };
 
 // Components with zero props by design (documented as such in their own

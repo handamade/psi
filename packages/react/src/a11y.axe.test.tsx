@@ -6,6 +6,7 @@ import {
   Menu, MenuItem, MenuSeparator,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination,
   Toast, ToastRegion,
+  Tabs, TabList, Tab, TabPanel,
 } from "./index.js";
 
 const cases: Array<[string, React.ReactElement]> = [
@@ -57,6 +58,9 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Toast danger routes assertive", <ToastRegion><Toast variant="danger">Could not void the transaction</Toast></ToastRegion>],
   ["Toast with action and dismiss", <ToastRegion><Toast variant="success" action={<Button variant="ghost" size={32}>Undo</Button>} onDismiss={() => {}}>Transaction voided</Toast></ToastRegion>],
   ["Toast region empty", <ToastRegion>{null}</ToastRegion>],
+  ["Tabs horizontal", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
+  ["Tabs vertical", <Tabs value="all" onValueChange={() => {}} orientation="vertical"><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
+  ["Tabs with a disabled tab", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="archived" disabled>Archived</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="archived">Archived rows</TabPanel></Tabs>],
 ];
 
 describe("axe: no violations in rendered components", () => {

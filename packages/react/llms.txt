@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-28 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+32 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -58,6 +58,13 @@
 - `<ToastRegion placement="bottom-end">` is the positioned container and must wrap every toast. It renders **two always-present live wrappers** (`role="status"` polite, `role="alert"` assertive) and routes each toast by variant — neutral/success polite, warning/danger assertive. It sits on the native top layer via `popover="manual"`, so a toast raised from inside a modal `Dialog` is still painted above the backdrop and still announced — though not clickable until the dialog closes, since `showModal()` makes everything outside the dialog inert. Raise toasts *after* the dialog closes if they carry an `action`.
 - `<ToastProvider limit={3} duration={5000} actionDuration={10000}>` owns the queue, the timers and the single region — the library's **one stateful container** (D65), and opt-in. Inside it, `const toast = useToast()` gives `show({variant, message, action}) => id`, `dismiss(id)` and `clear()`. Timers pause while the pointer or focus is in the region and resume with the time remaining (WCAG 2.2.1); toasts carrying an action get the longer lifetime.
 - **Do not hand-roll a queue or a `setTimeout`** — that is what `ToastProvider` is for. Do not render a bare `<Toast>` outside a `ToastRegion`: it would announce nothing. `useToast()` throws outside a provider rather than silently doing nothing.
+
+## Tabs family (4)
+- `<Tabs value={v} onValueChange={setV} orientation="horizontal|vertical">` is **controlled-only** (D67): `value` and `onValueChange` are required, there is no `defaultValue`, and Tabs never selects itself. Compose `<TabList aria-label="…">` with one `<Tab value>` each, then one `<TabPanel value>` per tab.
+- **Values are strings, not indices**, and `Tab`/`TabPanel` pair by value — their source order need not match, though keeping it matching reads better.
+- **Activation is automatic**: arrow keys move focus and selection together. There is no manual-activation mode. Arrows follow the orientation's axis (Left/Right horizontal, Up/Down vertical) with wrap; Home/End jump to the first/last enabled tab; disabled tabs are skipped and use `aria-disabled`, not the `disabled` attribute.
+- **Every panel renders; unselected ones get `hidden`.** So `aria-controls` always resolves and panel DOM state survives a switch. If a panel is expensive, render less *inside* it (`{selected ? <Heavy/> : null}`) rather than omitting the `TabPanel` — omitting it leaves the tab's `aria-controls` pointing at nothing.
+- `TabList` requires `aria-label`. The active panel is itself a tab stop, so a panel with no focusable content is still reachable.
 
 ## Compositions (recipes for what has no component yet)
 

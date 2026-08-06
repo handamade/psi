@@ -51,3 +51,21 @@ describe("tabs tokens", () => {
     ).toBe(false);
   });
 });
+
+describe("border scope group (D46 allow-list)", () => {
+  it("accepts the logical border longhands as well as the physical ones", async () => {
+    const { PROPERTY_GROUPS } = await import("../src/scopes.js");
+    // A vertical tab list binds --psi-tabs-list-border to border-inline-start.
+    // The group carried border-inline/border-block and every physical longhand
+    // but not these four, which was an omission — and the logical form is the
+    // one that survives RTL.
+    for (const prop of [
+      "border-inline-start",
+      "border-inline-end",
+      "border-block-start",
+      "border-block-end",
+    ]) {
+      expect(PROPERTY_GROUPS.border, `${prop} must be a legal border binding`).toContain(prop);
+    }
+  });
+});

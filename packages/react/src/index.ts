@@ -53,6 +53,14 @@ export { ToastRegion } from "./Toast/ToastRegion.js";
 export type { ToastRegionProps, ToastPlacement } from "./Toast/ToastRegion.js";
 export { ToastProvider } from "./Toast/ToastProvider.js";
 export type { ToastProviderProps } from "./Toast/ToastProvider.js";
+export { Tabs, TabsContext } from "./Tabs/Tabs.js";
+export type { TabsProps, TabsOrientation, TabsContextValue } from "./Tabs/Tabs.js";
+export { TabList } from "./Tabs/TabList.js";
+export type { TabListProps } from "./Tabs/TabList.js";
+export { Tab } from "./Tabs/Tab.js";
+export type { TabProps } from "./Tabs/Tab.js";
+export { TabPanel } from "./Tabs/TabPanel.js";
+export type { TabPanelProps } from "./Tabs/TabPanel.js";
 export { useToast, ToastContext } from "./Toast/useToast.js";
 export type { ToastHandle, ToastOptions } from "./Toast/useToast.js";
 export {

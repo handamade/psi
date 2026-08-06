@@ -6,8 +6,20 @@
     "component": "Tabs",
     "props": { "orientation": "{param:orientation}" },
     "slots": {
-      "list": ["{content:tabs-note}"],
-      "panels": ["{content:panels-note}"]
+      "body": [
+        {
+          "component": "TabList",
+          "props": { "aria-label": "Views" },
+          "slots": {
+            "body": [
+              { "component": "Tab", "props": { "value": "all" }, "content": "first-label" },
+              { "component": "Tab", "props": { "value": "flagged" }, "content": "second-label" }
+            ]
+          }
+        },
+        { "component": "TabPanel", "props": { "value": "all" }, "content": "first-panel" },
+        { "component": "TabPanel", "props": { "value": "flagged" }, "content": "second-panel" }
+      ]
     }
   },
   "parameters": [
@@ -19,8 +31,10 @@
     }
   ],
   "content": {
-    "tabs-note": "[one tab per view; keep labels to one or two words]",
-    "panels-note": "[one panel per tab, in the same order]"
+    "first-label": "All",
+    "second-label": "Flagged",
+    "first-panel": "[the default view]",
+    "second-panel": "[the second view; one panel per tab, paired by value]"
   },
-  "gaps": ["Tabs"]
+  "gaps": []
 }

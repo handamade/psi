@@ -10,7 +10,7 @@ const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf
 const patterns = loadPatterns(join(root, "patterns"));
 
 describe("seed patterns against the real manifest", () => {
-  it("all thirteen load and validate; one remains gapped, on Tabs (D66)", () => {
+  it("all thirteen load and validate; the backlog is empty (D67)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
@@ -27,9 +27,8 @@ describe("seed patterns against the real manifest", () => {
       "tabbed-workspace",
       "table-pagination",
     ]);
-    expect(gaps).toEqual({
-      "tabbed-workspace": ["Tabs"],
-    });
+    // Empty: every authored pattern composes only components that exist.
+    expect(gaps).toEqual({});
   });
   it("Field declares its prop-slots in the manifest", () => {
     const field = manifest.components.find((c: { name: string }) => c.name === "Field");
