@@ -46,7 +46,16 @@ function isAssertive(child: ReactNode): boolean {
  *    would be dismissed by the very click that raised the toast.
  *
  * Routing reads `variant` off each child, the same Children.map technique
- * Table uses for select-all injection. */
+ * Table uses for select-all injection.
+ *
+ * Consequence of the split, visible in the `InRegion` VR baseline: the stack is
+ * grouped by politeness, not strictly chronological — every assertive toast
+ * sorts below every polite one regardless of arrival order. Chronological order
+ * is preserved *within* each group. Keeping it exact across both would mean one
+ * live region with a politeness that changes per message, which is the thing
+ * the two wrappers exist to avoid. Accepted: at `limit` 3 the grouping reads as
+ * severity ordering, and the newest toast still lands nearest the screen edge
+ * within its group. */
 export function ToastRegion({
   placement = "bottom-end",
   "aria-label": ariaLabel = "Notifications",

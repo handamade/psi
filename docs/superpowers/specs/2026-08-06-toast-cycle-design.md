@@ -239,6 +239,15 @@ documented for Menu, and the jsdom polyfill in the test setup already covers
   because that reintroduces the mount-with-content problem one level down.
   Both wrappers stay in the DOM empty; only their contents change.
 
+  **The split costs strict chronological order**, which the `InRegion` VR
+  baseline makes visible: the stack groups by politeness, so every assertive
+  toast sorts below every polite one however they arrived. Order is preserved
+  *within* each group. The alternative — one region whose politeness changes
+  per message — is precisely what the two wrappers exist to avoid, so this is
+  accepted rather than fixed: at `limit` 3 the grouping reads as severity
+  ordering, and the newest toast still lands nearest the screen edge within its
+  group.
+
 - **Auto-dismiss pauses (WCAG 2.2.1).** Content that disappears on a timer
   needs a way to extend it. The provider pauses every timer on
   `pointerenter` and on focus entering the region, and resumes on leave. A
