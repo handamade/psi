@@ -49,6 +49,8 @@ export { Pagination } from "./Pagination/Pagination.js";
 export type { PaginationProps } from "./Pagination/Pagination.js";
 export { Toast } from "./Toast/Toast.js";
 export type { ToastProps, ToastVariant } from "./Toast/Toast.js";
+export { ToastRegion } from "./Toast/ToastRegion.js";
+export type { ToastRegionProps, ToastPlacement } from "./Toast/ToastRegion.js";
 export {
   IconPlus,
   IconMinus,
