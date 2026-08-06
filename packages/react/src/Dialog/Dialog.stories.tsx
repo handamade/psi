@@ -67,3 +67,51 @@ export const ForcedChoice: Story = {
     </Dialog>
   ),
 };
+
+/** D66 — a drawer is a Dialog placement, not a component. */
+export const DrawerInlineEnd: Story = {
+  render: () => (
+    <Dialog
+      open
+      onClose={() => {}}
+      placement="inline-end"
+      title="Transaction detail"
+      footer={<Button variant="neutral">Close</Button>}
+    >
+      <p>Acme Corp — Supplies</p>
+      <p>2026-07-14 · $1,240.00</p>
+    </Dialog>
+  ),
+};
+
+export const DrawerInlineStart: Story = {
+  render: () => (
+    <Dialog
+      open
+      onClose={() => {}}
+      placement="inline-start"
+      width={400}
+      title="Filters"
+      footer={<Button variant="accent">Apply</Button>}
+    >
+      <p>Narrow the transaction list.</p>
+    </Dialog>
+  ),
+};
+
+/** Proves the panel scrolls internally so the footer stays reachable. */
+export const DrawerLongContent: Story = {
+  render: () => (
+    <Dialog
+      open
+      onClose={() => {}}
+      placement="inline-end"
+      title="Audit trail"
+      footer={<Button variant="neutral">Close</Button>}
+    >
+      {Array.from({ length: 30 }, (_, i) => (
+        <p key={i}>Event {i + 1} — recorded 2026-07-{String((i % 28) + 1).padStart(2, "0")}.</p>
+      ))}
+    </Dialog>
+  ),
+};

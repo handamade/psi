@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import {
-  Button, Field, Input, Menu, MenuItem, MenuSeparator, IconButton, Pagination,
+  Button, Dialog, Field, Input, Menu, MenuItem, MenuSeparator, IconButton, Pagination,
   Panel, Select, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow,
   Tag, Toolbar, useToast,
 } from "@handamade/psi-react";
@@ -19,7 +19,11 @@ export function TransactionsScreen() {
   const [page, setPage] = useState(1);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [voided, setVoided] = useState<ReadonlySet<string>>(new Set());
+  const [detailId, setDetailId] = useState<string | null>(null);
   const toast = useToast();
+
+  // detail-drawer: a drawer is a Dialog placement, not a component (D66).
+  const detail = TRANSACTIONS.find((t) => t.id === detailId) ?? null;
 
   // action-feedback: voiding is destructive and instant, so the confirmation
   // carries its own reversal. show() returns the toast's id, which lets Undo
@@ -174,7 +178,14 @@ export function TransactionsScreen() {
                         </IconButton>
                       }
                     >
-                      <MenuItem onSelect={() => setOpenMenu(null)}>View details</MenuItem>
+                      <MenuItem
+                        onSelect={() => {
+                          setDetailId(t.id);
+                          setOpenMenu(null);
+                        }}
+                      >
+                        View details
+                      </MenuItem>
                       <MenuSeparator />
                       <MenuItem variant="danger" onSelect={() => voidTransaction(t.id, t.payee)}>Void</MenuItem>
                     </Menu>
@@ -201,6 +212,32 @@ export function TransactionsScreen() {
           </Toolbar>
         </>
       )}
+      {/* detail-drawer */}
+      <Dialog
+        open={detail !== null}
+        onClose={() => setDetailId(null)}
+        placement="inline-end"
+        width={400}
+        title={detail ? detail.payee : undefined}
+        footer={
+          <Button variant="neutral" onClick={() => setDetailId(null)}>
+            Close
+          </Button>
+        }
+      >
+        {detail && (
+          <dl>
+            <dt>Date</dt>
+            <dd>{detail.date}</dd>
+            <dt>Category</dt>
+            <dd>{detail.category}</dd>
+            <dt>Amount</dt>
+            <dd className="psi-tabular">{currency(detail.amount)}</dd>
+            <dt>Reference</dt>
+            <dd className="psi-tabular">{detail.id}</dd>
+          </dl>
+        )}
+      </Dialog>
     </main>
   );
 }

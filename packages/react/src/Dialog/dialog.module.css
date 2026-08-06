@@ -39,6 +39,12 @@
 
 .inlineStart,
 .inlineEnd {
+  /* Without this the 1px borders fall outside height: 100dvh — .dialog is
+     content-box, so a 900px viewport measured 902px tall and a width={400}
+     drawer measured 402px. Scoped to the placements rather than fixed on
+     .dialog: centered dialogs have always been content-box, and changing that
+     would shift every existing Dialog VR baseline for no gain here. */
+  box-sizing: border-box;
   margin-block: 0;
   height: 100dvh;
   max-height: 100dvh;

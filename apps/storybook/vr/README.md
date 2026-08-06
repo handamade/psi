@@ -72,6 +72,29 @@ Do not hand-generate baselines on a non-Linux machine and commit them as the fin
 answer — use `pnpm vr --update-snapshots` locally only to sanity-check that a story
 renders as expected, then let CI produce the real baseline.
 
+### A Linux container is faithful for component stories, not for the token pages
+
+Measured 2026-08-06 in a Linux dev container (Chromium 1194 against CI's 1228),
+running the committed baselines with `--update-snapshots=none`:
+
+- **All 188 component-story baselines matched**, across light and ember.
+- **16 did not**: `color-tokens`, `layout`, `motion` and `typography`
+  specimens, each in all four themes. The diffs include *height* changes
+  (1320 → 1315px, 855 → 850px), i.e. font metrics rather than colour.
+
+CI is green on these same baselines, so the committed files are right and the
+container's rendering is what differs. The practical rule:
+
+> Generating **missing component-story** baselines locally on Linux is safe —
+> `--update-snapshots=missing` writes only absent files and cannot touch the 16.
+> Never regenerate the token specimen pages outside CI, and never run a bare
+> `--update-snapshots` (which would rewrite them with local renders).
+
+Always run `--update-snapshots=none` **first** and read the failure *count*, not
+just the tail of the output. An earlier session reported "188/188 existing
+baselines passed" from the tail alone; it was 188 of 204, and the 16 divergences
+were already there, scrolled off the top.
+
 ### Expect `pnpm vr` to fail on macOS
 
 Playwright's default snapshot names are platform-suffixed (`...--light-linux.png`

@@ -25,6 +25,8 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Dialog", <Dialog open onClose={() => {}} title="Confirm" footer={<Button variant="danger">Delete</Button>}>Are you sure?</Dialog>],
   ["Dialog aria-label only", <Dialog open onClose={() => {}} aria-label="Quick action">Content</Dialog>],
   ["Dialog forced choice", <Dialog open onClose={() => {}} title="Pick one" dismissible={false} footer={<Button variant="accent">Keep</Button>}>No escape hatch.</Dialog>],
+  ["Dialog as drawer (D66)", <Dialog open onClose={() => {}} placement="inline-end" title="Transaction detail" footer={<Button variant="neutral">Close</Button>}>Acme Corp — $1,240.00</Dialog>],
+  ["Dialog as drawer, forced choice", <Dialog open onClose={() => {}} placement="inline-start" dismissible={false} title="Pick one" footer={<Button variant="accent">Keep</Button>}>No escape hatch.</Dialog>],
   ["Checkbox", <Checkbox>Beta features</Checkbox>],
   ["Switch", <Switch>Email notifications</Switch>],
   ["Tag", <Tag variant="accent" subtle>Pro</Tag>],
