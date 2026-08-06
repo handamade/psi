@@ -38,6 +38,7 @@ import { navbarVars } from "../src/components/navbar.js";
 import { panelVars } from "../src/components/panel.js";
 import { mediaVars } from "../src/components/media.js";
 import { menuVars } from "../src/components/menu.js";
+import { toastVars } from "../src/components/toast.js";
 import { fieldVars } from "../src/components/field.js";
 import { guidance } from "../src/guidance.js";
 
@@ -88,6 +89,7 @@ const componentVars: Record<string, Record<string, string>> = {
   switch: switchVars,
   table: tableVars,
   tag: tagVars,
+  toast: toastVars,
   tooltip: tooltipVars,
 };
 

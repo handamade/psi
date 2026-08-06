@@ -146,6 +146,16 @@ export const wcagAAPairs: ContrastPair[] = [
   // the fgAccent/fillTintAccent pair above: a selected row keeps ordinary
   // body text, it does not recolor it to the accent.
   { fg: "fgPrimary", bg: "fillTintAccent", minRatio: 4.5 },
+
+  // Toast's status icon on the elevated surface (D64/D65). The three pairs
+  // above gate these foregrounds on bgPrimary; --psi-surface-bg — what Toast,
+  // Menu and Dialog all alias — resolves to bgSecondary, which was ungated for
+  // the semantic foregrounds until Toast put an icon there. Held at 4.5 even
+  // though an icon is non-text content (WCAG 1.4.11 would allow 3.0): the
+  // colours clear 4.5 anyway, and the matrix's posture is a single floor.
+  { fg: "fgSuccess", bg: "bgSecondary", minRatio: 4.5 },
+  { fg: "fgWarning", bg: "bgSecondary", minRatio: 4.5 },
+  { fg: "fgDanger", bg: "bgSecondary", minRatio: 4.5 },
 ];
 
 /** Solid component-variant labels on their variant backgrounds (spec: "every
