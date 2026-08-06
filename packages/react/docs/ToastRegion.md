@@ -19,7 +19,7 @@ The positioned live region that holds the toast stack (D64). Two things here are
 |---|---|
 | Tab | Moves into the stacked toasts' controls in DOM order; the region itself is not focusable. |
 
-Renders two always-present live wrappers — role="status"/aria-live="polite" and role="alert"/aria-live="assertive" — and routes each toast into one by variant (neutral/success polite, warning/danger assertive). Both stay in the DOM when the queue is empty: a live region announces mutations to a subtree that already existed, so a wrapper mounting with its first toast would leave that toast unannounced. Sits on the native top layer via popover="manual", so a toast raised from inside a modal Dialog stays visible; manual (not auto) means no light dismiss, so the click that raised the toast cannot close it. The region is click-through (pointer-events: none) and each toast takes its own clicks back.
+Renders two always-present live wrappers — role="status"/aria-live="polite" and role="alert"/aria-live="assertive" — and routes each toast into one by variant (neutral/success polite, warning/danger assertive). Both stay in the DOM when the queue is empty: a live region announces mutations to a subtree that already existed, so a wrapper mounting with its first toast would leave that toast unannounced. Sits on the native top layer via popover="manual", so a toast raised from inside a modal Dialog is still painted above the backdrop and still announced — though showModal() makes everything outside the dialog inert, so it cannot be clicked until the dialog closes; manual (not auto) means no light dismiss, so the click that raised the toast cannot close it. The region is click-through (pointer-events: none) and each toast takes its own clicks back.
 
 ## Theming
 

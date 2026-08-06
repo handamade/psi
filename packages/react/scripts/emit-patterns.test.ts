@@ -7,7 +7,7 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 13 patterns sorted by id, three blocked on gaps (D62-D63)", () => {
+  it("writes dist/patterns.json: 13 patterns sorted by id, two blocked on gaps (D64-D65)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
@@ -38,10 +38,12 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(tablePagination.gaps).toEqual([]);
     expect(tablePagination.preset).toContain("<Pagination");
 
+    // Unblocked by the Toast family (D64-D65); Drawer and Tabs are the arc's
+    // remaining two gaps.
     const actionFeedback = output.patterns.find((p: { id: string }) => p.id === "action-feedback");
-    expect(actionFeedback.blocked).toBe(true);
-    expect(actionFeedback.gaps).toEqual(["Toast"]);
-    expect(actionFeedback.preset).toBeNull();
+    expect(actionFeedback.blocked).toBe(false);
+    expect(actionFeedback.gaps).toEqual([]);
+    expect(actionFeedback.preset).toContain("<Toast");
 
     const detailDrawer = output.patterns.find((p: { id: string }) => p.id === "detail-drawer");
     expect(detailDrawer.blocked).toBe(true);

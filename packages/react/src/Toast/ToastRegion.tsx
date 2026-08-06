@@ -77,6 +77,17 @@ export function ToastRegion({
   const assertiveItems = items.filter(isAssertive);
   const politeItems = items.filter((c) => !isAssertive(c));
 
+  // No re-stacking on queue change, deliberately. An earlier implementation
+  // called hidePopover()+showPopover() whenever the stack changed, on the
+  // theory that the top layer is insertion-ordered and a Dialog opened after
+  // the region would cover it. Measured in Chromium
+  // (apps/storybook/vr/toast.interaction.spec.ts): re-showing changes nothing,
+  // because what blocks a toast under an open modal is not paint order but
+  // `inert` — showModal() makes everything outside the dialog subtree
+  // non-hit-testable, and no top-layer shuffling escapes that. The toast is
+  // still *painted* above the backdrop and still announced; it just cannot be
+  // clicked until the dialog closes. Re-showing only added churn.
+
   return (
     <div
       ref={setRef}

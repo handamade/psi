@@ -187,6 +187,32 @@ layer, so it must not swallow clicks: `pointer-events: none` on the region,
 of the page dead to the mouse — the failure mode is silent and easy to ship,
 so it gets a test.
 
+**Measured correction — a toast under an open modal is painted but inert.**
+This section originally claimed a toast raised from inside a Dialog "must be
+visible", and left the reader to assume it was also usable. Measured in
+Chromium during implementation:
+
+- It **is** painted above the modal's backdrop, and it **is** announced. The
+  screenshot pair in `toast.interaction.spec.ts` confirms it: the same clip
+  differs before and after the toast is raised, which a `position: fixed`
+  region at `--psi-z-overlay` could not achieve. So `popover="manual"` is
+  doing exactly the job it was chosen for.
+- It is **not interactive** until the dialog closes. `showModal()` makes
+  everything outside the dialog's subtree `inert`, so the toast cannot be
+  hit-tested — a hit over its box is attributed to the dialog's backdrop.
+
+Crucially, **this is inertness, not paint order**, and no top-layer shuffling
+escapes it: an implementation that called `hidePopover()` + `showPopover()` on
+every queue change to re-enter the top layer last was written, measured to
+change nothing, and removed. Both facts are pinned by tests so the dead end is
+not re-explored — the removal is recorded in `ToastRegion.tsx` at the point
+where the effect used to live.
+
+Practically this costs little: the common flow is *confirm in the dialog → the
+dialog closes → the toast appears*, so the toast is interactive by the time a
+user reaches for it. An `action` on a toast raised while a modal is still open
+would be unreachable, which is worth knowing but not worth redesigning for.
+
 **Browser floor** is unchanged: the Popover API is the same floor D53
 documented for Menu, and the jsdom polyfill in the test setup already covers
 `showPopover`/`hidePopover` (`Menu/popover-polyfill.test.tsx`).
