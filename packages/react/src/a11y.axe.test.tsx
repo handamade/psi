@@ -5,6 +5,7 @@ import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination,
+  Toast, ToastRegion,
 } from "./index.js";
 
 const cases: Array<[string, React.ReactElement]> = [
@@ -50,6 +51,10 @@ const cases: Array<[string, React.ReactElement]> = [
   )],
   ["Pagination", <Pagination page={4} pageCount={13} onPageChange={() => {}} />],
   ["Pagination single page", <Pagination page={1} pageCount={1} onPageChange={() => {}} />],
+  ["Toast in a region", <ToastRegion><Toast variant="success">Transaction voided</Toast></ToastRegion>],
+  ["Toast danger routes assertive", <ToastRegion><Toast variant="danger">Could not void the transaction</Toast></ToastRegion>],
+  ["Toast with action and dismiss", <ToastRegion><Toast variant="success" action={<Button variant="ghost" size={32}>Undo</Button>} onDismiss={() => {}}>Transaction voided</Toast></ToastRegion>],
+  ["Toast region empty", <ToastRegion>{null}</ToastRegion>],
 ];
 
 describe("axe: no violations in rendered components", () => {

@@ -1,0 +1,112 @@
+/* packages/react/src/Toast/toast.module.css */
+/* One module serves Toast, ToastRegion and ToastProvider — the stylelint
+   plugin derives the allowed namespace from the filename, so every custom
+   property here must be --psi-toast-* or one of the global scale prefixes
+   (space|size|radius|text|font|duration|ease|z). Aliasing to --psi-surface-*
+   happens in packages/tokens/src/components/toast.ts, never here. */
+
+/* ── The card ─────────────────────────────────────────────────── */
+
+.toast {
+  /* The region sets pointer-events: none so its empty band stays
+     click-through; each toast must opt back in or its own buttons are dead. */
+  pointer-events: auto;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--psi-space-12);
+
+  min-width: 280px;
+  max-width: 420px;
+  padding: var(--psi-space-12) var(--psi-space-16);
+
+  border: 1px solid var(--psi-toast-border);
+  border-radius: var(--psi-toast-radius);
+  background: var(--psi-toast-bg);
+  color: var(--psi-toast-fg);
+  font: var(--psi-text-14-20-regular);
+
+  animation: toast-enter var(--psi-duration-200) var(--psi-ease-soft);
+}
+
+@keyframes toast-enter {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+/* ── Status icon ──────────────────────────────────────────────── */
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.iconNeutral { color: var(--psi-toast-icon-fg-neutral); }
+.iconSuccess { color: var(--psi-toast-icon-fg-success); }
+.iconWarning { color: var(--psi-toast-icon-fg-warning); }
+.iconDanger  { color: var(--psi-toast-icon-fg-danger); }
+
+/* ── Message and action ───────────────────────────────────────── */
+
+.body {
+  min-width: 0; /* let a long message wrap instead of stretching the grid */
+}
+
+.action {
+  display: inline-flex;
+}
+
+/* Same recipe as checkbox.module.css / switch.module.css. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Region ───────────────────────────────────────────────────── */
+
+.region {
+  /* popover="manual" puts this in the native top layer, so a toast raised
+     from inside a Dialog (showModal(), also top layer) stays visible. A
+     fixed element at --psi-z-overlay would paint under the modal backdrop. */
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: var(--psi-space-16);
+  border: 0;
+  background: none;
+  overflow: visible;
+
+  /* The region is a band across the viewport edge. Without this, an invisible
+     strip of the page is dead to the mouse — silent, and easy to ship. Each
+     .toast sets pointer-events: auto to take its own clicks back. */
+  pointer-events: none;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-8);
+  width: max-content;
+  max-width: 100%;
+}
+
+.region[data-placement="top-start"]    { top: 0; left: 0; align-items: flex-start; }
+.region[data-placement="top-end"]      { top: 0; right: 0; align-items: flex-end; }
+.region[data-placement="bottom-start"] { bottom: 0; left: 0; align-items: flex-start; }
+.region[data-placement="bottom-end"]   { bottom: 0; right: 0; align-items: flex-end; }
+
+/* Bottom placements stack newest-nearest-the-edge. */
+.region[data-placement^="bottom"] .live {
+  flex-direction: column-reverse;
+}
+
+.live {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-8);
+}

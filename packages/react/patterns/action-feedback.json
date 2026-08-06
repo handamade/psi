@@ -14,7 +14,7 @@
     {
       "key": "variant",
       "ask": "What kind of outcome is being confirmed?",
-      "options": ["success", "danger", "neutral"],
+      "options": ["success", "warning", "danger", "neutral"],
       "default": "success"
     }
   ],
@@ -22,5 +22,5 @@
     "message": "[what just happened]",
     "undo-label": "Undo"
   },
-  "gaps": ["Toast"]
+  "gaps": []
 }

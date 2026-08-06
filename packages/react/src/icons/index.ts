@@ -20,3 +20,6 @@ export { IconLinkedIn } from "./IconLinkedIn.js";
 export { IconGitHub } from "./IconGitHub.js";
 export { IconX } from "./IconX.js";
 export { IconInstagram } from "./IconInstagram.js";
+export { IconInfo } from "./IconInfo.js";
+export { IconAlertTriangle } from "./IconAlertTriangle.js";
+export { IconAlertCircle } from "./IconAlertCircle.js";
