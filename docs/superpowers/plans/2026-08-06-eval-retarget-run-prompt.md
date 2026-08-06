@@ -77,7 +77,21 @@ Grading and correcting in one breath destroys the measurement.
   at exactly 15 minutes with **zero steps ever reporting**, or a failure at
   `Set up job` with `Failed to resolve action download info. Error: Service
   Unavailable`. Both mean the runner never got the code. Re-run; do not debug
-  the diff. `main` at `8dd66d4` never got a run created at all.
+  the diff.
+
+  Two second-order effects worth knowing, because both look like something
+  else:
+
+  - **Runs can be created very late.** `main` at `8dd66d4` appeared to have no
+    run at all for ~25 minutes, then one showed up and was cancelled at the
+    usual 15-minute mark. "No run exists" is not a stable reading during an
+    incident — re-check before concluding anything from it.
+  - **A required check with no run blocks merging indefinitely**, showing as
+    `ci — Expected — Waiting for status to be reported` with
+    `mergeable_state: blocked`. Nothing times it out. The fix is a new
+    `pull_request` event: **push a commit** (`synchronize`), which preserves
+    an armed auto-merge. Closing and reopening also works but clears
+    auto-merge, so prefer the push.
 - **VR baselines.** Generating *missing component-story* baselines in a Linux
   container is safe; regenerating the token specimen pages is not. Run
   `--update-snapshots=none` first and read the **failure count**, not the tail
