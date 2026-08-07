@@ -73,13 +73,22 @@ Grading and correcting in one breath destroys the measurement.
 
 ## Environment gotchas that cost this session time
 
-- **GitHub Actions was degraded on 2026-08-06.** The signature: a job cancelled
-  at exactly 15 minutes with **zero steps ever reporting**, or a failure at
-  `Set up job` with `Failed to resolve action download info. Error: Service
-  Unavailable`. Both mean the runner never got the code. Re-run; do not debug
-  the diff.
+- **GitHub Actions was degraded from 2026-08-06 into the morning of 08-07** —
+  roughly fifteen hours, so do not assume an incident is minutes long. The
+  signature: a job cancelled at exactly 15 minutes with **zero steps ever
+  reporting** and `runner_id: 0` in the job record, or a failure at `Set up job`
+  with `Failed to resolve action download info. Error: Service Unavailable`.
+  Both mean the runner never got the code. Re-run; do not debug the diff.
 
-  Two second-order effects worth knowing, because both look like something
+  In the worst phase, **runs stopped being created at all repo-wide** while the
+  workflow still read `state: active` — two pushes produced zero runs over
+  fifteen hours. `ci.yml` has no `workflow_dispatch` trigger, so there is no way
+  to dispatch a probe run; the cheap probe is `rerun_workflow_run` on any past
+  run, which needs no new commit. Recovery is unmistakable — a runner is
+  assigned within seconds and `runner_id` is non-zero. Only after that does
+  pushing to the branch help.
+
+  Three second-order effects worth knowing, because each looks like something
   else:
 
   - **Runs can be created very late.** `main` at `8dd66d4` appeared to have no
@@ -92,6 +101,14 @@ Grading and correcting in one breath destroys the measurement.
     `pull_request` event: **push a commit** (`synchronize`), which preserves
     an armed auto-merge. Closing and reopening also works but clears
     auto-merge, so prefer the push.
+  - **Red on the PR page and "waiting for status" are the same fault.** An
+    infrastructure-cancelled job on an *earlier* commit of the PR keeps
+    rendering red long after that commit stops being the head, while the head
+    itself has no run and shows as pending. Two contradictory-looking readings,
+    one cause. Check `head.sha` before drawing any conclusion from a colour.
+    The combined-status API is no help here either: it reports `success` for a
+    head whose only check is Vercel's, because it aggregates legacy statuses
+    and not check-runs. `mergeable_state` is the authoritative field.
 - **VR baselines.** Generating *missing component-story* baselines in a Linux
   container is safe; regenerating the token specimen pages is not. Run
   `--update-snapshots=none` first and read the **failure count**, not the tail
