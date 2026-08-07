@@ -91,8 +91,6 @@ section {
   z-index: var(--psi-z-nav);
   border-bottom: 1px solid var(--promo-hairline-faint);
   background: var(--psi-bg-primary);
-  backdrop-filter: blur(var(--psi-navbar-blur));
-  -webkit-backdrop-filter: blur(var(--psi-navbar-blur));
 }
 
 .site-header .container {
