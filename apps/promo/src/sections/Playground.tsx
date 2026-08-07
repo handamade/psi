@@ -20,6 +20,7 @@ import {
 } from "@handamade/psi-react";
 
 import { storybookDocs } from "../lib/storybook";
+import { componentCount, componentNames, version } from "virtual:psi-facts";
 
 const VARIANTS = [
   "accent",
@@ -41,7 +42,7 @@ const INITIAL_TAGS = [
   { label: "zero-deps", variant: "neutral" },
 ] as const;
 
-const INITIAL_FILTERS = ["psi-tokens", "0.8.1", "wcag-aa"] as const;
+const INITIAL_FILTERS = ["psi-tokens", version, "wcag-aa"] as const;
 
 export function Playground() {
   const [tags, setTags] = useState<readonly (typeof INITIAL_TAGS)[number][]>(
@@ -67,7 +68,7 @@ export function Playground() {
       <div className="container">
         <div className="section-head">
           <span className="annot annot--accent">02 · Components</span>
-          <h2>Eighteen production components. All live — try them.</h2>
+          <h2>{componentCount} production components. All live — try them.</h2>
           <p className="lede">
             React 19, zero runtime dependencies, CSS Modules over
             component-level tokens. Every prop below ships in a
@@ -292,26 +293,14 @@ export function Playground() {
 
         <p className="pg-index annot">
           Full docs in Storybook:{" "}
-          {[
-            "Button",
-            "IconButton",
-            "Input",
-            "Select",
-            "Checkbox",
-            "Switch",
-            "Tag",
-            "Tooltip",
-            "Field",
-            "Dialog",
-            "Menu",
-            "Panel",
-            "Toolbar",
-          ].map((name, index) => (
-            <span key={name}>
-              {index > 0 && " · "}
-              <a href={storybookDocs(`Components/${name}`)}>{name}</a>
-            </span>
-          ))}
+          {componentNames
+            .filter((name) => !/^(Table.|Menu(Item|Separator)|Tab(List|Panel)?$|Toast(Region|Provider)|DescriptionItem)/.test(name))
+            .map((name, index) => (
+              <span key={name}>
+                {index > 0 && " · "}
+                <a href={storybookDocs(`Components/${name}`)}>{name}</a>
+              </span>
+            ))}
           {" · "}
           <a href={storybookDocs("Icons/Gallery")}>Icons</a>
           {" · "}

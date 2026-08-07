@@ -1,9 +1,10 @@
 import { useState, type CSSProperties } from "react";
 import { Button } from "@handamade/psi-react";
+import { componentCount, iconCount } from "virtual:psi-facts";
 
 const STATS = [
-  "18 components",
-  "22 icons",
+  `${componentCount} components`,
+  `${iconCount} icons`,
   "4 themes",
   "0 runtime deps",
   "AA enforced at build",

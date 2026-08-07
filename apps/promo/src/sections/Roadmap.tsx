@@ -1,7 +1,8 @@
 import { IconCheck, IconChevronRight, Panel } from "@handamade/psi-react";
+import { componentCount, iconCount, componentNames } from "virtual:psi-facts";
 
-const SHIPPED = [
-  ["18 components, 22 icons", "Button, IconButton, Input, Select, Checkbox, Switch, Tag, Tooltip, Card, Panel, NavBar, Toolbar, AspectRatio, Field, Dialog, Menu, MenuItem, MenuSeparator"],
+const SHIPPED: ReadonlyArray<readonly [string, string]> = [
+  [`${componentCount} components, ${iconCount} icons`, componentNames.join(", ")],
   ["4 themes", "light, dark and two customer brands (acme, ember) — plus `pnpm new-theme --base dark`"],
   ["Contrast gate", "WCAG AA validated per theme, at build time"],
   ["Visual regression", "Playwright screenshots per component, light + ember, gated in CI"],
@@ -17,7 +18,7 @@ const SHIPPED = [
   ["Control ramp", "per-size height, padding, gap and font are tokens — Button's full ramp, with IconButton, Input and Select binding the same family (D54–D55)"],
   ["Control radius", "one size-invariant dial, --psi-control-radius, drives control shape across six components (D56)"],
   ["MIT licensed", "open core — all three packages declare MIT and ship a LICENSE in their own tarball"],
-] as const;
+];
 
 const NEXT = [
   ["Theme console", "a prompt in, a real customers/<name>.ts out — Palette, SlotMap and control radius, applied live"],
