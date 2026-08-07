@@ -38,6 +38,22 @@ craft work on a small set, and none moved a strategic gate — the drift this
 spec is written to end. The cause was not working on the wrong things; it
 was working on things with no completion criterion.
 
+> **MET, 2026-08-07.** `tools/generation-eval/runs/2026-08-07-b.md` returned
+> **zero improvisations**, reported and assessed. The arc closed in seven
+> cycles: Table + Pagination, Toast, Drawer-as-a-Dialog-placement (D66), Tabs,
+> the eval retarget (D68–D69), DescriptionList + the affordance validator
+> (D70–D71), and the packaging work (D72–D75).
+>
+> Two things about how it closed are worth more than the closing. **The
+> component count was an output, exactly as D59 predicted** — 21 at the start,
+> 34 at the end, and the number was never once a target. And **the arc's own
+> success signal was wrong twice**: cycle 6 opened by reporting an empty
+> backlog, which was true and meaningless, because `gaps` inspected only the
+> compose tree while two patterns named missing affordances in prose; and the
+> D71 validator built to fix that shipped the very bug it was built to catch.
+> Both were found by running the eval, not by any gate — which is the case for
+> D59's central claim that a measurement beats a checklist.
+
 ## Decisions
 
 - **D59 — The coverage arc's completion criterion is expressiveness, not a
