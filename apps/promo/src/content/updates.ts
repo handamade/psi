@@ -15,6 +15,67 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-08-07",
+    tag: "release",
+    title: "0.14.2 — IconMoreHorizontal is importable",
+    body: "0.14.0 shipped the ellipsis icon and a row-actions preset that renders it, but the icon was never re-exported from the package root — so the snippet published as the canonical row-actions example was code no consumer could compile. The validator that exists to stop exactly this resolved the requirement against the source directory rather than the public export surface, where the file plainly existed. It now checks what consumers can actually import.",
+  },
+  {
+    date: "2026-08-07",
+    tag: "release",
+    title: "0.14.1 — the manifest describes children",
+    body: "Compound components now declare what nests inside them, and patterns can set aria-* on the elements they compose. The manifest is what agents read, so a prop it cannot describe is a prop that gets guessed.",
+  },
+  {
+    date: "2026-08-07",
+    tag: "components",
+    title: "0.14.0 — DescriptionList, and patterns that render themselves",
+    body: "DescriptionList/DescriptionItem give a detail drawer a real <dl> instead of a hand-rolled grid, and the composition presets became generated JSX rather than prose to copy. Plus IconMoreHorizontal, the ellipsis glyph a row-actions trigger wanted.",
+  },
+  {
+    date: "2026-08-07",
+    tag: "release",
+    title: "0.13.1 — the documented stylesheet import typechecks",
+    body: "import \"@handamade/psi-react/styles\" — what every doc tells you to write — was a TypeScript error for a standard TypeScript + Vite consumer. Found by installing the published packages into a scratch app, not by any in-repo gate. Both the documented and undocumented spellings now typecheck; no runtime change.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "release",
+    title: "0.13.0 — Tabs",
+    body: "Roving keyboard, automatic activation, and a panel that stays associated with its tab. The fifth and last component the pattern catalog declared as a gap.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "components",
+    title: "0.12.0 — a drawer is a Dialog placement, not a component",
+    body: "Dialog gains placement=\"center | inline-start | inline-end\". The inline values pin the panel full-height to that edge; modality, the focus trap, aria-modal, focus restore and the dismissal reasons are identical. Logical, so RTL flips for free — and there is no Drawer to import.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "components",
+    title: "0.11.0 — Toast",
+    body: "Status messaging lands: variants route to the right live region — warning and danger interrupt, everything else waits its turn — a visually-hidden prefix names the severity, and a toast carrying an action gets a longer timer (10s vs 5s) so there's time to reach it. Three new status glyphs come with it.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "components",
+    title: "0.10.0 — the Table family and Pagination",
+    body: "Six compound components on native <table> semantics, controlled-only: sorting and selection are props, and the consumer owns the state. Pagination is standalone — a numbered pager with ellipsis truncation, not a Table feature.",
+    link: { label: "Browse the Storybook", href: "/storybook/" },
+  },
+  {
+    date: "2026-08-05",
+    tag: "docs",
+    title: "0.9.1 — search overview allocates its budget by kind",
+    body: "search(\"\") used to fill topics, then patterns, then components until its budget ran out, so a growing pattern catalog was starving components off the end of the list. It now reserves a floor for components and shortens pattern summaries instead, so growth degrades gracefully rather than dropping items.",
+  },
+  {
+    date: "2026-08-05",
+    tag: "docs",
+    title: "0.9.0 — the machine-readable surface widens",
+    body: "The composition catalog reaches 13 patterns, five of them declaring the component they're still blocked on — Table, Pagination, Drawer, Toast, Tabs — so an agent can read the design system's own backlog instead of inferring it. IconButton's aria-label (required) and Input's type (a curated union) are both promoted into the manifest as discoverable props.",
+  },
+  {
     date: "2026-07-31",
     tag: "release",
     title: "0.8.0 — Menu, and shape becomes themeable",

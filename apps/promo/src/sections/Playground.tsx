@@ -20,6 +20,7 @@ import {
 } from "@handamade/psi-react";
 
 import { storybookDocs } from "../lib/storybook";
+import { componentCount, componentNames, storyTitles, version } from "virtual:psi-facts";
 
 const VARIANTS = [
   "accent",
@@ -41,7 +42,7 @@ const INITIAL_TAGS = [
   { label: "zero-deps", variant: "neutral" },
 ] as const;
 
-const INITIAL_FILTERS = ["psi-tokens", "0.8.1", "wcag-aa"] as const;
+const INITIAL_FILTERS = ["psi-tokens", version, "wcag-aa"] as const;
 
 export function Playground() {
   const [tags, setTags] = useState<readonly (typeof INITIAL_TAGS)[number][]>(
@@ -67,7 +68,7 @@ export function Playground() {
       <div className="container">
         <div className="section-head">
           <span className="annot annot--accent">02 · Components</span>
-          <h2>Eighteen production components. All live — try them.</h2>
+          <h2>{componentCount} production components. All live — try them.</h2>
           <p className="lede">
             React 19, zero runtime dependencies, CSS Modules over
             component-level tokens. Every prop below ships in a
@@ -181,7 +182,7 @@ export function Playground() {
 
           <Panel className="card pg-surface">
             <h3>
-              Panel + Toolbar · the 0.7 surface pair
+              Panel + Toolbar · the surface pair
               <a
                 className="sb-link"
                 href={storybookDocs("Components/Toolbar")}
@@ -236,15 +237,15 @@ export function Playground() {
               )}
             </Toolbar>
             <p className="annot pg-note">
-              This card is the new Panel — the elevated surface recipe Dialog
-              shares. The row above is the filter-toolbar pattern from
-              patterns.json, live: dismiss a filter and the Toolbar reflows.
+              This card is Panel — the elevated surface recipe Dialog shares. The row
+              above is the filter-toolbar pattern, live: dismiss a filter and the
+              Toolbar reflows.
             </p>
           </Panel>
 
           <Panel className="card pg-menu">
             <h3>
-              Menu · the 0.8 overlay tier
+              Menu · the overlay tier
               <a className="sb-link" href={storybookDocs("Components/Menu")}>
                 storybook →
               </a>
@@ -292,26 +293,14 @@ export function Playground() {
 
         <p className="pg-index annot">
           Full docs in Storybook:{" "}
-          {[
-            "Button",
-            "IconButton",
-            "Input",
-            "Select",
-            "Checkbox",
-            "Switch",
-            "Tag",
-            "Tooltip",
-            "Field",
-            "Dialog",
-            "Menu",
-            "Panel",
-            "Toolbar",
-          ].map((name, index) => (
-            <span key={name}>
-              {index > 0 && " · "}
-              <a href={storybookDocs(`Components/${name}`)}>{name}</a>
-            </span>
-          ))}
+          {componentNames
+            .filter((name) => name in storyTitles)
+            .map((name, index) => (
+              <span key={name}>
+                {index > 0 && " · "}
+                <a href={storybookDocs(storyTitles[name])}>{name}</a>
+              </span>
+            ))}
           {" · "}
           <a href={storybookDocs("Icons/Gallery")}>Icons</a>
           {" · "}

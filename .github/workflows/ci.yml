@@ -47,4 +47,10 @@ jobs:
             apps/storybook/vr/stories.spec.ts-snapshots/
             apps/storybook/test-results/
 
+      # The public site is a prose artifact and a product: axe + reflow (D74).
+      # apps/promo/dist already exists from the `pnpm build` step above —
+      # apps/promo is a workspace package with its own `build` script, so
+      # `pnpm -r run build` builds it same as every other package.
+      - run: pnpm test:site
+
       - run: pnpm lint

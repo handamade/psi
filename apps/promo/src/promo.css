@@ -50,13 +50,32 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+.skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  z-index: var(--psi-z-overlay);
+}
+
+.skip-link:focus-visible {
+  inset-inline-start: var(--promo-pad-x);
+  top: var(--psi-space-8);
+  padding: var(--psi-space-8) var(--psi-space-16);
+  border-radius: var(--psi-radius-8);
+  background: var(--psi-fill-accent);
+  color: var(--psi-fg-on-accent);
+  font: var(--psi-text-14-20-medium);
+}
+
 code,
 pre {
   font-family: var(--psi-font-mono);
 }
 
 section {
-  scroll-margin-top: 88px;
+  /* Budgeted from the header's tallest state (two-row wrap, ~95px),
+     not its one-row 64px minimum — the original 88px only cleared
+     the fixed-height header because it never wrapped (D76). */
+  scroll-margin-top: 119px;
 }
 
 .container {
@@ -65,12 +84,15 @@ section {
   padding-inline: var(--promo-pad-x);
 }
 
-/* Mono annotation — the page's signature detail */
+/* Mono annotation — the page's signature detail.
+ * fg-secondary, not fg-tertiary: .annot carries prose, and tertiary is the one
+ * foreground absent from the token contrast matrix, so it measured 2.84:1 here
+ * and shipped 55 axe failures on the page that advertises the AA gate (D76). */
 .annot {
   font: var(--psi-text-12-16-regular);
   font-family: var(--psi-font-mono);
   letter-spacing: 0.03em;
-  color: var(--psi-fg-tertiary);
+  color: var(--psi-fg-secondary);
 }
 
 .annot--accent {
@@ -84,16 +106,16 @@ section {
   top: 0;
   z-index: var(--psi-z-nav);
   border-bottom: 1px solid var(--promo-hairline-faint);
-  background: var(--psi-scrim-heavy);
-  backdrop-filter: blur(var(--psi-navbar-blur));
-  -webkit-backdrop-filter: blur(var(--psi-navbar-blur));
+  background: var(--psi-bg-primary);
 }
 
 .site-header .container {
   display: flex;
   align-items: center;
-  gap: var(--psi-space-24);
-  height: 64px;
+  gap: var(--psi-space-12) var(--psi-space-24);
+  min-height: 64px;
+  flex-wrap: wrap;
+  padding-block: var(--psi-space-8);
 }
 
 .wordmark {
@@ -292,20 +314,18 @@ section {
   gap: var(--psi-space-8);
 }
 
-.derive-swatch {
+.derive-cell {
   flex: 1;
   display: grid;
-  place-items: end start;
-  height: 64px;
-  padding: var(--psi-space-8);
-  border-radius: var(--psi-radius-6);
-  color: var(--psi-fg-static-white);
+  gap: var(--psi-space-4);
+  min-width: 0;
 }
 
-.derive-swatch span {
-  font: var(--psi-text-12-16-medium);
-  font-family: var(--psi-font-mono);
-  opacity: 0.9;
+/* The label sits below the swatch, not on it: white-on-accent measures
+ * 3.2:1 at the slider's far end, and this demo is *about* contrast (D76). */
+.derive-swatch {
+  height: 64px;
+  border-radius: var(--psi-radius-6);
 }
 
 .derive-swatch--base {
@@ -384,6 +404,14 @@ section {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--psi-space-16);
+}
+
+.principle {
+  display: grid;
+}
+
+.principle > .card {
+  height: 100%;
 }
 
 .principle h3 {
@@ -503,6 +531,12 @@ section {
 .pg-stack {
   display: grid;
   gap: var(--psi-space-16);
+}
+
+.pg-note,
+.roadmap-foot,
+.derive p {
+  max-width: 70ch;
 }
 
 .pg-note {
@@ -634,14 +668,29 @@ section {
 }
 
 .var-row {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: start;
   gap: var(--psi-space-12);
   padding: var(--psi-space-8) var(--psi-space-12);
   background: var(--psi-bg-primary);
   font: var(--psi-text-12-16-regular);
   font-family: var(--psi-font-mono);
   min-width: 0;
+}
+
+/* ARTIFACTS rows have no dot: an invisible spacer reserves the same
+ * 14px track width so both var-lists' second column starts at the
+ * same x offset (D76). */
+.var-row .dot-spacer {
+  visibility: hidden;
+}
+
+/* Unbreakable tokens (manifest.json, guidance.json) have no wrap
+ * opportunity at the narrow end of the 1fr track and would otherwise
+ * overflow the cell and paint over the value column (D76). */
+.var-row > :nth-child(2) {
+  overflow-wrap: anywhere;
 }
 
 .var-row .dot {
@@ -651,12 +700,14 @@ section {
   border: 1px solid var(--promo-hairline);
 }
 
+/* A FLOAT variable has no color. An empty swatch is honest; a borrowed one is not. */
+.var-row .dot--none {
+  border-style: dashed;
+  background: none;
+}
+
 .var-row .val {
-  margin-inline-start: auto;
-  color: var(--psi-fg-tertiary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--psi-fg-secondary);
   min-width: 0;
 }
 
@@ -680,7 +731,6 @@ section {
 
 .roadmap-foot {
   margin-top: var(--psi-space-24);
-  max-width: 70ch;
 }
 
 /* updates */
@@ -689,6 +739,7 @@ section {
   list-style: none;
   margin: 0;
   padding: 0;
+  max-width: 78ch;
   display: grid;
   gap: var(--psi-space-12);
 }
@@ -806,6 +857,14 @@ section {
 /* ------------------------------------------------------------ responsive */
 
 @media (max-width: 960px) {
+  .site-nav {
+    display: none;
+  }
+
+  .site-header .container {
+    justify-content: space-between;
+  }
+
   .hero .container {
     grid-template-columns: 1fr;
   }
@@ -832,10 +891,6 @@ section {
 }
 
 @media (max-width: 720px) {
-  .site-nav {
-    display: none;
-  }
-
   .update .card {
     grid-template-columns: 1fr;
     gap: var(--psi-space-12);
@@ -846,15 +901,16 @@ section {
     align-items: center;
   }
 
-  .site-header .container {
-    justify-content: space-between;
-  }
-
   .principles-grid {
     grid-template-columns: 1fr;
   }
 
   .pg-sizes {
     flex-wrap: wrap;
+  }
+
+  .theme-switch {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }

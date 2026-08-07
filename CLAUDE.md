@@ -23,15 +23,17 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 
 - **Node 24 (`.nvmrc`) — check `node -v` before the first pnpm command.** pnpm 11.9 requires ≥22.13 and dies on Node 20 with `ERR_UNKNOWN_BUILTIN_MODULE` (it needs `node:sqlite`). `~/.zshenv` puts 24 on PATH for fresh shells, but a shell that predates that setup still has 20 first. Fix the shell with `nvm use` (reads `.nvmrc`) — do not prefix individual commands with a PATH override, which fixes one command and leaves the next to fail.
 - Specs and plans live in `docs/superpowers/` (decision log **D1–D65** in the specs). Significant changes get a decision number — check the highest one in use before claiming the next, since parallel sessions have collided on numbering. **A grep alone over-reads**: it returns numbers that are merely *mentioned* or reserved forward (the D59 arc spec says later cycles "claim decision numbers from D61 onward", so `D61` greps as taken while nothing owns it). Confirm a number is actually claimed by a `## Decisions` entry in a spec, not just referenced in prose.
-- **Verify with all four gates, not three:**
+- **Verify with all five gates, not four:**
 
   ```bash
-  pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint
+  pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint && pnpm --dir apps/promo build && pnpm test:site
   ```
 
   The token build is the WCAG AA contrast gate — it throws on failures. **`check-docs-drift` is the one that gets forgotten**: it is its own CI step, *not* part of `build`/`test`/`lint`, so a green local trio says nothing about it. It fails whenever a component or pattern count changes and `llms.txt`, a README or any other prose still states the old number — which is every coverage cycle. It has now bitten twice (D53, and again on #69 where three files still claimed 4 composition patterns after the catalog went to 13). **Put it in the gate list of every plan.**
 
-  CI's full order is `build → check-docs-drift → test → vr → lint`. Of those, only `vr` cannot be run locally (see below).
+  **`test:site` is the fifth, added by D76**, and it is one omission away from the same fate as `check-docs-drift`: it is its own step, not folded into `test`, so a plan that lists only the historical four gates will look complete and gate nothing on `apps/promo`. It needs `apps/promo/dist` to exist — run a full `pnpm build` (or `pnpm --dir apps/promo build`) first, or it fails on a missing build output rather than testing anything — and it must run from the repo root, since it reads `packages/react/dist/manifest.json` and `apps/storybook/storybook-static/index.json` by relative path.
+
+  CI's full order is `build → check-docs-drift → test → vr → test:site → lint`. Of those, only `vr` cannot be run locally (see below).
 - **`pnpm vr` only passes in CI.** Baselines are ubuntu-latest renders; a macOS run fails all 188 stories on the `-darwin` snapshot suffix and its default update mode silently writes junk baselines. Let CI's `vr` job be the gate and hold the merge with auto-merge. Details in `apps/storybook/vr/README.md`.
 
 ## Branches and releases

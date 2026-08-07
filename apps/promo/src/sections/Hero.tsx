@@ -1,9 +1,10 @@
 import { useState, type CSSProperties } from "react";
 import { Button } from "@handamade/psi-react";
+import { componentCount, iconCount } from "virtual:psi-facts";
 
 const STATS = [
-  "18 components",
-  "22 icons",
+  `${componentCount} components`,
+  `${iconCount} icons`,
   "4 themes",
   "0 runtime deps",
   "AA enforced at build",
@@ -22,9 +23,9 @@ export function Hero() {
             @handamade · OKLCH design system
           </p>
           <h1 className="rise" style={{ "--rise": "0.05s" } as CSSProperties}>
-            Color isn&apos;t picked.
+            Color isn’t picked.
             <br />
-            It&apos;s <em>computed</em>.
+            It’s <em>computed</em>.
           </h1>
           <p
             className="hero-lede rise"
@@ -38,26 +39,10 @@ export function Hero() {
             className="hero-ctas rise"
             style={{ "--rise": "0.19s" } as CSSProperties}
           >
-            <Button
-              variant="accent"
-              size={48}
-              onClick={() =>
-                document
-                  .querySelector("#components")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
+            <Button variant="accent" size={48} href="#components">
               Explore the components
             </Button>
-            <Button
-              variant="neutral-subtle"
-              size={48}
-              onClick={() =>
-                document
-                  .querySelector("#theming")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
+            <Button variant="neutral-subtle" size={48} href="#theming">
               See theming in action
             </Button>
           </div>
@@ -97,15 +82,18 @@ export function Hero() {
             style={{ "--delta": String(delta) } as CSSProperties}
           >
             <div className="derive-row" aria-hidden="true">
-              <div className="derive-swatch derive-swatch--base">
-                <span>base</span>
-              </div>
-              <div className="derive-swatch derive-swatch--hover">
-                <span>l−0.04</span>
-              </div>
-              <div className="derive-swatch derive-swatch--active">
-                <span>l−0.08</span>
-              </div>
+              {(
+                [
+                  ["base", "derive-swatch--base"],
+                  ["l−0.04", "derive-swatch--hover"],
+                  ["l−0.08", "derive-swatch--active"],
+                ] as const
+              ).map(([label, cls]) => (
+                <div className="derive-cell" key={cls}>
+                  <div className={`derive-swatch ${cls}`} />
+                  <span className="annot">{label}</span>
+                </div>
+              ))}
             </div>
             <div className="derive-controls">
               <span className="annot">{label}</span>
