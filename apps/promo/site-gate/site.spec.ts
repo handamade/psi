@@ -43,7 +43,26 @@ test("the rendered page states the package's real counts", async ({ page }) => {
 
 // Every Storybook link the site generates must resolve to a real docs page —
 // three of them 404'd when the roster was first derived (Task 3 finding I1).
+// Checking the URL *shape* (starts with "/docs/") is not enough: a link with
+// the right shape but a wrong story id is exactly the 404 class I1 was about,
+// and it would still pass a shape-only check. So this reads Storybook's own
+// build index — a JSON manifest of every real story/docs id — and asserts
+// every id the promo page generates is actually present in it.
 test("no Storybook link points at a missing docs page", async ({ page }) => {
+  const { readFileSync, existsSync } = await import("node:fs");
+  const indexPath = "apps/storybook/storybook-static/index.json";
+  if (!existsSync(indexPath)) {
+    throw new Error(
+      `${indexPath} is missing. Run \`pnpm build\` first — this test needs ` +
+        "the Storybook static build's index to check generated links against.",
+    );
+  }
+  const index = JSON.parse(readFileSync(indexPath, "utf8")) as {
+    entries: Record<string, unknown>;
+  };
+  const knownIds = new Set(Object.keys(index.entries));
+  expect(knownIds.size).toBeGreaterThan(0);
+
   await page.goto(BASE, { waitUntil: "networkidle" });
   const ids = await page.evaluate(() =>
     [...document.querySelectorAll<HTMLAnchorElement>("a[href*='/docs/']")].map(
@@ -52,6 +71,11 @@ test("no Storybook link points at a missing docs page", async ({ page }) => {
   );
   expect(ids.length).toBeGreaterThan(0);
   expect(ids.filter((id) => !id.startsWith("/docs/"))).toEqual([]);
+
+  const missing = ids
+    .map((id) => id.replace(/^\/docs\//, ""))
+    .filter((id) => !knownIds.has(id));
+  expect(missing, "generated ids missing from the Storybook build index").toEqual([]);
 });
 
 // 320 is the WCAG reflow floor. 760 sits inside the band where the nav is still
