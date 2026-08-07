@@ -14,7 +14,19 @@ export default defineConfig({
   // the smallest label signal; the old maxDiffPixelRatio 0.001 (~800+ px on a
   // full-page shot) additionally masked any small-element diff.
   expect: { toHaveScreenshot: { maxDiffPixels: 48, threshold: 0.02, animations: "disabled" } },
-  use: { viewport: { width: 1000, height: 800 }, deviceScaleFactor: 1 },
+  use: {
+    viewport: { width: 1000, height: 800 },
+    deviceScaleFactor: 1,
+    // Escape hatch for Linux dev containers whose pre-installed Chromium is a
+    // different build than this Playwright pins — the launcher then aborts with
+    // "Executable doesn't exist at .../chromium_headless_shell-<n>/..." and no
+    // baseline can be generated at all. Point PSI_VR_CHROMIUM at the Chromium
+    // that *is* present. Unset in CI, so CI's render is untouched; see
+    // vr/README.md for which baselines are safe to generate this way.
+    launchOptions: process.env.PSI_VR_CHROMIUM
+      ? { executablePath: process.env.PSI_VR_CHROMIUM }
+      : {},
+  },
   webServer: {
     // `serve`'s default cleanUrls behavior 301-redirects /iframe.html -> /iframe and drops
     // the query string in the process, so every story loads with no id/theme selected

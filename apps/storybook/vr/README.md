@@ -90,6 +90,41 @@ container's rendering is what differs. The practical rule:
 > Never regenerate the token specimen pages outside CI, and never run a bare
 > `--update-snapshots` (which would rewrite them with local renders).
 
+#### The container may not have the Chromium this Playwright pins
+
+Measured 2026-08-07: `pnpm vr` aborted every test with
+
+```
+browserType.launch: Executable doesn't exist at
+  /opt/pw-browsers/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+```
+
+while `/opt/pw-browsers` held only build **1194**. This is not a diff and not a
+regression — nothing rendered at all. Read the count: a run where *every* test
+fails is an environment fault, not a visual one.
+
+Set `PSI_VR_CHROMIUM` to the Chromium that is actually present and the config
+uses it as `executablePath`:
+
+```sh
+PSI_VR_CHROMIUM=/opt/pw-browsers/chromium-1194/chrome-linux/chrome pnpm vr --update-snapshots=none
+```
+
+The variable is unset in CI, so CI's render is untouched. Do **not** run
+`playwright install` to fetch the pinned build.
+
+Note `--update-snapshots=missing` reports the files it writes as *failures* on
+that run (Playwright fails a test when it has to create the snapshot). Re-run
+with `=none` to confirm: the count should drop to the 16 below.
+
+#### Downloading CI's baselines may be blocked
+
+The documented path — pull the `vr-baselines` artifact from the failed CI run —
+needs `api.github.com`, which the agent proxy refuses with
+`CONNECT tunnel failed, response 403`. When that happens, generating **missing
+component-story** baselines locally is the fallback, per the rule above. Do not
+route around the proxy.
+
 Always run `--update-snapshots=none` **first** and read the failure *count*, not
 just the tail of the output. An earlier session reported "188/188 existing
 baselines passed" from the tail alone; it was 188 of 204, and the 16 divergences

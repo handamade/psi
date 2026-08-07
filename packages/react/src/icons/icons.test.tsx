@@ -12,6 +12,7 @@ import { IconInstagram } from "./IconInstagram.js";
 import { IconInfo } from "./IconInfo.js";
 import { IconAlertTriangle } from "./IconAlertTriangle.js";
 import { IconAlertCircle } from "./IconAlertCircle.js";
+import { IconMoreHorizontal } from "./IconMoreHorizontal.js";
 
 describe("Icons", () => {
   it("renders with aria-hidden by default", () => {
@@ -106,5 +107,14 @@ describe("Icons", () => {
     const svg = container.querySelector("svg")!;
     expect(svg).toHaveAttribute("width", "16");
     expect(svg).toHaveAttribute("height", "16");
+  });
+
+  it("ships an ellipsis glyph for row-actions triggers (D70)", () => {
+    const { container } = render(<IconMoreHorizontal />);
+    const svg = container.querySelector("svg")!;
+    expect(svg).toHaveAttribute("aria-hidden", "true");
+    // Three filled dots. row-actions specified an icon trigger before any
+    // ellipsis existed; this is the referent for that placeholder.
+    expect(svg.querySelectorAll("circle")).toHaveLength(3);
   });
 });

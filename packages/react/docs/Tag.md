@@ -47,4 +47,5 @@ Override `--psi-tag-*` custom properties at any scope.
 - Override component tokens (--psi-{component}-*), not semantic tokens, for one-off theming.
 - --psi-button-font overrides button typography across all sizes (documented D34 override; ember → mono).
 - Wrap labeled form controls in Field — label association, description/error line, aria-describedby and aria-invalid come wired; don't hand-roll label+message rows.
+- Field is for a control with a *visible* label. A toolbar filter control named by aria-label or placeholder takes neither a Field nor a hand-rolled label row — compare filter-toolbar (no labels) with table-pagination ("Rows per page" visible, so Field).
 - Use Dialog for blocking modal flows — title/footer slots, dismissible gate; danger stays on the footer Buttons, one accent per group.

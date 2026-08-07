@@ -1,23 +1,49 @@
 {
   "id": "row-actions",
   "intent": "List or table row with an icon-only actions menu, including a destructive item — hand the destructive item's confirmation off to the destructive-confirm pattern",
-  "match": ["row actions", "per-row actions", "table row menu", "actions menu", "row action list"],
+  "match": [
+    "row actions",
+    "per-row actions",
+    "table row menu",
+    "actions menu",
+    "row action list"
+  ],
   "compose": {
     "component": "Menu",
-    "props": { "placement": "{param:placement}", "aria-label": "{content:trigger-label}" },
+    "props": {
+      "placement": "{param:placement}",
+      "aria-label": "{content:trigger-label}"
+    },
     "slots": {
       "trigger": [
         {
           "component": "IconButton",
-          "props": { "variant": "ghost", "aria-label": "{content:trigger-label}" },
+          "props": {
+            "variant": "ghost",
+            "aria-label": "{content:trigger-label}"
+          },
           "content": "trigger-icon"
         }
       ],
       "body": [
-        { "component": "MenuItem", "content": "edit-label" },
-        { "component": "MenuItem", "content": "duplicate-label" },
-        { "component": "MenuSeparator" },
-        { "component": "MenuItem", "props": { "variant": "danger" }, "content": "delete-label" }
+        {
+          "component": "MenuItem",
+          "content": "edit-label"
+        },
+        {
+          "component": "MenuItem",
+          "content": "duplicate-label"
+        },
+        {
+          "component": "MenuSeparator"
+        },
+        {
+          "component": "MenuItem",
+          "props": {
+            "variant": "danger"
+          },
+          "content": "delete-label"
+        }
       ]
     }
   },
@@ -25,16 +51,26 @@
     {
       "key": "placement",
       "ask": "Which side should the menu open on?",
-      "options": ["bottom-start", "bottom-end"],
+      "options": [
+        "bottom-start",
+        "bottom-end"
+      ],
       "default": "bottom-end"
     }
   ],
   "content": {
     "trigger-label": "Actions",
-    "trigger-icon": "[icon]",
+    "trigger-icon": "the ellipsis glyph",
     "edit-label": "Edit",
     "duplicate-label": "Duplicate",
     "delete-label": "Delete"
   },
-  "gaps": []
+  "gaps": [],
+  "requires": [
+    {
+      "content": "trigger-icon",
+      "kind": "icon",
+      "name": "IconMoreHorizontal"
+    }
+  ]
 }

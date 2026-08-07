@@ -1,16 +1,63 @@
 {
   "id": "detail-drawer",
   "intent": "Side sheet showing one record's detail, opened from a table row, with its primary actions in a footer",
-  "match": ["detail drawer", "side sheet", "row detail", "slide-over", "record detail panel"],
+  "match": [
+    "detail drawer",
+    "side sheet",
+    "row detail",
+    "slide-over",
+    "record detail panel"
+  ],
   "compose": {
     "component": "Dialog",
-    "props": { "placement": "{param:placement}" },
+    "props": {
+      "placement": "{param:placement}"
+    },
     "slots": {
-      "title": ["{content:title}"],
-      "body": ["{content:body-note}"],
+      "title": [
+        "{content:title}"
+      ],
+      "body": [
+        {
+          "component": "DescriptionList",
+          "props": {
+            "layout": "inline"
+          },
+          "slots": {
+            "body": [
+              {
+                "component": "DescriptionItem",
+                "props": {
+                  "term": "{content:field-1-term}"
+                },
+                "content": "field-1-value"
+              },
+              {
+                "component": "DescriptionItem",
+                "props": {
+                  "term": "{content:field-2-term}"
+                },
+                "content": "field-2-value"
+              }
+            ]
+          }
+        }
+      ],
       "footer": [
-        { "component": "Button", "props": { "variant": "accent" }, "content": "primary-label" },
-        { "component": "Button", "props": { "variant": "neutral" }, "content": "dismiss-label" }
+        {
+          "component": "Button",
+          "props": {
+            "variant": "accent"
+          },
+          "content": "primary-label"
+        },
+        {
+          "component": "Button",
+          "props": {
+            "variant": "neutral"
+          },
+          "content": "dismiss-label"
+        }
       ]
     }
   },
@@ -18,15 +65,21 @@
     {
       "key": "placement",
       "ask": "Which edge should the drawer open from?",
-      "options": ["inline-end", "inline-start"],
+      "options": [
+        "inline-end",
+        "inline-start"
+      ],
       "default": "inline-end"
     }
   ],
   "content": {
     "title": "[record title]",
-    "body-note": "[key-value summary of the selected record]",
     "primary-label": "Save",
-    "dismiss-label": "Close"
+    "dismiss-label": "Close",
+    "field-1-term": "Date",
+    "field-1-value": "[the record's value for this field]",
+    "field-2-term": "Amount",
+    "field-2-value": "[one DescriptionItem per field you want to show]"
   },
   "gaps": []
 }

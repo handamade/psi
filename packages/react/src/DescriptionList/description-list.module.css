@@ -1,0 +1,59 @@
+/* packages/react/src/DescriptionList/description-list.module.css */
+/* One module serves DescriptionList and DescriptionItem — the stylelint
+   plugin derives the allowed namespace from the filename, so every custom
+   property here must be --psi-description-list-* or a global scale prefix.
+   Aliasing to the semantic layer happens in
+   packages/tokens/src/components/description-list.ts, never here. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  /* Overridden per data-gap below; this is the 12 default. */
+  gap: var(--psi-space-12);
+  margin: var(--psi-space-0);
+}
+
+.list[data-gap="8"] {
+  gap: var(--psi-space-8);
+}
+
+.list[data-gap="16"] {
+  gap: var(--psi-space-16);
+}
+
+/* ── Pair ─────────────────────────────────────────────────────── */
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-4);
+  min-width: 0;
+}
+
+/* Two-column grid: the term column sizes to its content, the value takes the
+   rest. `start` on the term keeps a one-line label aligned with the first
+   line of a value that wraps to several. */
+.list[data-layout="inline"] .item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--psi-space-16);
+  row-gap: var(--psi-space-0);
+  align-items: start;
+}
+
+.term {
+  color: var(--psi-description-list-term-fg);
+  font: var(--psi-text-14-20-medium);
+  min-width: 0;
+}
+
+.value {
+  color: var(--psi-description-list-value-fg);
+  font: var(--psi-text-14-20-regular);
+  /* <dd> carries a 40px inline-start margin by UA default. */
+  margin: var(--psi-space-0);
+  min-width: 0;
+  /* A long unbroken value (an account number, a hash) must wrap rather than
+     widen the drawer it sits in. */
+  overflow-wrap: anywhere;
+}

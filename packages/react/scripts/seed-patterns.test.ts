@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import ts from "typescript";
 import { loadPatterns, renderPreset, validatePatterns } from "./patterns.js";
@@ -8,10 +8,13 @@ const root = join(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8"));
 const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf8"));
 const patterns = loadPatterns(join(root, "patterns"));
+const icons = readdirSync(join(root, "src/icons"))
+  .filter((f) => f.startsWith("Icon") && f.endsWith(".tsx"))
+  .map((f) => f.replace(/\.tsx$/, ""));
 
 describe("seed patterns against the real manifest", () => {
   it("all thirteen load and validate; the backlog is empty (D67)", () => {
-    const { gaps } = validatePatterns(patterns, manifest.components, contracts);
+    const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
       "bulk-action-bar",
@@ -27,7 +30,10 @@ describe("seed patterns against the real manifest", () => {
       "tabbed-workspace",
       "table-pagination",
     ]);
-    // Empty: every authored pattern composes only components that exist.
+    // Empty on both counts (D71): every pattern composes only components that
+    // exist, *and* every affordance its content declares resolves. Before D71
+    // only the first half was checked, which is how row-actions shipped
+    // specifying an icon the library did not contain.
     expect(gaps).toEqual({});
   });
   it("Field declares its prop-slots in the manifest", () => {
@@ -59,5 +65,38 @@ describe("seed patterns against the real manifest", () => {
       const messages = (diagnostics ?? []).map((d) => ts.flattenDiagnosticMessageText(d.messageText, " "));
       expect(messages, `${pattern.id} preset does not parse`).toEqual([]);
     }
+  });
+});
+
+describe("declared affordances resolve (D71)", () => {
+  it("row-actions requires the ellipsis icon, and it exists", () => {
+    const rowActions = patterns.find((p) => p.id === "row-actions")!;
+    expect(rowActions.requires).toEqual([
+      { content: "trigger-icon", kind: "icon", name: "IconMoreHorizontal" },
+    ]);
+    expect(icons).toContain("IconMoreHorizontal");
+  });
+
+  it("would block row-actions if the icon vanished", () => {
+    // The guard, exercised: strip the roster and the pattern must go blocked.
+    // Without this the test above only proves the icon is present today.
+    const rowActions = patterns.find((p) => p.id === "row-actions")!;
+    const { gaps } = validatePatterns([rowActions], manifest.components, contracts, []);
+    expect(gaps["row-actions"]).toEqual(["IconMoreHorizontal"]);
+  });
+
+  it("renders the icon into the preset rather than prose", () => {
+    const rowActions = patterns.find((p) => p.id === "row-actions")!;
+    const preset = renderPreset(rowActions, manifest.components)!;
+    expect(preset).toContain("<IconMoreHorizontal />");
+    expect(preset).not.toContain("[icon]");
+  });
+
+  it("detail-drawer's body is a real DescriptionList, not a sentence", () => {
+    const drawer = patterns.find((p) => p.id === "detail-drawer")!;
+    const preset = renderPreset(drawer, manifest.components)!;
+    expect(preset).toContain("<DescriptionList");
+    expect(preset).toContain("<DescriptionItem term=");
+    expect(preset).not.toContain("key-value summary of the selected record");
   });
 });

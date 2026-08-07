@@ -1,19 +1,36 @@
 {
   "id": "filter-toolbar",
-  "intent": "Toolbar of filter controls: search, category select, active-filter tags",
-  "match": ["filter toolbar", "filter bar", "search and filter", "faceted filters"],
+  "intent": "Toolbar of filter controls: search, category select, active-filter tags — controls are named by aria-label/placeholder, not a visible label, so no Field (contrast table-pagination)",
+  "match": [
+    "filter toolbar",
+    "filter bar",
+    "search and filter",
+    "faceted filters"
+  ],
   "compose": {
     "component": "Toolbar",
     "slots": {
       "body": [
-        { "component": "Input" },
-        { "component": "Select" },
-        { "component": "Tag", "content": "example-filter" }
+        {
+          "component": "Input",
+          "props": {
+            "type": "search",
+            "placeholder": "{content:search-placeholder}"
+          }
+        },
+        {
+          "component": "Select"
+        },
+        {
+          "component": "Tag",
+          "content": "example-filter"
+        }
       ]
     }
   },
   "parameters": [],
   "content": {
+    "search-placeholder": "Search transactions",
     "example-filter": "[active filter]"
   },
   "gaps": []
