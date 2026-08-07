@@ -632,6 +632,37 @@ for (const theme of ["light", "dark"] as const) {
   });
 }
 
+// The counts must be right *on the page*, not just in source. check-docs-drift
+// can only see source text, so it cannot catch the stat line being deleted, or
+// an interpolation rewired to the wrong fact (`${iconCount} components`), or a
+// spelled-out word like the "Eighteen production components" heading that
+// started this. Only a rendered assertion closes those. (Task 3 review finding.)
+test("the rendered page states the package's real counts", async ({ page }) => {
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  const { readFileSync } = await import("node:fs");
+  const manifest = JSON.parse(
+    readFileSync("packages/react/dist/manifest.json", "utf8"),
+  ) as { components: unknown[]; icons: string[] };
+
+  const body = await page.locator("body").innerText();
+  expect(body).toContain(`${manifest.components.length} components`);
+  expect(body).toContain(`${manifest.icons.length} icons`);
+  expect(body).not.toMatch(/\bEighteen\b/i);
+});
+
+// Every Storybook link the site generates must resolve to a real docs page —
+// three of them 404'd when the roster was first derived (Task 3 finding I1).
+test("no Storybook link points at a missing docs page", async ({ page }) => {
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  const ids = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLAnchorElement>("a[href*='/docs/']")].map(
+      (a) => new URL(a.href, location.href).searchParams.get("path") ?? "",
+    ),
+  );
+  expect(ids.length).toBeGreaterThan(0);
+  expect(ids.filter((id) => !id.startsWith("/docs/"))).toEqual([]);
+});
+
 // 320 is the WCAG reflow floor. 760 sits inside the band where the nav is still
 // shown but no longer fits — the failure the 720px breakpoint alone missed.
 for (const width of [320, 760, 1440]) {
@@ -677,7 +708,7 @@ Expected: **FAIL**, and you must see all three of these before proceeding:
 - `no horizontal overflow at 320px` — offenders include `DIV.theme-switch@337`, `scrollW` 337 vs 320.
 - `no horizontal overflow at 760px` — `scrollW` 863 vs 760.
 
-`no axe violations (dark)` and `1440px` are expected to **pass** already — dark measures 4.51:1.
+Four tests are expected to **pass** on first run, and a failure in any of them is a real finding, not a mis-written test: `no axe violations (dark)` (dark measures 4.51:1), `no horizontal overflow at 1440px`, and the two Task 3 regression guards — `the rendered page states the package's real counts` and `no Storybook link points at a missing docs page`. Report which of the seven passed and which failed.
 
 - [ ] **Step 5: Commit the red gate**
 
