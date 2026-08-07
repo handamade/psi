@@ -28,7 +28,7 @@ const components = [button, dialog, tag];
 const contracts = { "inline-content": ["Tag"] };
 
 const base = (over: Partial<Pattern>): Pattern => ({
-  id: "p", intent: "i", match: ["m"], parameters: [], content: {}, gaps: [],
+  id: "p", intent: "i", match: ["m"], parameters: [], content: {}, gaps: [], requires: [],
   compose: { component: "Button" }, ...over,
 });
 
@@ -200,5 +200,74 @@ describe("real patterns/ + real dist/manifest.json (D62-D63)", () => {
     expect(byId["table-pagination"].gaps).toEqual([]);
     expect(byId["table-pagination"].blocked).toBe(false);
     expect(byId["table-pagination"].preset).toContain("<Pagination");
+  });
+});
+
+describe("requires — declared affordances (D71)", () => {
+  const icons = ["IconMoreHorizontal", "IconSearch"];
+
+  it("defaults to an empty list when a pattern declares none", () => {
+    const dir = mkdtempSync(join(tmpdir(), "patterns-"));
+    writeFileSync(join(dir, "a.json"), JSON.stringify(base({ id: "a" })));
+    expect(loadPatterns(dir)[0].requires).toEqual([]);
+  });
+
+  it("rejects a malformed entry at load time", () => {
+    const dir = mkdtempSync(join(tmpdir(), "patterns-"));
+    writeFileSync(
+      join(dir, "a.json"),
+      JSON.stringify({ ...base({ id: "a" }), requires: [{ content: "x", kind: "sparkle", name: "Y" }] }),
+    );
+    expect(() => loadPatterns(dir)).toThrow(/kind/);
+  });
+
+  it("rejects a requires entry naming a content key the pattern does not have", () => {
+    const p = base({
+      content: {},
+      requires: [{ content: "trigger-icon", kind: "icon", name: "IconMoreHorizontal" }],
+    });
+    expect(() => validatePatterns([p], components, contracts, icons)).toThrow(/trigger-icon/);
+  });
+
+  // The whole point of D71: this is the shape that used to pass silently.
+  it("reports an unresolved icon as a gap, which blocks the pattern", () => {
+    const p = base({
+      id: "row-actions",
+      content: { "trigger-icon": "[icon]" },
+      requires: [{ content: "trigger-icon", kind: "icon", name: "IconEllipsis" }],
+    });
+    const { gaps } = validatePatterns([p], components, contracts, icons);
+    expect(gaps["row-actions"]).toEqual(["IconEllipsis"]);
+  });
+
+  it("reports an unresolved component as a gap", () => {
+    const p = base({
+      id: "detail-drawer",
+      content: { body: "[key-value summary]" },
+      requires: [{ content: "body", kind: "component", name: "DescriptionList" }],
+    });
+    const { gaps } = validatePatterns([p], components, contracts, icons);
+    expect(gaps["detail-drawer"]).toEqual(["DescriptionList"]);
+  });
+
+  it("adds no gap once the affordance resolves", () => {
+    const p = base({
+      id: "row-actions",
+      content: { "trigger-icon": "[icon]" },
+      requires: [{ content: "trigger-icon", kind: "icon", name: "IconMoreHorizontal" }],
+    });
+    const { gaps } = validatePatterns([p], components, contracts, icons);
+    expect(gaps["row-actions"]).toBeUndefined();
+  });
+
+  it("does not force removal when it resolves, unlike an authored gap", () => {
+    // `gaps` throws once its entry appears in the manifest, so the backlog
+    // self-clears. `requires` is the opposite: a resolved requirement is the
+    // steady state and must stay declared, or the check stops guarding it.
+    const p = base({
+      requires: [{ content: "c", kind: "component", name: "Button" }],
+      content: { c: "[something]" },
+    });
+    expect(() => validatePatterns([p], components, contracts, icons)).not.toThrow();
   });
 });

@@ -10,6 +10,8 @@ const COMPONENTS = [
   "IconButton",
   "Card",
   "Panel",
+  "DescriptionList",
+  "DescriptionItem",
   "Input",
   "Select",
   "Field",
@@ -75,6 +77,7 @@ const PASSTHROUGH_DESCRIPTIONS: Record<string, string> = {
 // that share their parent's folder instead of getting one of their own
 // (Menu's item and separator live in Menu/, not MenuItem/ or MenuSeparator/).
 const COMPONENT_DIR: Record<string, string> = {
+  DescriptionItem: "DescriptionList",
   MenuItem: "Menu",
   MenuSeparator: "Menu",
   TableHead: "Table",

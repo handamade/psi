@@ -41,6 +41,7 @@ import { menuVars } from "../src/components/menu.js";
 import { toastVars } from "../src/components/toast.js";
 import { tabsVars } from "../src/components/tabs.js";
 import { fieldVars } from "../src/components/field.js";
+import { descriptionListVars } from "../src/components/description-list.js";
 import { guidance } from "../src/guidance.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
@@ -90,6 +91,7 @@ const componentVars: Record<string, Record<string, string>> = {
   switch: switchVars,
   table: tableVars,
   tabs: tabsVars,
+  "description-list": descriptionListVars,
   tag: tagVars,
   toast: toastVars,
   tooltip: tooltipVars,

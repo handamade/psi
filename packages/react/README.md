@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-32 React 19 components consuming @handamade/psi-tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
+34 React 19 components consuming @handamade/psi-tokens. Zero runtime dependencies, CSS Modules, full TypeScript support.
 
 ## Installation
 
@@ -20,10 +20,13 @@ Import components and their styles:
 import { Button } from "@handamade/psi-react";
 import "@handamade/psi-react/styles";
 
-// Also import token styles in your app root
+// Also import token styles in your app root — all four, not three.
+// utilities.css is required: .psi-container and the reduced-motion zeroing
+// live there, and omitting it renders a working build subtly wrong.
 import "@handamade/psi-tokens/base.css";
 import "@handamade/psi-tokens/light.css"; // or dark.css
 import "@handamade/psi-tokens/components.css";
+import "@handamade/psi-tokens/utilities.css";
 
 export default function App() {
   return <Button size={32} variant="accent">Click me</Button>;

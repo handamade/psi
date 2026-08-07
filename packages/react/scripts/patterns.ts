@@ -13,6 +13,22 @@ export interface PatternNode {
   content?: string; // content key for text children
 }
 
+/** A design-system affordance a pattern's *content* depends on (D71).
+ *
+ * `gaps` covers components named in `compose`; this covers the other half —
+ * a content placeholder standing for something the system must supply, which
+ * nothing could previously see. `row-actions` asking for "[icon]" and
+ * `detail-drawer` asking for "[key-value summary of the selected record]"
+ * both declared `gaps: []` truthfully while being unbuildable. */
+export interface PatternRequirement {
+  /** Key in the pattern's `content` map whose placeholder this satisfies. */
+  content: string;
+  /** Where the name is resolved: the manifest, or the icon roster. */
+  kind: "component" | "icon";
+  /** What would satisfy it. */
+  name: string;
+}
+
 /** Authored composition recipe (D47): what to build, from what parts, with
  * what parameters exposed to the consumer, and which named components in
  * `compose` are known gaps (not yet in the manifest). */
@@ -24,6 +40,8 @@ export interface Pattern {
   parameters: Array<{ key: string; ask: string; options: Array<string | number>; default?: string | number }>;
   content: Record<string, string>;
   gaps: string[];
+  /** Affordances the content depends on (D71); see PatternRequirement. */
+  requires: PatternRequirement[];
 }
 
 /** Slice of `dist/manifest.json` a pattern is validated against. */
@@ -60,7 +78,25 @@ export function loadPatterns(dir: string): Pattern[] {
       parameters: (raw.parameters as Pattern["parameters"]) ?? [],
       content: (raw.content as Pattern["content"]) ?? {},
       gaps: (raw.gaps as string[]) ?? [],
+      requires: parseRequires(raw.requires, file),
     };
+  });
+}
+
+/** Validates the optional `requires` array's shape. A bad entry is an
+ * authoring mistake and must fail loudly at load, not resolve to nothing. */
+function parseRequires(raw: unknown, file: string): PatternRequirement[] {
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) throw new Error(`${file}: "requires" must be an array`);
+  return raw.map((entry, i) => {
+    const e = entry as Record<string, unknown>;
+    const at = `${file}: requires[${i}]`;
+    if (typeof e?.content !== "string") throw new Error(`${at}: missing/invalid "content"`);
+    if (e.kind !== "component" && e.kind !== "icon") {
+      throw new Error(`${at}: "kind" must be "component" or "icon", got ${JSON.stringify(e.kind)}`);
+    }
+    if (typeof e.name !== "string") throw new Error(`${at}: missing/invalid "name"`);
+    return { content: e.content, kind: e.kind, name: e.name };
   });
 }
 
@@ -108,8 +144,12 @@ export function validatePatterns(
   patterns: Pattern[],
   components: ManifestComponent[],
   contracts: Record<string, string[]>,
+  icons: string[] = [],
 ): { gaps: Record<string, string[]> } {
   const byName = new Map(components.map((c) => [c.name, c]));
+  const iconNames = new Set(icons);
+  /** pattern id -> affordances declared in `requires` that resolve to nothing. */
+  const unmetRequirements = new Map<string, string[]>();
 
   for (const pattern of patterns) {
     const prefix = `pattern "${pattern.id}": `;
@@ -125,11 +165,28 @@ export function validatePatterns(
       }
     }
 
+    // D71: resolve declared affordances. An unmet one joins the pattern's
+    // gaps, which is what drives `blocked` — the same machinery the compose
+    // tree already feeds, now fed from content as well.
+    const unmet: string[] = [];
+    for (const req of pattern.requires ?? []) {
+      if (!(req.content in pattern.content)) {
+        throw new Error(
+          `${prefix}requires names content key "${req.content}", which the pattern does not define`,
+        );
+      }
+      const resolved = req.kind === "icon" ? iconNames.has(req.name) : byName.has(req.name);
+      if (!resolved) unmet.push(req.name);
+    }
+    if (unmet.length > 0) unmetRequirements.set(pattern.id, unmet);
+
     const referencedParams = new Set<string>();
     // param key -> literal union of every prop site it fills; `null` marks a
     // gap-node site (no manifest prop to check a union against — unconstrained).
     const paramSites = new Map<string, Array<Array<string | number> | null>>();
-    const referencedContent = new Set<string>();
+    // A key that exists only to be satisfied by a `requires` entry is
+    // referenced by that entry, not by the compose tree.
+    const referencedContent = new Set<string>((pattern.requires ?? []).map((r) => r.content));
 
     const assertJsxSafeText = (value: string, what: string) => {
       const bad = JSX_UNSAFE_TEXT.exec(value);
@@ -351,7 +408,11 @@ export function validatePatterns(
   }
 
   return {
-    gaps: Object.fromEntries(patterns.filter((p) => p.gaps.length > 0).map((p) => [p.id, p.gaps])),
+    gaps: Object.fromEntries(
+      patterns
+        .map((p) => [p.id, [...p.gaps, ...(unmetRequirements.get(p.id) ?? [])]] as const)
+        .filter(([, list]) => list.length > 0),
+    ),
   };
 }
 
@@ -371,12 +432,25 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
   const content = pattern.content;
   const ind = (depth: number) => "  ".repeat(depth);
 
+  // D71: a content key satisfied by an icon requirement renders as the real
+  // element, not its prose placeholder. Icons are not manifest components, so
+  // they cannot appear in the compose tree — this is the only place a pattern
+  // can emit one, and emitting `[icon]` was the defect the 2026-08-07 eval hit.
+  const iconForContent = new Map(
+    (pattern.requires ?? []).filter((r) => r.kind === "icon").map((r) => [r.content, r.name]),
+  );
+
   // Resolves a text position (slot string fill, or a prop's raw string):
   // {content:key} -> content value; anything else is literal text.
   const resolveText = (raw: string): string => {
     const contentMatch = CONTENT_RE.exec(raw);
     return contentMatch ? content[contentMatch[1]] : raw;
   };
+
+  /** Text children for a `node.content` key — the icon element when one
+   * satisfies it, the content string otherwise. Prop positions never call
+   * this: an element cannot sit in a double-quoted attribute. */
+  const resolveChildText = (key: string): string => iconForContent.get(key) ? `<${iconForContent.get(key)} />` : content[key];
 
   // JSX attribute values are double-quoted string literals — a literal `"`
   // in the content/default text would otherwise terminate the attribute
@@ -440,7 +514,7 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
         childNodes = body.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill, depth + 1)));
       }
     } else if (node.content !== undefined) {
-      childText = content[node.content];
+      childText = resolveChildText(node.content);
     }
 
     // Block mode (props each on their own line, children each on their own

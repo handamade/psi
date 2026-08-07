@@ -23,3 +23,4 @@ export { IconInstagram } from "./IconInstagram.js";
 export { IconInfo } from "./IconInfo.js";
 export { IconAlertTriangle } from "./IconAlertTriangle.js";
 export { IconAlertCircle } from "./IconAlertCircle.js";
+export { IconMoreHorizontal } from "./IconMoreHorizontal.js";
