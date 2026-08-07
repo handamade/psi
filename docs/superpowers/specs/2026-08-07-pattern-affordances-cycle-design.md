@@ -74,6 +74,17 @@ inside square brackets — where nothing looks.
   roster. An unresolved entry is a gap, and a pattern with gaps is `blocked` —
   the existing machinery, now fed by a source it could not previously see.
 
+  > **Corrected by D74 — the icon roster was the wrong roster.** As shipped,
+  > `kind: "icon"` resolved against the *source directory*, and the code comment
+  > claimed this meant "a file that exists but was never exported still fails to
+  > resolve". Reading a directory does the exact opposite. `IconMoreHorizontal`
+  > was added to `src/icons/index.ts` but not to the hand-written re-export list
+  > in `src/index.ts`, so `row-actions` resolved happily and 0.14.0 shipped a
+  > preset emitting an element no consumer could import. The check now resolves
+  > against the public export surface. The lesson is narrower than "test the
+  > guard" — the guard *was* tested, by removal, and passed; what went untested
+  > was whether its resolution target meant what the comment said.
+
   **What this does not do, stated plainly.** It cannot stop an author from
   writing a bracketed placeholder and declaring nothing — the validator cannot
   read intent out of prose, and no schema change makes it able to. What it does
