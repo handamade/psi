@@ -133,6 +133,15 @@ Three findings from the same run that are corrections rather than design:
 inconsistency**, and it is deferred to its own cycle rather than rushed into
 this one.
 
+> **Superseded — this diagnosis was wrong.** D72 measured it against the real
+> parser and every clause below is false. `react-docgen-typescript` omits
+> `children` unless the declaration carries a **JSDoc comment**; `extends`, the
+> type spelling and `propFilter` are all irrelevant, and the filter never
+> receives the prop at all. See
+> `2026-08-07-manifest-children-cycle-design.md`. Left in place rather than
+> rewritten, because "plausible diagnosis recorded confidently, then falsified
+> by one probe" is the thing worth remembering.
+
 Diagnosis, so the next cycle starts from the answer: `emit-manifest.ts`'s
 `propFilter` keeps a prop when `prop.parent.fileName` is outside
 `node_modules`. `MenuItem` and `TableCell` **do** declare `children` on their

@@ -1,7 +1,9 @@
-import type { HTMLAttributes, Ref } from "react";
+import type { HTMLAttributes, Ref, ReactNode } from "react";
 import styles from "./panel.module.css";
 
 export interface PanelProps extends HTMLAttributes<HTMLDivElement> {
+  /** Panel contents. */
+  children?: ReactNode;
   /** Inner padding in px. @default 24 */
   padding?: 16 | 24;
   /** Forwarded ref to the root element. */

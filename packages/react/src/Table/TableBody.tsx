@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import styles from "./table.module.css";
 
 export interface TableBodyProps {
+  /** The body TableRows. */
   children: ReactNode;
   className?: string;
 }

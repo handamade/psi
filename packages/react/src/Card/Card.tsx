@@ -2,6 +2,8 @@ import type { HTMLAttributes, ReactNode, Ref } from "react";
 import styles from "./card.module.css";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  /** Body content, beside or below the media slot. */
+  children?: ReactNode;
   /** stacked = media above body; featured = media beside body (~1.6fr/1fr), stacks under md. @default "stacked" */
   variant?: "stacked" | "featured";
   /** Media slot rendered edge-to-edge (img, AspectRatio, …). */

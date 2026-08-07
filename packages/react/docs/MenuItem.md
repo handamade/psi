@@ -7,6 +7,7 @@ One action in a Menu. Renders a real <button> so activation, Enter and Space com
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | yes | Item label. |
 | `onSelect` | `() => void` | — | yes | Fires on activation; Menu then reports the dismissal via onClose("item-select") (D50). |
 | `variant` | `"neutral" \| "danger"` | neutral | no | danger is for destructive actions only (house rule). |
 | `disabled` | `boolean` | false | no |  |

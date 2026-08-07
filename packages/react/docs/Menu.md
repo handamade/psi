@@ -12,6 +12,7 @@ Action menu on the native Popover API top layer: the top layer and light dismiss
 | `trigger` | `ReactElement<Record<string, unknown>, string \| JSXElementConstructor<any>>` | — | yes | The trigger element. Must be a single React element that spreads unknown props onto a focusable node (a Psi `Button`, say): Menu clones it to add `aria-haspopup="menu"` and `aria-expanded`, so assistive tech associates the menu with the control users actually focus. |
 | `placement` | `"bottom-start" \| "bottom-end" \| "top-start" \| "top-end"` | bottom-start | no | Placement relative to the trigger. |
 | `aria-label` | `string` | — | no | Accessible name for the menu when there is no visible label. |
+| `children` | `ReactNode` | — | yes | MenuItem and MenuSeparator children. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 | `ref` | `Ref<HTMLDivElement>` | — | no | Forwarded ref to the popover element. |
 

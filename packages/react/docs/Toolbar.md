@@ -7,6 +7,7 @@ Horizontal grouping row for filter/search controls (D52). Wraps on overflow; zer
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | The controls. |
 | `gap` | `8 \| 12 \| 16` | 8 | no | Gap between controls in px. |
 | `ref` | `Ref<HTMLDivElement>` | — | no | Forwarded ref to the root element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |

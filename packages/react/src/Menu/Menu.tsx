@@ -51,6 +51,7 @@ export interface MenuProps {
   placement?: MenuPlacement;
   /** Accessible name for the menu when there is no visible label. */
   "aria-label"?: string;
+  /** MenuItem and MenuSeparator children. */
   children: ReactNode;
   className?: string;
   /** Forwarded ref to the popover element. */

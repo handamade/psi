@@ -123,6 +123,7 @@ export function parseLiteralUnion(type: string): Array<string | number> | null {
 
 const PARAM_RE = /^\{param:([a-z0-9-]+)\}$/;
 const CONTENT_RE = /^\{content:([a-z0-9-]+)\}$/;
+const ARIA_PROP_RE = /^aria-[a-z]+$/;
 const CANONICAL_CARDINALITIES = new Set(["0..1", "1..1", "0..*", "1..*"]);
 
 /** Characters that end a JSX text run: `<` opens an element, `{` opens an
@@ -268,6 +269,16 @@ export function validatePatterns(
             sites.push(null);
             paramSites.set(paramMatch[1], sites);
           }
+          continue;
+        }
+
+        // D73: aria-* is valid on every component. Each spreads its rest props
+        // onto a DOM element, so the manifest's silence was never a claim that
+        // an aria attribute is unavailable — and enumerating them per component
+        // would fix one attribute at a time forever. Unchecked by design:
+        // there is no literal union to validate an accessible name against.
+        if (ARIA_PROP_RE.test(propName)) {
+          trackPropPlaceholders(propValue);
           continue;
         }
 

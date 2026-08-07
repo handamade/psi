@@ -5,6 +5,7 @@ import { TableContext } from "./TableContext.js";
 import { TableSelectAllCell } from "./TableSelectionCell.js";
 
 export interface TableHeadProps {
+  /** The header TableRow. */
   children: ReactNode;
   className?: string;
 }

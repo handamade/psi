@@ -15,11 +15,15 @@
           "component": "Input",
           "props": {
             "type": "search",
+            "aria-label": "{content:search-label}",
             "placeholder": "{content:search-placeholder}"
           }
         },
         {
-          "component": "Select"
+          "component": "Select",
+          "props": {
+            "aria-label": "{content:select-label}"
+          }
         },
         {
           "component": "Tag",
@@ -30,7 +34,9 @@
   },
   "parameters": [],
   "content": {
+    "search-label": "Search transactions",
     "search-placeholder": "Search transactions",
+    "select-label": "Category",
     "example-filter": "[active filter]"
   },
   "gaps": []

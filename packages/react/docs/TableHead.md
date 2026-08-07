@@ -7,6 +7,7 @@
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | yes | The header TableRow. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
 ## Theming

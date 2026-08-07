@@ -14,6 +14,8 @@ export type DialogPlacement = "center" | "inline-start" | "inline-end";
 
 export interface DialogProps
   extends Omit<DialogHTMLAttributes<HTMLDialogElement>, "title" | "onClose" | "open"> {
+  /** Body content, between the title and footer slots. */
+  children?: ReactNode;
   /** Controlled open state; syncs to showModal()/close(). */
   open: boolean;
   /** Called on every dismissal attempt with its source; the consumer flips `open`. */

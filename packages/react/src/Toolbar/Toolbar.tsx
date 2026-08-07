@@ -1,9 +1,11 @@
-import type { HTMLAttributes, Ref } from "react";
+import type { HTMLAttributes, Ref, ReactNode } from "react";
 import styles from "./toolbar.module.css";
 
 type Gap = 8 | 12 | 16;
 
 export interface ToolbarProps extends HTMLAttributes<HTMLDivElement> {
+  /** The controls. */
+  children?: ReactNode;
   /** Gap between controls in px. @default 8 */
   gap?: Gap;
   /** Forwarded ref to the root element. */

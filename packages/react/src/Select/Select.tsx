@@ -1,11 +1,13 @@
 import { useContext } from "react";
-import type { SelectHTMLAttributes, Ref } from "react";
+import type { SelectHTMLAttributes, Ref, ReactNode } from "react";
 import { FieldContext } from "../Field/Field.js";
 import styles from "./select.module.css";
 
 type Size = 24 | 32 | 40 | 48;
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  /** The <option> elements. */
+  children?: ReactNode;
   /**
    * Height in px (24 | 32 | 40 | 48). Replaces the native `size` attribute
    * (which sets the visible option-row count on a listbox-style `<select>`)

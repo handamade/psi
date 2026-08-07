@@ -7,6 +7,7 @@ Content container with an optional edge-to-edge media slot; `stacked` (media abo
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | Body content, beside or below the media slot. |
 | `variant` | `"stacked" \| "featured"` | stacked | no | stacked = media above body; featured = media beside body (~1.6fr/1fr), stacks under md. |
 | `media` | `ReactNode` | — | no | Media slot rendered edge-to-edge (img, AspectRatio, …). |
 | `hoverLift` | `boolean` | false | no | Lift on hover: translateY(-6px) over --psi-duration-350. |

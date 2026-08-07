@@ -7,6 +7,7 @@ Labeled form-row wrapper: label above, control, one message line below — descr
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | The control this field labels. |
 | `label` | `ReactNode` | — | no | Label content; renders a <label> (or <legend> in group mode). |
 | `description` | `ReactNode` | — | no | Helper line under the control; replaced by error when error is set. |
 | `error` | `ReactNode` | — | no | Error content; when truthy it replaces the description and switches the field (and a wrapped Input/Select) into error state. |

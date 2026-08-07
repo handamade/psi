@@ -7,6 +7,7 @@ Action trigger. With `href` renders an anchor with identical styling (D33); `dis
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | Label content. |
 | `variant` | `"accent" \| "accent-subtle" \| "neutral" \| "neutral-subtle" \| "ghost" \| "danger" \| "danger-subtle" \| "outline"` | neutral | no | Visual variant. |
 | `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Height in px (24 \| 32 \| 40 \| 48). |
 | `href` | `string` | — | no | Render as an anchor with this href (D33). disabled → aria-disabled, no href attribute, pointer-events: none. |

@@ -7,6 +7,7 @@ Square icon-only button; same variant/size/href contract as Button. Give it an a
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | The icon element — an Icon* component. |
 | `aria-label` | `string` | — | yes | Accessible name for the icon-only control. Required: an IconButton has no text to name it, so omitting this ships an unnameable button (D60). If you also pass `aria-labelledby`, that wins per the accname algorithm. |
 | `variant` | `"accent" \| "neutral" \| "ghost" \| "danger"` | neutral | no | Visual variant. |
 | `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Square size in px (24 \| 32 \| 40 \| 48). |

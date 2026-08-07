@@ -7,6 +7,7 @@ Styled native `<select>` with pixel-true heights (24–48) and an error state. I
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | The <option> elements. |
 | `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Height in px (24 \| 32 \| 40 \| 48). Replaces the native `size` attribute (which sets the visible option-row count on a listbox-style `<select>`) with the design system's control height in pixels. |
 | `error` | `boolean` | false | no | Show error styling. Inside a Field, the Field's error also lights this. |
 | `ref` | `Ref<HTMLSelectElement>` | — | no | Forwarded ref to the underlying `<select>` element. |

@@ -9,6 +9,7 @@ export interface TableRowProps {
   rowId?: string;
   /** Accessible name for this row's selection checkbox. */
   selectLabel?: string;
+  /** The row's cells. */
   children: ReactNode;
   className?: string;
 }
