@@ -67,7 +67,7 @@ export const UPDATES: UpdateEntry[] = [
     date: "2026-08-05",
     tag: "docs",
     title: "0.9.0 — the machine-readable surface widens",
-    body: "The composition catalog reaches 13 patterns, five of them declaring the component they're still blocked on — Table, Pagination, Drawer, Toast, Tabs — so an agent can read the design system's own backlog instead of inferring it. IconButton's aria-label and Input's type union are promoted into the manifest as discoverable, required props.",
+    body: "The composition catalog reaches 13 patterns, five of them declaring the component they're still blocked on — Table, Pagination, Drawer, Toast, Tabs — so an agent can read the design system's own backlog instead of inferring it. IconButton's aria-label (required) and Input's type (a curated union) are both promoted into the manifest as discoverable props.",
   },
   {
     date: "2026-07-31",
