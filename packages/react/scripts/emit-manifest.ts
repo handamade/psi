@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { withCustomConfig } from "react-docgen-typescript";
@@ -149,9 +149,20 @@ const manifest = COMPONENTS.map((name) => {
   };
 });
 
+// The icon roster has no other machine-readable form: emit-patterns reads
+// src/icons off disk and throws the list away, which is why "22 icons" could
+// rot on the public site undetected while component counts at least had a
+// source to check against (D74).
+const icons = readdirSync(join(root, "src", "icons"))
+  .filter((f) => f.startsWith("Icon") && f.endsWith(".tsx"))
+  .map((f) => f.replace(/\.tsx$/, ""))
+  .sort();
+
 mkdirSync(join(root, "dist"), { recursive: true });
 writeFileSync(
   join(root, "dist", "manifest.json"),
-  JSON.stringify({ components: manifest }, null, 2) + "\n",
+  JSON.stringify({ components: manifest, icons }, null, 2) + "\n",
 );
-console.log(`[react] wrote dist/manifest.json (${manifest.length} components)`);
+console.log(
+  `[react] wrote dist/manifest.json (${manifest.length} components, ${icons.length} icons)`,
+);
