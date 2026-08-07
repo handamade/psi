@@ -65,12 +65,15 @@ section {
   padding-inline: var(--promo-pad-x);
 }
 
-/* Mono annotation — the page's signature detail */
+/* Mono annotation — the page's signature detail.
+ * fg-secondary, not fg-tertiary: .annot carries prose, and tertiary is the one
+ * foreground absent from the token contrast matrix, so it measured 2.84:1 here
+ * and shipped 46 axe failures on the page that advertises the AA gate (D74). */
 .annot {
   font: var(--psi-text-12-16-regular);
   font-family: var(--psi-font-mono);
   letter-spacing: 0.03em;
-  color: var(--psi-fg-tertiary);
+  color: var(--psi-fg-secondary);
 }
 
 .annot--accent {
@@ -659,10 +662,7 @@ section {
 
 .var-row .val {
   margin-inline-start: auto;
-  color: var(--psi-fg-tertiary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--psi-fg-secondary);
   min-width: 0;
 }
 
