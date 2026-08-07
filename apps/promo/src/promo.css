@@ -95,8 +95,10 @@ section {
 .site-header .container {
   display: flex;
   align-items: center;
-  gap: var(--psi-space-24);
-  height: 64px;
+  gap: var(--psi-space-12) var(--psi-space-24);
+  min-height: 64px;
+  flex-wrap: wrap;
+  padding-block: var(--psi-space-8);
 }
 
 .wordmark {
@@ -812,6 +814,14 @@ section {
 /* ------------------------------------------------------------ responsive */
 
 @media (max-width: 960px) {
+  .site-nav {
+    display: none;
+  }
+
+  .site-header .container {
+    justify-content: space-between;
+  }
+
   .hero .container {
     grid-template-columns: 1fr;
   }
@@ -838,10 +848,6 @@ section {
 }
 
 @media (max-width: 720px) {
-  .site-nav {
-    display: none;
-  }
-
   .update .card {
     grid-template-columns: 1fr;
     gap: var(--psi-space-12);
@@ -852,15 +858,16 @@ section {
     align-items: center;
   }
 
-  .site-header .container {
-    justify-content: space-between;
-  }
-
   .principles-grid {
     grid-template-columns: 1fr;
   }
 
   .pg-sizes {
     flex-wrap: wrap;
+  }
+
+  .theme-switch {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }
