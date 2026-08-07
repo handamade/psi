@@ -651,6 +651,12 @@ section {
   border: 1px solid var(--promo-hairline);
 }
 
+/* A FLOAT variable has no color. An empty swatch is honest; a borrowed one is not. */
+.var-row .dot--none {
+  border-style: dashed;
+  background: none;
+}
+
 .var-row .val {
   margin-inline-start: auto;
   color: var(--psi-fg-tertiary);

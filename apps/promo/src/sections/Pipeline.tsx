@@ -3,9 +3,9 @@ import { Panel } from "@handamade/psi-react";
 const FIGMA_VARS = [
   { name: "bg/primary", varClass: "--psi-bg-primary", note: "COLOR · 4 modes" },
   { name: "fg/accent", varClass: "--psi-fg-accent", note: "COLOR · 4 modes" },
-  { name: "space/16", varClass: "--psi-fill-neutral3", note: "FLOAT · 16" },
-  { name: "radius/8", varClass: "--psi-fill-neutral4", note: "FLOAT · 8" },
-];
+  { name: "space/16", varClass: null, note: "FLOAT · 16" },
+  { name: "radius/8", varClass: null, note: "FLOAT · 8" },
+] as const;
 
 const ARTIFACTS = [
   {
@@ -45,21 +45,24 @@ export function Pipeline() {
               Figma, synced from code
             </h3>
             <p>
-              The in-repo <strong>Psi Token Sync</strong> plugin upserts a
+              The in-repo <strong>Psi Token Sync</strong> plugin publishes a
               variable collection into Figma: one mode per theme, colors
-              grouped bg/fg/fill/border, floats for space, size and radius,
-              text styles for every type combo. Idempotent, with a dry-run
-              diff and orphan reporting — each variable even carries its
-              derivation formula in the description.
+              grouped bg/fg/fill/border, floats for space, size and radius.
+              Idempotent, with a dry-run diff and orphan reporting — each
+              variable carries its derivation formula in the description.
             </p>
             <div className="var-list" aria-label="Synced Figma variables (illustration)">
               {FIGMA_VARS.map((row) => (
                 <div className="var-row" key={row.name}>
-                  <span
-                    className="dot"
-                    style={{ background: `var(${row.varClass})` }}
-                    aria-hidden="true"
-                  />
+                  {row.varClass ? (
+                    <span
+                      className="dot"
+                      style={{ background: `var(${row.varClass})` }}
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <span className="dot dot--none" aria-hidden="true" />
+                  )}
                   <span>{row.name}</span>
                   <span className="val">{row.note}</span>
                 </div>

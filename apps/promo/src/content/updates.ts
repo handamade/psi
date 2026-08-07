@@ -15,6 +15,55 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-08-07",
+    tag: "release",
+    title: "0.14.1 — the manifest describes children",
+    body: "Compound components now declare what nests inside them, and patterns can set aria-* on the elements they compose. The manifest is what agents read, so a prop it cannot describe is a prop that gets guessed.",
+  },
+  {
+    date: "2026-08-07",
+    tag: "components",
+    title: "0.14.0 — DescriptionList, and patterns that render themselves",
+    body: "DescriptionList/DescriptionItem give a detail drawer a real <dl> instead of a hand-rolled grid, and the composition presets became generated JSX rather than prose to copy. Plus IconMoreHorizontal, the ellipsis glyph a row-actions trigger wanted.",
+  },
+  {
+    date: "2026-08-07",
+    tag: "release",
+    title: "0.13.1 — the documented stylesheet import typechecks",
+    body: "import \"@handamade/psi-react/styles\" — what every doc tells you to write — was a TypeScript error for a standard TypeScript + Vite consumer. Found by installing the published packages into a scratch app, not by any in-repo gate. Both the documented and undocumented spellings now typecheck; no runtime change.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "release",
+    title: "0.13.0 — Tabs",
+    body: "Roving keyboard, automatic activation, and a panel that stays associated with its tab. The fifth and last component the pattern catalog declared as a gap.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "components",
+    title: "0.12.0 — a drawer is a Dialog placement, not a component",
+    body: "Dialog gains placement=\"center | inline-start | inline-end\". The inline values pin the panel full-height to that edge; modality, the focus trap, aria-modal, focus restore and the dismissal reasons are identical. Logical, so RTL flips for free — and there is no Drawer to import.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "components",
+    title: "0.11.0 — Toast",
+    body: "Status messaging lands: variants route to the right live region, a visually-hidden prefix names the severity, and toasts carrying an action or an error stay until dismissed. Three new status glyphs come with it.",
+  },
+  {
+    date: "2026-08-06",
+    tag: "components",
+    title: "0.10.0 — the Table family and Pagination",
+    body: "Six compound components on native <table> semantics, controlled-only: sorting and selection are props, and the consumer owns the state. Pagination is standalone — a numbered pager with ellipsis truncation, not a Table feature.",
+    link: { label: "Browse the Storybook", href: "/storybook/" },
+  },
+  {
+    date: "2026-08-05",
+    tag: "docs",
+    title: "0.9.0 — the machine-readable surface widens",
+    body: "The composition catalog reaches 13 patterns, each declaring the components it still lacks, and the MCP search overview now allocates its budget per kind so growth shortens summaries instead of dropping items.",
+  },
+  {
     date: "2026-07-31",
     tag: "release",
     title: "0.8.0 — Menu, and shape becomes themeable",

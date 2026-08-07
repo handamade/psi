@@ -182,7 +182,7 @@ export function Playground() {
 
           <Panel className="card pg-surface">
             <h3>
-              Panel + Toolbar · the 0.7 surface pair
+              Panel + Toolbar · the surface pair
               <a
                 className="sb-link"
                 href={storybookDocs("Components/Toolbar")}
@@ -237,15 +237,15 @@ export function Playground() {
               )}
             </Toolbar>
             <p className="annot pg-note">
-              This card is the new Panel — the elevated surface recipe Dialog
-              shares. The row above is the filter-toolbar pattern from
-              patterns.json, live: dismiss a filter and the Toolbar reflows.
+              This card is Panel — the elevated surface recipe Dialog shares. The row
+              above is the filter-toolbar pattern, live: dismiss a filter and the
+              Toolbar reflows.
             </p>
           </Panel>
 
           <Panel className="card pg-menu">
             <h3>
-              Menu · the 0.8 overlay tier
+              Menu · the overlay tier
               <a className="sb-link" href={storybookDocs("Components/Menu")}>
                 storybook →
               </a>
