@@ -100,3 +100,34 @@ describe("declared affordances resolve (D71)", () => {
     expect(preset).not.toContain("key-value summary of the selected record");
   });
 });
+
+describe("the manifest describes children (D72)", () => {
+  // react-docgen-typescript reports `children` only when the declaration
+  // carries a JSDoc comment — not because of propFilter, extends, or the type
+  // spelling, all of which D70 wrongly blamed and D72 disproved with a probe.
+  const TAKES_NO_CHILDREN = ["Input", "Pagination", "MenuSeparator"];
+
+  it("lists children for every component that accepts it", () => {
+    const missing = manifest.components
+      .filter((c: { name: string; props: { name: string }[] }) => !TAKES_NO_CHILDREN.includes(c.name))
+      .filter((c: { props: { name: string }[] }) => !c.props.some((p) => p.name === "children"))
+      .map((c: { name: string }) => c.name);
+    expect(missing).toEqual([]);
+  });
+
+  it("omits children from the three that take none", () => {
+    // Publishing a prop that does not apply is worse than omitting one that
+    // does — an agent cross-checking the manifest would pass children to an
+    // <input>.
+    for (const name of TAKES_NO_CHILDREN) {
+      const c = manifest.components.find((x: { name: string }) => x.name === name);
+      expect(c.props.some((p: { name: string }) => p.name === "children"), name).toBe(false);
+    }
+  });
+
+  it("gives filter-toolbar's controls accessible names (D73)", () => {
+    const preset = renderPreset(patterns.find((p) => p.id === "filter-toolbar")!, manifest.components)!;
+    expect(preset).toContain('<Input aria-label=');
+    expect(preset).toContain('<Select aria-label=');
+  });
+});

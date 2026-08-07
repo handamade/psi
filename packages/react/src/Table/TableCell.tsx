@@ -4,6 +4,7 @@ import styles from "./table.module.css";
 export interface TableCellProps {
   /** Right-aligns and renders tabular figures (D62). */
   numeric?: boolean;
+  /** Cell content. */
   children?: ReactNode;
   className?: string;
 }

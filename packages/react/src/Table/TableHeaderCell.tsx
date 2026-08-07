@@ -8,6 +8,7 @@ export interface TableHeaderCellProps {
   sortKey?: string;
   /** Right-aligns and renders tabular figures (D62). */
   numeric?: boolean;
+  /** Header label. */
   children?: ReactNode;
   className?: string;
 }

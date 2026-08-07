@@ -7,6 +7,7 @@ Fixed-aspect-ratio box that sizes its child media.
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | Content constrained to the ratio. |
 | `ratio` | `number` | — | yes | Width/height ratio, e.g. 16/10 or 4/5. |
 | `ref` | `Ref<HTMLDivElement>` | — | no | Forwarded ref to the frame element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |

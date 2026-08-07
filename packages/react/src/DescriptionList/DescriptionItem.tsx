@@ -2,6 +2,8 @@ import type { HTMLAttributes, ReactNode, Ref } from "react";
 import styles from "./description-list.module.css";
 
 export interface DescriptionItemProps extends HTMLAttributes<HTMLDivElement> {
+  /** The value — renders the <dd>. */
+  children?: ReactNode;
   /** The term — renders the `<dt>`. */
   term: ReactNode;
   /** Forwarded ref to the group wrapper. */

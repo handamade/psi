@@ -1,7 +1,9 @@
-import type { HTMLAttributes, Ref } from "react";
+import type { HTMLAttributes, Ref, ReactNode } from "react";
 import styles from "./description-list.module.css";
 
 export interface DescriptionListProps extends HTMLAttributes<HTMLDListElement> {
+  /** One DescriptionItem per field. */
+  children?: ReactNode;
   /** `stacked` puts the term above its value; `inline` puts them in a
    * two-column grid, which is what a detail drawer wants. @default "stacked" */
   layout?: "stacked" | "inline";

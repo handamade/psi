@@ -271,3 +271,29 @@ describe("requires — declared affordances (D71)", () => {
     expect(() => validatePatterns([p], components, contracts, icons)).not.toThrow();
   });
 });
+
+describe("aria-* props (D73)", () => {
+  it("accepts an aria attribute the manifest does not list", () => {
+    // Every component spreads rest props onto a DOM element, so aria-* is
+    // always valid; the manifest's silence was never a claim otherwise. Before
+    // D73 this threw, which is why filter-toolbar shipped an unnamed Select.
+    const p = base({ compose: { component: "Button", props: { "aria-label": "Close" } } });
+    expect(() => validatePatterns([p], components, contracts)).not.toThrow();
+  });
+
+  it("resolves a content placeholder inside an aria attribute", () => {
+    const p = base({
+      compose: { component: "Button", props: { "aria-label": "{content:label}" } },
+      content: { label: "Search transactions" },
+    });
+    expect(() => validatePatterns([p], components, contracts)).not.toThrow();
+    expect(renderPreset(p, components)).toContain('aria-label="Search transactions"');
+  });
+
+  it("still rejects a genuinely unknown prop", () => {
+    // The escape hatch is aria-* only — it must not become a hole through
+    // which any invented prop passes.
+    const p = base({ compose: { component: "Button", props: { ariaLabel: "Close" } } });
+    expect(() => validatePatterns([p], components, contracts)).toThrow(/unknown prop/);
+  });
+});

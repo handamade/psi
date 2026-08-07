@@ -15,6 +15,7 @@ Data table on native table semantics. Holds no state: sorting, selection and pag
 | `selectable` | `boolean` | false | no | Renders the row-selection checkbox column. |
 | `selected` | `ReadonlySet<string>` | new Set<string>() | no | Controlled selection, keyed by each `TableRow`'s `rowId`. |
 | `onSelectionChange` | `((selected: ReadonlySet<string>) => void)` | — | no | Called with the next selection. See `onSortChange` on why it is optional. |
+| `children` | `ReactNode` | — | yes | TableHead and TableBody. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 | `ref` | `Ref<HTMLTableElement>` | — | no | Forwarded ref to the underlying `<table>` element. |
 

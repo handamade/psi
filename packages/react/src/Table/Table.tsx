@@ -81,6 +81,7 @@ export interface TableProps {
   selected?: ReadonlySet<string>;
   /** Called with the next selection. See `onSortChange` on why it is optional. */
   onSelectionChange?: (selected: ReadonlySet<string>) => void;
+  /** TableHead and TableBody. */
   children: ReactNode;
   className?: string;
   /** Forwarded ref to the underlying `<table>` element. */

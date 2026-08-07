@@ -1,7 +1,9 @@
-import type { HTMLAttributes, Ref } from "react";
+import type { HTMLAttributes, Ref, ReactNode } from "react";
 import styles from "./aspect-ratio.module.css";
 
 export interface AspectRatioProps extends HTMLAttributes<HTMLDivElement> {
+  /** Content constrained to the ratio. */
+  children?: ReactNode;
   /** Width/height ratio, e.g. 16/10 or 4/5. */
   ratio: number;
   /** Forwarded ref to the frame element. */

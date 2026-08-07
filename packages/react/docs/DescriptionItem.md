@@ -7,6 +7,7 @@ One term/value pair. The term is a prop and the value is children, matching Fiel
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | The value — renders the <dd>. |
 | `term` | `ReactNode` | — | yes | The term — renders the `<dt>`. |
 | `ref` | `Ref<HTMLDivElement>` | — | no | Forwarded ref to the group wrapper. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |

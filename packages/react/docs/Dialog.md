@@ -7,6 +7,7 @@ Modal dialog on the native <dialog> top layer: focus trap, aria-modal and focus 
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | Body content, between the title and footer slots. |
 | `open` | `boolean` | — | yes | Controlled open state; syncs to showModal()/close(). |
 | `onClose` | `(reason: "esc" \| "backdrop" \| "close-button") => void` | — | yes | Called on every dismissal attempt with its source; the consumer flips `open`. |
 | `title` | `ReactNode` | — | no | Heading; renders an <h2> wired to aria-labelledby. Without it, pass aria-label. |

@@ -9,6 +9,7 @@
 |---|---|---|---|---|
 | `rowId` | `string` | — | no | Stable identity for selection. Required for selectable tables (D62). |
 | `selectLabel` | `string` | — | no | Accessible name for this row's selection checkbox. |
+| `children` | `ReactNode` | — | yes | The row's cells. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
 ## Theming

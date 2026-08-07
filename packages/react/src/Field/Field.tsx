@@ -17,6 +17,8 @@ export interface FieldContextValue {
 export const FieldContext = createContext<FieldContextValue | null>(null);
 
 export interface FieldProps extends HTMLAttributes<HTMLElement> {
+  /** The control this field labels. */
+  children?: ReactNode;
   /** Label content; renders a <label> (or <legend> in group mode). */
   label?: ReactNode;
   /** Helper line under the control; replaced by error when error is set. */

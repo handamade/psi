@@ -3,6 +3,7 @@ import type {
   ButtonHTMLAttributes,
   MouseEventHandler,
   Ref,
+  ReactNode,
 } from "react";
 import styles from "./button.module.css";
 
@@ -19,6 +20,8 @@ type Variant =
 type Size = 24 | 32 | 40 | 48;
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Label content. */
+  children?: ReactNode;
   /** Visual variant. @default "neutral" */
   variant?: Variant;
   /** Height in px (24 | 32 | 40 | 48). @default 32 */

@@ -4,6 +4,7 @@ import { MenuContext } from "./Menu.js";
 import styles from "./menu.module.css";
 
 export interface MenuItemProps {
+  /** Item label. */
   children: ReactNode;
   /** Fires on activation; Menu then reports the dismissal via onClose("item-select") (D50). */
   onSelect: () => void;

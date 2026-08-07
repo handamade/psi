@@ -7,6 +7,7 @@ Key/value display (D70): a `<dl>` of term/value pairs, the body `detail-drawer` 
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | One DescriptionItem per field. |
 | `layout` | `"stacked" \| "inline"` | stacked | no | `stacked` puts the term above its value; `inline` puts them in a two-column grid, which is what a detail drawer wants. |
 | `gap` | `8 \| 12 \| 16` | 12 | no | Gap between pairs, in px. |
 | `ref` | `Ref<HTMLDListElement>` | — | no | Forwarded ref to the root element. |

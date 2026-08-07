@@ -7,6 +7,7 @@ Elevated surface panel (D51): secondary background, faint hairline, radius-12 �
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
+| `children` | `ReactNode` | — | no | Panel contents. |
 | `padding` | `16 \| 24` | 24 | no | Inner padding in px. |
 | `ref` | `Ref<HTMLDivElement>` | — | no | Forwarded ref to the root element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
