@@ -90,7 +90,7 @@ section {
   top: 0;
   z-index: var(--psi-z-nav);
   border-bottom: 1px solid var(--promo-hairline-faint);
-  background: var(--psi-scrim-heavy);
+  background: var(--psi-bg-primary);
   backdrop-filter: blur(var(--psi-navbar-blur));
   -webkit-backdrop-filter: blur(var(--psi-navbar-blur));
 }
@@ -300,20 +300,18 @@ section {
   gap: var(--psi-space-8);
 }
 
-.derive-swatch {
+.derive-cell {
   flex: 1;
   display: grid;
-  place-items: end start;
-  height: 64px;
-  padding: var(--psi-space-8);
-  border-radius: var(--psi-radius-6);
-  color: var(--psi-fg-static-white);
+  gap: var(--psi-space-4);
+  min-width: 0;
 }
 
-.derive-swatch span {
-  font: var(--psi-text-12-16-medium);
-  font-family: var(--psi-font-mono);
-  opacity: 0.9;
+/* The label sits below the swatch, not on it: white-on-accent measures
+ * 3.2:1 at the slider's far end, and this demo is *about* contrast (D74). */
+.derive-swatch {
+  height: 64px;
+  border-radius: var(--psi-radius-6);
 }
 
 .derive-swatch--base {
@@ -392,6 +390,14 @@ section {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--psi-space-16);
+}
+
+.principle {
+  display: grid;
+}
+
+.principle > .card {
+  height: 100%;
 }
 
 .principle h3 {
@@ -511,6 +517,12 @@ section {
 .pg-stack {
   display: grid;
   gap: var(--psi-space-16);
+}
+
+.pg-note,
+.roadmap-foot,
+.derive p {
+  max-width: 70ch;
 }
 
 .pg-note {
@@ -642,14 +654,29 @@ section {
 }
 
 .var-row {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: start;
   gap: var(--psi-space-12);
   padding: var(--psi-space-8) var(--psi-space-12);
   background: var(--psi-bg-primary);
   font: var(--psi-text-12-16-regular);
   font-family: var(--psi-font-mono);
   min-width: 0;
+}
+
+/* ARTIFACTS rows have no dot: an invisible spacer reserves the same
+ * 14px track width so both var-lists' second column starts at the
+ * same x offset (D74). */
+.var-row .dot-spacer {
+  visibility: hidden;
+}
+
+/* Unbreakable tokens (manifest.json, guidance.json) have no wrap
+ * opportunity at the narrow end of the 1fr track and would otherwise
+ * overflow the cell and paint over the value column (D74). */
+.var-row > :nth-child(2) {
+  overflow-wrap: anywhere;
 }
 
 .var-row .dot {
@@ -666,7 +693,6 @@ section {
 }
 
 .var-row .val {
-  margin-inline-start: auto;
   color: var(--psi-fg-secondary);
   min-width: 0;
 }
@@ -691,7 +717,6 @@ section {
 
 .roadmap-foot {
   margin-top: var(--psi-space-24);
-  max-width: 70ch;
 }
 
 /* updates */
@@ -700,6 +725,7 @@ section {
   list-style: none;
   margin: 0;
   padding: 0;
+  max-width: 78ch;
   display: grid;
   gap: var(--psi-space-12);
 }

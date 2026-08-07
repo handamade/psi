@@ -83,6 +83,10 @@ export function Pipeline() {
             <div className="var-list" aria-label="AI-readable artifacts">
               {ARTIFACTS.map((artifact) => (
                 <div className="var-row" key={artifact.file}>
+                  <span
+                    className="dot dot--none dot-spacer"
+                    aria-hidden="true"
+                  />
                   <span className="annot annot--accent">{artifact.file}</span>
                   <span className="val">{artifact.note}</span>
                 </div>
