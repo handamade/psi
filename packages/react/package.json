@@ -10,8 +10,14 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./styles": "./dist/styles.css",
-    "./styles.css": "./dist/styles.css",
+    "./styles": {
+      "types": "./dist/styles.d.ts",
+      "default": "./dist/styles.css"
+    },
+    "./styles.css": {
+      "types": "./dist/styles.d.ts",
+      "default": "./dist/styles.css"
+    },
     "./manifest.json": "./dist/manifest.json",
     "./patterns.json": "./dist/patterns.json"
   },
@@ -22,7 +28,7 @@
     "llms.txt"
   ],
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json && tsx scripts/emit-manifest.ts && tsx scripts/emit-patterns.ts && tsx scripts/emit-docs.ts",
+    "build": "vite build && tsc -p tsconfig.build.json && tsx scripts/emit-styles-dts.ts && tsx scripts/emit-manifest.ts && tsx scripts/emit-patterns.ts && tsx scripts/emit-docs.ts",
     "dev": "vite build --watch"
   },
   "peerDependencies": {

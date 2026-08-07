@@ -7,11 +7,16 @@ paraphrase or add repo context beyond what it grants.
 Run cadence: after any recipe/doc change, and before promoting any new component's docs.
 Log the result as `runs/<date>.md` (see `RUBRIC.md` for how to score it).
 
+The primary task is a **ledger screen** (D69). It replaced a settings form, which only ever
+exercised components that already existed and so could measure documentation quality but never
+coverage. The ledger arc's completion criterion (D59) is a run of this task with **zero
+improvisations**.
+
 ---
 
 ## The prompt
 
-You are working in the `ds` design system repo. You may reach the design system **only**
+You are working in the Psi (Ψ) design system repo. You may reach the design system **only**
 through its machine-readable trail:
 
 - Start at `llms.txt` (repo root) and follow it wherever it points — `packages/tokens/llms.txt`,
@@ -26,25 +31,44 @@ through its machine-readable trail:
 
 ### Build this
 
-A **Profile settings form** using the design system's React components:
+A **transactions screen** using the design system's React components:
 
-- A **name** input and an **email** input. Show the email input in its error state as a
-  worked example (i.e., render one instance of the form, or a second field, demonstrating what
-  an invalid/error email input looks like).
-- A **Plan** select with options Free / Pro / Team.
-- A small **"Pro"** tag placed next to the Plan field's label.
-- An **Email notifications** switch.
-- A **Beta features** checkbox.
-- A button row: **Save** as the primary action, **Cancel** as the secondary action.
-- Apply the system's **dark theme** to the form, using whatever mechanism the docs prescribe.
-- Use the system's spacing tokens/utilities for all gaps and layout spacing — no hardcoded
-  pixel/rem spacing values.
-- Import whatever CSS the docs say is required to make the components render and themed
-  correctly (all token stylesheets the trail tells you to import, not just the ones that seem
-  obviously necessary).
+- A **table** of transactions with columns Date, Payee, Category and Amount.
+  Amount is a numeric column. The table is **sortable** by Date, Payee and
+  Amount, and **selectable** by row.
+- A **filter row** above it: a search input and a category select, with a
+  dismissible chip per active filter.
+- A **row-actions menu** on each row, with "View details" and a destructive
+  "Void".
+- **Pagination** below the table, alongside a rows-per-page select.
+- A **tab set** switching between saved views (All / Flagged), the table
+  belonging to the active view.
+- **"View details" opens a side sheet / drawer** showing that transaction's
+  fields with a Close action.
+- **"Void" shows a transient confirmation** with an Undo action.
+- A **bulk action bar** that appears when rows are selected, showing the count
+  and a Clear selection action.
+- An **empty state** for when no rows match.
+- Use the system's spacing tokens/utilities for all gaps and layout spacing —
+  no hardcoded pixel/rem spacing values.
+- Import whatever CSS the docs say is required to make the components render
+  correctly (all the stylesheets the trail tells you to import, not just the
+  ones that seem obviously necessary).
 
-Do not invent props, component names, or token names. If the docs don't tell you something you
-need, make the smallest reasonable guess and **log it** — don't silently pick an answer.
+Do not invent props, component names, or token names. **If the design system
+has no component for something, do not hand-roll a substitute silently — build
+the smallest reasonable stand-in and log it as a gap.** A `div` standing in for
+a component, or a composition rebuilt from primitives when the docs describe a
+pattern for it, is the single most important thing this eval measures.
+
+### Secondary task (only if asked to run the long form)
+
+A **Profile settings form**: name and email inputs with the email shown in its
+error state, a Plan select (Free / Pro / Team), a small "Pro" tag beside the
+Plan label, an Email notifications switch, a Beta features checkbox, and a
+Save / Cancel button row. Apply the system's **dark theme** using whatever
+mechanism the docs prescribe. This is the task earlier runs used; it is kept so
+the docs-gap trend stays comparable across runs.
 
 ### Report back
 
@@ -58,3 +82,9 @@ When the component is built, report:
    and why. If you made zero guesses, say so explicitly.
 3. **Components and props used** — every DS component you imported and, for each, every prop
    you passed, so it can be cross-checked against `dist/manifest.json` for invented props.
+4. **Every improvisation** — anything you built yourself because the design system had no
+   component or pattern for it: a hand-rolled element where you expected a component, a `div`
+   or native element standing in for one, or a composition you assembled from primitives that
+   the docs turned out to describe as a pattern. For each, say what you needed and what you did
+   instead. **If you improvised nothing, say so explicitly** — that is the result this eval is
+   looking for.
