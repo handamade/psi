@@ -61,15 +61,18 @@ Grading and correcting in one breath destroys the measurement.
 
 ## Repo state as of this handoff
 
-- **`main` is at 0.13.0**, published on npm with tags pushed. Four clean
-  releases in a row (0.10.0 → 0.13.0).
+- **`main` carries D68–D69** (PR #84, merged 2026-08-07). The packaging fix is
+  in, so `import "@handamade/psi-react/styles"` typechecks and the prompt the
+  eval hands the agent is the retargeted one.
+- **0.13.0 is the published version**; **0.13.1 is cut and awaiting release.**
+  Five clean releases in a row (0.10.0 → 0.13.1). If the eval's agent installs
+  from npm rather than reading this repo, it gets 0.13.0 and will hit the
+  `./styles` typecheck error — that is a known, already-fixed bug and **must
+  not be logged as a finding**.
 - **32 components, 13 patterns, zero gaps.** Every pattern composes only
   components that exist.
 - **Decision log runs D1–D69.** Claim D70 next. Confirm against a `## Decisions`
   entry in a spec, not a grep — the note in `CLAUDE.md` explains why.
-- **PR #84 is open** with D68–D69 (the packaging fix and the eval retarget).
-  Merge it before running the eval, so the agent reads the retargeted prompt
-  and gets a `@handamade/psi-react/styles` import that typechecks.
 
 ## Environment gotchas that cost this session time
 
