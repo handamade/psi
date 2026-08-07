@@ -1,4 +1,4 @@
-# D74 Public Site Cycle — Implementation Plan
+# D76 Public Site Cycle — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -16,8 +16,8 @@
 - Never hardcode colors in CSS — bind `var(--psi-*)`. The custom stylelint plugin enforces this.
 - Sizes are px numbers (`24 | 32 | 40 | 48`), never S/M/L. Variants are flat: `accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline`.
 - Consumers import **five** stylesheets: `base.css`, one theme css, `components.css`, `utilities.css`, plus `@handamade/psi-react/styles`.
-- Branch is `d74-promo-site` in the worktree at `.claude/worktrees/d73-promo-site/`. All commands run from the worktree root.
-- **Out of scope, do not drift into it:** adding `fgTertiary` to `contrast-matrix.ts`; the D75 preset render gate; the Figma parity question; any art-direction change.
+- Branch is `d76-promo-site` in the worktree at `.claude/worktrees/d73-promo-site/`. All commands run from the worktree root.
+- **Out of scope, do not drift into it:** adding `fgTertiary` to `contrast-matrix.ts`; the D77 preset render gate; the Figma parity question; any art-direction change.
 
 ## Prerequisite (blocks Task 5 onward)
 
@@ -107,7 +107,7 @@ import { writeFileSync, mkdirSync, readdirSync } from "node:fs";
 // The icon roster has no other machine-readable form: emit-patterns reads
 // src/icons off disk and throws the list away, which is why "22 icons" could
 // rot on the public site undetected while component counts at least had a
-// source to check against (D74).
+// source to check against (D76).
 const icons = readdirSync(join(root, "src", "icons"))
   .filter((f) => f.startsWith("Icon") && f.endsWith(".tsx"))
   .map((f) => f.replace(/\.tsx$/, ""))
@@ -136,7 +136,7 @@ Expected: build green; 2113 + 2 tests pass. `manifest.json` is git-tracked outpu
 
 ```bash
 git add packages/react/scripts/emit-manifest.ts packages/react/scripts/emit-manifest.test.ts
-git commit -m "feat(react): manifest carries the icon roster (D74)"
+git commit -m "feat(react): manifest carries the icon roster (D76)"
 ```
 
 ---
@@ -168,7 +168,7 @@ const require = createRequire(import.meta.url);
 /**
  * Exposes the package's own generated artifacts to the site as `virtual:psi-facts`.
  *
- * D74: the site stated "18 components" for six releases because the numbers were
+ * D76: the site stated "18 components" for six releases because the numbers were
  * typed. They are now read from manifest.json at config time — a wrong count is
  * no longer expressible. Only the resolved values reach the bundle; the 57KB
  * manifest does not.
@@ -199,7 +199,7 @@ export function psiFacts(): Plugin {
 
       if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) {
         throw new Error(
-          "psi-facts: manifest.json has no icon roster — rebuild @handamade/psi-react (D74 Task 1)",
+          "psi-facts: manifest.json has no icon roster — rebuild @handamade/psi-react (D76 Task 1)",
         );
       }
 
@@ -265,7 +265,7 @@ Delete the two probe lines from `main.tsx`. Re-run `pnpm --dir apps/promo build`
 
 ```bash
 git add apps/promo/vite-plugin-psi-facts.ts apps/promo/src/virtual-psi-facts.d.ts apps/promo/vite.config.ts
-git commit -m "feat(promo): virtual:psi-facts derives every count from the manifest (D74)"
+git commit -m "feat(promo): virtual:psi-facts derives every count from the manifest (D76)"
 ```
 
 ---
@@ -300,7 +300,7 @@ const claims = [
   ["packages/react/llms.txt", /(\d+) composition patterns/, np],
   ["packages/mcp/README.md", /(\d+) composition patterns/, np],
   ["packages/mcp/llms.txt", /(\d+) composition patterns/, np],
-  // D74: the public site is a prose artifact too. It stated "18 components"
+  // D76: the public site is a prose artifact too. It stated "18 components"
   // across six releases precisely because nothing here looked at apps/promo.
   // These entries are belt-and-braces over virtual:psi-facts — the plugin makes
   // a wrong number inexpressible, and this makes a reintroduced literal fail CI.
@@ -400,7 +400,7 @@ Expected: at least 1.
 
 ```bash
 git add tools/check-docs-drift.mjs apps/promo/src/sections/Hero.tsx apps/promo/src/sections/Playground.tsx apps/promo/src/sections/Roadmap.tsx
-git commit -m "feat(promo): counts derive from the manifest, and drift-check gates the site (D74)"
+git commit -m "feat(promo): counts derive from the manifest, and drift-check gates the site (D76)"
 ```
 
 ---
@@ -557,7 +557,7 @@ Expected: all four green.
 
 ```bash
 git add apps/promo/src/content/updates.ts apps/promo/src/sections/Roadmap.tsx apps/promo/src/sections/Playground.tsx apps/promo/src/sections/Pipeline.tsx apps/promo/src/promo.css
-git commit -m "docs(promo): publish 0.9.0–0.14.1 and de-version the demo copy (D74)"
+git commit -m "docs(promo): publish 0.9.0–0.14.1 and de-version the demo copy (D76)"
 ```
 
 ---
@@ -582,7 +582,7 @@ Create `apps/promo/site-gate/playwright.config.ts`:
 import { defineConfig } from "@playwright/test";
 
 /**
- * The public site's own gate (D74). Deliberately NOT `vr`:
+ * The public site's own gate (D76). Deliberately NOT `vr`:
  * no screenshot assertions, so it is platform-independent and runs locally.
  * `vr` stays CI-only because its baselines are ubuntu renders.
  *
@@ -714,7 +714,7 @@ Four tests are expected to **pass** on first run, and a failure in any of them i
 
 ```bash
 git add apps/promo/site-gate package.json
-git commit -m "test(promo): the site gates itself on axe and reflow (D74)"
+git commit -m "test(promo): the site gates itself on axe and reflow (D76)"
 ```
 
 ---
@@ -734,7 +734,7 @@ In `apps/promo/src/promo.css`, line 73:
 /* Mono annotation — the page's signature detail.
  * fg-secondary, not fg-tertiary: .annot carries prose, and tertiary is the one
  * foreground absent from the token contrast matrix, so it measured 2.84:1 here
- * and shipped 46 axe failures on the page that advertises the AA gate (D74). */
+ * and shipped 46 axe failures on the page that advertises the AA gate (D76). */
 .annot {
   font: var(--psi-text-12-16-regular);
   font-family: var(--psi-font-mono);
@@ -764,7 +764,7 @@ Expected: both axe tests PASS. If any violation remains, read its `id` and `coun
 
 ```bash
 git add apps/promo/src/promo.css
-git commit -m "fix(promo): .annot carries prose, so it binds fg-secondary (D74)"
+git commit -m "fix(promo): .annot carries prose, so it binds fg-secondary (D76)"
 ```
 
 ---
@@ -845,7 +845,7 @@ Expected: `ok` on all twelve. (Start the server first with `npx serve -l 6210 ap
 
 ```bash
 git add apps/promo/src/promo.css
-git commit -m "fix(promo): the header wraps, and the nav yields at 960 not 720 (D74)"
+git commit -m "fix(promo): the header wraps, and the nav yields at 960 not 720 (D76)"
 ```
 
 ---
@@ -964,7 +964,7 @@ In `apps/promo/src/promo.css`, replace the `.derive-swatch` block (lines 295-309
 }
 
 /* The label sits below the swatch, not on it: white-on-accent measures
- * 3.2:1 at the slider's far end, and this demo is *about* contrast (D74). */
+ * 3.2:1 at the slider's far end, and this demo is *about* contrast (D76). */
 .derive-swatch {
   height: 64px;
   border-radius: var(--psi-radius-6);
@@ -986,7 +986,7 @@ Inspect at 1440 and 320 via `preview_start` `promo-wt` (needs the prerequisite e
 
 ```bash
 git add apps/promo/src/promo.css apps/promo/src/sections/Hero.tsx apps/promo/index.html
-git commit -m "fix(promo): shared card edges, capped measure, opaque header (D74)"
+git commit -m "fix(promo): shared card edges, capped measure, opaque header (D76)"
 ```
 
 ---
@@ -1074,7 +1074,7 @@ Then confirm by hand in `promo-wt`: Tab once from page load → the skip link is
 
 ```bash
 git add apps/promo/src/App.tsx apps/promo/src/promo.css apps/promo/src/sections/Hero.tsx apps/promo/src/sections/Header.tsx
-git commit -m "fix(promo): skip link, CTAs as links, complete nav (D74)"
+git commit -m "fix(promo): skip link, CTAs as links, complete nav (D76)"
 ```
 
 ---
@@ -1091,7 +1091,7 @@ git commit -m "fix(promo): skip link, CTAs as links, complete nav (D74)"
 §04 advertises `llms.txt` as a shipped artifact while `assemble-site.mjs` copies only promo and storybook. After the two `cp` calls:
 
 ```js
-// The site advertises these in §04 — serve them at the advertised URLs (D74).
+// The site advertises these in §04 — serve them at the advertised URLs (D76).
 await cp(path.join(repo, "llms.txt"), path.join(out, "llms.txt"));
 await cp(
   path.join(repo, "packages/tokens/llms.txt"),
@@ -1115,7 +1115,7 @@ Expected: three `.txt` files listed.
 In `.github/workflows/ci.yml`, after the `pnpm vr` step and its failure-artifact upload, before `pnpm lint`:
 
 ```yaml
-      # The public site is a prose artifact and a product: axe + reflow (D74)
+      # The public site is a prose artifact and a product: axe + reflow (D76)
       - run: pnpm test:site
 ```
 
@@ -1146,9 +1146,9 @@ Expected: all green. Do **not** run `pnpm vr` — it is CI's.
 
 ```bash
 git add tools/assemble-site.mjs .github/workflows/ci.yml .changeset/public-site-cycle.md
-git commit -m "ci(promo): serve the advertised llms.txt and gate the site (D74)"
-git push -u origin d74-promo-site
-gh pr create --title "feat: the public site is true, and gated (D74)" --body "..."
+git commit -m "ci(promo): serve the advertised llms.txt and gate the site (D76)"
+git push -u origin d76-promo-site
+gh pr create --title "feat: the public site is true, and gated (D76)" --body "..."
 ```
 
 Then arm auto-merge **and verify it armed** — `gh pr merge --auto` exits 0 while leaving it off:
@@ -1164,7 +1164,7 @@ If `autoMergeRequest` is `null`, use the `enablePullRequestAutoMerge` GraphQL mu
 
 ## Self-Review
 
-**Spec coverage.** D74 half one → Tasks 1, 2, 3 (derived numbers), 4 (feed + roadmap + de-versioning + Figma softening), 10 (llms.txt). D74 half two → Tasks 5 (gate), 6 (contrast), 7 (overflow), 8 (craft), 9 (keyboard). "The gate, which is the actual decision" → Tasks 3 step 1 and 5, both proven red first. Gates section → Task 3 step 2 and Task 5 step 4 assert failure before the fix; `vr` untouched throughout. Changeset → Task 10. Out-of-scope items appear only in Global Constraints as prohibitions.
+**Spec coverage.** D76 half one → Tasks 1, 2, 3 (derived numbers), 4 (feed + roadmap + de-versioning + Figma softening), 10 (llms.txt). D76 half two → Tasks 5 (gate), 6 (contrast), 7 (overflow), 8 (craft), 9 (keyboard). "The gate, which is the actual decision" → Tasks 3 step 1 and 5, both proven red first. Gates section → Task 3 step 2 and Task 5 step 4 assert failure before the fix; `vr` untouched throughout. Changeset → Task 10. Out-of-scope items appear only in Global Constraints as prohibitions.
 
 **Placeholder scan.** One deliberate soft spot: Task 10 Step 1's `llms.txt` filenames depend on what §04 actually states — the step says to make the copy match the page and to verify the root file exists rather than assuming a name. Task 8 Step 2's `ARTIFACTS`-row alignment says to check both lists render before committing, because the two lists have different column counts. Everything else carries literal code.
 

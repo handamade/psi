@@ -74,7 +74,7 @@ pre {
 section {
   /* Budgeted from the header's tallest state (two-row wrap, ~95px),
      not its one-row 64px minimum — the original 88px only cleared
-     the fixed-height header because it never wrapped (D74). */
+     the fixed-height header because it never wrapped (D76). */
   scroll-margin-top: 119px;
 }
 
@@ -87,7 +87,7 @@ section {
 /* Mono annotation — the page's signature detail.
  * fg-secondary, not fg-tertiary: .annot carries prose, and tertiary is the one
  * foreground absent from the token contrast matrix, so it measured 2.84:1 here
- * and shipped 55 axe failures on the page that advertises the AA gate (D74). */
+ * and shipped 55 axe failures on the page that advertises the AA gate (D76). */
 .annot {
   font: var(--psi-text-12-16-regular);
   font-family: var(--psi-font-mono);
@@ -322,7 +322,7 @@ section {
 }
 
 /* The label sits below the swatch, not on it: white-on-accent measures
- * 3.2:1 at the slider's far end, and this demo is *about* contrast (D74). */
+ * 3.2:1 at the slider's far end, and this demo is *about* contrast (D76). */
 .derive-swatch {
   height: 64px;
   border-radius: var(--psi-radius-6);
@@ -681,14 +681,14 @@ section {
 
 /* ARTIFACTS rows have no dot: an invisible spacer reserves the same
  * 14px track width so both var-lists' second column starts at the
- * same x offset (D74). */
+ * same x offset (D76). */
 .var-row .dot-spacer {
   visibility: hidden;
 }
 
 /* Unbreakable tokens (manifest.json, guidance.json) have no wrap
  * opportunity at the narrow end of the 1fr track and would otherwise
- * overflow the cell and paint over the value column (D74). */
+ * overflow the cell and paint over the value column (D76). */
 .var-row > :nth-child(2) {
   overflow-wrap: anywhere;
 }

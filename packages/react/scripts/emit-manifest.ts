@@ -152,7 +152,7 @@ const manifest = COMPONENTS.map((name) => {
 // The icon roster has no other machine-readable form: emit-patterns reads
 // src/icons off disk and throws the list away, which is why "22 icons" could
 // rot on the public site undetected while component counts at least had a
-// source to check against (D74).
+// source to check against (D76).
 const icons = readdirSync(join(root, "src", "icons"))
   .filter((f) => f.startsWith("Icon") && f.endsWith(".tsx"))
   .map((f) => f.replace(/\.tsx$/, ""))

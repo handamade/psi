@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
  * Reads each component's Storybook `title:` straight from its
  * `<Component>/<Component>.stories.tsx`, keyed by component name. A
  * component with no story file simply gets no entry — this is what lets
- * consumers drop a hand-maintained denylist of compound members (D74
+ * consumers drop a hand-maintained denylist of compound members (D76
  * review: three of 21 links 404'd because they'd been hardcoded as
  * `Components/${name}`, but Table/Pagination live under `Data/` and Toast
  * under `Feedback/`).
@@ -39,7 +39,7 @@ function readStoryTitles(
 /**
  * Exposes the package's own generated artifacts to the site as `virtual:psi-facts`.
  *
- * D74: the site stated "18 components" for six releases because the numbers were
+ * D76: the site stated "18 components" for six releases because the numbers were
  * typed. They are now read from manifest.json at config time — a wrong count is
  * no longer expressible. Only the resolved values reach the bundle; the 57KB
  * manifest does not.
@@ -76,7 +76,7 @@ export function psiFacts(): Plugin {
 
       if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) {
         throw new Error(
-          "psi-facts: manifest.json has no icon roster — rebuild @handamade/psi-react (D74 Task 1)",
+          "psi-facts: manifest.json has no icon roster — rebuild @handamade/psi-react (D76 Task 1)",
         );
       }
 

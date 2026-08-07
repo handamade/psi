@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 /**
- * The public site's own gate (D74). Deliberately NOT `vr`:
+ * The public site's own gate (D76). Deliberately NOT `vr`:
  * no screenshot assertions, so it is platform-independent and runs locally.
  * `vr` stays CI-only because its baselines are ubuntu renders.
  *

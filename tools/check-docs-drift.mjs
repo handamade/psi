@@ -15,6 +15,10 @@ const patterns = JSON.parse(
 );
 const np = patterns.patterns.length;
 
+const { version: pkgVersion } = JSON.parse(
+  await readFile("packages/react/package.json", "utf8"),
+);
+
 const claims = [
   ["README.md", /(\d+) React 19 components/, nc],
   ["packages/react/README.md", /(\d+) React 19 components/, nc],
@@ -23,7 +27,7 @@ const claims = [
   ["packages/react/llms.txt", /(\d+) composition patterns/, np],
   ["packages/mcp/README.md", /(\d+) composition patterns/, np],
   ["packages/mcp/llms.txt", /(\d+) composition patterns/, np],
-  // D74: the public site is a prose artifact too. It stated "18 components"
+  // D76: the public site is a prose artifact too. It stated "18 components"
   // across six releases precisely because nothing here looked at apps/promo.
   // These entries are belt-and-braces over virtual:psi-facts — the plugin makes
   // a wrong number inexpressible, and this makes a reintroduced literal fail CI.
@@ -41,12 +45,57 @@ const claims = [
   // components" — a spelled-out word no /(\d+)/ regex would have caught) and
   // was not watched at all. It is now.
   ["apps/promo/src/sections/Playground.tsx", /(\d+) production components/, nc, "must-not-hardcode"],
+  // D76 spec: "What stays hand-written (release notes) joins the
+  // check-docs-drift claims list." UPDATES is entirely hand-written and is
+  // the exact artifact that rotted for six releases (it said 0.8.0 while
+  // main shipped 0.14.1). Entries are added at the top (see the file's own
+  // header comment), so the first `title: "..."` match in the array literal
+  // is the newest entry. Mode "version-string": extract a semver from that
+  // title and compare it against package.json's version as a *string*, not
+  // a number — versions aren't numeric and a numeric compare would silently
+  // coerce "0.14.10" and "0.14.1" to the same NaN-safe falsy mismatch in
+  // stranger ways than a plain string diff.
+  [
+    "apps/promo/src/content/updates.ts",
+    /title:\s*"([^"]*)"/,
+    pkgVersion,
+    "version-string",
+  ],
 ];
 
 let failed = false;
 for (const [file, re, expected, mode] of claims) {
   const text = await readFile(file, "utf8");
   const m = text.match(re);
+
+  if (mode === "version-string") {
+    if (!m) {
+      console.error(`DRIFT: ${file} has no match for ${re}`);
+      failed = true;
+      continue;
+    }
+    const versionMatch = m[1].match(/\d+\.\d+\.\d+/);
+    if (!versionMatch) {
+      console.error(
+        `DRIFT: ${file}'s newest UPDATES entry title ("${m[1]}") has no ` +
+          `extractable version number, so it cannot be checked against ` +
+          `packages/react/package.json (${expected}). Give the newest entry ` +
+          `a title that leads with its version, e.g. "${expected} — ...".`,
+      );
+      failed = true;
+      continue;
+    }
+    if (versionMatch[0] !== expected) {
+      console.error(
+        `DRIFT: ${file}'s newest UPDATES entry claims ${versionMatch[0]}, ` +
+          `but packages/react/package.json is ${expected}. The release feed ` +
+          `is behind the release — add (or fix) the entry for ${expected}.`,
+      );
+      failed = true;
+    }
+    continue;
+  }
+
   if (!m) {
     if (mode === "must-not-hardcode") continue;
     console.error(`DRIFT: ${file} has no match for ${re}`);

@@ -1,18 +1,29 @@
-# The public site is a projection, and it is also a product (D74)
+# The public site is a projection, and it is also a product (D76)
 
 Date: 2026-08-07. Status: **Draft** — a maintenance cycle, deliberately not on
 the arc's critical path. Written to be *injected*, not scheduled.
 
-Supersedes the untracked draft `2026-08-07-consumer-surface-gaps-design.md`,
-which claimed D73–D74. **Both numbers were taken while it sat uncommitted**:
-`2026-08-07-manifest-children-cycle-design.md` claims D72–D73 and shipped as
-0.14.1 (#89, #90). Highest number actually held by a `## Decisions` entry is
-**D73**. This spec takes **D74**; the preset-render gate that draft called D74
-is recorded under *Deferred* as a future **D75** and is **not** in this cycle.
+Supersedes the untracked draft `2026-08-07-consumer-surface-gaps-design.md`.
+This spec takes **D76**; the preset-render gate that draft called D74 is
+recorded under *Deferred* as a future **D77**, and is **not** in this cycle.
 
-That collision is itself the third instance of the hazard `CLAUDE.md` already
-documents. The rule held — the grep was not the check, the `## Decisions` entry
-was — but only because someone re-checked before implementing.
+**Those numbers moved twice, and the second time is the interesting one.**
+The draft claimed D73–D74 while it sat uncommitted, and
+`2026-08-07-manifest-children-cycle-design.md` took D72–D73 underneath it
+(0.14.1, #89/#90). This spec was therefore written as D74 — correctly, against
+the highest `## Decisions` entry at the time. Then, while the branch was in
+flight, D74 shipped as 0.14.2 (#91, `IconMoreHorizontal` importable) and D75
+shipped as `pnpm verify:published` (#93). Hence D76/D77.
+
+So the rule in `CLAUDE.md` — confirm a number against a `## Decisions` entry,
+not a grep — is necessary and **not sufficient**. It answers "is this number
+taken *now*", and a cycle long enough to span other merges needs the answer to
+"is it still free when I land". Two further notes for whoever writes the next
+one. First, D74's second claim lives only in commit messages and a release
+title; no `## Decisions` entry owns it, so the prescribed check would have
+called it free. Second, re-checking at merge is what caught this — a branch
+that renumbers cleanly at the end costs a `sed`, while one that merges on a
+colliding number costs a rewrite of the log everyone reads afterwards.
 
 ## Provenance
 
@@ -49,12 +60,12 @@ Not re-litigated here:
 - **The manifest `children` / native-prop emitter fix.** The superseded draft
   listed this as out of scope, "owed to its own cycle" — it then shipped as
   D72–D73 in 0.14.1. `patterns/filter-toolbar.json` was touched by #89, so the
-  deferred D75 analysis below must be re-verified against the current file
+  deferred D77 analysis below must be re-verified against the current file
   before anyone implements it.
 
 ## Decisions
 
-- **D74 — The public site is gated like every other prose artifact, and held
+- **D76 — The public site is gated like every other prose artifact, and held
   to the same craft bar as the components it advertises.**
 
   Two halves. They are one decision because they have one cause: `apps/promo`
@@ -212,7 +223,7 @@ One ordering constraint: `runs/2026-08-07.md` names the next refinement as a
 **genuinely external run** — installed from npm with no repo present, so
 `CLAUDE.md` cannot load. On that run the website is part of the measured
 surface, and an agent reading `psi.kurkin.de` first would be measuring 18
-components against a 34-component package. **D74 should land before that run**,
+components against a 34-component package. **D76 should land before that run**,
 or the run measures the site instead of the system.
 
 This cycle is being implemented in an isolated worktree on `d74-promo-site`,
@@ -237,10 +248,10 @@ A changeset is required: `manifest.json` gaining `icons` is user-visible.
 
 ## Deferred, with the diagnosis recorded
 
-### D75 — a preset is answerable for what it renders, not only what it composes
+### D77 — a preset is answerable for what it renders, not only what it composes
 
 **Not in this cycle.** Recorded so it is not re-derived, and renumbered from the
-superseded draft's D74.
+superseded draft's D76.
 
 `patterns.json` presets are documented as copy-paste JSX an agent should emit
 verbatim. The `filter-toolbar` preset emits a bare `Input` and `Select` inside
