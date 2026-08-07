@@ -11,6 +11,7 @@
     "lint": "eslint . && pnpm lint:css",
     "lint:css": "stylelint 'packages/react/src/**/*.module.css' 'apps/**/*.css' 'apps/storybook/.storybook/*.css'",
     "vr": "playwright test -c apps/storybook/vr",
+    "verify:published": "node tools/verify-published.mjs",
     "test:e2e": "playwright test -c apps/storybook/vr --grep @interaction",
     "release": "git checkout main && git pull --ff-only && node tools/release-guard.mjs && pnpm build && pnpm -r publish --access public && changeset tag && git push --tags"
   },
