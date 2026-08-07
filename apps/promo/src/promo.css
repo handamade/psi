@@ -68,7 +68,7 @@ section {
 /* Mono annotation — the page's signature detail.
  * fg-secondary, not fg-tertiary: .annot carries prose, and tertiary is the one
  * foreground absent from the token contrast matrix, so it measured 2.84:1 here
- * and shipped 46 axe failures on the page that advertises the AA gate (D74). */
+ * and shipped 55 axe failures on the page that advertises the AA gate (D74). */
 .annot {
   font: var(--psi-text-12-16-regular);
   font-family: var(--psi-font-mono);
