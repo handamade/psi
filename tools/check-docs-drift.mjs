@@ -27,22 +27,28 @@ const claims = [
   // across six releases precisely because nothing here looked at apps/promo.
   // These entries are belt-and-braces over virtual:psi-facts — the plugin makes
   // a wrong number inexpressible, and this makes a reintroduced literal fail CI.
-  ["apps/promo/src/sections/Hero.tsx", /(\d+) components/, nc],
-  ["apps/promo/src/sections/Hero.tsx", /(\d+) icons/, ni],
-  ["apps/promo/src/sections/Roadmap.tsx", /(\d+) components/, nc],
-  ["apps/promo/src/sections/Roadmap.tsx", /(\d+) icons/, ni],
+  // Mode "must-not-hardcode": the healthy source has no typed digit for the
+  // regex to find (the count is a template-literal expression, not a
+  // literal) — a missing match is the fix, not drift. A *present* match that
+  // disagrees with the manifest still fails below: that is what catches a
+  // reintroduced literal. Rows without this mode keep the original behavior,
+  // where a missing match is itself DRIFT.
+  ["apps/promo/src/sections/Hero.tsx", /(\d+) components/, nc, "must-not-hardcode"],
+  ["apps/promo/src/sections/Hero.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
+  ["apps/promo/src/sections/Roadmap.tsx", /(\d+) components/, nc, "must-not-hardcode"],
+  ["apps/promo/src/sections/Roadmap.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
+  // Playground.tsx carried the original defect ("Eighteen production
+  // components" — a spelled-out word no /(\d+)/ regex would have caught) and
+  // was not watched at all. It is now.
+  ["apps/promo/src/sections/Playground.tsx", /(\d+) production components/, nc, "must-not-hardcode"],
 ];
 
 let failed = false;
-for (const [file, re, expected] of claims) {
+for (const [file, re, expected, mode] of claims) {
   const text = await readFile(file, "utf8");
   const m = text.match(re);
   if (!m) {
-    // apps/promo's counts are derived from virtual:psi-facts (D74), so the
-    // healthy source has no typed digit for these to find — that is the fix,
-    // not drift. These entries exist to catch a *reintroduced* literal, which
-    // the mismatch branch below still does whenever a match is present.
-    if (file.startsWith("apps/promo/")) continue;
+    if (mode === "must-not-hardcode") continue;
     console.error(`DRIFT: ${file} has no match for ${re}`);
     failed = true;
   } else if (Number(m[1]) !== expected) {

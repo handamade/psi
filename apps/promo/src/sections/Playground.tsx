@@ -20,7 +20,7 @@ import {
 } from "@handamade/psi-react";
 
 import { storybookDocs } from "../lib/storybook";
-import { componentCount, componentNames, version } from "virtual:psi-facts";
+import { componentCount, componentNames, storyTitles, version } from "virtual:psi-facts";
 
 const VARIANTS = [
   "accent",
@@ -294,11 +294,11 @@ export function Playground() {
         <p className="pg-index annot">
           Full docs in Storybook:{" "}
           {componentNames
-            .filter((name) => !/^(Table.|Menu(Item|Separator)|Tab(List|Panel)?$|Toast(Region|Provider)|DescriptionItem)/.test(name))
+            .filter((name) => name in storyTitles)
             .map((name, index) => (
               <span key={name}>
                 {index > 0 && " · "}
-                <a href={storybookDocs(`Components/${name}`)}>{name}</a>
+                <a href={storybookDocs(storyTitles[name])}>{name}</a>
               </span>
             ))}
           {" · "}

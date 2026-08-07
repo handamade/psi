@@ -1,9 +1,40 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import type { Plugin } from "vite";
 
 const require = createRequire(import.meta.url);
+
+/**
+ * Reads each component's Storybook `title:` straight from its
+ * `<Component>/<Component>.stories.tsx`, keyed by component name. A
+ * component with no story file simply gets no entry — this is what lets
+ * consumers drop a hand-maintained denylist of compound members (D74
+ * review: three of 21 links 404'd because they'd been hardcoded as
+ * `Components/${name}`, but Table/Pagination live under `Data/` and Toast
+ * under `Feedback/`).
+ */
+function readStoryTitles(
+  pkgRoot: string,
+  componentNames: readonly string[],
+): Record<string, string> {
+  const srcDir = join(pkgRoot, "src");
+  const titles: Record<string, string> = {};
+
+  for (const entry of readdirSync(srcDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !componentNames.includes(entry.name)) continue;
+
+    const dir = join(srcDir, entry.name);
+    const storyFile = readdirSync(dir).find((f) => f.endsWith(".stories.tsx"));
+    if (!storyFile) continue;
+
+    const text = readFileSync(join(dir, storyFile), "utf8");
+    const match = text.match(/title:\s*["'`]([^"'`]+)["'`]/);
+    if (match) titles[entry.name] = match[1];
+  }
+
+  return titles;
+}
 
 /**
  * Exposes the package's own generated artifacts to the site as `virtual:psi-facts`.
@@ -49,13 +80,17 @@ export function psiFacts(): Plugin {
         );
       }
 
+      const componentNames = manifest.components.map((c) => c.name);
+      const pkgRoot = dirname(pkgPath);
+
       const facts = {
         componentCount: manifest.components.length,
         iconCount: manifest.icons.length,
         patternCount: patterns.patterns.length,
         version: pkg.version,
-        componentNames: manifest.components.map((c) => c.name),
+        componentNames,
         iconNames: manifest.icons,
+        storyTitles: readStoryTitles(pkgRoot, componentNames),
       };
 
       return Object.entries(facts)
