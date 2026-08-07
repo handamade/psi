@@ -47,9 +47,10 @@ export function Pipeline() {
             <p>
               The in-repo <strong>Psi Token Sync</strong> plugin publishes a
               variable collection into Figma: one mode per theme, colors
-              grouped bg/fg/fill/border, floats for space, size and radius.
-              Idempotent, with a dry-run diff and orphan reporting — each
-              variable carries its derivation formula in the description.
+              grouped bg/fg/fill/border, floats for space, size and radius,
+              text styles for every type combo. Idempotent, with a dry-run
+              diff and orphan reporting — each color variable carries its
+              derivation formula in the description.
             </p>
             <div className="var-list" aria-label="Synced Figma variables (illustration)">
               {FIGMA_VARS.map((row) => (

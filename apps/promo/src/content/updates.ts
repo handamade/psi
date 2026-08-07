@@ -48,7 +48,7 @@ export const UPDATES: UpdateEntry[] = [
     date: "2026-08-06",
     tag: "components",
     title: "0.11.0 — Toast",
-    body: "Status messaging lands: variants route to the right live region, a visually-hidden prefix names the severity, and toasts carrying an action or an error stay until dismissed. Three new status glyphs come with it.",
+    body: "Status messaging lands: variants route to the right live region — warning and danger interrupt, everything else waits its turn — a visually-hidden prefix names the severity, and a toast carrying an action gets a longer timer (10s vs 5s) so there's time to reach it. Three new status glyphs come with it.",
   },
   {
     date: "2026-08-06",
@@ -60,8 +60,14 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-08-05",
     tag: "docs",
+    title: "0.9.1 — search overview allocates its budget by kind",
+    body: "search(\"\") used to fill topics, then patterns, then components until its budget ran out, so a growing pattern catalog was starving components off the end of the list. It now reserves a floor for components and shortens pattern summaries instead, so growth degrades gracefully rather than dropping items.",
+  },
+  {
+    date: "2026-08-05",
+    tag: "docs",
     title: "0.9.0 — the machine-readable surface widens",
-    body: "The composition catalog reaches 13 patterns, each declaring the components it still lacks, and the MCP search overview now allocates its budget per kind so growth shortens summaries instead of dropping items.",
+    body: "The composition catalog reaches 13 patterns, five of them declaring the component they're still blocked on — Table, Pagination, Drawer, Toast, Tabs — so an agent can read the design system's own backlog instead of inferring it. IconButton's aria-label and Input's type union are promoted into the manifest as discoverable, required props.",
   },
   {
     date: "2026-07-31",
