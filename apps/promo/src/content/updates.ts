@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-08-07",
     tag: "release",
+    title: "0.14.2 — IconMoreHorizontal is importable",
+    body: "0.14.0 shipped the ellipsis icon and a row-actions preset that renders it, but the icon was never re-exported from the package root — so the snippet published as the canonical row-actions example was code no consumer could compile. The validator that exists to stop exactly this resolved the requirement against the source directory rather than the public export surface, where the file plainly existed. It now checks what consumers can actually import.",
+  },
+  {
+    date: "2026-08-07",
+    tag: "release",
     title: "0.14.1 — the manifest describes children",
     body: "Compound components now declare what nests inside them, and patterns can set aria-* on the elements they compose. The manifest is what agents read, so a prop it cannot describe is a prop that gets guessed.",
   },
