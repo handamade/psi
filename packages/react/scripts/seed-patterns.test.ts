@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import ts from "typescript";
 import { loadPatterns, renderPreset, validatePatterns } from "./patterns.js";
@@ -8,9 +8,13 @@ const root = join(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8"));
 const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf8"));
 const patterns = loadPatterns(join(root, "patterns"));
-const icons = readdirSync(join(root, "src/icons"))
-  .filter((f) => f.startsWith("Icon") && f.endsWith(".tsx"))
-  .map((f) => f.replace(/\.tsx$/, ""));
+// The PUBLIC surface, matching emit-patterns: an icon file that exists but is
+// not re-exported from src/index.ts is unimportable by a consumer, so it must
+// not satisfy a pattern's `requires`.
+const publicExports = readFileSync(join(root, "src/index.ts"), "utf8");
+const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
+  .map((m) => m[1])
+  .filter((n) => existsSync(join(root, "src/icons", `${n}.tsx`)));
 
 describe("seed patterns against the real manifest", () => {
   it("all thirteen load and validate; the backlog is empty (D67)", () => {
@@ -129,5 +133,28 @@ describe("the manifest describes children (D72)", () => {
     const preset = renderPreset(patterns.find((p) => p.id === "filter-toolbar")!, manifest.components)!;
     expect(preset).toContain('<Input aria-label=');
     expect(preset).toContain('<Select aria-label=');
+  });
+});
+
+describe("every icon is importable from the package root", () => {
+  // Shipped broken in 0.14.0: IconMoreHorizontal was added to
+  // src/icons/index.ts but not to the hand-written re-export list in
+  // src/index.ts, so `row-actions`' preset emitted <IconMoreHorizontal /> —
+  // code no consumer could compile. The build was green; only the D68 external
+  // consumer run against the published tarball caught it.
+  it("re-exports every icon in the barrel from src/index.ts", () => {
+    const barrel = readFileSync(join(root, "src/icons/index.ts"), "utf8");
+    const inBarrel = [...new Set([...barrel.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)].map((m) => m[1]))];
+    const missing = inBarrel.filter((n) => !icons.includes(n));
+    expect(missing).toEqual([]);
+  });
+
+  it("has a file on disk for every icon the root exports", () => {
+    // The other direction: a name re-exported but deleted would break the build,
+    // but this pins the two lists as the same set rather than merely overlapping.
+    expect(icons.length).toBeGreaterThan(0);
+    for (const n of icons) {
+      expect(existsSync(join(root, "src/icons", `${n}.tsx`)), n).toBe(true);
+    }
   });
 });

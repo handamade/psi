@@ -93,4 +93,5 @@ export {
   IconInfo,
   IconAlertTriangle,
   IconAlertCircle,
+  IconMoreHorizontal,
 } from "./icons/index.js";

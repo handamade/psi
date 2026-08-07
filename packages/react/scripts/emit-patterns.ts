@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, readdirSync } from "node:fs";
+import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadPatterns, validatePatterns, renderPreset } from "./patterns.js";
@@ -19,11 +19,16 @@ export function emitPatterns(rootDir: string): void {
   const patterns = loadPatterns(join(rootDir, "patterns"));
 
   // The icon roster is the resolution target for `requires` entries of
-  // kind "icon" (D71). Read from the source directory rather than the barrel
-  // so a file that exists but was never exported still fails to resolve.
-  const icons = readdirSync(join(rootDir, "src", "icons"))
-    .filter((f) => f.startsWith("Icon") && f.endsWith(".tsx"))
-    .map((f) => f.replace(/\.tsx$/, ""));
+  // kind "icon" (D71). It must be the package's PUBLIC export surface, not the
+  // source directory: `src/index.ts` re-exports icons through a hand-written
+  // list, so an icon file can exist, build, and still be unimportable by a
+  // consumer. Reading the directory made `row-actions` resolve against exactly
+  // such an icon and ship a preset nobody could compile (caught by the D68
+  // external consumer run against published 0.14.0, not by anything in-repo).
+  const publicExports = readFileSync(join(rootDir, "src", "index.ts"), "utf8");
+  const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
+    .map((m) => m[1])
+    .filter((name) => existsSync(join(rootDir, "src", "icons", `${name}.tsx`)));
 
   const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
 
