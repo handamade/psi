@@ -15,8 +15,11 @@ export function App() {
 
   return (
     <>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
       <Header theme={theme} onTheme={setTheme} />
-      <main>
+      <main id="main" tabIndex={-1}>
         <Hero />
         <Principles />
         <Playground />

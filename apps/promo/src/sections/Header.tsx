@@ -8,6 +8,8 @@ const NAV = [
   ["Components", "#components"],
   ["Theming", "#theming"],
   ["Pipeline", "#pipeline"],
+  ["Agents", "#agents"],
+  ["Roadmap", "#roadmap"],
   ["Updates", "#updates"],
   ["Storybook", STORYBOOK_BASE],
 ] as const;

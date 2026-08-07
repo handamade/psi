@@ -39,26 +39,10 @@ export function Hero() {
             className="hero-ctas rise"
             style={{ "--rise": "0.19s" } as CSSProperties}
           >
-            <Button
-              variant="accent"
-              size={48}
-              onClick={() =>
-                document
-                  .querySelector("#components")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
+            <Button variant="accent" size={48} href="#components">
               Explore the components
             </Button>
-            <Button
-              variant="neutral-subtle"
-              size={48}
-              onClick={() =>
-                document
-                  .querySelector("#theming")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
+            <Button variant="neutral-subtle" size={48} href="#theming">
               See theming in action
             </Button>
           </div>

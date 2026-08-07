@@ -50,6 +50,22 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+.skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  z-index: var(--psi-z-overlay);
+}
+
+.skip-link:focus-visible {
+  inset-inline-start: var(--promo-pad-x);
+  top: var(--psi-space-8);
+  padding: var(--psi-space-8) var(--psi-space-16);
+  border-radius: var(--psi-radius-8);
+  background: var(--psi-fill-accent);
+  color: var(--psi-fg-on-accent);
+  font: var(--psi-text-14-20-medium);
+}
+
 code,
 pre {
   font-family: var(--psi-font-mono);
