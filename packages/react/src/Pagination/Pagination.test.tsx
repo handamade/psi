@@ -185,4 +185,10 @@ describe("Pagination out-of-range page (D78)", () => {
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
+
+  it("treats a non-finite page as 1, not NaN, so the clamp still lands", () => {
+    render(<Pagination page={NaN} pageCount={5} onPageChange={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "1" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
+  });
 });

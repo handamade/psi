@@ -50,7 +50,7 @@
 - Selecting rows: give each `<TableRow>` a `rowId` and a `selectLabel` — the row checkbox has no visible label, so `selectLabel` is its accessible name. `<TableHead>` grows the select-all checkbox automatically; do not add one. Consult dist/patterns.json for the `data-table` pattern.
 
 ## Pagination
-- `<Pagination page={n} pageCount={total} onPageChange={...}>`: a numbered pager with ellipsis truncation (`‹ 1 … 4 5 6 … 13 ›`), built from Button/IconButton (D63). `siblingCount` (default 1) sets how many pages flank the current one before truncating; `aria-current="page"` marks the active page and the ellipsis is inert.
+- `<Pagination page={n} pageCount={total} onPageChange={...}>`: a numbered pager with ellipsis truncation (`‹ 1 … 4 5 6 … 13 ›`), built from Button/IconButton (D63). `siblingCount` (default 1) sets how many pages flank the current one before truncating; `aria-current="page"` marks the active page and the ellipsis is inert. `page` outside `[1, pageCount]` (including non-finite values) is clamped for rendering and warns in development (D78).
 - It is **standalone, not a Table family member** and has no connection to `Table` — `Table` has no `page` prop. The `table-pagination` pattern composes it as a `Toolbar` sibling of a page-size `Select`; the consumer owns page state and slices the rows.
 
 ## Dialog, and drawers (there is no Drawer component)
@@ -70,6 +70,8 @@
 - **Activation is automatic**: arrow keys move focus and selection together. There is no manual-activation mode. Arrows follow the orientation's axis (Left/Right horizontal, Up/Down vertical) with wrap; Home/End jump to the first/last enabled tab; disabled tabs are skipped and use `aria-disabled`, not the `disabled` attribute.
 - **Every panel renders; unselected ones get `hidden`.** So `aria-controls` always resolves and panel DOM state survives a switch. If a panel is expensive, render less *inside* it (`{selected ? <Heavy/> : null}`) rather than omitting the `TabPanel` — omitting it leaves the tab's `aria-controls` pointing at nothing.
 - `TabList` requires `aria-label`. The active panel is itself a tab stop, so a panel with no focusable content is still reachable.
+
+## Menu family (3)
 - `<Menu open onClose={(reason) => …} trigger={<IconButton …/>} placement="bottom-start|bottom-end|top-start|top-end" aria-label="…">`: action menu on the native Popover API — top layer and light dismiss come from the platform, roving keyboard and dismissal reasons from Psi (D53). **Controlled-only** like Dialog: `onClose(reason)` reports `"esc" | "outside" | "item-select"` and the consumer flips `open`. Compose `<MenuItem onSelect>` and `<MenuSeparator>`; the trigger needs an accessible name, so an icon-only trigger is `<IconButton aria-label>`.
 - Many menus, one state: for a row-actions column, hold a single `openMenuId` and render each row's Menu with `open={openMenuId === row.id}`, closing with `onClose={() => setOpenMenuId(null)}`. Do not give each row its own boolean. This is the shape D58 fixed a real dismissal bug in — switching directly between two menus left both closed, because the platform light-dismisses the first before the consumer's click handler runs.
 

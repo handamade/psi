@@ -67,7 +67,11 @@ export function paginationRange(
 }
 
 export interface PaginationProps {
-  /** Current page, 1-based. */
+  /**
+   * Current page, 1-based. A value outside `[1, pageCount]` (including
+   * non-finite values like `NaN`) is clamped for rendering and logs a
+   * `console.warn` in development. `pageCount < 1` renders no page buttons.
+   */
   page: number;
   /** Total number of pages. */
   pageCount: number;
@@ -102,7 +106,8 @@ export function Pagination({
   // out-of-range `page` otherwise matches no button, so `aria-current="page"`
   // lands nowhere and assistive tech reports a pager with no current page.
   const hasPages = pageCount >= 1;
-  const effectivePage = hasPages ? Math.min(Math.max(page, 1), pageCount) : 0;
+  const safePage = Number.isFinite(page) ? page : 1;
+  const effectivePage = hasPages ? Math.min(Math.max(safePage, 1), pageCount) : 0;
 
   if (process.env.NODE_ENV !== "production" && (!hasPages || page !== effectivePage)) {
     console.warn(
