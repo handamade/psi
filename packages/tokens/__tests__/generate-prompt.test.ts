@@ -28,8 +28,17 @@ describe("parsePrompt", () => {
   });
 
   it("reads a chroma keyword", () => {
-    expect(parsePrompt("neon cyber").chroma).toBe("electric");
-    expect(parsePrompt("calm muted").chroma).toBe("muted");
+    expect(parsePrompt("a neon sign").chroma).toBe("electric");
+    expect(parsePrompt("a muted palette").chroma).toBe("muted");
+    expect(parsePrompt("a calm room").chroma).toBe("calm");
+    expect(parsePrompt("bold and loud").chroma).toBe("vivid");
+  });
+
+  it("takes the leftmost keyword when a prompt names several", () => {
+    // Deterministic precedence: firstMatch scans words in order, so the
+    // earliest keyword wins. "calm muted" is calm, not muted.
+    expect(parsePrompt("calm muted").chroma).toBe("calm");
+    expect(parsePrompt("muted calm").chroma).toBe("muted");
   });
 
   it("still derives a valid vector from words it does not know", () => {
