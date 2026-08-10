@@ -120,13 +120,47 @@ decisions, and are recorded here so implementation cannot quietly reverse one.
   argument that themes are attribute-scoped, and a generated theme swallowing
   them would make the section self-refuting. **It gets a test, not a comment.**
 
-  Two consequences are designed for rather than discovered:
+  Three consequences are designed for rather than discovered:
 
-  - **Restore before first paint.** The theme persists to `localStorage` and is
-    reapplied by a small inline script in `<head>`, or a returning visitor sees
-    the default theme flash into their custom one.
-  - **Reset is always one click away.** A reset control is permanently visible
-    while a custom theme is active.
+  - **What persists is the `BrandVector`, never the resolved tokens.** This is
+    the difference between a recoverable page and an unrecoverable one. A
+    stored blob of resolved custom properties cannot be validated on read, has
+    not passed `solveL`, and is reapplied before paint on every later visit —
+    so one corrupt or stale payload poisons the page permanently, and the
+    reset control ends up living inside the very theme it exists to escape.
+
+    A `BrandVector` is six fields over a closed set. It is schema-checked on
+    read, and anything that fails falls through to the default theme after
+    clearing the key, so the failure mode is self-healing rather than sticky.
+    Because only solver output can then reach the screen, **the reset control
+    is legible by construction** — which is what makes whole-page theming
+    defensible at all.
+
+  - **Restore before first paint, without shipping the deriver in `<head>`.**
+    Re-deriving needs `generate/`, which is too much to inline. So the vector
+    is stored beside a *cache* of its resolved custom properties: the boot
+    script applies the cache for paint, and the app then validates the vector,
+    re-derives, and rewrites the cache if it disagrees.
+
+    A cache that drifts — because the derivation changed between visits —
+    therefore corrects itself within the same load, and the rewritten cache
+    makes the *next* load correct before paint too. A visitor is never pinned
+    to an old algorithm's output, and the worst case is one frame of stale
+    colour rather than a permanently wrong theme.
+
+  - **Reset restores the page, not the console.** One control, permanently
+    visible while a custom theme is active, and its scope is explicit:
+
+    | Cleared | Kept |
+    | --- | --- |
+    | inline custom properties on `documentElement` | the `psi-appearance` preference |
+    | `data-psi-theme="custom"` | the prompt text in the input |
+    | the stored vector and its cache | |
+
+    Appearance is deliberately **not** reset: a visitor who chose dark did not
+    ask to leave it by discarding a brand. Keeping the prompt makes reset a
+    comparison tool — reset, look, derive again — rather than a punishment for
+    experimenting.
 
 - **The hero's formula card is subsumed, not displaced.** The Δ-lightness
   demo (`Hero.tsx:61–115`) becomes the console's derived-state row: the same
@@ -352,6 +386,15 @@ theme therefore reaches the whole page rather than half of it.
 - **Site gate** — the axe runs assert the resolved `data-psi-theme` rather
   than trusting the seeded storage key, so both appearances are provably
   covered.
+- **Reset and recovery** — the explicitly hostile cases, because this is what
+  the whole-page decision rests on:
+  - a hand-corrupted stored vector, a vector with an off-scale `radius`, and a
+    non-JSON value each boot to the default theme with the key cleared, not to
+    a broken page;
+  - a stale cache disagreeing with its vector heals on load rather than
+    persisting the old output;
+  - reset clears the theme and its storage, keeps appearance and prompt, and
+    a reload after reset stays reset.
 - **Browser** — derive with the remote stage unconfigured (local path), then
   configured; confirm restore-before-paint on reload, and reset. Confirm the
   Ψ mark follows a generated theme (it must never keep the pre-derive
@@ -389,7 +432,13 @@ theme therefore reaches the whole page rather than half of it.
 ## Accepted cost
 
 Whole-page theming means a visitor's prompt repaints the sections arguing for
-Psi's own design decisions. The AA solver keeps every generated theme readable
-and the reset control keeps it recoverable, but "impressive" and "on-message"
-are in genuine tension here. The trade is accepted for the hero demo, and
-recorded so a later reviewer sees it was chosen rather than overlooked.
+Psi's own design decisions. "Impressive" and "on-message" are in genuine
+tension here, and the trade is accepted for the hero demo.
+
+It is only defensible because recovery is structural rather than a button:
+`solveL` means every theme that can reach the screen is readable, and
+persisting the `BrandVector` rather than resolved tokens means every theme
+that can reach the screen came from `solveL`. Those two together are what
+make the reset control guaranteed legible. **If a later change persists
+resolved output instead — for speed, say — this justification collapses and
+the whole-page decision should be revisited with it.**
