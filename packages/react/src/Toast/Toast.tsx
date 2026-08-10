@@ -78,7 +78,7 @@ export function Toast({
         <Icon size={20} aria-hidden="true" />
       </span>
       <div className={styles.body}>
-        {prefix && <span className={styles.srOnly}>{prefix}</span>}
+        {prefix && <span className="psi-sr-only">{prefix}</span>}
         {children}
       </div>
       {action != null && <div className={styles.action}>{action}</div>}

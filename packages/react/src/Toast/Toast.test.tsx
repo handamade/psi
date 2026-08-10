@@ -85,4 +85,10 @@ describe("Toast", () => {
     render(<Toast ref={ref}>msg</Toast>);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
+
+  it("hides the status prefix via the shared psi-sr-only utility, not a private class (D80)", () => {
+    render(<Toast variant="success">Saved</Toast>);
+    const prefix = screen.getByText("Success:");
+    expect(prefix.className).toContain("psi-sr-only");
+  });
 });

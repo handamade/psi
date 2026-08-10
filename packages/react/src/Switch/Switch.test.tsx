@@ -72,4 +72,12 @@ describe("Switch", () => {
     await user.keyboard(" ");
     expect(screen.getByRole("switch")).toBeChecked();
   });
+
+  it("hides the native input via the shared psi-sr-only utility, not a private class (D80)", () => {
+    const { container } = render(<Switch />);
+    const input = container.querySelector("input")!;
+    const classes = input.className.split(" ");
+    expect(classes).toContain("psi-sr-only");
+    expect(classes).not.toContain("undefined");
+  });
 });

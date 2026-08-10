@@ -40,6 +40,9 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 ## Tabular numerals (--psi-font-variant-numeric, .psi-tabular)
 - --psi-font-variant-numeric is tabular-nums (D62); apply the .psi-tabular utility class to numeric content for fixed-width digits that don't jitter between rows. Table's own numeric columns (TableCell/TableHeaderCell `numeric` prop) bind the token directly in CSS — reach for the utility class for numeric content outside Table.
 
+## Visually hidden (.psi-sr-only)
+- .psi-sr-only hides content visually while keeping it in the accessibility tree — position/size/clip only, never display:none or visibility:hidden, so screen readers still announce it and it stays in the tab order if focusable. Use it for status-word prefixes, icon-only-control labels not carried by aria-label, or a native input replaced by a custom visual control.
+
 ## Dark-first brands
 - A brand theme can declare `base: "dark"` (see ember) so its formulas derive from the dark palette instead of light — use this for brands whose primary surface is a dark canvas rather than treating dark as an inverted afterthought.
 

@@ -198,4 +198,26 @@ describe("emitUtilitiesRoster", () => {
     expect(gap!.property).toBe("gap");
     expect(gap!.scale).toContain(24);
   });
+
+  it("carries the sr-only utility (D80)", () => {
+    expect(emitUtilitiesRoster().classes).toContain("psi-sr-only");
+  });
+});
+
+describe("visually-hidden utility (D80)", () => {
+  it("emits .psi-sr-only with both clip and clip-path", () => {
+    const css = emitUtilitiesCSS();
+    const rule = css.match(/\.psi-sr-only\s*\{[^}]*\}/);
+    expect(rule).not.toBeNull();
+    expect(rule![0]).toContain("clip: rect(0 0 0 0)");
+    expect(rule![0]).toContain("clip-path: inset(50%)");
+    expect(rule![0]).toContain("position: absolute");
+  });
+
+  it("registers in the roster with no scale, matching .psi-container", () => {
+    const family = emitUtilitiesRoster().families.find((f) => f.prefix === "psi-sr-only");
+    expect(family).toBeDefined();
+    expect(family!.scale).toBeNull();
+    expect(family!.classes).toEqual(["psi-sr-only"]);
+  });
 });

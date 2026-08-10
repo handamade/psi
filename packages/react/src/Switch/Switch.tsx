@@ -28,7 +28,7 @@ export function Switch({
         ref={ref}
         type="checkbox"
         role="switch"
-        className={styles.input}
+        className={`psi-sr-only ${styles.input}`}
         disabled={disabled}
         {...rest}
       />

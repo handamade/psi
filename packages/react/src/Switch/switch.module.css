@@ -15,19 +15,11 @@
   cursor: not-allowed;
 }
 
-/* ── Visually-hidden native input ────────────────────────────── */
-
-.input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* Hidden visually via the shared .psi-sr-only utility (D80), applied in
+   Switch.tsx. This class carries no declarations of its own any more --
+   it exists only as the sibling-selector anchor below (:checked,
+   :focus-visible). Do not delete it; deleting it breaks every rule that
+   follows. */
 
 /* ── Track ───────────────────────────────────────────────────── */
 
