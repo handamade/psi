@@ -57,12 +57,17 @@ advance. Generated themes need the solving variant of the same math.
   interface BrandVector {
     hue: number;                     // 0–360, the accent anchor
     chroma: "muted" | "calm" | "balanced" | "vivid" | "electric";
-    base: "light" | "dark";
+    mode: "light" | "dark";          // which member to SHOW; both are derived
     radius: 4 | 6 | 8 | 12;          // on-scale rungs only (D56)
     fonts?: BrandFonts;              // roles from a fixed catalog (D29)
     name: string;                    // slug for customers/<name>.ts
   }
   ```
+
+  `mode` is a presentation hint, not a derivation input — see "A brand is
+  always a light/dark pair" below. A prompt reading *midnight* implies dark and
+  *sunrise* implies light, so the console switches to the implied mode on
+  derive; the other member exists either way.
 
   **`/api/theme` returns a `BrandVector`, never colours.** The model emits a
   brief — a hue number, a chroma word, a radius rung, font roles drawn from a
@@ -88,6 +93,38 @@ advance. Generated themes need the solving variant of the same math.
 
 The four commitments below are consequences of D57 rather than separate
 decisions, and are recorded here so implementation cannot quietly reverse one.
+
+- **A brand is always a light/dark pair, derived together.** `deriveTheme`
+  returns both members from one `BrandVector`, each solved to AA
+  independently. The header toggle then *selects* between them — an instant
+  swap, with no re-derivation and no second solver pass.
+
+  Only the lightness anchors invert; the brand's hue and chroma carry across
+  both, which is what makes the pair read as one brand in two modes rather
+  than two unrelated themes. The template in `scripts/new-theme.ts` already
+  documents these two shapes — light uses `ink l≈0.25 / canvas l≈0.95`, dark
+  uses `ink l≈0.95 / canvas l≈0.15` — so the pair is built from anchors the
+  package already describes.
+
+  **This needs no change to `CustomerTheme`.** Psi has no concept of one brand
+  in two modes — `acme` is light, `ember` is dark, neither has a counterpart —
+  but the existing types express a pair without extension: one `Palette`
+  holding both lightness anchors, and two `SlotMap`s selecting between them.
+
+  ```ts
+  export const acmePalette: Palette = {
+    acmeInkLight:    { l: 0.25, … },  acmeInkDark:    { l: 0.95, … },
+    acmeCanvasLight: { l: 0.96, … },  acmeCanvasDark: { l: 0.15, … },
+    acmeBrand: { … },   // hue + chroma shared by both members
+  };
+  export const acmeSlots     = { ink: "acmeInkLight", canvas: "acmeCanvasLight", … };
+  export const acmeDarkSlots = { ink: "acmeInkDark",  canvas: "acmeCanvasDark",  … };
+  ```
+
+  The generated file registers two entries — `acme` and `acme-dark`, the
+  second carrying `base: "dark"`. Teaching `CustomerTheme` about pairs
+  directly would be cleaner and is a token-package decision with its own D
+  number, deliberately not taken here.
 
 - **Generated themes are *solved* to AA; shipped themes stay *gated*.**
   `packages/tokens/src/contrast-matrix.ts` already implements the WCAG maths
@@ -153,14 +190,15 @@ decisions, and are recorded here so implementation cannot quietly reverse one.
 
     | Cleared | Kept |
     | --- | --- |
-    | inline custom properties on `documentElement` | the `psi-appearance` preference |
+    | inline custom properties on `documentElement` | `psi-theme` — the light/dark mode |
     | `data-psi-theme="custom"` | the prompt text in the input |
-    | the stored vector and its cache | |
+    | `psi-brand` — the stored vector and its cache | |
 
-    Appearance is deliberately **not** reset: a visitor who chose dark did not
-    ask to leave it by discarding a brand. Keeping the prompt makes reset a
-    comparison tool — reset, look, derive again — rather than a punishment for
-    experimenting.
+    The mode is deliberately **not** reset: a visitor who chose dark did not
+    ask to leave it by discarding a brand. This falls out of the two keys
+    being orthogonal — reset clears one and never touches the other. Keeping
+    the prompt makes reset a comparison tool — reset, look, derive again —
+    rather than a punishment for experimenting.
 
 - **The hero's formula card is subsumed, not displaced.** The Δ-lightness
   demo (`Hero.tsx:61–115`) becomes the console's derived-state row: the same
@@ -193,11 +231,16 @@ decisions, and are recorded here so implementation cannot quietly reverse one.
   left as homework.
 
   **That is precisely the gap the console fills**, and it fixes the two units'
-  relationship: `serializeCustomerTheme` must emit the *same shape* the CLI's
-  template emits, so that the browser and the CLI converge on one file format
-  rather than drifting into two. The sequel is therefore not "build a CLI" but
-  "teach the existing one to derive" — `pnpm new-theme acme --prompt "…"`,
-  reusing `generate/` unchanged.
+  relationship. `serializeCustomerTheme` emits the CLI's template shape
+  *extended to a pair*: one `Palette` carrying both modes' lightness anchors,
+  two `SlotMap`s, two registry entries. The CLI's single-mode output is the
+  degenerate case of that form, not a different format — which is what keeps
+  the browser and the CLI from drifting into two file layouts.
+
+  The sequel is therefore not "build a CLI" but "teach the existing one to
+  derive" — `pnpm new-theme acme --prompt "…"`, reusing `generate/` unchanged.
+  At that point `--base` becomes redundant, since a derived brand carries both
+  modes; retiring it is that spec's decision.
 
   One detail in that template is evidence for the solver decision above: it
   warns by hand that "warning in particular must stay light enough to carry
@@ -219,45 +262,53 @@ They are recorded here because the console lands in the middle of them.
   place on the page that ignores the theme the hero just derived. If a drawn
   asset replaces the glyph later, it inherits the same constraint.
 
-  The switcher drops from four themes (`light | dark | acme | ember`) to the
-  conventional three-way `light | dark | system`.
+  The switcher drops from a four-theme roster (`light | dark | acme | ember`)
+  to a **binary light/dark toggle**. There is no `system` option: the theme
+  *chooser* — the thing that selects among brands — is moving to the Theming
+  section, and eventually to a page of its own. The header stops being a
+  showcase and becomes an appearance control.
 
-- **Appearance is app state; `data-psi-theme` stays the DS contract.** These
-  are different types and conflating them breaks the page:
+  **First visit still follows the OS.** `index.html` today reads
+  `stored || (prefers-color-scheme: dark ? "dark" : "light")`, and that
+  behaviour is kept: a dark-mode visitor is not flashed a light page. The
+  absence of a `system` *option* is a UI decision, not a reason to ignore the
+  OS for the initial value. Once the visitor toggles, their choice sticks.
 
-  ```ts
-  type Appearance = "light" | "dark" | "system";   // app-level, promo only
-  type ThemeName  = "light" | "dark" | …;          // the Psi contract
-  ```
+- **Mode and brand are orthogonal, and stored separately.** The page has two
+  independent axes, and the earlier draft of this spec tangled them:
 
-  Psi has no `system` theme, and never will — `system` is a *resolution rule*,
-  not a token set. The boot script must resolve it before writing the
-  attribute. **This is a live trap, not a hypothetical:** `index.html` today
-  reads `localStorage["psi-theme"]` and assigns it straight to
-  `data-psi-theme`. Storing `"system"` under that key would emit
-  `data-psi-theme="system"`, which matches no theme CSS and renders the page
-  unstyled.
+  | Key | Holds | Absent means |
+  | --- | --- | --- |
+  | `psi-theme` | `"light" \| "dark"` — which mode | first visit → OS preference |
+  | `psi-brand` | a `BrandVector` — which brand | stock Psi |
 
-  Therefore the preference moves to a **new key**, `psi-appearance`, holding an
-  `Appearance`; the boot script resolves it to a `ThemeName` before assignment.
-  A new key also disposes of migration: a returning visitor's stored
-  `psi-theme` of `"acme"` has no appearance equivalent, and an unreadable key
-  simply falls through to `system` — which is what the boot script already does
-  when storage is empty.
+  The applied theme is `brand ? derived[mode] : stock[mode]`. The header writes
+  only the first key; the console writes only the second. They cannot contend,
+  because neither is expressible in the other's key.
 
-  `system` additionally requires a live `matchMedia("(prefers-color-scheme:
-  dark)")` listener, attached only while the preference is `system`. Today the
-  media query is consulted once at boot and never again, so an OS appearance
-  change mid-visit is ignored until reload.
+  **A note on what this replaced.** An earlier draft introduced a
+  `psi-appearance` key to hold a three-way `light | dark | system`, because
+  `"system"` is not a `ThemeName` and writing it to `data-psi-theme` would
+  match no theme CSS and render the page unstyled. Dropping `system` dissolves
+  that trap entirely — `"light"` and `"dark"` *are* valid theme names, so the
+  existing key needs no rename and no migration.
 
-- **The switcher and the console compose rather than fight.** Both write
-  theme state, so precedence must be explicit. While a console theme is active,
-  changing appearance **re-derives the same `BrandVector` at the new `base`**
-  rather than discarding the visitor's theme; a `system` flip does the same.
+  One migration concern survives: a returning visitor holds
+  `psi-theme: "ember"` or `"acme"` from the old roster, which the header can no
+  longer represent. The boot script therefore **validates the stored value
+  against `light | dark`** and falls through to the OS preference otherwise,
+  rather than stranding that visitor in a theme with no control for leaving it.
 
-  This is why `base` is a field on `BrandVector` (D57) rather than baked into
-  the derived output — it is the pivot that lets one derived brand exist in
-  both appearances. Reset remains the only control that discards a theme.
+- **The toggle selects a member; it never re-derives.** Because a brand is
+  derived as a light/dark pair (see Design), switching mode while a console
+  theme is active swaps to the pair's other member — instant, and identical to
+  what a reload would produce. Deriving sets the mode to `vector.mode`, so a
+  prompt reading *midnight* lands the visitor in dark without a second click.
+
+  An earlier draft had the toggle re-derive at a new `base`. Pair generation
+  replaces it: there is nothing to recompute, and the two storage keys are
+  orthogonal, so the header and the console cannot contend for the same state.
+  Reset remains the only control that discards a brand.
 
 - **`themes/light.ts` moves to the Theming section.** The hero's formula card
   splits in two, and the halves go to different places:
@@ -337,19 +388,27 @@ than smuggled in here.
 var(--psi-radius-12)` (`promo.css:563`) — an app-level rung binding, not on
 the control dial, and so unaffected by a generated theme's radius.
 
-**`ember` loses its only site surface.** The header switcher is the sole
-site-wide way to see `ember` today — the Theming grid shows light, dark and
-acme, and nothing else references it. Narrowing the switcher to
-`light | dark | system` therefore leaves a shipped, published theme with no
-representation on the public site. It remains in the package, in the resolved
-token output, and in Storybook.
+**`ember` is between homes.** The header switcher is the only site-wide way to
+see `ember` today — the Theming grid shows light, dark and acme, and nothing
+else references it. Narrowing the header to a light/dark toggle removes that
+surface before its replacement exists.
 
-This is accepted deliberately rather than solved here: the Theming section is
-scheduled for its own redesign, and placing `ember` is that cycle's decision
-(the grid growing to four cards is the obvious candidate). Recorded so the
-redesign inherits it as a known debt instead of rediscovering it — and so
-that, until then, "4 themes" in the hero's stat line is a claim the page no
-longer demonstrates.
+The destination is known rather than undecided: the theme *chooser* moves into
+the Theming section, and later onto a page of its own. That relocation is the
+Theming redesign's work, not the console's, so between this cycle and that one
+a shipped, published theme has no representation on the public site. It remains
+in the package, the resolved token output, and Storybook throughout.
+
+Two consequences to carry into that cycle:
+
+- the hero's `"4 themes"` stat stays **true** — the package still ships four —
+  but becomes a claim the page no longer demonstrates;
+- `Roadmap.tsx:6` describes those four as "light, dark and two customer brands
+  (acme, ember)", which likewise stays true while becoming unillustrated.
+
+Neither is drift for `check-docs-drift` to catch (it tracks component, icon and
+pattern counts, not themes), so nothing will fail if this is forgotten. That is
+exactly why it is written down.
 
 Beyond that one rule, `apps/promo` is fully token-bound and needs no
 preparation for whole-page theming: the stylesheet contains three colour
@@ -367,7 +426,8 @@ theme therefore reaches the whole page rather than half of it.
   and needs `apps/promo/dist` to exist first.
 - **Unit** — `parsePrompt` determinism (same prompt → same vector; unknown
   words still derive); `solveL` convergence against `checkContrast` across the
-  hue circle at both `base` values; `serializeCustomerTheme` output parses as
+  hue circle in **both** members of a derived pair; `serializeCustomerTheme`
+  output parses as
   valid TypeScript matching the `CustomerTheme` shape **and matches the shape
   `scripts/new-theme.ts` emits**, so the browser and the CLI cannot drift into
   two file formats.
@@ -376,13 +436,18 @@ theme therefore reaches the whole page rather than half of it.
 - **Contract** — `/api/theme` responses failing `BrandVector` validation are
   rejected and the local derivation stands; a timeout, a non-2xx and an absent
   API key each leave a fully working console.
-- **Appearance** — `system` tracks a live OS appearance change without reload;
-  an explicit `light`/`dark` does not. A stored `psi-appearance` of `system`
-  never reaches `data-psi-theme`. A stale `psi-theme` value from a previous
-  visit does not break boot.
-- **Composition** — with a console theme active, switching appearance
-  re-derives at the new `base` and keeps the derived brand; only reset
-  discards it.
+- **Mode** — a first visit with no stored value follows
+  `prefers-color-scheme`; once toggled, the stored choice wins over the OS. A
+  stale `psi-theme` of `"ember"` or `"acme"` from the old roster falls through
+  to the OS preference rather than stranding the visitor in a theme the header
+  cannot leave.
+- **Pair** — one prompt yields two themes, **both** clearing the AA matrix;
+  the brand's hue and chroma are identical across the pair while the lightness
+  anchors invert. A prompt implying dark (*midnight*) lands in dark on derive.
+- **Composition** — with a console theme active, toggling mode swaps to the
+  pair's other member and keeps the brand; the result is identical to
+  reloading in that mode. Only reset discards the brand, and it leaves the
+  mode untouched.
 - **Site gate** — the axe runs assert the resolved `data-psi-theme` rather
   than trusting the seeded storage key, so both appearances are provably
   covered.
