@@ -3,6 +3,13 @@
 Date: 2026-08-10. Status: **Draft** — targets `apps/promo`, `packages/tokens`,
 and one new Vercel Function.
 
+Scope note: D57 is the console itself (`packages/tokens` generator, the
+Function, the hero). It arrives alongside a set of `apps/promo` changes —
+header mark, appearance switcher, the `themes/light.ts` relocation — which
+claim no decision numbers and are specified under "The promo page" below.
+Further promo work (the Theming and Components sections' redesign) is
+deliberately deferred to its own cycle.
+
 Provenance: D57 was reserved for this work by the D56 control-radius spec
 (2026-07-31), whose sequencing note scoped it as "prompt → constraint vector →
 `Palette` + `SlotMap` + control radius, applied live and exported as a real
@@ -134,16 +141,119 @@ decisions, and are recorded here so implementation cannot quietly reverse one.
   so a generated theme that sets `--psi-fill-accent` moves them automatically.
   The Δ slider keeps working on top, now composing with the derived accent.
 
-- **The console emits real `customers/<name>.ts` source.** Below the
-  preview, the generated file renders as copyable source in the shape of
-  `packages/tokens/src/themes/customers/acme.ts`: `Palette`, `SlotMap`, a
+- **The console emits source the existing CLI could have written.**
+  Below the preview, the generated file renders as copyable source in the shape
+  of `packages/tokens/src/themes/customers/acme.ts`: `Palette`, `SlotMap`, a
   control-radius override, and `fonts` when the vector carries them.
 
-  This settles an existing inaccuracy. The Theming section already captions its
-  code block `scaffolded by \`pnpm new-theme acme\`` (`Theming.tsx:108`) — **a
-  command that does not exist anywhere in the repository.** The console makes
-  the generation claim true through the browser; the caption is corrected to
-  describe what actually exists.
+  **`pnpm new-theme` already exists** — `packages/tokens/scripts/new-theme.ts`,
+  wired at `packages/tokens/package.json:25`. It writes
+  `customers/<name>.ts` and registers it in `customers/index.ts` at the
+  `// <ds:register …>` marker, and it supports `--base dark`. The promo page's
+  two references to it (`Theming.tsx:108`, `Roadmap.tsx:6`) are accurate and
+  need no correction.
+
+  What the CLI does *not* do is derive anything. Its template emits
+  placeholder anchors — every hue hardcoded to 250/260, under comments reading
+  "Replace with brand OKLCH anchors" and "tune to taste". The brand values are
+  left as homework.
+
+  **That is precisely the gap the console fills**, and it fixes the two units'
+  relationship: `serializeCustomerTheme` must emit the *same shape* the CLI's
+  template emits, so that the browser and the CLI converge on one file format
+  rather than drifting into two. The sequel is therefore not "build a CLI" but
+  "teach the existing one to derive" — `pnpm new-theme acme --prompt "…"`,
+  reusing `generate/` unchanged.
+
+  One detail in that template is evidence for the solver decision above: it
+  warns by hand that "warning in particular must stay light enough to carry
+  black label text at 4.5:1". A derived theme has no such footnote, because
+  `solveL` guarantees it.
+
+## The promo page
+
+**No D numbers are claimed below.** Following the precedent set by the
+2026-07-31 promo refresh, `apps/promo` is a consumer app of the packages; page
+changes that alter no token, component or public contract are not decisions.
+They are recorded here because the console lands in the middle of them.
+
+- **The header carries a Ψ mark and an appearance switcher, not a theme
+  roster.** The wordmark gains the Ψ glyph as an **inline SVG component** —
+  not a `public/` asset — with `fill="currentColor"`. Inline costs no extra
+  request, and `currentColor` means the mark follows the resolved theme,
+  including any console-generated one. A hardcoded fill would be the single
+  place on the page that ignores the theme the hero just derived. If a drawn
+  asset replaces the glyph later, it inherits the same constraint.
+
+  The switcher drops from four themes (`light | dark | acme | ember`) to the
+  conventional three-way `light | dark | system`.
+
+- **Appearance is app state; `data-psi-theme` stays the DS contract.** These
+  are different types and conflating them breaks the page:
+
+  ```ts
+  type Appearance = "light" | "dark" | "system";   // app-level, promo only
+  type ThemeName  = "light" | "dark" | …;          // the Psi contract
+  ```
+
+  Psi has no `system` theme, and never will — `system` is a *resolution rule*,
+  not a token set. The boot script must resolve it before writing the
+  attribute. **This is a live trap, not a hypothetical:** `index.html` today
+  reads `localStorage["psi-theme"]` and assigns it straight to
+  `data-psi-theme`. Storing `"system"` under that key would emit
+  `data-psi-theme="system"`, which matches no theme CSS and renders the page
+  unstyled.
+
+  Therefore the preference moves to a **new key**, `psi-appearance`, holding an
+  `Appearance`; the boot script resolves it to a `ThemeName` before assignment.
+  A new key also disposes of migration: a returning visitor's stored
+  `psi-theme` of `"acme"` has no appearance equivalent, and an unreadable key
+  simply falls through to `system` — which is what the boot script already does
+  when storage is empty.
+
+  `system` additionally requires a live `matchMedia("(prefers-color-scheme:
+  dark)")` listener, attached only while the preference is `system`. Today the
+  media query is consulted once at boot and never again, so an OS appearance
+  change mid-visit is ignored until reload.
+
+- **The switcher and the console compose rather than fight.** Both write
+  theme state, so precedence must be explicit. While a console theme is active,
+  changing appearance **re-derives the same `BrandVector` at the new `base`**
+  rather than discarding the visitor's theme; a `system` flip does the same.
+
+  This is why `base` is a field on `BrandVector` (D57) rather than baked into
+  the derived output — it is the pivot that lets one derived brand exist in
+  both appearances. Reset remains the only control that discards a theme.
+
+- **`themes/light.ts` moves to the Theming section.** The hero's formula card
+  splits in two, and the halves go to different places:
+
+  - the Δ-lightness **swatches** fold into the console, now driven by the
+    derived accent (see Design, above);
+  - the `themes/light.ts` → `--psi-fg-accent` **source listing** relocates to
+    the Theming section, beside the existing `customers/acme.ts` snippet.
+
+  Both are theme *source* artifacts written in the same DSL — one shipped, one
+  branded. The section already argues "a customer is a theme file, not a fork";
+  showing the default theme's formula next to a customer's palette completes
+  that argument instead of splitting it across two screens.
+
+- **The site gate's storage key must move in lockstep.**
+  `apps/promo/site-gate/site.spec.ts:20` seeds
+  `localStorage.setItem("psi-theme", theme)` to run axe under light and dark.
+  Renaming the key without updating the test **does not fail** — axe simply
+  runs twice against the same default appearance, and the dark-mode pass is
+  lost silently. The test therefore also asserts the resolved
+  `data-psi-theme` after load, so that a future key change fails loudly
+  instead of quietly halving the gate's coverage.
+
+- **The hero rebuild inherits a D76 invariant.** `site.spec.ts` asserts the
+  hero's derive labels clear AA at both Δ-slider extremes, and records why:
+  the labels once sat *on* the accent swatches and measured 4.38:1 at rest,
+  2.88:1 at maximum — a contrast demo that failed contrast. The console's
+  derived-state row reuses those swatches, so **its labels sit on the panel,
+  never on a swatch.** The test carries forward to the new markup rather than
+  being rewritten around it.
 
 ## Architecture
 
@@ -151,7 +261,7 @@ decisions, and are recorded here so implementation cannot quietly reverse one.
 | --- | --- | --- |
 | `parsePrompt`, dictionaries, font catalog | `packages/tokens/src/generate/` | nothing |
 | `deriveTheme`, `solveL` | `packages/tokens/src/generate/` | `contrast-matrix.ts`, `dsl/` |
-| `serializeCustomerTheme` | `packages/tokens/src/generate/` | `dsl/` types |
+| `serializeCustomerTheme` | `packages/tokens/src/generate/` | `dsl/` types, `scripts/new-theme.ts` template shape |
 | `/api/theme` | `api/theme.ts` | `generate/` types, AI Gateway |
 | Console UI | `apps/promo/src/sections/Hero.tsx` | `@handamade/psi-tokens` |
 
@@ -164,9 +274,11 @@ and no new infrastructure category.
 
 ## Non-goals
 
-- **No CLI.** `pnpm new-theme <name>` writing a real file and registering it in
-  `customers/index.ts` is the natural sequel and reuses `generate/` unchanged.
-  It is a separate spec; this one produces source in the browser.
+- **No change to `pnpm new-theme`.** The CLI already exists and already writes
+  and registers `customers/<name>.ts`; it simply scaffolds placeholder anchors
+  rather than derived ones. Giving it a `--prompt` flag over `generate/` is the
+  natural sequel and is a separate spec. This one produces source in the
+  browser, in the shape the CLI already emits.
 - **No new token families.** Southleft themes texture, elevation and motion;
   Psi has no such families, and each would be its own decision before a console
   could drive it. Scope is colour, control radius, and the `BrandFonts` roles
@@ -191,6 +303,20 @@ than smuggled in here.
 var(--psi-radius-12)` (`promo.css:563`) — an app-level rung binding, not on
 the control dial, and so unaffected by a generated theme's radius.
 
+**`ember` loses its only site surface.** The header switcher is the sole
+site-wide way to see `ember` today — the Theming grid shows light, dark and
+acme, and nothing else references it. Narrowing the switcher to
+`light | dark | system` therefore leaves a shipped, published theme with no
+representation on the public site. It remains in the package, in the resolved
+token output, and in Storybook.
+
+This is accepted deliberately rather than solved here: the Theming section is
+scheduled for its own redesign, and placing `ember` is that cycle's decision
+(the grid growing to four cards is the obvious candidate). Recorded so the
+redesign inherits it as a known debt instead of rediscovering it — and so
+that, until then, "4 themes" in the hero's stat line is a claim the page no
+longer demonstrates.
+
 Beyond that one rule, `apps/promo` is fully token-bound and needs no
 preparation for whole-page theming: the stylesheet contains three colour
 literals in total, all three `oklch(from var(--psi-fill-accent) …)`, and its
@@ -202,20 +328,34 @@ theme therefore reaches the whole page rather than half of it.
 
 - **All five gates** — `pnpm build && node tools/check-docs-drift.mjs &&
   pnpm test && pnpm lint && pnpm --dir apps/promo build && pnpm test:site`.
-  `check-docs-drift` matters here: the Theming section's prose changes and the
-  `pnpm new-theme` caption is corrected. `test:site` (D76) covers `apps/promo`
+  `check-docs-drift` matters here: the Theming section's prose changes, the
+  hero is rebuilt, and a section moves. `test:site` (D76) covers `apps/promo`
   and needs `apps/promo/dist` to exist first.
 - **Unit** — `parsePrompt` determinism (same prompt → same vector; unknown
   words still derive); `solveL` convergence against `checkContrast` across the
   hue circle at both `base` values; `serializeCustomerTheme` output parses as
-  valid TypeScript matching the `CustomerTheme` shape.
+  valid TypeScript matching the `CustomerTheme` shape **and matches the shape
+  `scripts/new-theme.ts` emits**, so the browser and the CLI cannot drift into
+  two file formats.
 - **The pinned-demo test** — a generated theme applied to `documentElement`
   must not alter the three `data-psi-theme` cards in the Theming section.
 - **Contract** — `/api/theme` responses failing `BrandVector` validation are
   rejected and the local derivation stands; a timeout, a non-2xx and an absent
   API key each leave a fully working console.
+- **Appearance** — `system` tracks a live OS appearance change without reload;
+  an explicit `light`/`dark` does not. A stored `psi-appearance` of `system`
+  never reaches `data-psi-theme`. A stale `psi-theme` value from a previous
+  visit does not break boot.
+- **Composition** — with a console theme active, switching appearance
+  re-derives at the new `base` and keeps the derived brand; only reset
+  discards it.
+- **Site gate** — the axe runs assert the resolved `data-psi-theme` rather
+  than trusting the seeded storage key, so both appearances are provably
+  covered.
 - **Browser** — derive with the remote stage unconfigured (local path), then
-  configured; confirm restore-before-paint on reload, and reset.
+  configured; confirm restore-before-paint on reload, and reset. Confirm the
+  Ψ mark follows a generated theme (it must never keep the pre-derive
+  colour).
 - `pnpm vr` is unaffected — the VR suite covers Storybook stories, and no
   package renders differently by default. CI remains its gate regardless.
 
