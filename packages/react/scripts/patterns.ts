@@ -1,3 +1,5 @@
+import { createElement, type ComponentType, type ReactElement, type ReactNode } from "react";
+
 // D48's "scopes entry" class is enforced by the D46 token build (packages/tokens); not duplicated here.
 
 /** A single node in a pattern's `compose` tree: a component instance, its
@@ -510,4 +512,95 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
   };
 
   return `${renderNode(pattern.compose, 0)}\n`;
+}
+
+/**
+ * Renders a fully-bound pattern (D77) to a real, mountable React element
+ * tree — the same compose-tree walk and {param:}/{content:} resolution
+ * `renderPreset` uses to emit JSX text, but calling `createElement` against
+ * `registry` instead of pushing text. Returns null under the same two
+ * conditions `renderPreset` does: unresolved gaps, or a parameter with no
+ * default (not renderable as a static preset).
+ *
+ * No JSX-string formatting concerns apply here (block mode, indentation) —
+ * those exist only for the human-readable copy-paste output. `registry` is
+ * a flat name -> component map; the real barrel export names already match
+ * `compose.component` strings exactly (`"Toolbar"` -> `export { Toolbar }`),
+ * and the same barrel re-exports icons, so one `import * as Psi from
+ * "@handamade/psi-react"` covers both `PatternNode.component` and D71 icon
+ * requirements.
+ */
+export function renderPresetElement(
+  pattern: Pattern,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for interface symmetry with renderPreset/validatePatterns; rendering only needs the compose tree, parameters and content.
+  components: ManifestComponent[],
+  registry: Record<string, ComponentType<any>>,
+): ReactElement | null {
+  if (pattern.gaps.length > 0) return null;
+  if (pattern.parameters.some((p) => p.default === undefined)) return null;
+
+  const paramDefaults = new Map(pattern.parameters.map((p) => [p.key, p.default as string | number]));
+  const content = pattern.content;
+
+  const iconForContent = new Map(
+    (pattern.requires ?? []).filter((r) => r.kind === "icon").map((r) => [r.content, r.name]),
+  );
+
+  const resolveText = (raw: string): string => {
+    const m = CONTENT_RE.exec(raw);
+    return m ? content[m[1]] : raw;
+  };
+
+  const componentFor = (name: string): ComponentType<any> => {
+    const Component = registry[name];
+    if (!Component) throw new Error(`renderPresetElement: no component registered for "${name}"`);
+    return Component;
+  };
+
+  /** Content children for a node with no `body` slot fills: the real icon
+   * element when a D71 icon requirement satisfies the key, the content
+   * string otherwise. */
+  const resolveChildContent = (key: string): ReactNode => {
+    const iconName = iconForContent.get(key);
+    return iconName ? createElement(componentFor(iconName)) : content[key];
+  };
+
+  const resolvePropValue = (raw: unknown): unknown => {
+    if (typeof raw === "string") {
+      const paramMatch = PARAM_RE.exec(raw);
+      if (paramMatch) return paramDefaults.get(paramMatch[1]);
+      return resolveText(raw);
+    }
+    return raw; // number | boolean literal
+  };
+
+  let key = 0;
+  const renderNode = (node: PatternNode): ReactElement => {
+    const Component = componentFor(node.component);
+    const props: Record<string, unknown> = { key: key++ };
+
+    for (const [name, raw] of Object.entries(node.props ?? {})) {
+      props[name] = resolvePropValue(raw);
+    }
+
+    for (const [slotName, fills] of Object.entries(node.slots ?? {})) {
+      if (slotName === "body") continue;
+      props[slotName] =
+        fills.length === 1
+          ? (typeof fills[0] === "string" ? resolveText(fills[0]) : renderNode(fills[0]))
+          : fills.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill)));
+    }
+
+    const body = node.slots?.body;
+    let children: ReactNode = null;
+    if (body && body.length > 0) {
+      children = body.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill)));
+    } else if (node.content !== undefined) {
+      children = resolveChildContent(node.content);
+    }
+
+    return createElement(Component, props, children);
+  };
+
+  return renderNode(pattern.compose);
 }
