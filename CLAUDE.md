@@ -47,6 +47,16 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 
   Empty output means every file the branch touched is identical on `origin/main`, so the branch is safe to delete. **Read the output before deleting** — the check is worthless if the delete runs regardless.
 
+  **When the scoped diff comes back non-empty, run the ancestor check before believing it:**
+
+  ```bash
+  git merge-base --is-ancestor origin/<branch> origin/main && echo ABSORBED
+  ```
+
+  `ABSORBED` is conclusive — the tip is already in `main`'s history, the branch holds nothing, delete it. **Silence is not the opposite.** Because squash-merge rewrites the commit, a normally-merged branch is *never* an ancestor: measured on the merged heads of #96, #97 and #98, all three exit non-zero. So this check stays silent for most branches you are about to delete legitimately. It is a fast yes, not a verdict — on silence, fall back to reading the scoped diff.
+
+  This is what settles the scoped diff's one recurring false positive: **non-empty purely because `main` edited the same file later.** Hit on `claude/progress-review-goals-fsnch5` (2026-08-10), whose diff showed a real `ci.yml` hunk while the branch had **zero unique commits** — `main` had added the `pnpm test:site` step after it. The tell is in the diff you already have: every line was a `-` and none was a `+`, i.e. the branch *lacks* what `main` has rather than carrying anything of its own. Same shape as the two earlier instances on `fix/absorbed-check-stale-main` and `fix/branch-absorbed-check`.
+
   Three checks that look right and are not. `git cherry -v main <branch>`: the squashed commit's patch-id matches no individual commit, so every commit shows `+` and a fully-merged branch reads as if it still carries work (confirmed on a 13-commit branch). An **unscoped** `git diff`: non-empty whenever `main` has merely moved ahead — 1379 deletions on a fully absorbed branch. And the scoped diff against **local `main` instead of `origin/main`**: a stale local `main` reports a fully-absorbed branch as carrying work — 47606 bytes on a branch whose content was already on `origin/main`, because local `main` sat 3 commits behind. Local `main` is stale by default whenever PRs merge remotely, which is every time.
 - **Arm auto-merge at PR creation, then verify it armed.** `gh pr merge <n> --auto --squash` exits 0 and prints nothing while leaving auto-merge OFF. Always read it back with `gh pr view <n> --json autoMergeRequest`; if it says null, use the `enablePullRequestAutoMerge` GraphQL mutation, which does work. This matters because the `protect-main` ruleset sets `strict_required_status_checks_policy`, so a second open PR goes stale and needs a full ~5.5-min `ci` re-run.
 - **Every user-visible change carries a changeset.** `packages/*` are versioned in lockstep at one number.
