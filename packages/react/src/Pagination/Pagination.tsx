@@ -67,7 +67,11 @@ export function paginationRange(
 }
 
 export interface PaginationProps {
-  /** Current page, 1-based. */
+  /**
+   * Current page, 1-based. A value outside `[1, pageCount]` (including
+   * non-finite values like `NaN`) is clamped for rendering and logs a
+   * `console.warn` in development. `pageCount < 1` renders no page buttons.
+   */
   page: number;
   /** Total number of pages. */
   pageCount: number;
@@ -97,15 +101,29 @@ export function Pagination({
   "aria-label": ariaLabel = "Pagination",
   className,
 }: PaginationProps) {
-  const items = paginationRange(page, pageCount, siblingCount);
+  // D78: a controlled component that renders a page its `page` prop does not
+  // name — a bounded exception to controlled-only, on the D65 precedent. An
+  // out-of-range `page` otherwise matches no button, so `aria-current="page"`
+  // lands nowhere and assistive tech reports a pager with no current page.
+  const hasPages = pageCount >= 1;
+  const safePage = Number.isFinite(page) ? page : 1;
+  const effectivePage = hasPages ? Math.min(Math.max(safePage, 1), pageCount) : 0;
+
+  if (process.env.NODE_ENV !== "production" && (!hasPages || page !== effectivePage)) {
+    console.warn(
+      `Psi Pagination: \`page\` ${page} is out of range for \`pageCount\` ${pageCount}; rendering page ${hasPages ? effectivePage : "none"}. Clamp \`page\` when \`pageCount\` shrinks — e.g. after filtering.`,
+    );
+  }
+
+  const items = hasPages ? paginationRange(effectivePage, pageCount, siblingCount) : [];
   return (
     <nav aria-label={ariaLabel} className={[styles.nav, className].filter(Boolean).join(" ")}>
       <IconButton
         aria-label="Previous page"
         size={32}
         variant="ghost"
-        disabled={page <= 1}
-        onClick={() => onPageChange(page - 1)}
+        disabled={!hasPages || effectivePage <= 1}
+        onClick={() => onPageChange(effectivePage - 1)}
       >
         <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16">
           <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
@@ -121,8 +139,8 @@ export function Pagination({
           <Button
             key={item}
             size={32}
-            variant={item === page ? "accent-subtle" : "ghost"}
-            aria-current={item === page ? "page" : undefined}
+            variant={item === effectivePage ? "accent-subtle" : "ghost"}
+            aria-current={item === effectivePage ? "page" : undefined}
             onClick={() => onPageChange(item)}
           >
             {String(item)}
@@ -134,8 +152,8 @@ export function Pagination({
         aria-label="Next page"
         size={32}
         variant="ghost"
-        disabled={page >= pageCount}
-        onClick={() => onPageChange(page + 1)}
+        disabled={!hasPages || effectivePage >= pageCount}
+        onClick={() => onPageChange(effectivePage + 1)}
       >
         <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16">
           <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />

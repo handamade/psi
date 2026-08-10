@@ -7,7 +7,7 @@ Numbered pager with ellipsis truncation (D63). Standalone rather than a Table fa
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
-| `page` | `number` | — | yes | Current page, 1-based. |
+| `page` | `number` | — | yes | Current page, 1-based. A value outside `[1, pageCount]` (including non-finite values like `NaN`) is clamped for rendering and logs a `console.warn` in development. `pageCount < 1` renders no page buttons. |
 | `pageCount` | `number` | — | yes | Total number of pages. |
 | `onPageChange` | `(page: number) => void` | — | yes | Called with the requested page. Required — unlike Table's `onSortChange`/ `onSelectionChange`, which are optional because `sortable`/`selectable` gate whether they're meaningful, `Pagination` has no such gating boolean: the prop is unconditionally meaningful, so a `Pagination` without it is a dead control (final review finding, D62). |
 | `siblingCount` | `number` | 1 | no | Pages shown either side of the current one before truncating. |

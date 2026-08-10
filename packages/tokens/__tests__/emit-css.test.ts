@@ -3,7 +3,7 @@ import { emitBaseCSS, emitThemeCSS } from "../scripts/emit-css.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { acmePalette, acmeSlots } from "../src/themes/customers/acme.js";
-import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
+import { emitScaleVarsCSS, emitUtilitiesCSS, emitUtilitiesRoster } from "../scripts/emit-utilities.js";
 import { token, slot } from "../src/dsl/builders.js";
 
 describe("emitBaseCSS", () => {
@@ -112,5 +112,90 @@ describe("tabular numerals (D62)", () => {
     expect(emitUtilitiesCSS()).toContain(
       ".psi-tabular { font-variant-numeric: var(--psi-font-variant-numeric); }",
     );
+  });
+});
+
+describe("spacing utility families (D79) — order and structure locked", () => {
+  const css = emitUtilitiesCSS();
+  const lines = css.split("\n");
+
+  it("gap utilities appear before padding utilities", () => {
+    const gapIndex = lines.findIndex((l) => l.includes(".psi-gap-8 {"));
+    const paddingIndex = lines.findIndex((l) => l.includes(".psi-p-8 {"));
+    expect(gapIndex).toBeGreaterThan(-1);
+    expect(paddingIndex).toBeGreaterThan(-1);
+    expect(gapIndex).toBeLessThan(paddingIndex);
+  });
+
+  it("padding utilities appear before margin utilities", () => {
+    const paddingIndex = lines.findIndex((l) => l.includes(".psi-p-8 {"));
+    const marginIndex = lines.findIndex((l) => l.includes(".psi-m-8 {"));
+    expect(paddingIndex).toBeGreaterThan(-1);
+    expect(marginIndex).toBeGreaterThan(-1);
+    expect(paddingIndex).toBeLessThan(marginIndex);
+  });
+
+  it("within padding group, .psi-p precedes .psi-px precedes .psi-py for the same step", () => {
+    const pIndex = lines.findIndex((l) => l.includes(".psi-p-8 {"));
+    const pxIndex = lines.findIndex((l) => l.includes(".psi-px-8 {"));
+    const pyIndex = lines.findIndex((l) => l.includes(".psi-py-8 {"));
+    expect(pIndex).toBeGreaterThan(-1);
+    expect(pxIndex).toBeGreaterThan(-1);
+    expect(pyIndex).toBeGreaterThan(-1);
+    expect(pIndex).toBeLessThan(pxIndex);
+    expect(pxIndex).toBeLessThan(pyIndex);
+  });
+
+  it("within margin group, .psi-m precedes .psi-mx precedes .psi-my for the same step", () => {
+    const mIndex = lines.findIndex((l) => l.includes(".psi-m-8 {"));
+    const mxIndex = lines.findIndex((l) => l.includes(".psi-mx-8 {"));
+    const myIndex = lines.findIndex((l) => l.includes(".psi-my-8 {"));
+    expect(mIndex).toBeGreaterThan(-1);
+    expect(mxIndex).toBeGreaterThan(-1);
+    expect(myIndex).toBeGreaterThan(-1);
+    expect(mIndex).toBeLessThan(mxIndex);
+    expect(mxIndex).toBeLessThan(myIndex);
+  });
+
+  it("blank line separates gap group from padding group", () => {
+    // Find the last gap utility and the first padding utility
+    const lastGapIndex = lines.findLastIndex((l) => l.includes(".psi-gap-") && l.includes("{"));
+    const firstPaddingIndex = lines.findIndex((l) => l.includes(".psi-p-8 {"));
+    expect(lastGapIndex).toBeGreaterThan(-1);
+    expect(firstPaddingIndex).toBeGreaterThan(-1);
+    // There should be exactly one blank line between them
+    expect(lines[lastGapIndex + 1]).toBe("");
+  });
+
+  it("blank line separates padding group from margin group", () => {
+    // Find the last padding utility and the first margin utility
+    const lastPaddingIndex = lines.findLastIndex(
+      (l) => (l.includes(".psi-p-") || l.includes(".psi-px-") || l.includes(".psi-py-")) && l.includes("{"),
+    );
+    const firstMarginIndex = lines.findIndex((l) => l.includes(".psi-m-8 {"));
+    expect(lastPaddingIndex).toBeGreaterThan(-1);
+    expect(firstMarginIndex).toBeGreaterThan(-1);
+    // There should be exactly one blank line between them
+    expect(lines[lastPaddingIndex + 1]).toBe("");
+  });
+});
+
+describe("emitUtilitiesRoster", () => {
+  it("lists every class the CSS emits, and nothing it does not", () => {
+    const roster = emitUtilitiesRoster();
+    const css = emitUtilitiesCSS();
+    const inCss = [...css.matchAll(/^\s*\.(psi-[a-z0-9-]+)\s*[,{]/gm)].map((m) => m[1]);
+    expect([...new Set(inCss)].sort()).toEqual(roster.classes);
+  });
+
+  it("carries the margin family the eval kept missing", () => {
+    expect(emitUtilitiesRoster().classes).toContain("psi-m-0");
+  });
+
+  it("describes each family's property and scale", () => {
+    const gap = emitUtilitiesRoster().families.find((f) => f.prefix === "psi-gap-*");
+    expect(gap).toBeDefined();
+    expect(gap!.property).toBe("gap");
+    expect(gap!.scale).toContain(24);
   });
 });

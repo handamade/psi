@@ -4,7 +4,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 
 ## Machine-readable artifacts
 - dist/resolved/{light,dark,acme,ember}.json: every token with OKLCH, hex, and derivation formula
-- dist/guidance.json: variant intent, usage rules, state derivation, typography defaults, motion/layout/fonts notes, recipes
+- dist/guidance.json: variant intent, usage rules, state derivation, typography defaults, motion/layout/fonts notes, recipes, and the utility-class roster at `utilities.classes`
 - dist/dtcg/{theme}.json: W3C DTCG format export
 - dist/components/{name}.vars.css: component-token declarations (--psi-{component}-*)
 - dist/scope-map.json: D46 token scopes — property groups, per-token scopes (semantic + component), scale-family scopes

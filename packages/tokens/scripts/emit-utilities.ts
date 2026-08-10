@@ -92,6 +92,35 @@ export function emitScaleVarsCSS(): string {
 // ── Utility classes ──────────────────────────────────────────────
 
 /**
+ * The single description of the spacing-driven utility families (D79).
+ *
+ * Both `emitUtilitiesCSS` and `emitUtilitiesRoster` generate from this, so the
+ * shipped classes and the published roster cannot disagree. A roster written
+ * *beside* the emitter rather than *from* it would be a second source of truth
+ * — and the promo site's "22 icons" is what a second source of truth looks
+ * like six releases later.
+ *
+ * Grouping is load-bearing for the emitted CSS: each inner array is one block
+ * of related declarations emitted per spacing step, with a blank line after
+ * the block. Flattening these into one list would reorder the output.
+ */
+const SPACING_UTILITY_GROUPS: ReadonlyArray<
+  ReadonlyArray<{ prefix: string; property: string }>
+> = [
+  [{ prefix: "psi-gap", property: "gap" }],
+  [
+    { prefix: "psi-p", property: "padding" },
+    { prefix: "psi-px", property: "padding-inline" },
+    { prefix: "psi-py", property: "padding-block" },
+  ],
+  [
+    { prefix: "psi-m", property: "margin" },
+    { prefix: "psi-mx", property: "margin-inline" },
+    { prefix: "psi-my", property: "margin-block" },
+  ],
+];
+
+/**
  * Generate utility classes for spacing, sizing, and typography.
  * Wrapped in @layer psi.utilities.
  */
@@ -100,38 +129,14 @@ export function emitUtilitiesCSS(): string {
 
   lines.push("@layer psi.utilities {");
 
-  // Gap utilities
-  for (const px of spacingScale) {
-    lines.push(`  .psi-gap-${px} { gap: var(--psi-space-${px}); }`);
+  for (const group of SPACING_UTILITY_GROUPS) {
+    for (const px of spacingScale) {
+      for (const { prefix, property } of group) {
+        lines.push(`  .${prefix}-${px} { ${property}: var(--psi-space-${px}); }`);
+      }
+    }
+    lines.push("");
   }
-
-  lines.push("");
-
-  // Padding utilities
-  for (const px of spacingScale) {
-    lines.push(`  .psi-p-${px} { padding: var(--psi-space-${px}); }`);
-    lines.push(
-      `  .psi-px-${px} { padding-inline: var(--psi-space-${px}); }`,
-    );
-    lines.push(
-      `  .psi-py-${px} { padding-block: var(--psi-space-${px}); }`,
-    );
-  }
-
-  lines.push("");
-
-  // Margin utilities
-  for (const px of spacingScale) {
-    lines.push(`  .psi-m-${px} { margin: var(--psi-space-${px}); }`);
-    lines.push(
-      `  .psi-mx-${px} { margin-inline: var(--psi-space-${px}); }`,
-    );
-    lines.push(
-      `  .psi-my-${px} { margin-block: var(--psi-space-${px}); }`,
-    );
-  }
-
-  lines.push("");
 
   // Typography utilities
   for (const c of typographyCombos) {
@@ -173,4 +178,84 @@ export function emitUtilitiesCSS(): string {
   lines.push("}");
 
   return lines.join("\n") + "\n";
+}
+
+export interface UtilityFamily {
+  /** Class prefix with a `-*` suffix for scaled families, or the bare class. */
+  prefix: string;
+  /** CSS property (or comma-separated properties) the family sets. */
+  property: string;
+  /** Spacing steps the family is built from, or null when it is not scaled. */
+  scale: number[] | null;
+  classes: string[];
+}
+
+/**
+ * Machine-readable roster of every utility class (D79).
+ *
+ * Generated from the same `SPACING_UTILITY_GROUPS` that produces the CSS, so a
+ * class cannot exist in one and not the other. This is the icon-roster fix
+ * generalised: before it, `psi-m-*` and `psi-p-*` appeared in no llms.txt, no
+ * guidance.json and no manifest.json, so the only way to learn they existed was
+ * to read utilities.css.
+ */
+export function emitUtilitiesRoster(): {
+  note: string;
+  families: UtilityFamily[];
+  classes: string[];
+} {
+  const families: UtilityFamily[] = [];
+
+  for (const group of SPACING_UTILITY_GROUPS) {
+    for (const { prefix, property } of group) {
+      families.push({
+        prefix: `${prefix}-*`,
+        property,
+        scale: [...spacingScale],
+        classes: spacingScale.map((px) => `${prefix}-${px}`),
+      });
+    }
+  }
+
+  families.push({
+    prefix: "psi-text-*",
+    property: "font",
+    scale: null,
+    classes: typographyCombos.map((c) => `psi-text-${comboName(c)}`),
+  });
+
+  families.push({
+    prefix: "psi-display-*",
+    property: "font, letter-spacing, text-transform",
+    scale: null,
+    classes: displayCombos.map((d) => `psi-display-${displayName(d)}`),
+  });
+
+  families.push({
+    prefix: "psi-tabular",
+    property: "font-variant-numeric",
+    scale: null,
+    classes: ["psi-tabular"],
+  });
+
+  families.push({
+    prefix: "psi-container",
+    property: "max-width, margin-inline, padding-inline",
+    scale: null,
+    classes: ["psi-container"],
+  });
+
+  families.push({
+    prefix: "psi-media-tint",
+    property: "filter",
+    scale: null,
+    classes: ["psi-media-tint"],
+  });
+
+  return {
+    note:
+      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Utilities set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
+    families,
+    classes: [...new Set(families.flatMap((f) => f.classes))].sort(),
+  };
 }
