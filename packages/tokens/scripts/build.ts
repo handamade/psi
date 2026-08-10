@@ -16,7 +16,7 @@ import { SCALE_SCOPES, PROPERTY_GROUPS, keyGroup } from "../src/scopes.js";
 import { emitBaseCSS, emitThemeCSS, camelToKebab } from "./emit-css.js";
 import { emitResolvedJSON } from "./emit-json.js";
 import { emitTokenTypes } from "./emit-types.js";
-import { emitScaleVarsCSS, emitUtilitiesCSS } from "./emit-utilities.js";
+import { emitScaleVarsCSS, emitUtilitiesCSS, emitUtilitiesRoster } from "./emit-utilities.js";
 import { emitComponentVarsCSS } from "./emit-components.js";
 import { emitDTCG } from "./emit-dtcg.js";
 import { gamutWarnings } from "../src/gamut.js";
@@ -239,7 +239,10 @@ function build(): void {
   console.log("  wrote dist/scope-map.json");
 
   // 6. Emit guidance.json
-  writeFileSync(join(distDir, "guidance.json"), JSON.stringify(guidance, null, 2));
+  writeFileSync(
+    join(distDir, "guidance.json"),
+    JSON.stringify({ ...guidance, utilities: emitUtilitiesRoster() }, null, 2),
+  );
   console.log("  wrote dist/guidance.json");
 
   console.log("[tokens] Build complete.");

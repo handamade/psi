@@ -179,3 +179,83 @@ export function emitUtilitiesCSS(): string {
 
   return lines.join("\n") + "\n";
 }
+
+export interface UtilityFamily {
+  /** Class prefix with a `-*` suffix for scaled families, or the bare class. */
+  prefix: string;
+  /** CSS property (or comma-separated properties) the family sets. */
+  property: string;
+  /** Spacing steps the family is built from, or null when it is not scaled. */
+  scale: number[] | null;
+  classes: string[];
+}
+
+/**
+ * Machine-readable roster of every utility class (D79).
+ *
+ * Generated from the same `SPACING_UTILITY_GROUPS` that produces the CSS, so a
+ * class cannot exist in one and not the other. This is the icon-roster fix
+ * generalised: before it, `psi-m-*` and `psi-p-*` appeared in no llms.txt, no
+ * guidance.json and no manifest.json, so the only way to learn they existed was
+ * to read utilities.css.
+ */
+export function emitUtilitiesRoster(): {
+  note: string;
+  families: UtilityFamily[];
+  classes: string[];
+} {
+  const families: UtilityFamily[] = [];
+
+  for (const group of SPACING_UTILITY_GROUPS) {
+    for (const { prefix, property } of group) {
+      families.push({
+        prefix: `${prefix}-*`,
+        property,
+        scale: [...spacingScale],
+        classes: spacingScale.map((px) => `${prefix}-${px}`),
+      });
+    }
+  }
+
+  families.push({
+    prefix: "psi-text-*",
+    property: "font",
+    scale: null,
+    classes: typographyCombos.map((c) => `psi-text-${comboName(c)}`),
+  });
+
+  families.push({
+    prefix: "psi-display-*",
+    property: "font, letter-spacing, text-transform",
+    scale: null,
+    classes: displayCombos.map((d) => `psi-display-${displayName(d)}`),
+  });
+
+  families.push({
+    prefix: "psi-tabular",
+    property: "font-variant-numeric",
+    scale: null,
+    classes: ["psi-tabular"],
+  });
+
+  families.push({
+    prefix: "psi-container",
+    property: "max-width, margin-inline, padding-inline",
+    scale: null,
+    classes: ["psi-container"],
+  });
+
+  families.push({
+    prefix: "psi-media-tint",
+    property: "filter",
+    scale: null,
+    classes: ["psi-media-tint"],
+  });
+
+  return {
+    note:
+      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Utilities set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
+    families,
+    classes: [...new Set(families.flatMap((f) => f.classes))].sort(),
+  };
+}

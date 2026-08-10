@@ -3,7 +3,7 @@ import { emitBaseCSS, emitThemeCSS } from "../scripts/emit-css.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { acmePalette, acmeSlots } from "../src/themes/customers/acme.js";
-import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
+import { emitScaleVarsCSS, emitUtilitiesCSS, emitUtilitiesRoster } from "../scripts/emit-utilities.js";
 import { token, slot } from "../src/dsl/builders.js";
 
 describe("emitBaseCSS", () => {
@@ -177,5 +177,25 @@ describe("spacing utility families (D79) — order and structure locked", () => 
     expect(firstMarginIndex).toBeGreaterThan(-1);
     // There should be exactly one blank line between them
     expect(lines[lastPaddingIndex + 1]).toBe("");
+  });
+});
+
+describe("emitUtilitiesRoster", () => {
+  it("lists every class the CSS emits, and nothing it does not", () => {
+    const roster = emitUtilitiesRoster();
+    const css = emitUtilitiesCSS();
+    const inCss = [...css.matchAll(/^\s*\.(psi-[a-z0-9-]+)\s*[,{]/gm)].map((m) => m[1]);
+    expect([...new Set(inCss)].sort()).toEqual(roster.classes);
+  });
+
+  it("carries the margin family the eval kept missing", () => {
+    expect(emitUtilitiesRoster().classes).toContain("psi-m-0");
+  });
+
+  it("describes each family's property and scale", () => {
+    const gap = emitUtilitiesRoster().families.find((f) => f.prefix === "psi-gap-*");
+    expect(gap).toBeDefined();
+    expect(gap!.property).toBe("gap");
+    expect(gap!.scale).toContain(24);
   });
 });
