@@ -20,6 +20,7 @@ type Story = StoryObj;
 function preset(id: string) {
   const pattern = patternsFile.patterns.find((p) => p.id === id);
   if (!pattern) throw new Error(`emit-pattern-stories: no pattern "${id}" in patterns.json`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the JSON-imported pattern/manifest data's inferred shape doesn't structurally match Pattern/ManifestComponent, and Psi (a namespace import covering both components and TypeScript types) doesn't structurally match Record<string, ComponentType<any>> — both are genuine, deliberate boundary casts.
   return () => renderPresetElement(pattern as any, manifestFile.components as any, Psi as any);
 }
 

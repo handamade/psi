@@ -20,7 +20,7 @@ describe("emitPatternStories", () => {
       { id: "filter-toolbar" },
       { id: "data-table" },
     ];
-    const source = emitPatternStories(patterns as any);
+    const source = emitPatternStories(patterns);
     expect(source).toContain("export const FilterToolbar: Story = {");
     expect(source).toContain("export const DataTable: Story = {");
     expect((source.match(/^export const \w+: Story = \{$/gm) ?? []).length).toBe(2);
@@ -28,7 +28,7 @@ describe("emitPatternStories", () => {
 
   it("double-emit is byte-identical (same discipline as emit-patterns.ts)", () => {
     const patterns = [{ id: "filter-toolbar" }];
-    expect(emitPatternStories(patterns as any)).toBe(emitPatternStories(patterns as any));
+    expect(emitPatternStories(patterns)).toBe(emitPatternStories(patterns));
   });
 
   it("real build output: generated file has exactly one export per real pattern.json entry", () => {

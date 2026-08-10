@@ -532,8 +532,8 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
  */
 export function renderPresetElement(
   pattern: Pattern,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for interface symmetry with renderPreset/validatePatterns; rendering only needs the compose tree, parameters and content.
   components: ManifestComponent[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- component prop shapes are determined by runtime pattern data, not statically knowable — this is the dynamic-dispatch boundary the function exists to cross.
   registry: Record<string, ComponentType<any>>,
 ): ReactElement | null {
   if (pattern.gaps.length > 0) return null;
@@ -551,6 +551,7 @@ export function renderPresetElement(
     return m ? content[m[1]] : raw;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- component prop shapes are determined by runtime pattern data, not statically knowable — this is the dynamic-dispatch boundary the function exists to cross.
   const componentFor = (name: string): ComponentType<any> => {
     const Component = registry[name];
     if (!Component) throw new Error(`renderPresetElement: no component registered for "${name}"`);
