@@ -10,6 +10,11 @@ const PROMPTS = [
   "calm quiet linen",
   "zzzq wibble frobnicate",
   "",
+  // Finding 3: none of the prompts above exercise "muted" chroma (0.06, the
+  // lowest, most likely to struggle clearing AA at low L) or radius rung 6.
+  // "misty" -> muted (dictionaries.ts CHROMAS), "crisp" -> radius 6 (RADII),
+  // "lagoon" -> hue 200 (HUES). Verified against parsePrompt directly.
+  "misty crisp lagoon",
 ];
 
 describe("deriveTheme", () => {
@@ -49,6 +54,25 @@ describe("deriveTheme", () => {
     expect(Object.keys(props).every((k) => k.startsWith("--psi-"))).toBe(true);
     expect(props["--psi-bg-primary"]).toMatch(/^#[0-9a-f]{6}$/);
     expect(props["--psi-control-radius"]).toBe("var(--psi-radius-4)");
+  });
+
+  it("preserves alpha on custom properties instead of collapsing onto the opaque source token", () => {
+    // Finding 1: tok.hex is always opaque (formatHex discards alpha). A
+    // token like fillTintAccent carries alpha and derives from fgAccent —
+    // if the alpha channel is silently dropped when emitting
+    // customProperties, fillTintAccent renders byte-identical to fgAccent at
+    // full strength in the browser, even though checkContrast (which
+    // composites alpha correctly) still reports the AA sweep as clean. That
+    // would make the sweep's guarantee false for anything actually painted
+    // from these custom properties (Task 10).
+    const pair = deriveTheme(parsePrompt("sharp forest"));
+    const props = pair.light.customProperties;
+
+    expect(props["--psi-fill-tint-accent"]).toMatch(/^#[0-9a-f]{8}$/);
+    expect(props["--psi-fill-tint-accent"]).not.toBe(props["--psi-fg-accent"]);
+
+    // Opaque tokens must stay 6-digit — no gratuitous "ff" suffix.
+    expect(props["--psi-bg-primary"]).toMatch(/^#[0-9a-f]{6}$/);
   });
 
   it("is deterministic", () => {
