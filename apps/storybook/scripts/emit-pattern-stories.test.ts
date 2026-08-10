@@ -41,4 +41,12 @@ describe("emitPatternStories", () => {
       expect(source).toContain(`export const ${patternIdToExportName(p.id)}: Story = {`);
     }
   });
+
+  it("committed Presets.stories.tsx has not drifted from what the generator currently produces", () => {
+    const patternsPath = join(__dirname, "../../../packages/react/dist/patterns.json");
+    const real = JSON.parse(readFileSync(patternsPath, "utf8")) as { patterns: Array<{ id: string }> };
+    const committedPath = join(__dirname, "../src/patterns/Presets.stories.tsx");
+    const committed = readFileSync(committedPath, "utf8");
+    expect(committed).toBe(emitPatternStories(real.patterns));
+  });
 });

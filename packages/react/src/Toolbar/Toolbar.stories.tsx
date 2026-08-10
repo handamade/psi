@@ -22,8 +22,8 @@ export const FilterToolbar: Story = {
     "aria-label": "Filters",
     children: (
       <>
-        {/* Input/Select default to width:100%; size them in the story so the
-            row reads as a toolbar instead of every control stacking. */}
+        {/* These widths deliberately override --psi-toolbar-control-width's
+            200px default for this story. */}
         <Input size={32} placeholder="Search" aria-label="Search" style={{ width: 240 }} />
         <Select size={32} aria-label="Category" style={{ width: 180 }}>
           <option>All</option>

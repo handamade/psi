@@ -529,6 +529,11 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
  * and the same barrel re-exports icons, so one `import * as Psi from
  * "@handamade/psi-react"` covers both `PatternNode.component` and D71 icon
  * requirements.
+ *
+ * `components` is unread by this function's body — kept for interface
+ * symmetry with `renderPreset`/`validatePatterns` (both also take a
+ * `components` parameter), even though this rendering only needs the
+ * compose tree, parameters, and content.
  */
 export function renderPresetElement(
   pattern: Pattern,

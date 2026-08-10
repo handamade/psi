@@ -12,7 +12,7 @@ export function patternIdToExportName(id: string): string {
     .join("");
 }
 
-const HEADER = `// GENERATED FILE — do not hand-edit. Run \`tsx scripts/emit-pattern-stories.ts\`
+export const HEADER = `// GENERATED FILE — do not hand-edit. Run \`tsx scripts/emit-pattern-stories.ts\`
 // (part of \`pnpm build\`) to regenerate. One story per packages/react
 // patterns.json entry (D77) — every pattern is mounted from a real,
 // registered component tree via renderPresetElement, not a hand-copied
@@ -59,4 +59,7 @@ function main() {
   console.log(`[storybook] wrote src/patterns/Presets.stories.tsx (${patterns.length} patterns)`);
 }
 
-main();
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain) {
+  main();
+}
