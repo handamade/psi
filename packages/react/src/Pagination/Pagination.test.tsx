@@ -139,3 +139,50 @@ describe("Pagination", () => {
     expect(screen.queryByRole("button", { name: "…" })).toBeNull();
   });
 });
+
+describe("Pagination out-of-range page (D78)", () => {
+  it("marks the last page current when page exceeds pageCount", () => {
+    render(<Pagination page={5} pageCount={3} onPageChange={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "3" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("emits from the effective page, so Previous can recover from out of range", async () => {
+    const onPageChange = vi.fn();
+    render(<Pagination page={5} pageCount={3} onPageChange={onPageChange} />);
+    await userEvent.click(screen.getByRole("button", { name: "Previous page" }));
+    expect(onPageChange).toHaveBeenCalledWith(2);
+  });
+
+  it("marks the first page current when page is below 1", () => {
+    render(<Pagination page={0} pageCount={5} onPageChange={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "1" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("renders no page buttons and disables both arrows when there are no pages", () => {
+    render(<Pagination page={3} pageCount={0} onPageChange={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: "1" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+  });
+
+  it("warns in dev when page is out of range", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<Pagination page={5} pageCount={3} onPageChange={vi.fn()} />);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("out of range"));
+    warn.mockRestore();
+  });
+
+  it("warns when there are no pages at all", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<Pagination page={3} pageCount={0} onPageChange={vi.fn()} />);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("out of range"));
+    warn.mockRestore();
+  });
+
+  it("does not warn for an in-range page", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<Pagination page={2} pageCount={3} onPageChange={vi.fn()} />);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
