@@ -314,6 +314,54 @@ between dropping the parity claim, rebuilding the plugin against the file's
 actual structure with a manual post-release ritual, or paying for Enterprise.
 That is a numbered decision of its own, not a CI ticket.
 
+## Known carry (shipped, deliberately not fixed here)
+
+Three carries left by the merged cycle (#96). Recorded here rather than in the
+PR description, because a PR body is not a place work survives — this section
+exists precisely so the next cycle inherits them without re-deriving them.
+
+### 1. `.formula-card-head` collides at 320px, and the overflow gate cannot see it
+
+Pre-existing, not introduced. `promo.css:280` is `display: flex;
+justify-content: space-between` with no `flex-wrap` and no `min-width: 0` on
+its children, so at 320px the two items overlap instead of wrapping.
+
+**The gate is blind to it by construction.** `no horizontal overflow at ${width}px`
+compares `scrollWidth` against `clientWidth`, and *overlap does not grow
+`scrollWidth`* — two boxes occupying the same pixels stay inside the container.
+This is the same shape as the layout blindness recorded for presets in D77
+above: a correct assertion measuring the wrong property. A fix wants
+`flex-wrap: wrap` plus `min-width: 0`, and an assertion that compares the two
+children's bounding boxes rather than the container's scroll width.
+
+### 2. No assertion locks the skip link, focus order, or the CTA `href`s
+
+The cycle added a skip link and converted the hero CTAs from click-handler
+`<button>`s to real `<a href>` links. Both are load-bearing accessibility
+behaviour and **neither has a test**. `site.spec.ts` ships eight tests: axe in
+two themes, the hero derive-label contrast, the rendered counts, Storybook link
+resolution, and overflow at three widths. Axe does not assert that a skip link
+exists, that it is first in tab order, or that it targets a real id.
+
+Any of the three can be deleted by a future edit with all five gates green.
+This is the D75 habit stated in the handoff — *a guard is verified by
+reproducing the failure it was built for* — applied to guards that were never
+written.
+
+### 3. `check-docs-drift` enumerates promo files by name
+
+`tools/check-docs-drift.mjs:40–63` names four files: `Hero.tsx`, `Roadmap.tsx`,
+`Playground.tsx`, `updates.ts`. **A count that moves into a fifth section file
+is unwatched**, and a new section is unwatched from birth.
+
+Worth stating plainly: this is the same class of defect the cycle was built to
+fix. D76 existed because the drift checker had *no* reference to `apps/promo`;
+it now has four, and the class — "the checker only sees what someone remembered
+to list" — is untouched. Globbing `apps/promo/src/**/*.{tsx,ts}` for the claim
+patterns closes the class. The `must-not-hardcode` mode already makes that safe:
+a file with no typed digit passes rather than reporting drift, which is exactly
+the property a glob over mostly-irrelevant files needs.
+
 ## Out of scope
 
 - **Re-running the eval.** The arc's critical path, not this cycle's work.
