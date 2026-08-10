@@ -78,4 +78,12 @@ describe("Checkbox", () => {
     const { container } = render(<Checkbox aria-label="Select row" />);
     expect(container.textContent).toBe("");
   });
+
+  it("hides the native input via the shared psi-sr-only utility, not a private class (D80)", () => {
+    const { container } = render(<Checkbox />);
+    const input = container.querySelector("input")!;
+    const classes = input.className.split(" ");
+    expect(classes).toContain("psi-sr-only");
+    expect(classes).not.toContain("undefined");
+  });
 });

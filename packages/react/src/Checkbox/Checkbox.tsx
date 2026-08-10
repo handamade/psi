@@ -32,7 +32,7 @@ export function Checkbox({
       <input
         ref={ref}
         type="checkbox"
-        className={styles.input}
+        className={`psi-sr-only ${styles.input}`}
         disabled={disabled}
         {...rest}
       />
