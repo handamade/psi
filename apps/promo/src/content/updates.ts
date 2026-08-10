@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-08-10",
     tag: "release",
+    title: "0.16.0 — Pagination clamps, and utilities are machine-readable",
+    body: "Pagination given a page beyond pageCount rendered aria-current=\"page\" on nothing — assistive tech reported no current page. It now renders from an effective page clamped into [1, pageCount], warns in development, and renders no page buttons when there are no pages. And guidance.json gains utilities: all 146 utility classes, generated from the same source as the CSS, so psi-m-* and psi-p-* no longer require reading utilities.css to discover.",
+  },
+  {
+    date: "2026-08-10",
+    tag: "release",
     title: "0.15.0 — the icon roster is machine-readable",
     body: "manifest.json gains icons: string[]. The component inventory has always been queryable; the icon set was not, so anything that needed to know which glyphs exist had to read the package barrel and guess. That asymmetry is why this page could advertise a wrong icon count for six releases while the component count stayed honest — one had a source to check against and the other did not.",
   },
