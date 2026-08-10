@@ -1,14 +1,33 @@
 /**
- * `culori` ships no type declarations and there is no `@types/culori`
- * package. Every other file in this package that imports it (e.g.
- * `contrast-matrix.ts`) is only ever run through `tsx` — untyped
- * transpile-only — never checked by `tsc`. `src/generate` is the sole
- * subtree in this package covered by strict `tsc` (see
- * `tsconfig.build.json`, whose `include` is scoped to `src/generate` so it
- * can emit the `.d.ts` for the public `./generate` export), so it's the
- * first place a bare `culori` import hits `noImplicitAny` for real
- * (TS7016). This ambient shim unblocks that without adding a dependency
- * or touching any existing file — see the D57 Task 4 report for the full
- * trail.
+ * culori 4.x ships no type declarations (no `types` field, no .d.ts).
+ * `src/generate` is the first code in this package that tsc type-checks --
+ * everything else runs through untyped tsx -- so it is the first to need
+ * these. Declared narrowly on purpose: a blanket `declare module "culori"`
+ * would type the whole library as `any` and silence real mistakes in exactly
+ * the file where the colour maths must be right.
+ *
+ * `rgb` is here for contrast-matrix.ts, which enters this program via
+ * derive.ts.
  */
-declare module "culori";
+declare module "culori" {
+  export interface Oklch {
+    mode: "oklch";
+    l: number;
+    c: number;
+    h?: number;
+    alpha?: number;
+  }
+
+  export interface Rgb {
+    mode: "rgb";
+    r: number;
+    g: number;
+    b: number;
+    alpha?: number;
+  }
+
+  export function wcagContrast(a: string | Oklch | Rgb, b: string | Oklch | Rgb): number;
+  export function formatHex(color: string | Oklch | Rgb): string | undefined;
+  export function clampChroma(color: Oklch, mode?: string): Oklch;
+  export function rgb(color: string | Oklch | Rgb): Rgb | undefined;
+}
