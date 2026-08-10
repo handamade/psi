@@ -6,7 +6,7 @@
 // apart and a new 14th pattern gets a story with no hand-authoring.
 
 import type { Meta, StoryObj } from "storybook";
-import * as Psi from "@handamade/psi-react";
+import * as Psi from "../../../../packages/react/src/index.js";
 import { renderPresetElement } from "../../../../packages/react/scripts/patterns.js";
 import patternsFile from "@handamade/psi-react/patterns.json";
 import manifestFile from "@handamade/psi-react/manifest.json";
