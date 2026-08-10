@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-08-10",
     tag: "release",
+    title: "0.17.0 — a public visually-hidden utility",
+    body: "Psi had no public way to hide content visually while keeping it in the accessibility tree — the technique existed only as private, byte-identical CSS duplicated across Toast, Checkbox and Switch, undocumented anywhere. .psi-sr-only ships from utilities.css, generated the same way every other utility family is, and appears in guidance.json's utilities.classes automatically. The shared recipe also adds clip-path: inset(50%) alongside the legacy clip: rect(...), a correctness fix none of the three private copies had. Toast, Checkbox and Switch now consume it — internal cleanup, no visible change.",
+  },
+  {
+    date: "2026-08-10",
+    tag: "release",
     title: "0.16.0 — Pagination clamps, and utilities are machine-readable",
     body: "Pagination given a page beyond pageCount rendered aria-current=\"page\" on nothing — assistive tech reported no current page. It now renders from an effective page clamped into [1, pageCount], warns in development, and renders no page buttons when there are no pages. And guidance.json gains utilities: all 146 utility classes, generated from the same source as the CSS, so psi-m-* and psi-p-* no longer require reading utilities.css to discover.",
   },
