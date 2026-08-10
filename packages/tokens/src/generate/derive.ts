@@ -1,4 +1,3 @@
-import { formatHex8 } from "culori";
 import { checkContrast, wcagAAPairs } from "../contrast-matrix.js";
 import { resolve, type ResolvedTheme } from "../dsl/resolver.js";
 import { cap, set, slot, token } from "../dsl/builders.js";
@@ -27,6 +26,22 @@ export interface DerivedPair {
 /** camelCase token name → --psi-kebab-case custom property. */
 function cssName(token: string): string {
   return `--psi-${token.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}`;
+}
+
+/** The channels of `hex` with an exact alpha. checkContrast composites
+ * tok.hex (gamut-clamped, 8-bit per channel) with the unrounded alpha, so
+ * this is the only form that renders precisely what was validated. hex8
+ * cannot: it quantizes alpha to 1/255, which moves the composited result a
+ * full channel step and drops near-threshold pairs below 4.5 (measured: 384
+ * of 1225 sampled prompts had a pair render under AA with hex8). Deliberately
+ * not `oklch(l c h / a)` either — the browser would recompute RGB from OKLCH
+ * and could land a bit away from `formatHex`'s own rounding, reintroducing
+ * the same class of mismatch between what was validated and what renders. */
+function withAlpha(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgb(${r} ${g} ${b} / ${alpha})`;
 }
 
 const BASE_TARGET = 4.5;
@@ -200,12 +215,12 @@ function deriveMember(
     // byte-identical to the token they derive from (e.g. fillTintAccent
     // would render as fgAccent at full strength): checkContrast composites
     // alpha correctly, so the AA sweep would still pass while the shipped
-    // custom property renders the guarantee false in the browser.
+    // custom property renders the guarantee false in the browser. `withAlpha`
+    // carries the exact float alpha checkContrast validated against — see its
+    // own comment for why hex8 (1/255 alpha quantization) isn't safe here.
     const alpha = tok.oklch.alpha;
     customProperties[cssName(name)] =
-      alpha === undefined || alpha >= 1
-        ? tok.hex
-        : (formatHex8({ mode: "oklch", ...tok.oklch }) ?? tok.hex);
+      alpha === undefined || alpha >= 1 ? tok.hex : withAlpha(tok.hex, alpha);
   }
   for (const [name, value] of Object.entries(customerTheme.componentOverrides ?? {})) {
     customProperties[`--psi-${name}`] = value;

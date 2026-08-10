@@ -56,22 +56,41 @@ describe("deriveTheme", () => {
     expect(props["--psi-control-radius"]).toBe("var(--psi-radius-4)");
   });
 
-  it("preserves alpha on custom properties instead of collapsing onto the opaque source token", () => {
+  it("emits alpha-carrying tokens with the exact channels and alpha the AA sweep validated", () => {
     // Finding 1: tok.hex is always opaque (formatHex discards alpha). A
     // token like fillTintAccent carries alpha and derives from fgAccent —
     // if the alpha channel is silently dropped when emitting
     // customProperties, fillTintAccent renders byte-identical to fgAccent at
     // full strength in the browser, even though checkContrast (which
-    // composites alpha correctly) still reports the AA sweep as clean. That
-    // would make the sweep's guarantee false for anything actually painted
-    // from these custom properties (Task 10).
-    const pair = deriveTheme(parsePrompt("sharp forest"));
+    // composites alpha correctly) still reports the AA sweep as clean.
+    //
+    // Finding 1's fix-round-2 attempt (hex8) is ALSO wrong, and a bare
+    // `not.toBe` here would not have caught it: hex8 quantizes alpha to
+    // 1/255, which is close enough to look plausible but composites to a
+    // measurably different colour than the exact float alpha checkContrast
+    // validated — enough to drop near-threshold pairs below 4.5 as
+    // rendered. `rgb(r g b / alpha)` is the only form that carries both the
+    // exact channels of the validated `tok.hex` AND the unrounded alpha, so
+    // this test asserts that specific property, not just "looks different
+    // from the opaque token".
+    const pair = deriveTheme(parsePrompt("sunset calm"));
     const props = pair.light.customProperties;
 
-    expect(props["--psi-fill-tint-accent"]).toMatch(/^#[0-9a-f]{8}$/);
-    expect(props["--psi-fill-tint-accent"]).not.toBe(props["--psi-fg-accent"]);
+    const tint = props["--psi-fill-tint-accent"]!;
+    const accent = props["--psi-fg-accent"]!;
 
-    // Opaque tokens must stay 6-digit — no gratuitous "ff" suffix.
+    // Exact alpha, not a 1/255 approximation.
+    expect(tint).toMatch(/^rgb\(\d+ \d+ \d+ \/ 0?\.\d+\)$/);
+
+    // Same channels as the opaque token it derives from — this is what makes
+    // the rendered contrast equal the contrast checkContrast measured.
+    const channels = (v: string) => v.match(/\d+/g)!.slice(0, 3).join(",");
+    const hexChannels = [1, 3, 5]
+      .map((i) => String(parseInt(accent.slice(i, i + 2), 16)))
+      .join(",");
+    expect(channels(tint)).toBe(hexChannels);
+
+    // Opaque tokens stay plain 6-digit hex.
     expect(props["--psi-bg-primary"]).toMatch(/^#[0-9a-f]{6}$/);
   });
 
