@@ -15,6 +15,18 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-08-10",
+    tag: "release",
+    title: "0.15.0 — the icon roster is machine-readable",
+    body: "manifest.json gains icons: string[]. The component inventory has always been queryable; the icon set was not, so anything that needed to know which glyphs exist had to read the package barrel and guess. That asymmetry is why this page could advertise a wrong icon count for six releases while the component count stayed honest — one had a source to check against and the other did not.",
+  },
+  {
+    date: "2026-08-07",
+    tag: "site",
+    title: "This page is derived, and gated",
+    body: "Every count here now reads from manifest.json at build time rather than being typed by hand, so a wrong number is no longer expressible. The docs-drift checker had never looked at this site at all — it printed \"34 components\" in CI beside a page that said 18. It watches the site now, along with the release feed you are reading, and a Playwright suite holds the page to the accessibility bar the components are held to.",
+  },
+  {
     date: "2026-08-07",
     tag: "release",
     title: "0.14.2 — IconMoreHorizontal is importable",
