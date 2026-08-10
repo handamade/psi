@@ -49,7 +49,11 @@ export function isBrandVector(value: unknown): value is BrandVector {
   if (!CHROMA_WORDS.includes(v.chroma as ChromaWord)) return false;
   if (v.mode !== "light" && v.mode !== "dark") return false;
   if (!RADIUS_RUNGS.includes(v.radius as RadiusRung)) return false;
-  if (typeof v.name !== "string" || !/^[a-z][a-z0-9-]*$/.test(v.name)) return false;
+  // The length bound is not cosmetic: `name` becomes a filename and a
+  // TypeScript identifier, and this guard is the only thing between an
+  // untrusted producer and both. parsePrompt's own slugify caps at 48.
+  if (typeof v.name !== "string" || v.name.length > 64) return false;
+  if (!/^[a-z][a-z0-9-]*$/.test(v.name)) return false;
   if (v.fonts !== undefined && !isFonts(v.fonts)) return false;
   return true;
 }

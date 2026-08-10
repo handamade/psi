@@ -77,3 +77,19 @@ describe("fnv1a", () => {
     expect(fnv1a("psi")).not.toBe(fnv1a("psj"));
   });
 });
+
+describe("isBrandVector name bounds", () => {
+  const valid = parsePrompt("sunset over the atlantic");
+
+  it("rejects a well-formed but absurdly long name", () => {
+    expect(isBrandVector({ ...valid, name: "a".repeat(65) })).toBe(false);
+    expect(isBrandVector({ ...valid, name: "a".repeat(64) })).toBe(true);
+  });
+
+  it("still rejects unsafe identifier stems", () => {
+    expect(isBrandVector({ ...valid, name: "../../etc/passwd" })).toBe(false);
+    expect(isBrandVector({ ...valid, name: "9lives" })).toBe(false);
+    expect(isBrandVector({ ...valid, name: "" })).toBe(false);
+    expect(isBrandVector({ ...valid, name: "Has-Capitals" })).toBe(false);
+  });
+});
