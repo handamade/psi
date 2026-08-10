@@ -167,6 +167,9 @@ export function emitUtilitiesCSS(): string {
   lines.push(`  .psi-media-tint:hover, .psi-media-tint:focus-visible { filter: none; }`);
 
   lines.push("");
+  lines.push(`  .psi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }`);
+
+  lines.push("");
   lines.push("  /* Reduced motion (D30): zero every duration token; anything driven by");
   lines.push("     --psi-duration-* complies for free. psi.utilities wins over psi.base. */");
   lines.push("  @media (prefers-reduced-motion: reduce) {");
@@ -250,6 +253,13 @@ export function emitUtilitiesRoster(): {
     property: "filter",
     scale: null,
     classes: ["psi-media-tint"],
+  });
+
+  families.push({
+    prefix: "psi-sr-only",
+    property: "position, width, height, padding, margin, overflow, clip, clip-path, white-space, border",
+    scale: null,
+    classes: ["psi-sr-only"],
   });
 
   return {
