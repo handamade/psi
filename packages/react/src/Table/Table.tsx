@@ -69,10 +69,13 @@ export interface TableProps {
   /** Controlled sort state; `null` when nothing is sorted. */
   sort?: TableSortState | null;
   /**
-   * Called when a header's sort control is activated. Optional in the type
-   * because `sortable` may be false; a discriminated union expressing the real
-   * contract does not survive docgen's flat prop extraction, which would strip
-   * these props from the manifest entirely (D62).
+   * Called with the **next** sort state, already toggled — store it as given
+   * and do not toggle again. A fresh column arrives `"asc"`; an active `"asc"`
+   * column emits `"desc"`; an active `"desc"` column emits `"asc"`.
+   *
+   * Optional in the type because `sortable` may be false; a discriminated union
+   * expressing the real contract does not survive docgen's flat prop
+   * extraction, which would strip these props from the manifest entirely (D62).
    */
   onSortChange?: (sort: TableSortState) => void;
   /** Renders the row-selection checkbox column. */
