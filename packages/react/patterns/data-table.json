@@ -52,7 +52,7 @@
     "date-label": "Date",
     "payee-label": "Payee",
     "amount-label": "Amount",
-    "actions-label": "[a visible \"Actions\" header, or a visually-hidden one — the column needs an accessible name either way; never an empty th]",
+    "actions-label": "[a visible \"Actions\" header — the column needs an accessible name, so never an empty th]",
     "date-cell": "[one row per record]",
     "payee-cell": "[the record's payee]",
     "amount-cell": "[numeric columns align right and use tabular figures]",
