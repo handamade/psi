@@ -27,12 +27,14 @@ export function compositeHex(fgHex: string, alpha: number, bgHex: string): strin
   const b = rgb(bgHex);
   if (!f) throw new Error(`compositeHex: unparseable color "${fgHex}"`);
   if (!b) throw new Error(`compositeHex: unparseable color "${bgHex}"`);
-  return formatHex({
+  const hex = formatHex({
     mode: "rgb",
     r: f.r * alpha + b.r * (1 - alpha),
     g: f.g * alpha + b.g * (1 - alpha),
     b: f.b * alpha + b.b * (1 - alpha),
   });
+  if (!hex) throw new Error(`compositeHex: could not format the blend of "${fgHex}" and "${bgHex}"`);
+  return hex;
 }
 
 /**

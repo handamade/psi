@@ -28,6 +28,6 @@ declare module "culori" {
 
   export function wcagContrast(a: string | Oklch | Rgb, b: string | Oklch | Rgb): number;
   export function formatHex(color: string | Oklch | Rgb): string | undefined;
-  export function clampChroma(color: Oklch, mode?: string): Oklch;
+  export function clampChroma(color: Oklch, mode?: string, rgbGamut?: string): Oklch;
   export function rgb(color: string | Oklch | Rgb): Rgb | undefined;
 }
