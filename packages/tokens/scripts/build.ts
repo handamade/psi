@@ -30,6 +30,7 @@ import { checkboxVars } from "../src/components/checkbox.js";
 import { switchVars } from "../src/components/switch.js";
 import { tableVars } from "../src/components/table.js";
 import { tagVars } from "../src/components/tag.js";
+import { toolbarVars } from "../src/components/toolbar.js";
 import { tooltipVars } from "../src/components/tooltip.js";
 import { cardVars } from "../src/components/card.js";
 import { controlVars } from "../src/components/control.js";
@@ -93,6 +94,7 @@ const componentVars: Record<string, Record<string, string>> = {
   tabs: tabsVars,
   "description-list": descriptionListVars,
   tag: tagVars,
+  toolbar: toolbarVars,
   toast: toastVars,
   tooltip: tooltipVars,
 };
