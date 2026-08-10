@@ -380,11 +380,18 @@ describe("Pagination out-of-range page (D78)", () => {
     expect(screen.getByRole("button", { name: "1" })).toHaveAttribute("aria-current", "page");
   });
 
-  it("renders no page buttons when there are no pages", () => {
-    render(<Pagination page={1} pageCount={0} onPageChange={vi.fn()} />);
+  it("renders no page buttons and disables both arrows when there are no pages", () => {
+    render(<Pagination page={3} pageCount={0} onPageChange={vi.fn()} />);
     expect(screen.queryByRole("button", { name: "1" })).toBeNull();
     expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+  });
+
+  it("warns when there are no pages at all", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<Pagination page={3} pageCount={0} onPageChange={vi.fn()} />);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("out of range"));
+    warn.mockRestore();
   });
 
   it("warns in dev when page is out of range", () => {
@@ -402,6 +409,8 @@ describe("Pagination out-of-range page (D78)", () => {
   });
 });
 ```
+
+> **Corrected during execution.** This test originally used `page={1} pageCount={0}`, which passed BEFORE the fix: the unpatched `disabled={page <= 1}` was already true because page was 1, `1 >= 0` was also true, and `paginationRange(1, 0, 1)` already returned `[]`. It exercised nothing. `page={3}` is what makes the unpatched code leave Previous enabled with zero pages.
 
 - [ ] **Step 2: Run them to confirm they fail — and read *how* they fail**
 
@@ -608,13 +617,15 @@ Replace the whole `content` object with:
     "date-label": "Date",
     "payee-label": "Payee",
     "amount-label": "Amount",
-    "actions-label": "[a visible \"Actions\" header, or a visually-hidden one — the column needs an accessible name either way; never an empty th]",
+    "actions-label": "[a visible \"Actions\" header — the column needs an accessible name, so never an empty th]",
     "date-cell": "[one row per record]",
     "payee-cell": "[the record's payee]",
     "amount-cell": "[numeric columns align right and use tabular figures]",
     "actions-cell": "[the row-actions menu — compose it from the row-actions pattern]"
   }
 ```
+
+> **Corrected during execution.** The original offered a visually-hidden header, but Psi exposes no way to build one — there is no public `.psi-sr-only` utility, nothing in `llms.txt` documents the convention, and the `clip: rect(...)` technique exists only as private CSS duplicated in Toast, Checkbox and Switch. Recorded as a follow-up worth its own decision.
 
 Note what this fixes beyond the missing column: the row-actions instruction was attached to **`payee-cell`** while the last cell was `amount-cell`, so an agent following it literally put the menu in the middle column.
 
