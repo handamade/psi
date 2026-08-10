@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadPatterns, parseLiteralUnion, renderPreset, validatePatterns } from "./patterns.js";
+import { loadPatterns } from "./patterns-loader.js";
+import { parseLiteralUnion, renderPreset, validatePatterns } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
 
 const button: ManifestComponent = {

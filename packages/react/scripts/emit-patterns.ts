@@ -1,7 +1,8 @@
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadPatterns, validatePatterns, renderPreset } from "./patterns.js";
+import { loadPatterns } from "./patterns-loader.js";
+import { validatePatterns, renderPreset } from "./patterns.js";
 import type { ManifestComponent } from "./patterns.js";
 
 /** Reads `dist/manifest.json` + `src/contracts.json`, loads+validates the

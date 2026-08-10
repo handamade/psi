@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import ts from "typescript";
-import { loadPatterns, renderPreset, validatePatterns } from "./patterns.js";
+import { loadPatterns } from "./patterns-loader.js";
+import { renderPreset, validatePatterns } from "./patterns.js";
 
 const root = join(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8"));

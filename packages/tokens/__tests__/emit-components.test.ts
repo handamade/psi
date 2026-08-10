@@ -7,6 +7,7 @@ import { checkboxVars } from "../src/components/checkbox.js";
 import { switchVars } from "../src/components/switch.js";
 import { tagVars } from "../src/components/tag.js";
 import { tooltipVars } from "../src/components/tooltip.js";
+import { toolbarVars } from "../src/components/toolbar.js";
 
 describe("emitComponentVarsCSS", () => {
   it("emits psi.components layer with prefixed vars", () => {
@@ -58,6 +59,13 @@ describe("emitComponentVarsCSS", () => {
     const css = emitComponentVarsCSS("tooltip", tooltipVars);
     for (const key of Object.keys(tooltipVars)) {
       expect(css).toContain(`--psi-tooltip-${key}: ${tooltipVars[key]};`);
+    }
+  });
+
+  it("emits every toolbarVars key as a prefixed --psi-toolbar-* declaration", () => {
+    const css = emitComponentVarsCSS("toolbar", toolbarVars);
+    for (const key of Object.keys(toolbarVars)) {
+      expect(css).toContain(`--psi-toolbar-${key}: ${toolbarVars[key]};`);
     }
   });
 });
