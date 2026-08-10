@@ -696,9 +696,10 @@ This is the decision that lets the console accept free text. A build-time *gate*
 **Interfaces:**
 - Consumes: `culori` (`wcagContrast`, `formatHex`, `clampChroma`).
 - Produces:
-  - `function hexFor(l: number, c: number, h: number): string` — gamut-clamped sRGB hex
+  - `function hexFor(l: number, c: number, h: number): string` — gamut-clamped sRGB hex; **throws on non-finite input** rather than letting culori coerce `NaN` to `0` and return `#000000`, which would trivially clear contrast against any light canvas
   - `function contrastOf(aHex: string, bHex: string): number`
-  - `function solveL(opts: { c: number; h: number; against: string; target: number; direction: "darker" | "lighter" }): number` — the L that first clears `target`, or the closest reachable
+  - `interface SolvedL { l: number; cleared: boolean }`
+  - `function solveL(opts: { c: number; h: number; against: string; target: number; direction: "darker" | "lighter" }): SolvedL` — `cleared: false` means the target was unreachable at this chroma and `l` is merely the most legible value available. **Callers must read `cleared`**; ignoring it ships a below-AA colour that looks solved.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1006,22 +1007,30 @@ function solveOverrides(palette: Palette, slots: SlotMap, mode: "light" | "dark"
 
   for (const [name, slotName] of textTokens) {
     const anchor = palette[slots[slotName]]!;
-    const l = solveL({
-      c: anchor.c,
-      h: anchor.h,
-      against: canvasHex,
-      target: 4.5,
-      direction,
-    });
-    // Reduce chroma until the solved colour still clears, matching the
-    // resolver's gamut behaviour and acme's hand-tuned caps.
+
+    // Solve lightness at the anchor's own chroma. When `cleared` is false the
+    // target is unreachable at that chroma, and chroma is the lever that makes
+    // a saturated hue reachable — so reduce it and re-solve. This is exactly
+    // what acme's hand-tuned caps (`acmeOverrides`) do by hand.
+    //
+    // Reading `.cleared` is not optional: `solveL` returns its most legible
+    // available value when it gives up, so ignoring the flag would ship a
+    // below-AA colour that looks like a solved one.
     let c = anchor.c;
-    while (c > 0 && contrastOf(hexFor(l, c, anchor.h), canvasHex) < 4.5) {
+    let solved = solveL({ c, h: anchor.h, against: canvasHex, target: 4.5, direction });
+    while (!solved.cleared && c > 0) {
       c = Math.max(0, c - 0.008);
+      solved = solveL({ c, h: anchor.h, against: canvasHex, target: 4.5, direction });
     }
+    if (!solved.cleared) {
+      throw new Error(
+        `solveOverrides: ${name} cannot clear 4.5:1 against ${canvasHex} at any chroma`,
+      );
+    }
+
     overrides[name] = token({
       from: slot[slotName],
-      l: set(Number(l.toFixed(4))),
+      l: set(Number(solved.l.toFixed(4))),
       c: cap(Number(c.toFixed(4))),
       scopes: ["text"],
     });
