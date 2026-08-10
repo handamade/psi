@@ -264,7 +264,7 @@ export function emitUtilitiesRoster(): {
 
   return {
     note:
-      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Utilities set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
+      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Scaled utility families set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. The bare/fixed utilities (.psi-container, .psi-media-tint, .psi-sr-only) set several. Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
     families,
     classes: [...new Set(families.flatMap((f) => f.classes))].sort(),
   };

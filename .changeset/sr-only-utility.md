@@ -15,3 +15,12 @@ it appears in `guidance.json` → `utilities.classes` automatically.
 
 Toast, Checkbox and Switch now consume it instead of their own private
 copies — internal cleanup only, no prop, behavior, or ARIA change (D80).
+The shared recipe also adds `clip-path: inset(50%)` alongside the legacy
+`clip: rect(0 0 0 0)`, a correctness fix none of the three private blocks
+had. One behavioral consequence: this hiding now lives in
+`utilities.css` rather than shipping inside `@handamade/psi-react/styles`,
+so consumers who had been omitting `utilities.css` will see a raw
+unstyled checkbox/switch input and a visible "Success:"/"Warning:"/"Error:"
+prefix in toasts, instead of merely mis-themed content. `utilities.css`
+is already documented as required (`NavBar` has depended on it the same
+way), so the risk is low.
