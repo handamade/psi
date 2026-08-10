@@ -22,7 +22,7 @@ With aria-label it renders role=group so the control cluster announces with a na
 
 ## Theming
 
-This component has no `--psi-toolbar-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+Override `--psi-toolbar-*` custom properties at any scope.
 
 
 

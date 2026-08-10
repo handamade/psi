@@ -7,3 +7,8 @@
 .gap8 { gap: var(--psi-space-8); }
 .gap12 { gap: var(--psi-space-12); }
 .gap16 { gap: var(--psi-space-16); }
+
+.toolbar > input,
+.toolbar > select {
+  width: var(--psi-toolbar-control-width);
+}
