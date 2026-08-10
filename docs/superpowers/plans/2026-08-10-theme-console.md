@@ -351,7 +351,11 @@ export function isBrandVector(value: unknown): value is BrandVector {
   if (!CHROMA_WORDS.includes(v.chroma as ChromaWord)) return false;
   if (v.mode !== "light" && v.mode !== "dark") return false;
   if (!RADIUS_RUNGS.includes(v.radius as RadiusRung)) return false;
-  if (typeof v.name !== "string" || !/^[a-z][a-z0-9-]*$/.test(v.name)) return false;
+  // The length bound is not cosmetic: `name` becomes a filename and a
+  // TypeScript identifier, and this guard is the only thing between an
+  // untrusted producer and both. parsePrompt's own slugify caps at 48.
+  if (typeof v.name !== "string" || v.name.length > 64) return false;
+  if (!/^[a-z][a-z0-9-]*$/.test(v.name)) return false;
   if (v.fonts !== undefined && !isFonts(v.fonts)) return false;
   return true;
 }
@@ -1346,6 +1350,14 @@ describe("isBrandVector", () => {
     expect(isBrandVector({ ...valid, name: "../../etc/passwd" })).toBe(false);
     expect(isBrandVector({ ...valid, name: "9lives" })).toBe(false);
     expect(isBrandVector({ ...valid, name: "" })).toBe(false);
+    expect(isBrandVector({ ...valid, name: "Has-Capitals" })).toBe(false);
+  });
+
+  it("rejects a well-formed but absurdly long name", () => {
+    // `name` becomes a filename and an identifier. A model returning 100k
+    // legal characters would pass the regex and fail downstream.
+    expect(isBrandVector({ ...valid, name: "a".repeat(65) })).toBe(false);
+    expect(isBrandVector({ ...valid, name: "a".repeat(64) })).toBe(true);
   });
 
   it("rejects a fonts object carrying an unknown role", () => {
