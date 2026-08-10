@@ -17,7 +17,8 @@
                   "body": [
                     { "component": "TableHeaderCell", "props": { "sortKey": "date" }, "content": "date-label" },
                     { "component": "TableHeaderCell", "props": { "sortKey": "payee" }, "content": "payee-label" },
-                    { "component": "TableHeaderCell", "props": { "sortKey": "amount", "numeric": true }, "content": "amount-label" }
+                    { "component": "TableHeaderCell", "props": { "sortKey": "amount", "numeric": true }, "content": "amount-label" },
+                    { "component": "TableHeaderCell", "content": "actions-label" }
                   ]
                 }
               }
@@ -35,7 +36,8 @@
                   "body": [
                     { "component": "TableCell", "content": "date-cell" },
                     { "component": "TableCell", "content": "payee-cell" },
-                    { "component": "TableCell", "props": { "numeric": true }, "content": "amount-cell" }
+                    { "component": "TableCell", "props": { "numeric": true }, "content": "amount-cell" },
+                    { "component": "TableCell", "content": "actions-cell" }
                   ]
                 }
               }
@@ -50,9 +52,11 @@
     "date-label": "Date",
     "payee-label": "Payee",
     "amount-label": "Amount",
+    "actions-label": "[a visible \"Actions\" header, or a visually-hidden one — the column needs an accessible name either way; never an empty th]",
     "date-cell": "[one row per record]",
-    "payee-cell": "[put the row-actions menu in the last cell]",
-    "amount-cell": "[numeric columns align right and use tabular figures]"
+    "payee-cell": "[the record's payee]",
+    "amount-cell": "[numeric columns align right and use tabular figures]",
+    "actions-cell": "[the row-actions menu — compose it from the row-actions pattern]"
   },
   "gaps": []
 }
