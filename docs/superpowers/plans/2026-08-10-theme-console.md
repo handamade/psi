@@ -2266,10 +2266,13 @@ test("a derived theme does not repaint the pinned Theming cards", async ({ page 
   expect(await cardBg()).toBe(before);
 
   // …and prove the page around them DID move, or the test proves nothing.
-  const bodyBg = await page.evaluate(
-    () => getComputedStyle(document.body).backgroundColor,
-  );
-  expect(bodyBg).toContain("255, 0, 255");
+  // NOTE: do NOT string-match the computed value. body carries a 200ms
+  // background-color transition, so an immediate read catches a mid-transition
+  // frame, and Chromium serializes a transitioned OKLCH-derived colour as
+  // oklab(...) — never rgb(255, 0, 255). Wait out the transition and compare
+  // rasterized RGB instead, which is exact and format-independent.
+  await page.waitForTimeout(300);
+  // (see site.spec.ts as shipped for the canvas-rasterization helper)
 });
 ```
 
