@@ -8,17 +8,17 @@ import { AgentReady } from "./sections/AgentReady";
 import { Roadmap } from "./sections/Roadmap";
 import { Updates } from "./sections/Updates";
 import { Footer } from "./sections/Footer";
-import { useTheme } from "./theme";
+import { useMode } from "./theme";
 
 export function App() {
-  const [theme, setTheme] = useTheme();
+  const [mode, setMode] = useMode();
 
   return (
     <>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <Header theme={theme} onTheme={setTheme} />
+      <Header mode={mode} onMode={setMode} />
       <main id="main" tabIndex={-1}>
         <Hero />
         <Principles />

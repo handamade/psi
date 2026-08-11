@@ -1,7 +1,10 @@
 import { useState, type CSSProperties } from "react";
 import { Button, IconCheck, Switch, Tag } from "@handamade/psi-react";
 
-import type { ThemeName } from "../theme";
+/** The three pinned preview cards below are attribute-scoped demos, not the
+ * app's live mode/brand state (Task 8's Mode is light|dark only) — so this
+ * type is local to the demo, not the exported Mode. */
+type PreviewTheme = "light" | "dark" | "acme";
 
 const ACME_SNIPPET = `export const acmePalette: Palette = {
   charcoal: { l: 0.22, c: 0.015, h: 30 },
@@ -23,7 +26,7 @@ export const acmeSlots: SlotMap = {
 const RADIUS_RUNGS = [4, 6, 8, 12] as const;
 const DEFAULT_RUNG = 2; // radius-8, the --psi-control-radius default
 
-function ThemePreview({ name, radius }: { name: ThemeName; radius: number }) {
+function ThemePreview({ name, radius }: { name: PreviewTheme; radius: number }) {
   return (
     <figure className="theme-card">
       {/* The inline custom property MUST sit on this element, not a wrapper:

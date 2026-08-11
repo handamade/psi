@@ -159,38 +159,3 @@ export function applyCustomProperties(props: Record<string, string>): void {
   }
   document.documentElement.dataset.psiCustom = "";
 }
-
-// --- Compatibility layer for pre-D57 consumers -----------------------------
-//
-// Task 9 rewrites Header.tsx and App.tsx to the Mode/Brand API above and
-// drops this section entirely. Until then, Header.tsx, Theming.tsx and
-// App.tsx still import THEMES / ThemeName / useTheme, so those stay here,
-// unchanged from before this task, purely to keep `pnpm --dir apps/promo
-// build` green.
-
-export const THEMES = ["light", "dark", "acme", "ember"] as const;
-export type ThemeName = (typeof THEMES)[number];
-
-function isTheme(value: string | undefined): value is ThemeName {
-  return (THEMES as readonly string[]).includes(value ?? "");
-}
-
-/** @deprecated pre-D57 compatibility shim — removed when Task 9 rewrites App/Header. */
-export function useTheme(): [ThemeName, (theme: ThemeName) => void] {
-  const [theme, setThemeState] = useState<ThemeName>(() => {
-    const current = document.documentElement.dataset.psiTheme;
-    return isTheme(current) ? current : "light";
-  });
-
-  const setTheme = (next: ThemeName) => {
-    setThemeState(next);
-    document.documentElement.dataset.psiTheme = next;
-    try {
-      localStorage.setItem(MODE_KEY, next);
-    } catch {
-      /* storage unavailable */
-    }
-  };
-
-  return [theme, setTheme];
-}

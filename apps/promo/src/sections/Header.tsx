@@ -1,7 +1,8 @@
 import { Button } from "@handamade/psi-react";
 
 import { STORYBOOK_BASE } from "../lib/storybook";
-import { THEMES, type ThemeName } from "../theme";
+import { PsiMark } from "../PsiMark";
+import type { Mode } from "../theme";
 
 const NAV = [
   ["Principles", "#principles"],
@@ -15,16 +16,19 @@ const NAV = [
 ] as const;
 
 export function Header({
-  theme,
-  onTheme,
+  mode,
+  onMode,
 }: {
-  theme: ThemeName;
-  onTheme: (theme: ThemeName) => void;
+  mode: Mode;
+  onMode: (mode: Mode) => void;
 }) {
+  const nextMode: Mode = mode === "dark" ? "light" : "dark";
+
   return (
     <header className="site-header">
       <div className="container">
         <a className="wordmark" href="#top" aria-label="Psi — back to top">
+          <PsiMark size={24} />
           <span className="wordmark-mark" aria-hidden="true">
             psi
           </span>
@@ -37,22 +41,15 @@ export function Header({
             </a>
           ))}
         </nav>
-        <div
-          className="theme-switch"
-          role="group"
-          aria-label="Theme (sets data-psi-theme)"
-        >
-          {THEMES.map((name) => (
-            <Button
-              key={name}
-              size={24}
-              variant={name === theme ? "accent-subtle" : "ghost"}
-              aria-pressed={name === theme}
-              onClick={() => onTheme(name)}
-            >
-              {name}
-            </Button>
-          ))}
+        <div className="theme-switch">
+          <Button
+            size={24}
+            variant="neutral-subtle"
+            aria-label={`Switch to ${nextMode} mode`}
+            onClick={() => onMode(nextMode)}
+          >
+            {nextMode}
+          </Button>
         </div>
       </div>
     </header>
