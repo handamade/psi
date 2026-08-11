@@ -88,8 +88,19 @@ function applyMode(next: Mode): void {
  * but that setter persists, so the first OS change recorded an explicit
  * preference and permanently disabled the listener. Following the OS is not
  * a choice and must not be recorded as one.
+ *
+ * Returns a THIRD setter, `setModeEphemeral`, for the same reason: a brand
+ * derivation carries its own `vector.mode`, and applying it needs to update
+ * the visible mode without recording it as the visitor's explicit choice —
+ * `psi-brand` already persists the vector (and its mode) on its own, so
+ * nothing is lost by not also writing `psi-theme`. Wiring a derived brand's
+ * mode through the persisting `setMode` was tried (D57 review) and is the
+ * same class of bug commit 0a0806b fixed for the OS-follow listener,
+ * re-entering through a different door: typing a brief and never touching
+ * the toggle would silently opt the visitor out of OS colour-scheme
+ * following forever.
  */
-export function useMode(): [Mode, (next: Mode) => void] {
+export function useMode(): [Mode, (next: Mode) => void, (next: Mode) => void] {
   const [mode, setModeState] = useState<Mode>(() => readStoredMode() ?? systemMode());
 
   /** An explicit choice. This is the only path that persists. */
@@ -101,6 +112,13 @@ export function useMode(): [Mode, (next: Mode) => void] {
     } catch {
       /* storage unavailable */
     }
+  }, []);
+
+  /** A machine choice (a derived brand's own `vector.mode`), not a
+   * visitor's. Updates the visible mode and <html> without persisting. */
+  const setModeEphemeral = useCallback((next: Mode) => {
+    setModeState(next);
+    applyMode(next);
   }, []);
 
   useEffect(() => {
@@ -116,7 +134,7 @@ export function useMode(): [Mode, (next: Mode) => void] {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  return [mode, setMode];
+  return [mode, setMode, setModeEphemeral];
 }
 
 /** Brand state. Orthogonal to mode: reset clears this and never touches that. */

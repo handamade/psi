@@ -44,7 +44,17 @@ export function Hero({
   const { brand, setBrand, reset } = useBrand();
   const [pair, setPair] = useState<DerivedPair | null>(null);
   const [transcript, setTranscript] = useState<string[]>([]);
+  const [pending, setPending] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Guards a request against being clobbered by a *later* one — reset() or
+  // a fresh derive() both bump this, so a response that resolves after
+  // either has happened is provably stale and is dropped. Comparing the
+  // input's live text (the original approach) fails on a same-prompt
+  // resubmit (both guards pass, last-to-resolve wins) and false-negatives
+  // when the visitor types without submitting (a valid in-flight response
+  // gets discarded for no reason) — a monotonic counter has neither problem.
+  const generation = useRef(0);
 
   // Push a line to the transcript. Resolves immediately when the visitor
   // asked for reduced motion; otherwise resolves after the stagger delay, so
@@ -77,30 +87,40 @@ export function Hero({
 
   const derive = useCallback(
     async (prompt: string) => {
-      // 1. Local derivation renders immediately — this is the floor, not a
-      //    fallback. With no API key the console is fully functional.
-      const localVector = parsePrompt(prompt);
-      await applyVector(localVector, "local seed engine");
-
-      // 2. Then consult the art director. Failure is silent and expected.
-      let remote: unknown;
+      const myGeneration = ++generation.current;
+      setPending(true);
       try {
-        const res = await fetch("/api/theme", {
+        // 1. Local derivation renders immediately — this is the floor, not
+        //    a fallback. With no API key the console is fully functional.
+        const localVector = parsePrompt(prompt);
+        const localApplied = applyVector(localVector, "local seed engine");
+
+        // 2. Consult the art director concurrently — don't wait on the
+        //    local transcript's typewriter delay before leaving for the
+        //    network. Failure is silent and expected.
+        const remotePromise = fetch("/api/theme", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ prompt }),
           signal: AbortSignal.timeout(15_000),
-        });
-        remote = res.status === 200 ? await res.json() : null;
-      } catch {
-        remote = null;
+        })
+          .then((res) => (res.status === 200 ? res.json() : null))
+          .catch(() => null);
+
+        await localApplied;
+        const remote: unknown = await remotePromise;
+
+        // 3. Discard a stale response: a newer derive() or a reset() may
+        //    have happened while this one was in flight.
+        if (myGeneration !== generation.current) return;
+
+        if (isBrandVector(remote)) await applyVector(remote, "claude");
+        else await log("// art director unreachable — the local derivation stands.");
+      } finally {
+        // Don't let a stale request's cleanup re-enable the button after a
+        // newer one has already taken over the "in flight" state.
+        if (myGeneration === generation.current) setPending(false);
       }
-
-      // 3. Discard a stale response: the visitor may have typed since.
-      if (inputRef.current?.value.trim() !== prompt) return;
-
-      if (isBrandVector(remote)) await applyVector(remote, "claude");
-      else await log("// art director unreachable — the local derivation stands.");
     },
     [applyVector, log],
   );
@@ -108,16 +128,25 @@ export function Hero({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const value = inputRef.current?.value.trim();
-    if (value) void derive(value);
+    if (!value) return;
+    derive(value).catch(() => {
+      void log("// derivation failed — the previous theme stands.");
+    });
   };
 
   // useBrand's reset() clears the brand and its storage, but the console
   // also holds the last derived pair (for the copy button) — clear that
   // here too, or "copy customers/<name>.ts" would keep offering a theme
-  // that's no longer applied.
+  // that's no longer applied. Bumping `generation` invalidates any derive()
+  // still in flight, so its eventual response can't silently re-apply the
+  // theme this reset just cleared (Critical-1) — and un-sticking `pending`
+  // lets the visitor derive again immediately rather than waiting out the
+  // now-irrelevant request.
   const handleReset = useCallback(() => {
+    generation.current++;
     reset();
     setPair(null);
+    setPending(false);
   }, [reset]);
 
   const handleCopy = useCallback(async () => {
@@ -130,6 +159,12 @@ export function Hero({
       await log("// clipboard unavailable — copy failed.");
     }
   }, [pair, log]);
+
+  // A vector's slugified name can run to 48 chars (parsePrompt's own cap),
+  // long enough on its own to overflow a 320px viewport — truncated with
+  // CSS ellipsis below, so the full string lives here for `title`/
+  // `aria-label` rather than the (visually clipped) rendered text.
+  const copyLabel = pair ? `copy customers/${pair.vector.name}.ts` : "copy customers/….ts";
 
   // Re-derive and heal the cache on mount: the boot script painted from a
   // possibly-drifted cache before this module (or `generate/`) was
@@ -148,14 +183,16 @@ export function Hero({
   }, []);
 
   // Swap members when the mode changes: a selection, never a re-derivation.
-  // No solver run, no network — both members were already solved when the
-  // brand was derived.
+  // No solver run, no network — `pair` already holds both members, solved
+  // when the brand was derived (or healed on mount), so this only ever
+  // looks one up. (Previously called `deriveTheme(brand)` here, which reran
+  // the AA solver on every toggle and again once more on mount.)
   useEffect(() => {
-    if (!brand) return;
-    const member = deriveTheme(brand)[mode];
+    if (!brand || !pair) return;
+    const member = pair[mode];
     applyCustomProperties(member.customProperties);
     setBrand(brand, member.customProperties);
-  }, [mode, brand, setBrand]);
+  }, [mode, brand, pair, setBrand]);
 
   return (
     <section className="hero" id="top">
@@ -221,7 +258,7 @@ export function Hero({
               placeholder="midnight fintech, confident and calm"
               defaultValue=""
             />
-            <Button type="submit" variant="accent" size={40}>
+            <Button type="submit" variant="accent" size={40} disabled={pending}>
               derive
             </Button>
           </form>
@@ -278,10 +315,15 @@ export function Hero({
             <Button
               variant="neutral-subtle"
               size={32}
+              className="console-copy"
               disabled={!pair}
+              title={copyLabel}
+              aria-label={copyLabel}
               onClick={() => void handleCopy()}
             >
-              copy customers/{pair ? pair.vector.name : "…"}.ts
+              <span className="console-copy-label" aria-hidden="true">
+                {copyLabel}
+              </span>
             </Button>
             {brand !== null && (
               <Button variant="ghost" size={32} onClick={handleReset}>

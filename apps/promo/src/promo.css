@@ -306,11 +306,31 @@ section {
 
 .console-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--psi-space-12);
   padding: var(--psi-space-16) var(--psi-space-20);
   border-top: 1px dashed var(--promo-hairline-faint);
+}
+
+/* The vector name can run to 48 chars — long enough on its own to overflow
+ * a 320px viewport. flex-shrink alone won't do it: a flex item's default
+ * min-width is its content's intrinsic (unbreakable, nowrap) size, so
+ * min-width: 0 here is what lets the button shrink at all, and the same on
+ * the label span is what lets *it* shrink enough for text-overflow to have
+ * something to truncate. */
+.console-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.console-copy-label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .derive {
