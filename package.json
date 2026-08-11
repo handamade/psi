@@ -8,7 +8,7 @@
     "dev": "pnpm run --filter @handamade/psi-tokens --filter ds-storybook dev --parallel",
     "dev:web": "pnpm run --filter @handamade/psi-tokens --filter promo --filter ds-storybook dev --parallel",
     "test": "vitest run",
-    "lint": "eslint . && pnpm lint:css",
+    "lint": "tsc -p api/tsconfig.build.json && eslint . && pnpm lint:css",
     "lint:css": "stylelint 'packages/react/src/**/*.module.css' 'apps/**/*.css' 'apps/storybook/.storybook/*.css'",
     "vr": "playwright test -c apps/storybook/vr",
     "verify:published": "node tools/verify-published.mjs",

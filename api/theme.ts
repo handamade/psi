@@ -7,6 +7,19 @@ import {
 
 const MODEL = "claude-sonnet-5";
 const TIMEOUT_MS = 12_000;
+/**
+ * Adaptive thinking runs BY DEFAULT on Sonnet 5 when `thinking` is omitted.
+ * That is what made every real call here return 502: the first content block
+ * came back as `{ type: "thinking" }`, `content[0].text` read `undefined`,
+ * `JSON.parse("")` threw, and the handler answered `{"error":"unparseable"}` —
+ * after paying for the upstream call. This endpoint wants one small JSON
+ * object, so thinking is disabled outright rather than tuned.
+ */
+const THINKING = { type: "disabled" } as const;
+// `max_tokens` bounds thinking AND response text together. 256 was tight even
+// for the bare vector; 512 is ample for the object the system prompt asks for
+// and still bounds a runaway reply.
+const MAX_TOKENS = 512;
 // This is a public, unauthenticated endpoint that makes a billed upstream
 // call per request — both bounds exist to stop someone from forcing that
 // call with an unbounded body. MAX_BODY_BYTES caps the raw bytes read off
@@ -111,7 +124,8 @@ export default async function handler(
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 256,
+        max_tokens: MAX_TOKENS,
+        thinking: THINKING,
         system: SYSTEM,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -120,8 +134,15 @@ export default async function handler(
 
     if (!upstream.ok) return json(res, 502, { error: "upstream" });
 
-    const payload = (await upstream.json()) as { content?: { text?: string }[] };
-    const text = payload.content?.[0]?.text?.trim() ?? "";
+    // `content` is a discriminated union of blocks, and the text block is not
+    // guaranteed to be first — indexing `[0]` couples this parser to a
+    // response shape the API never promised. Scan for the first `text` block
+    // instead, which is correct whether or not a `thinking` block precedes it.
+    const payload = (await upstream.json()) as {
+      content?: { type?: string; text?: string }[];
+    };
+    const text =
+      payload.content?.find((b) => b.type === "text")?.text?.trim() ?? "";
 
     let candidate: unknown;
     try {
@@ -145,8 +166,11 @@ export default async function handler(
       mode: take("mode"),
       radius: take("radius"),
       // The model's name is a suggestion; the safe local slug is the default.
+      // Same shape as `isBrandVector`: single interior hyphens only. The old
+      // `[a-z0-9-]*` let `a--b` and `ab-` through, and `serialize.ts`'s
+      // `ident()` turns those into identifiers containing a literal hyphen.
       name:
-        typeof c.name === "string" && /^[a-z][a-z0-9-]*$/.test(c.name)
+        typeof c.name === "string" && /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(c.name)
           ? c.name
           : local.name,
       // Fonts are never the model's to choose.

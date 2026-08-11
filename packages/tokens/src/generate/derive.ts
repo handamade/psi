@@ -1,4 +1,4 @@
-import { checkContrast, wcagAAPairs } from "../contrast-matrix.js";
+import { checkContrast, componentLabelPairs, wcagAAPairs } from "../contrast-matrix.js";
 import { resolve, type ResolvedTheme } from "../dsl/resolver.js";
 import { cap, set, slot, token } from "../dsl/builders.js";
 import type { Palette, SlotMap, ThemeDef, TokenDef } from "../dsl/types.js";
@@ -44,6 +44,25 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgb(${r} ${g} ${b} / ${alpha})`;
 }
 
+/**
+ * The gate, and it must be the SAME set `scripts/build.ts` runs over every
+ * committed theme: `[...wcagAAPairs, ...componentLabelPairs]`, 33 pairs.
+ *
+ * Checking only `wcagAAPairs` (28) is what let "a theme derived from any
+ * prompt clears the AA matrix by construction" ship false a third time. The
+ * five-pair delta is `componentLabelPairs` — solid variant labels on their
+ * fills — and the first of them, `fgOnAccent` on `fillAccent`, sat right at
+ * the threshold: `bold calm app` (hue 146, `vivid`) rendered it at 4.4979:1 in
+ * BOTH modes while the console printed "zero failures — by construction", and
+ * the `customers/bold-calm-app.ts` that prompt emitted threw in `pnpm build`,
+ * which had been checking all 33 the whole time.
+ *
+ * `buildBrandPalette` is what makes the extra five pass by construction (see
+ * `accentLightness` there for why the fix has to be upstream of this loop
+ * rather than another escalating target inside it).
+ */
+const AA_MATRIX = [...wcagAAPairs, ...componentLabelPairs];
+
 const BASE_TARGET = 4.5;
 const TARGET_ESCALATION = 0.1;
 const MAX_OUTER_ATTEMPTS = 40;
@@ -88,7 +107,7 @@ const TINT_SOURCE: Readonly<Record<string, string>> = {
  * what the initial `it.each` sweep caught (5 prompts, both text-on-canvas and
  * text-on-tint failures, e.g. `fgAccent/fillTintAccent 3.88<4.5`).
  *
- * The accept/reject gate for the whole function is the FULL `wcagAAPairs`
+ * The accept/reject gate for the whole function is the FULL `AA_MATRIX`
  * sweep against the real resolved theme, not a per-token subset: a per-token
  * filter (`p.fg === name`) is blind to cross pairs whose `bg` a token
  * controls indirectly but whose `fg` is something else — e.g. `{ fg:
@@ -128,11 +147,19 @@ function solveOverrides(palette: Palette, slots: SlotMap, mode: "light" | "dark"
         `solveOverrides: ${slotName} cannot clear ${target}:1 against ${canvasHex} at any chroma`,
       );
     }
+    // Deliberately NO `scopes`. `assembleCustomerTheme` inherits the base
+    // token's scopes when an override declares none (D46), and the base
+    // declarations are not uniform: `fgDanger` is `["text", "border"]` in both
+    // light.ts and dark.ts, while the other three are `["text"]`. Hardcoding
+    // `["text"]` here silently narrowed fgDanger — invisible in-memory (the
+    // console never runs the scope gate) but fatal in the token build, which
+    // rejects the emitted `customers/<name>.ts` with
+    // `Scope drift for token "fgDanger": light declares ["text","border"],
+    // <name> declares ["text"]` before the contrast gate is even reached.
     return token({
       from: slot[slotName],
       l: set(Number(solved.l.toFixed(4))),
       c: cap(Number(c.toFixed(4))),
-      scopes: ["text"],
     });
   }
 
@@ -153,7 +180,7 @@ function solveOverrides(palette: Palette, slots: SlotMap, mode: "light" | "dark"
       palette,
       slots,
     );
-    const failures = checkContrast(trialResolved, wcagAAPairs).filter((r) => !r.pass);
+    const failures = checkContrast(trialResolved, AA_MATRIX).filter((r) => !r.pass);
     if (failures.length === 0) {
       lastFailures = [];
       break;
@@ -244,10 +271,13 @@ export function deriveTheme(v: BrandVector): DerivedPair {
   };
 
   // Belt and braces: the solver targets the text pairs directly, but the AA
-  // matrix covers more than those. A residual failure means a bug in the
-  // solver, not bad input, so surface it loudly in development.
+  // matrix covers more than those — including the five `componentLabelPairs`
+  // no target inside `solveOverrides` can move, which is exactly why this
+  // check runs over `AA_MATRIX` and not the narrower `wcagAAPairs`. A residual
+  // failure means a bug in the solver or the palette anchors, not bad input,
+  // so surface it loudly in development.
   for (const member of [pair.light, pair.dark]) {
-    const failures = checkContrast(member.resolved, wcagAAPairs).filter((r) => !r.pass);
+    const failures = checkContrast(member.resolved, AA_MATRIX).filter((r) => !r.pass);
     if (failures.length > 0) {
       throw new Error(
         `deriveTheme: ${member.mode} left ${failures.length} AA failure(s): ` +

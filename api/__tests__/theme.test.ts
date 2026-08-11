@@ -1,13 +1,25 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { Readable } from "node:stream";
+import { IncomingMessage } from "node:http";
+import { Socket } from "node:net";
 import handler from "../theme.js";
 
-// A minimal stand-in for IncomingMessage: a real Readable so `for await`
-// streaming and `.destroy()` (used by the oversized-body guard) both behave
-// like the real thing, plus the `method` property the handler reads.
-function makeReq(body: string, method = "POST"): Readable & { method?: string } {
-  const req = Readable.from([Buffer.from(body, "utf8")]) as Readable & { method?: string };
+/**
+ * A real `IncomingMessage` over a detached socket, so `for await` streaming and
+ * `.destroy()` (used by the oversized-body guard) behave like the real thing —
+ * and, unlike the `Readable & { method?: string }` this used to be, it actually
+ * satisfies the handler's parameter type. That mismatch was 8 TS2345 errors
+ * sitting in this file, invisible because nothing type-checked `api/**` until
+ * `api/tsconfig.build.json` was added to `pnpm lint`. Casting them away with
+ * `as never` would have hidden the same class of bug again.
+ */
+function makeReq(
+  body: string,
+  method = "POST",
+): IncomingMessage & { body?: unknown; method?: string } {
+  const req = new IncomingMessage(new Socket());
   req.method = method;
+  req.push(Buffer.from(body, "utf8"));
+  req.push(null);
   return req;
 }
 
@@ -48,12 +60,42 @@ function stubFetch(impl: typeof fetch): void {
   globalThis.fetch = vi.fn(impl) as unknown as typeof fetch;
 }
 
+/**
+ * The REAL Messages API response shape: `content` is a list of typed blocks.
+ * The old stub here was `{ content: [{ text }] }` — no `type`, always exactly
+ * one block — which is why the suite stayed green while every live call
+ * returned 502. On Sonnet 5, omitting `thinking` runs adaptive thinking by
+ * default, so `content[0]` was a `thinking` block, `content[0].text` was
+ * `undefined`, and `JSON.parse("")` threw straight into
+ * `502 {"error":"unparseable"}`.
+ */
 function upstreamOk(text: string): Response {
   return {
     ok: true,
-    json: async () => ({ content: [{ text }] }),
+    json: async () => ({ content: [{ type: "text", text }] }),
   } as unknown as Response;
 }
+
+/** The same reply with a `thinking` block ahead of the text block. */
+function upstreamOkAfterThinking(text: string): Response {
+  return {
+    ok: true,
+    json: async () => ({
+      content: [
+        { type: "thinking", thinking: "The brief reads coastal…", signature: "sig" },
+        { type: "text", text },
+      ],
+    }),
+  } as unknown as Response;
+}
+
+const VALID_VECTOR = JSON.stringify({
+  hue: 200,
+  chroma: "vivid",
+  mode: "dark",
+  radius: 8,
+  name: "ok-name",
+});
 
 afterEach(() => {
   if (ORIGINAL_KEY === undefined) delete process.env.ANTHROPIC_API_KEY;
@@ -117,6 +159,37 @@ describe("POST /api/theme", () => {
 
       expect(res.statusCode).toBe(400);
       expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it("reads the text block even when a thinking block precedes it", async () => {
+      // The exact bug: `content[0]` is not the text block. Indexing position 0
+      // yields `undefined` here and 502s; scanning for `type === "text"` does
+      // not. This test is the one that fails if anyone reindexes.
+      stubFetch(async () => upstreamOkAfterThinking(VALID_VECTOR));
+
+      const res = makeRes();
+      await handler(makeReq(JSON.stringify({ prompt: "a coastal brand" })), res as never);
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toMatchObject({ hue: 200, chroma: "vivid" });
+    });
+
+    it("disables thinking and leaves room for the JSON object", async () => {
+      // Belt to the braces above: the request that cannot produce a leading
+      // thinking block in the first place. `max_tokens` bounds thinking and
+      // response text together, so both halves of the fix are asserted here.
+      const fetchSpy = vi.fn(async () => upstreamOk(VALID_VECTOR));
+      globalThis.fetch = fetchSpy as unknown as typeof fetch;
+
+      const res = makeRes();
+      await handler(makeReq(JSON.stringify({ prompt: "sunset" })), res as never);
+
+      expect(res.statusCode).toBe(200);
+      const [, init] = fetchSpy.mock.calls[0] as unknown as [string, RequestInit];
+      const sent = JSON.parse(init.body as string) as Record<string, unknown>;
+      expect(sent.thinking).toEqual({ type: "disabled" });
+      expect(sent.max_tokens).toBeGreaterThanOrEqual(512);
+      expect(sent.model).toBe("claude-sonnet-5");
     });
 
     it("strips extra keys the model invents — only BrandVector fields reach the 200 body", async () => {

@@ -53,7 +53,14 @@ export function isBrandVector(value: unknown): value is BrandVector {
   // TypeScript identifier, and this guard is the only thing between an
   // untrusted producer and both. parsePrompt's own slugify caps at 48.
   if (typeof v.name !== "string" || v.name.length > 64) return false;
-  if (!/^[a-z][a-z0-9-]*$/.test(v.name)) return false;
+  // Single interior hyphens only — no consecutive, no trailing. The looser
+  // `^[a-z][a-z0-9-]*$` admitted `a--b` and `ab-`, which `serialize.ts`'s
+  // `ident()` turned into `a-B` and `ab-`: literal hyphens inside a TypeScript
+  // identifier, i.e. an emitted `customers/<name>.ts` that does not parse.
+  // parsePrompt's slugify already collapses runs and strips trailing hyphens,
+  // so nothing it produces is affected — this closes the untrusted path (the
+  // model-supplied name in api/theme.ts, and stored brands).
+  if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(v.name)) return false;
   if (v.fonts !== undefined && !isFonts(v.fonts)) return false;
   return true;
 }

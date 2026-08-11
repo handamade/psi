@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { deriveTheme } from "../src/generate/derive.js";
 import { parsePrompt } from "../src/generate/prompt.js";
 import { serializeCustomerTheme } from "../src/generate/serialize.js";
+import { isBrandVector } from "../src/generate/types.js";
 
 const pair = deriveTheme(parsePrompt("sunset over the atlantic"));
 const out = serializeCustomerTheme(pair);
@@ -116,6 +117,76 @@ describe("serializeCustomerTheme", () => {
         if (def.c) expect(line, `${marker} ${name} c`).toContain(`c: cap(${def.c.value})`);
       }
     }
+  });
+
+  it("emits no fonts block for a colour-only vector", () => {
+    // "sunset over the atlantic" names no font keyword, so BrandFonts must not
+    // be imported — an unused type import is an eslint error in a generated
+    // file, and `pnpm lint` is one of the gates.
+    expect(pair.vector.fonts).toBeUndefined();
+    expect(out.source).not.toContain("BrandFonts");
+    expect(out.source).not.toMatch(/Fonts: BrandFonts/);
+    expect(out.registration).not.toContain("fonts:");
+  });
+
+  describe("a vector that carries fonts", () => {
+    // `editorial` is a FONT_SETS key (dictionaries.ts), so this prompt's
+    // vector carries a font-role set. Before D57's final review the serializer
+    // had no `fonts` path at all: deriveMember put them on the CustomerTheme
+    // and the emitted source dropped them silently, so a prompt that asked for
+    // typography got a colour-only brand out with no error anywhere.
+    const fontPair = deriveTheme(parsePrompt("editorial lagoon"));
+    const fontOut = serializeCustomerTheme(fontPair);
+
+    it("derives fonts from the prompt at all", () => {
+      expect(fontPair.vector.fonts).toBeDefined();
+    });
+
+    it("exports every role the vector carries, with the value it carries", () => {
+      expect(fontOut.source).toMatch(/export const \w+Fonts: BrandFonts = \{/);
+      for (const [role, stack] of Object.entries(fontPair.vector.fonts!)) {
+        expect(fontOut.source, role).toContain(`${role}: ${JSON.stringify(stack)},`);
+      }
+    });
+
+    it("imports BrandFonts from the registry it is registered in", () => {
+      expect(fontOut.source).toContain('import type { BrandFonts } from "./index.js";');
+    });
+
+    it("registers fonts on BOTH members — typography is not mode-specific", () => {
+      const lines = fontOut.registration.split("\n");
+      expect(lines).toHaveLength(2);
+      for (const line of lines) {
+        expect(line).toContain(`fonts: ${"editorialLagoon"}Fonts,`);
+      }
+    });
+  });
+
+  describe("ident() cannot emit an invalid identifier", () => {
+    // `ident` is not exported; drive it through the public seam by handing
+    // serializeCustomerTheme a vector whose name has the pathological shapes.
+    // `parsePrompt`'s slugify cannot produce these, but `api/theme.ts` takes a
+    // name from the model, so this is the untrusted path — and a stray hyphen
+    // in `export const a-B Palette` is a file that does not parse.
+    for (const name of ["a--b", "ab-", "a---b-", "x--y--z"]) {
+      it(`emits parseable identifiers for ${JSON.stringify(name)}`, () => {
+        const bad = serializeCustomerTheme({ ...pair, vector: { ...pair.vector, name } });
+        for (const m of bad.source.matchAll(/export const ([^:]+):/g)) {
+          expect(m[1], `identifier from ${name}`).toMatch(/^[A-Za-z][A-Za-z0-9]*$/);
+        }
+      });
+    }
+
+    it("is rejected upstream too — isBrandVector refuses those names", () => {
+      const base = { hue: 200, chroma: "calm", mode: "light", radius: 8 } as const;
+      expect(isBrandVector({ ...base, name: "a--b" })).toBe(false);
+      expect(isBrandVector({ ...base, name: "ab-" })).toBe(false);
+      expect(isBrandVector({ ...base, name: "-ab" })).toBe(false);
+      // …while everything parsePrompt actually produces still passes.
+      expect(isBrandVector({ ...base, name: "a-b" })).toBe(true);
+      expect(isBrandVector({ ...base, name: "ab" })).toBe(true);
+      expect(isBrandVector(parsePrompt("sunset over the atlantic"))).toBe(true);
+    });
   });
 
   it("round-trips: every anchor in the source matches the derived palette", () => {
