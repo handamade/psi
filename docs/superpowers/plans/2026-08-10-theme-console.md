@@ -1637,7 +1637,6 @@ Mode and brand are independent axes. `psi-theme` holds `"light" | "dark"`; `psi-
   - `function useMode(): [Mode, (m: Mode) => void]`
   - `function useBrand(): { brand: BrandVector | null; setBrand: (v: BrandVector, cache: Record<string, string>) => void; reset: () => void }`
   - `function applyCustomProperties(props: Record<string, string>): void`
-  - `function useSystemModeSync(setMode: (m: Mode) => void): void`
   - `function readStoredMode(): Mode | null`, `function readStoredBrand(): StoredBrand | null`
   - `const MODE_KEY = "psi-theme"`, `const BRAND_KEY = "psi-brand"`
 
@@ -1766,26 +1765,57 @@ export function readStoredBrand(): StoredBrand | null {
     } catch {
       /* storage unavailable */
     }
+    // Clearing storage is not enough. The boot script has ALREADY painted the
+    // cached properties onto <html> — it cannot validate the vector, because
+    // it runs before any module loads. If we only cleared the key, the visitor
+    // would keep looking at a theme whose vector we just rejected, with the
+    // reset control living inside it. Strip the paint too.
+    clearAppliedTheme();
     return null;
   }
+}
+
+/** Remove every inline --psi-* property the boot script or console applied. */
+export function clearAppliedTheme(): void {
+  const style = document.documentElement.style;
+  for (const name of Array.from(style).filter((n) => n.startsWith("--psi-"))) {
+    style.removeProperty(name);
+  }
+  delete document.documentElement.dataset.psiCustom;
 }
 
 function systemMode(): Mode {
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-/** Mode state, synced to <html data-psi-theme>. */
+/** Mode state, synced to <html data-psi-theme>. Follows the OS until the
+ * visitor makes an explicit choice, which then wins permanently. */
 export function useMode(): [Mode, (next: Mode) => void] {
   const [mode, setModeState] = useState<Mode>(() => readStoredMode() ?? systemMode());
 
+  /** An explicit choice. This is the only path that persists. */
   const setMode = useCallback((next: Mode) => {
     setModeState(next);
-    document.documentElement.dataset.psiTheme = next;
+    applyMode(next);
     try {
       localStorage.setItem(MODE_KEY, next);
     } catch {
       /* storage unavailable */
     }
+  }, []);
+
+  useEffect(() => {
+    const mq = matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => {
+      // An explicit choice outranks the OS, forever.
+      if (readStoredMode() !== null) return;
+      const next: Mode = mq.matches ? "dark" : "light";
+      setModeState(next);
+      applyMode(next);
+      // Deliberately NOT persisted — see applyMode's comment.
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   return [mode, setMode];
@@ -1836,20 +1866,18 @@ export function applyCustomProperties(props: Record<string, string>): void {
   document.documentElement.dataset.psiCustom = "";
 }
 
-/** Keep `system`-less mode honest: with nothing stored, follow the OS live. */
-export function useSystemModeSync(setMode: (m: Mode) => void): void {
-  useEffect(() => {
-    if (readStoredMode() !== null) return;
-    const mq = matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      if (readStoredMode() === null) {
-        document.documentElement.dataset.psiTheme = mq.matches ? "dark" : "light";
-        setMode(mq.matches ? "dark" : "light");
-      }
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [setMode]);
+/**
+ * OS following lives INSIDE useMode, and deliberately does not persist.
+ *
+ * An earlier design exposed `useSystemModeSync(setMode)` and passed it
+ * `useMode`'s setter. That setter persists, so the first OS theme change wrote
+ * an explicit value to storage, `readStoredMode()` became non-null, and the
+ * guard then disabled the listener permanently — OS following worked exactly
+ * once, for a visitor who had never chosen anything. Following the OS is not a
+ * choice, so it must not be recorded as one.
+ */
+function applyMode(next: Mode): void {
+  document.documentElement.dataset.psiTheme = next;
 }
 ```
 
@@ -1916,7 +1944,7 @@ git commit -m "feat(promo): split mode and brand into two orthogonal storage key
 - Modify: `apps/promo/src/App.tsx`
 
 **Interfaces:**
-- Consumes: `Mode`, `useMode`, `useSystemModeSync` (Task 8).
+- Consumes: `Mode`, `useMode` (Task 8). OS following lives inside `useMode`; there is no separate sync hook.
 - Produces: `<PsiMark size={number} />`; `<Header mode onMode />`.
 
 - [ ] **Step 1: Write the mark**
@@ -1991,11 +2019,10 @@ with the props changed to `{ mode, onMode }: { mode: Mode; onMode: (m: Mode) => 
 - [ ] **Step 3: Rewire `App.tsx`**
 
 ```tsx
-import { useMode, useSystemModeSync } from "./theme";
+import { useMode } from "./theme";
 
 export function App() {
   const [mode, setMode] = useMode();
-  useSystemModeSync(setMode);
 
   return (
     <>

@@ -17,6 +17,17 @@ function isMode(value: unknown): value is Mode {
   return value === "light" || value === "dark";
 }
 
+/** Remove every inline --psi-* property the boot script or console applied.
+ * Shared by readStoredBrand's rejection path and useBrand's reset — both
+ * need to erase the same paint, for the same reason. */
+export function clearAppliedTheme(): void {
+  const style = document.documentElement.style;
+  for (const name of Array.from(style).filter((n) => n.startsWith("--psi-"))) {
+    style.removeProperty(name);
+  }
+  delete document.documentElement.dataset.psiCustom;
+}
+
 /** Null means "nothing usable stored" — the caller falls back to the OS.
  * A stale "acme"/"ember" from the old roster lands here rather than being
  * written to data-psi-theme, where it would strand the visitor. */
@@ -53,6 +64,11 @@ export function readStoredBrand(): StoredBrand | null {
     } catch {
       /* storage unavailable */
     }
+    // The boot script may already have painted this rejected vector's cache
+    // onto <html> before any module — including this validator — could run.
+    // Clearing the key alone leaves that paint on screen, with the reset
+    // control living inside the very theme being rejected. Strip it too.
+    clearAppliedTheme();
     return null;
   }
 }
@@ -61,18 +77,43 @@ function systemMode(): Mode {
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-/** Mode state, synced to <html data-psi-theme>. */
+function applyMode(next: Mode): void {
+  document.documentElement.dataset.psiTheme = next;
+}
+
+/**
+ * Mode state, synced to <html data-psi-theme>. OS following lives INSIDE
+ * this hook and deliberately does not persist: an earlier design routed it
+ * through a separate `useSystemModeSync` hook fed the returned `setMode`,
+ * but that setter persists, so the first OS change recorded an explicit
+ * preference and permanently disabled the listener. Following the OS is not
+ * a choice and must not be recorded as one.
+ */
 export function useMode(): [Mode, (next: Mode) => void] {
   const [mode, setModeState] = useState<Mode>(() => readStoredMode() ?? systemMode());
 
+  /** An explicit choice. This is the only path that persists. */
   const setMode = useCallback((next: Mode) => {
     setModeState(next);
-    document.documentElement.dataset.psiTheme = next;
+    applyMode(next);
     try {
       localStorage.setItem(MODE_KEY, next);
     } catch {
       /* storage unavailable */
     }
+  }, []);
+
+  useEffect(() => {
+    const mq = matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => {
+      if (readStoredMode() !== null) return; // an explicit choice outranks the OS, forever
+      const next: Mode = mq.matches ? "dark" : "light";
+      setModeState(next);
+      applyMode(next);
+      // Deliberately NOT persisted.
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   return [mode, setMode];
@@ -104,11 +145,7 @@ export function useBrand(): {
     } catch {
       /* storage unavailable */
     }
-    const style = document.documentElement.style;
-    for (const name of Array.from(style).filter((n) => n.startsWith("--psi-"))) {
-      style.removeProperty(name);
-    }
-    delete document.documentElement.dataset.psiCustom;
+    clearAppliedTheme();
   }, []);
 
   return { brand, setBrand, reset };
@@ -121,22 +158,6 @@ export function applyCustomProperties(props: Record<string, string>): void {
     style.setProperty(name, value);
   }
   document.documentElement.dataset.psiCustom = "";
-}
-
-/** Keep `system`-less mode honest: with nothing stored, follow the OS live. */
-export function useSystemModeSync(setMode: (m: Mode) => void): void {
-  useEffect(() => {
-    if (readStoredMode() !== null) return;
-    const mq = matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      if (readStoredMode() === null) {
-        document.documentElement.dataset.psiTheme = mq.matches ? "dark" : "light";
-        setMode(mq.matches ? "dark" : "light");
-      }
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [setMode]);
 }
 
 // --- Compatibility layer for pre-D57 consumers -----------------------------
