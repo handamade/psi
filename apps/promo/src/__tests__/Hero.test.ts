@@ -19,7 +19,7 @@ vi.mock("@handamade/psi-tokens/generate", async (importOriginal) => {
 });
 
 import { Hero } from "../sections/Hero";
-import type { Mode } from "../theme";
+import { BRAND_KEY, type Mode } from "../theme";
 import { deriveTheme } from "@handamade/psi-tokens/generate";
 
 const deriveThemeSpy = deriveTheme as unknown as ReturnType<typeof vi.fn>;
@@ -199,6 +199,56 @@ describe("Hero console — mode toggle", () => {
     const propsAtOtherMode = inlineStyleText();
     expect(propsAtOtherMode).toMatch(/--psi-/);
     expect(propsAtOtherMode).not.toBe(propsAtInitialMode);
+
+    unmount();
+  });
+});
+
+describe("Hero console — mount-restore self-heal", () => {
+  it("clears a stored vector that no longer derives, instead of bricking every future mount", async () => {
+    // readStoredBrand only validates the vector's SHAPE (isBrandVector) —
+    // it cannot prove the vector still derives. Seed a shape-valid vector,
+    // then make deriveTheme itself throw on the mount-restore call, as it
+    // would if a solver change could no longer clear AA for this hue.
+    const storedVector = {
+      hue: 40,
+      chroma: "vivid",
+      mode: "dark",
+      radius: 12,
+      name: "stale-vector",
+    };
+    localStorage.setItem(
+      BRAND_KEY,
+      JSON.stringify({ vector: storedVector, cache: { "--psi-fg-primary": "#000000" } }),
+    );
+    deriveThemeSpy.mockImplementationOnce(() => {
+      throw new Error("solver: no longer clears AA for this hue");
+    });
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+
+    function Harness() {
+      return createElement(Hero, { mode: "light" as Mode, onMode: () => {} });
+    }
+
+    // The bug this guards: without a try/catch around the mount-restore
+    // deriveTheme call, this throw would propagate out of the effect and
+    // crash the render entirely — mount() itself would throw, since nothing
+    // catches it upstream (no error boundary in this harness, matching
+    // production's App).
+    const { container, unmount } = mount(createElement(Harness));
+    await act(async () => {
+      await flush();
+    });
+
+    // The page rendered — the crash the missing try/catch would have caused
+    // did not happen.
+    expect(container.querySelector(".console-prompt")).not.toBeNull();
+    // The un-derivable brand was cleared, exactly like a shape-invalid one:
+    // no reset control (brand is null), no leftover custom properties, and
+    // the stored key itself is gone so the NEXT mount doesn't throw again.
+    expect(findResetButton(container)).toBeUndefined();
+    expect(inlineStyleText()).not.toMatch(/--psi-/);
+    expect(localStorage.getItem(BRAND_KEY)).toBeNull();
 
     unmount();
   });

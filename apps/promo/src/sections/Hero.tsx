@@ -173,11 +173,21 @@ export function Hero({
   useEffect(() => {
     const stored = readStoredBrand();
     if (!stored) return;
-    const derived = deriveTheme(stored.vector);
-    const member = derived[mode];
-    applyCustomProperties(member.customProperties);
-    setPair(derived);
-    setBrand(stored.vector, member.customProperties);
+    // readStoredBrand only proves the vector's SHAPE is valid — it cannot
+    // prove the vector still derives (e.g. a solver change that can no
+    // longer clear AA for this hue). An uncaught throw here would run on
+    // every future mount, bricking the page with the reset control
+    // unreachable because it never renders. Self-heal exactly like a
+    // shape-invalid vector: clear the stored brand and fall back to stock.
+    try {
+      const derived = deriveTheme(stored.vector);
+      const member = derived[mode];
+      applyCustomProperties(member.customProperties);
+      setPair(derived);
+      setBrand(stored.vector, member.customProperties);
+    } catch {
+      reset();
+    }
     // Mount only — reading `mode`/`setBrand` fresh each run would re-run
     // this healing pass on every mode toggle, which Step 4 already owns.
   }, []);

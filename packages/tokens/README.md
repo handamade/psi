@@ -48,8 +48,8 @@ const { filename, source, registration } = serializeCustomerTheme(pair); // cust
 ```
 
 - `parsePrompt` is deterministic — an FNV-1a hash seeds a PRNG, so an unrecognised prompt still derives a coherent brand.
-- `deriveTheme` solves both members of the pair independently to WCAG AA by binary-searching lightness, so a generated theme cannot fail the contrast matrix.
-- `serializeCustomerTheme` emits the same `customers/<name>.ts` shape `pnpm new-theme` scaffolds by hand, plus the registry lines to wire it in.
+- `deriveTheme` solves both members of the pair independently to WCAG AA by binary-searching lightness; it never returns a below-AA theme, because it throws instead of returning one if the solver can't clear the matrix.
+- `serializeCustomerTheme` emits `customers/<name>.ts` source in the CLI's own layout (`pnpm new-theme`'s `Palette` + `SlotMap`), extended to a pair: two `SlotMap`s (light and dark) and, unlike the CLI's override-free scaffold, the solved `ThemeDef` overrides each member needs to clear AA — the same kind of hand-tuned correction `acmeOverrides` carries in `customers/acme.ts`, but derived rather than hand-tuned.
 
 ## Machine-readable artifacts
 
