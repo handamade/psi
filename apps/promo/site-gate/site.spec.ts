@@ -19,9 +19,62 @@ for (const theme of ["light", "dark"] as const) {
   test(`no axe violations (${theme})`, async ({ page }) => {
     await page.addInitScript((t) => localStorage.setItem("psi-theme", t), theme);
     await page.goto(BASE, { waitUntil: "networkidle" });
+    // Prove the seed actually took. Without this, a future key rename would
+    // leave both runs on the same appearance and pass anyway (D57).
+    await expect(page.locator("html")).toHaveAttribute("data-psi-theme", theme);
     expect(await runAxe(page)).toEqual([]);
   });
 }
+
+/**
+ * The Theming section's three cards each declare their own data-psi-theme, so
+ * an element's own rule beats an inherited value and they stay pinned under a
+ * console-derived theme. Those cards ARE the attribute-scoping argument — if a
+ * generated theme swallowed them the section would refute itself (D57).
+ */
+test("a derived theme does not repaint the pinned Theming cards", async ({ page }) => {
+  await page.goto(BASE, { waitUntil: "networkidle" });
+
+  const cardBg = () =>
+    page.evaluate(() => {
+      const card = document.querySelector('[data-psi-theme="acme"]');
+      return card ? getComputedStyle(card).backgroundColor : null;
+    });
+
+  const before = await cardBg();
+  expect(before).not.toBeNull();
+
+  // Apply an extreme brand directly to <html>, as the console does.
+  await page.evaluate(() => {
+    document.documentElement.style.setProperty("--psi-bg-primary", "#ff00ff");
+    document.documentElement.dataset.psiCustom = "";
+  });
+  // `body` carries `transition: background-color var(--psi-duration-200)`
+  // (200ms) — reading immediately would measure a mid-transition frame
+  // instead of the applied color, so wait past it.
+  await page.waitForTimeout(300);
+
+  expect(await cardBg()).toBe(before);
+
+  // …and prove the page around them DID move, or the test proves nothing.
+  // Every token here is OKLCH-based end to end, and Chromium's computed
+  // style keeps a transitioned background-color in oklab() notation rather
+  // than converting it back to rgb() — a plain string match for
+  // "255, 0, 255" would never pass regardless of the wait above. Rasterize
+  // it through a canvas instead: that always yields real 0–255 sRGB
+  // channels no matter which colour-function syntax the computed style used.
+  const bodyRgb = await page.evaluate(() => {
+    const bg = getComputedStyle(document.body).backgroundColor;
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return { r, g, b };
+  });
+  expect(bodyRgb).toEqual({ r: 255, g: 0, b: 255 });
+});
 
 /**
  * The hero's derive labels, measured directly — because axe structurally cannot.
