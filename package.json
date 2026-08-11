@@ -29,7 +29,8 @@
     "vitest": "^3.2.0"
   },
   "dependencies": {
-    "@handamade/psi-mcp": "workspace:*"
+    "@handamade/psi-mcp": "workspace:*",
+    "@handamade/psi-tokens": "workspace:*"
   },
   "packageManager": "pnpm@11.9.0",
   "engines": {

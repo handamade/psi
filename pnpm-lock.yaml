@@ -11,6 +11,9 @@ importers:
       '@handamade/psi-mcp':
         specifier: workspace:*
         version: link:packages/mcp
+      '@handamade/psi-tokens':
+        specifier: workspace:*
+        version: link:packages/tokens
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.0

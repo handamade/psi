@@ -1,8 +1,19 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { isBrandVector, parsePrompt } from "@handamade/psi-tokens/generate";
+import {
+  isBrandVector,
+  parsePrompt,
+  type BrandVector,
+} from "@handamade/psi-tokens/generate";
 
 const MODEL = "claude-sonnet-5";
 const TIMEOUT_MS = 12_000;
+// This is a public, unauthenticated endpoint that makes a billed upstream
+// call per request — both bounds exist to stop someone from forcing that
+// call with an unbounded body. MAX_BODY_BYTES caps the raw bytes read off
+// the wire (checked while streaming, not after buffering); MAX_PROMPT_CHARS
+// caps the extracted prompt text itself, after trimming.
+const MAX_PROMPT_CHARS = 500; // a brand brief, not an essay
+const MAX_BODY_BYTES = 16 * 1024;
 
 /**
  * The model returns a BrandVector, never colours (D57). Every field is drawn
@@ -24,26 +35,54 @@ function json(res: ServerResponse, status: number, body: unknown): void {
   res.end(JSON.stringify(body));
 }
 
-async function readPrompt(req: IncomingMessage & { body?: unknown }): Promise<string | null> {
+type ReadPromptResult =
+  | { ok: true; prompt: string }
+  | { ok: false; status: number; error: string };
+
+async function readPrompt(
+  req: IncomingMessage & { body?: unknown },
+): Promise<ReadPromptResult> {
   let parsed: unknown = req.body;
   if (parsed === undefined) {
     const chunks: Buffer[] = [];
-    for await (const chunk of req) chunks.push(chunk as Buffer);
+    let bytes = 0;
+    for await (const chunk of req) {
+      const buf = chunk as Buffer;
+      bytes += buf.length;
+      // Bail the moment the running total crosses the cap. Buffering the
+      // whole stream first and checking afterwards would still let an
+      // attacker force us to read (and pay for) an unbounded body.
+      if (bytes > MAX_BODY_BYTES) {
+        req.destroy();
+        return { ok: false, status: 413, error: "body too large" };
+      }
+      chunks.push(buf);
+    }
     try {
       parsed = JSON.parse(Buffer.concat(chunks).toString("utf8"));
     } catch {
-      return null;
+      return { ok: false, status: 400, error: "invalid JSON" };
     }
   }
   if (typeof parsed === "string") {
     try {
       parsed = JSON.parse(parsed);
     } catch {
-      return null;
+      return { ok: false, status: 400, error: "invalid JSON" };
     }
   }
-  const prompt = (parsed as { prompt?: unknown } | null)?.prompt;
-  return typeof prompt === "string" && prompt.trim().length > 0 ? prompt : null;
+  const raw = (parsed as { prompt?: unknown } | null)?.prompt;
+  if (typeof raw !== "string") {
+    return { ok: false, status: 400, error: "Expected { prompt: string }" };
+  }
+  const prompt = raw.trim();
+  if (prompt.length === 0) {
+    return { ok: false, status: 400, error: "Expected { prompt: string }" };
+  }
+  if (prompt.length > MAX_PROMPT_CHARS) {
+    return { ok: false, status: 400, error: "prompt too long" };
+  }
+  return { ok: true, prompt };
 }
 
 export default async function handler(
@@ -58,8 +97,9 @@ export default async function handler(
   // unreachable" without surfacing a failure.
   if (!apiKey) return json(res, 204, {});
 
-  const prompt = await readPrompt(req);
-  if (prompt === null) return json(res, 400, { error: "Expected { prompt: string }" });
+  const read = await readPrompt(req);
+  if (!read.ok) return json(res, read.status, { error: read.error });
+  const prompt = read.prompt;
 
   try {
     const upstream = await fetch("https://api.anthropic.com/v1/messages", {
@@ -93,15 +133,24 @@ export default async function handler(
     // The model does not choose the fonts, and its name is only a suggestion:
     // fall back to the local slug so the filename is always well-formed.
     const local = parsePrompt(prompt);
-    const merged = {
-      ...local,
-      ...(candidate as Record<string, unknown>),
+    const c = candidate as Record<string, unknown>;
+    const take = <K extends keyof BrandVector>(k: K): BrandVector[K] =>
+      (c[k] !== undefined ? c[k] : local[k]) as BrandVector[K];
+
+    // Built field-by-field, never spread: a key the model invents cannot
+    // reach the response body, because there is no path for it to arrive on.
+    const merged: BrandVector = {
+      hue: take("hue"),
+      chroma: take("chroma"),
+      mode: take("mode"),
+      radius: take("radius"),
+      // The model's name is a suggestion; the safe local slug is the default.
       name:
-        typeof (candidate as { name?: unknown }).name === "string" &&
-        /^[a-z][a-z0-9-]*$/.test((candidate as { name: string }).name)
-          ? (candidate as { name: string }).name
+        typeof c.name === "string" && /^[a-z][a-z0-9-]*$/.test(c.name)
+          ? c.name
           : local.name,
-      fonts: local.fonts,
+      // Fonts are never the model's to choose.
+      ...(local.fonts ? { fonts: local.fonts } : {}),
     };
 
     if (!isBrandVector(merged)) return json(res, 502, { error: "invalid vector" });
