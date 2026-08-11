@@ -1634,7 +1634,7 @@ Mode and brand are independent axes. `psi-theme` holds `"light" | "dark"`; `psi-
 - Consumes: `isBrandVector`, `deriveTheme`, `type BrandVector` from `@handamade/psi-tokens/generate`.
 - Produces:
   - `type Mode = "light" | "dark"`
-  - `function useMode(): [Mode, (m: Mode) => void]`
+  - `function useMode(): [Mode, (m: Mode) => void, (m: Mode) => void]` — the third element is a NON-PERSISTING setter for machine-chosen modes. A derived brand's mode is not a visitor choice; persisting it opts them out of OS following forever (the same failure the OS-follow fix addressed).
   - `function useBrand(): { brand: BrandVector | null; setBrand: (v: BrandVector, cache: Record<string, string>) => void; reset: () => void }`
   - `function applyCustomProperties(props: Record<string, string>): void`
   - `function readStoredMode(): Mode | null`, `function readStoredBrand(): StoredBrand | null`
@@ -2006,7 +2006,7 @@ And the switcher becomes:
           <Button
             size={24}
             variant="neutral-subtle"
-            aria-pressed={mode === "dark"}
+            aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
             onClick={() => onMode(mode === "dark" ? "light" : "dark")}
           >
             {mode === "dark" ? "light" : "dark"}
@@ -2062,7 +2062,7 @@ The Δ-lightness card is subsumed, not displaced: its swatches already read `okl
 - Modify: `apps/promo/src/promo.css` (console layout only — no colour literals)
 
 **Interfaces:**
-- Consumes: `parsePrompt`, `deriveTheme`, `serializeCustomerTheme`, `isBrandVector` from `@handamade/psi-tokens/generate`; `useBrand`, `useMode`, `applyCustomProperties` from `../theme`.
+- Consumes: `parsePrompt`, `deriveTheme`, `serializeCustomerTheme`, `isBrandVector` from `@handamade/psi-tokens/generate`; `useBrand`, `applyCustomProperties` from `../theme`. `mode` and `onMode` arrive as PROPS from `App.tsx` — Hero must NOT call `useMode()` itself, or it gets a second independent instance that desyncs from the header's toggle and silently breaks mode-switching after the first click.
 - Produces: nothing consumed by later tasks.
 
 - [ ] **Step 1: Build the derive flow**
