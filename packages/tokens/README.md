@@ -35,6 +35,22 @@ All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, 
 
 Run `pnpm new-theme` to scaffold a customer brand theme (palette + slot mapping).
 
+## Deriving a brand from a prompt
+
+`@handamade/psi-tokens/generate` (D57) derives a brand at runtime instead of scaffolding one by hand:
+
+```ts
+import { parsePrompt, deriveTheme, serializeCustomerTheme } from "@handamade/psi-tokens/generate";
+
+const vector = parsePrompt("a calm dark fintech brand");   // deterministic BrandVector
+const pair = deriveTheme(vector);                          // AA-solved light + dark DerivedTheme pair
+const { filename, source, registration } = serializeCustomerTheme(pair); // customers/<name>.ts
+```
+
+- `parsePrompt` is deterministic — an FNV-1a hash seeds a PRNG, so an unrecognised prompt still derives a coherent brand.
+- `deriveTheme` solves both members of the pair independently to WCAG AA by binary-searching lightness, so a generated theme cannot fail the contrast matrix.
+- `serializeCustomerTheme` emits the same `customers/<name>.ts` shape `pnpm new-theme` scaffolds by hand, plus the registry lines to wire it in.
+
 ## Machine-readable artifacts
 
 For AI and tooling, see [llms.txt](./llms.txt):
@@ -42,6 +58,7 @@ For AI and tooling, see [llms.txt](./llms.txt):
 - `dist/guidance.json` — Variant intent, usage rules, state derivation
 - `dist/dtcg/{theme}.json` — W3C DTCG format export
 - `dist/components/{name}.vars.css` — Component-specific token declarations
+- `dist/generate/` — Compiled `./generate` subpath (`parsePrompt`, `deriveTheme`, `serializeCustomerTheme`, and lower-level helpers)
 
 ## Note
 
