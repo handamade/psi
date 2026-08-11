@@ -627,6 +627,13 @@ section {
   margin-top: var(--psi-space-16);
 }
 
+.code-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-16);
+  min-width: 0;
+}
+
 .code-block {
   border: 1px solid var(--promo-hairline-faint);
   border-radius: var(--psi-radius-12);
