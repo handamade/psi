@@ -20,7 +20,7 @@ export function App() {
       </a>
       <Header mode={mode} onMode={setMode} />
       <main id="main" tabIndex={-1}>
-        <Hero />
+        <Hero mode={mode} onMode={setMode} />
         <Principles />
         <Playground />
         <Theming />
