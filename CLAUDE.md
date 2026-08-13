@@ -65,3 +65,16 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 - **Cut a release whenever `.changeset/` is non-empty and `main` is green** — don't let them pool. Four accumulated once and left D53 merged-but-unpublished across three decisions.
 - **After every publish, run `pnpm verify:published`** (D75). It installs the real tarballs into a scratch project outside the workspace and checks what the workspace structurally cannot: `exports` conditions, `LICENSE` in the tarball, and that every identifier a published preset renders is actually importable. It has caught two real bugs that all five CI gates missed — D68's `./styles` TS2882 and D74's unexported `IconMoreHorizontal`, the latter shipping in two releases because this run was manual and got skipped. It takes a version argument (`node tools/verify-published.mjs 0.14.0`) so a regression can be bisected.
 - Release: branch `release/psi-x.y.z` → `pnpm changeset version` → PR → merge → `pnpm release` locally. `pnpm release` now ends in `git push --tags` (`changeset tag` creates tags but never pushes them — that gap silently stranded 0.8.1's tags after publish). Needs npm auth, and **npm 2FA means it must run in an interactive terminal** — non-interactive shells fail with `ERR_PNPM_OTP_NON_INTERACTIVE` before publishing anything. `tools/release-guard.mjs` refuses anything but a clean, up-to-date `main`.
+
+## gstack (recommended)
+
+This project uses [gstack](https://github.com/garrytan/gstack) for AI-assisted workflows.
+Install it for the best experience:
+
+```bash
+git clone --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+cd ~/.claude/skills/gstack && ./setup --team
+```
+
+Skills like /qa, /ship, /review, /investigate, and /browse become available after install.
+Use /browse for all web browsing. Use ~/.claude/skills/gstack/... for gstack file paths.
