@@ -30,6 +30,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { concreteSubpaths } from "./lib/exports-map.mjs";
 
 const args = process.argv.slice(2);
 const keep = args.includes("--keep");
@@ -56,6 +57,61 @@ const note = (ok, label, detail = "") => {
 const run = (cmd, cmdArgs, cwd) =>
   execFileSync(cmd, cmdArgs, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 
+/**
+ * npm install, retried, with the failure actually legible.
+ *
+ * Two lessons from 0.19.0, both cheap and both painful at the time.
+ *
+ * `--silent` used to be passed here. When the install failed the script died
+ * with `status: 1` and `stderr: ''` — an execFileSync stack trace and no cause
+ * whatsoever. A verification tool that fails opaquely costs more than the bug
+ * it guards, so npm's own output is captured and printed on the last attempt.
+ *
+ * And the failure itself was not a bug: `pnpm release` had published seconds
+ * earlier and the registry had not yet served the new version to the install
+ * path. That sequence is what the docs prescribe, so the lag is a normal
+ * condition rather than an error — hence the retry.
+ */
+const install = (pkgArgs, cwd, { attempts = 3, waitMs = 5000 } = {}) => {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return run("npm", ["install", ...pkgArgs], cwd);
+    } catch (e) {
+      const detail = [String(e.stderr ?? "").trim(), String(e.stdout ?? "").trim()]
+        .filter(Boolean)
+        .join("\n");
+      if (attempt >= attempts) {
+        console.log(`  FAIL npm install (${attempt} attempts)`);
+        console.log(detail.split("\n").slice(0, 20).map((l) => `       ${l}`).join("\n"));
+        throw new Error(`npm install failed after ${attempt} attempts — see output above`, { cause: e });
+      }
+      console.log(`  ..   npm install attempt ${attempt} failed, retrying in ${waitMs / 1000}s (registry lag after a fresh publish is normal)`);
+      execFileSync(process.execPath, ["-e", `setTimeout(()=>{}, ${waitMs})`], { stdio: "ignore" });
+    }
+  }
+};
+
+/**
+ * Every concrete subpath a consumer can import, read from the INSTALLED
+ * package's own `exports` map rather than a list maintained by hand.
+ *
+ * The hand-maintained list is why this check passed 0.19.0 while never once
+ * touching what 0.19.0 shipped: `@handamade/psi-tokens/generate` was a brand
+ * new subpath and nothing here knew to look for it. That is the same shape as
+ * D68 — a checker only catches the surface it was told about — so the surface
+ * is now derived instead of declared.
+ *
+ * The enumeration itself lives in `lib/exports-map.mjs` and is unit-tested;
+ * this reads the installed package.json and hands it over, keeping the
+ * script's rule intact: every assertion reads the installed package, never
+ * the repo.
+ */
+const installedSubpaths = (pkg, cwd) =>
+  concreteSubpaths(
+    pkg,
+    JSON.parse(readFileSync(join(cwd, "node_modules", ...pkg.split("/"), "package.json"), "utf8")),
+  );
+
 const dir = mkdtempSync(join(tmpdir(), "psi-verify-"));
 console.log(`\nVerifying ${REACT_PKG}@${version} in ${dir}\n`);
 
@@ -63,8 +119,8 @@ try {
   // ── Install ──────────────────────────────────────────────────────────
   mkdirSync(join(dir, "src"), { recursive: true });
   writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "psi-verify", private: true, type: "module" }, null, 2));
-  run("npm", ["install", "--silent", `${REACT_PKG}@${version}`, `${TOKENS_PKG}@${version}`, "react", "react-dom"], dir);
-  run("npm", ["install", "--silent", "-D", "typescript", "vite", "@vitejs/plugin-react", "@types/react", "@types/react-dom"], dir);
+  install([`${REACT_PKG}@${version}`, `${TOKENS_PKG}@${version}`, "react", "react-dom"], dir);
+  install(["-D", "typescript", "vite", "@vitejs/plugin-react", "@types/react", "@types/react-dom"], dir);
 
   const installed = JSON.parse(readFileSync(join(dir, "node_modules", REACT_PKG, "package.json"), "utf8"));
   console.log(`  resolved to ${installed.version}\n`);
@@ -75,11 +131,22 @@ try {
   }
 
   // ── Every export target resolves through the published `exports` map ──
-  for (const spec of STYLESHEETS) {
+  // Resolution goes through `import.meta.resolve`, not `createRequire().resolve`.
+  // The require path honours only the `require` condition, so an import-only
+  // subpath fails it — `@handamade/psi-tokens/generate` declares `types` and
+  // `import` and nothing else, and reports ERR_PACKAGE_PATH_NOT_EXPORTED under
+  // require while being perfectly healthy. Adding the new subpath to the old
+  // mechanism would have turned this check red on a good package.
+  const specs = [...new Set([
+    ...STYLESHEETS,
+    ...installedSubpaths(REACT_PKG, dir),
+    ...installedSubpaths(TOKENS_PKG, dir),
+  ])];
+  for (const spec of specs) {
     let ok = true;
     let detail = "";
     try {
-      run("node", ["-e", `require("module").createRequire(process.cwd()+"/x.js").resolve(${JSON.stringify(spec)})`], dir);
+      run("node", ["--input-type=module", "-e", `import.meta.resolve(${JSON.stringify(spec)})`], dir);
     } catch (e) {
       ok = false;
       detail = String(e.stderr ?? e).split("\n").find((l) => l.includes("Error")) ?? "unresolved";
