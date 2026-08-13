@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-08-13",
+    tag: "release",
+    title: "0.19.0 — a brand from a prompt, solved to AA",
+    body: "@handamade/psi-tokens/generate turns a description into a real customers/<name>.ts: a light and dark pair derived from one BrandVector — hue, chroma, radius, and a name — serialized as source that survives the token build. The contract is deliberately narrow. A prompt never produces colours; it produces a vector over closed sets, so nothing reaches a rendered colour without passing the AA solver first. Each member is then solved to WCAG AA by binary-searching lightness against the same 33 pairs the build gates every committed theme on, and the derivation throws rather than return a theme that renders below AA. The accent anchor is darkened only as far as a white label needs to clear it, so that pair passes by construction instead of by escalation — at a flat lightness the worst hue on the circle rendered white-on-accent at 4.4979:1, just under AA, which is the measurement that made the anchor fix necessary. Parsing is deterministic: an FNV-1a hash seeds a PRNG, so an unrecognised description still derives a coherent brand and the same description always derives the same one. The theme console in the hero above drives all of it.",
+  },
+  {
     date: "2026-08-10",
     tag: "release",
     title: "0.18.0 — Toolbar stops stacking, and every pattern renders",
