@@ -72,7 +72,7 @@ export function resolve(
     let baseAlpha: number | undefined;
 
     if (def.from.type === "slot") {
-      const paletteName = (slots as Record<string, string>)[def.from.name];
+      const paletteName = (slots as unknown as Record<string, string>)[def.from.name];
       if (!paletteName) {
         throw new Error(
           `Unknown slot: "${def.from.name}"`,

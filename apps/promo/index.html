@@ -10,16 +10,33 @@
     <title>Psi — Color isn’t picked. It’s computed.</title>
     <script>
       (function () {
-        var stored = null;
+        var doc = document.documentElement;
+        var mode = null;
+        var brand = null;
         try {
-          stored = localStorage.getItem("psi-theme");
+          var storedMode = localStorage.getItem("psi-theme");
+          if (storedMode === "light" || storedMode === "dark") mode = storedMode;
+          brand = JSON.parse(localStorage.getItem("psi-brand") || "null");
         } catch (_) {
           /* storage unavailable */
         }
-        var theme =
-          stored ||
-          (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-        document.documentElement.dataset.psiTheme = theme;
+        // No system OPTION in the switcher, but the first visit still follows
+        // the OS — omitting the option is a UI decision, not a reason to flash
+        // a dark-mode visitor a light page.
+        doc.dataset.psiTheme =
+          mode || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
+        // Paint the cached brand before first paint. The app then validates the
+        // vector, re-derives, and rewrites the cache if it disagrees, so a stale
+        // cache costs one frame rather than pinning a visitor to old output.
+        if (brand && brand.cache && typeof brand.cache === "object") {
+          for (var name in brand.cache) {
+            if (name.indexOf("--psi-") === 0) {
+              doc.style.setProperty(name, brand.cache[name]);
+            }
+          }
+          doc.dataset.psiCustom = "";
+        }
       })();
     </script>
   </head>

@@ -1,7 +1,16 @@
 import { useState, type CSSProperties } from "react";
 import { Button, IconCheck, Switch, Tag } from "@handamade/psi-react";
 
-import type { ThemeName } from "../theme";
+/** The three pinned preview cards below are attribute-scoped demos, not the
+ * app's live mode/brand state (Task 8's Mode is light|dark only) — so this
+ * type is local to the demo, not the exported Mode. */
+type PreviewTheme = "light" | "dark" | "acme";
+
+const LIGHT_SNIPPET = `fgAccent: token({
+  from: slot.accent,
+  l: set(0.48),
+  c: cap(0.23),
+}),`;
 
 const ACME_SNIPPET = `export const acmePalette: Palette = {
   charcoal: { l: 0.22, c: 0.015, h: 30 },
@@ -23,7 +32,7 @@ export const acmeSlots: SlotMap = {
 const RADIUS_RUNGS = [4, 6, 8, 12] as const;
 const DEFAULT_RUNG = 2; // radius-8, the --psi-control-radius default
 
-function ThemePreview({ name, radius }: { name: ThemeName; radius: number }) {
+function ThemePreview({ name, radius }: { name: PreviewTheme; radius: number }) {
   return (
     <figure className="theme-card">
       {/* The inline custom property MUST sit on this element, not a wrapper:
@@ -102,13 +111,24 @@ export function Theming() {
         </div>
 
         <div className="theming-cols">
-          <div className="code-block">
-            <div className="code-block-head">
-              <span className="annot">
-                themes/customers/acme.ts · scaffolded by `pnpm new-theme acme`
-              </span>
+          <div className="code-stack">
+            <div className="code-block">
+              <div className="code-block-head">
+                <span className="annot">
+                  themes/light.ts · the shipped default
+                </span>
+              </div>
+              <pre>{LIGHT_SNIPPET}</pre>
             </div>
-            <pre>{ACME_SNIPPET}</pre>
+            <div className="code-block">
+              <div className="code-block-head">
+                <span className="annot">
+                  themes/customers/acme.ts · scaffolded by `pnpm new-theme
+                  acme`
+                </span>
+              </div>
+              <pre>{ACME_SNIPPET}</pre>
+            </div>
           </div>
           <ul className="check-list">
             <li>
@@ -135,7 +155,10 @@ export function Theming() {
               <IconCheck size={16} aria-hidden="true" />
               <span>
                 <strong>WCAG AA is a build gate, not a guideline.</strong> A
-                theme that fails the contrast matrix fails the build.
+                theme committed to the repo fails the build if it fails the
+                contrast matrix. A theme derived in the console can&rsquo;t
+                fail it at all — every pair is solved to AA before it
+                renders.
               </span>
             </li>
             <li>

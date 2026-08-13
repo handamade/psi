@@ -1,0 +1,29 @@
+{
+  // `api/` is a Vercel Function directory, not a workspace package, so nothing
+  // in `pnpm -r run build` ever reached it — and `eslint.config.js` uses the
+  // untyped recommended config, so `pnpm lint` did not either. The result:
+  // `api/**` was type-checked by no gate at all, and this branch shipped 8
+  // TS2345 errors in its own test file without a single one failing CI.
+  //
+  // Same shape as packages/mcp and packages/react's tsconfig.build.json, with
+  // `noEmit` because there is nothing to build here — Vercel compiles the
+  // function itself. Run by `pnpm lint`, which CI runs.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    // `@types/node` is not a root devDependency and pnpm does not hoist, so
+    // point at the copy `packages/mcp` already installs rather than adding a
+    // dependency for a type-only need. If that package ever drops it, this
+    // fails loudly with "Cannot find type definition file for 'node'" — it
+    // cannot degrade into silently unchecked Node globals.
+    "typeRoots": ["../packages/mcp/node_modules/@types"],
+    "types": ["node"]
+  },
+  // Relative to this file, so this is exactly `api/**` — the handler and its
+  // tests, nothing else.
+  "include": ["."]
+}

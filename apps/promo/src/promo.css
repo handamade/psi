@@ -267,9 +267,9 @@ section {
   border-top: 1px solid var(--promo-hairline-faint);
 }
 
-/* formula card */
+/* theme console */
 
-.formula-card {
+.console-card {
   border: 1px solid var(--promo-hairline);
   border-radius: var(--psi-radius-12);
   background: var(--psi-bg-secondary);
@@ -277,7 +277,7 @@ section {
   overflow: hidden;
 }
 
-.formula-card-head {
+.console-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -285,21 +285,52 @@ section {
   border-bottom: 1px solid var(--promo-hairline-faint);
 }
 
-.formula-card pre {
-  margin: 0;
-  padding: var(--psi-space-20);
-  font: var(--psi-text-14-20-regular);
-  font-family: var(--psi-font-mono);
-  color: var(--psi-fg-primary);
-  overflow-x: auto;
+.console-prompt {
+  display: flex;
+  gap: var(--psi-space-8);
+  padding: var(--psi-space-16) var(--psi-space-20);
+  border-bottom: 1px dashed var(--promo-hairline-faint);
 }
 
-.formula-card pre .tok {
-  color: var(--psi-fg-accent);
+.console-prompt input {
+  flex: 1;
+  min-width: 0;
 }
 
-.formula-card pre .fn {
-  color: var(--psi-fg-success);
+.console-transcript {
+  display: grid;
+  gap: var(--psi-space-4);
+  min-height: 56px;
+  padding: var(--psi-space-16) var(--psi-space-20) 0;
+}
+
+.console-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--psi-space-12);
+  padding: var(--psi-space-16) var(--psi-space-20);
+  border-top: 1px dashed var(--promo-hairline-faint);
+}
+
+/* The vector name can run to 48 chars — long enough on its own to overflow
+ * a 320px viewport. flex-shrink alone won't do it: a flex item's default
+ * min-width is its content's intrinsic (unbreakable, nowrap) size, so
+ * min-width: 0 here is what lets the button shrink at all, and the same on
+ * the label span is what lets *it* shrink enough for text-overflow to have
+ * something to truncate. */
+.console-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.console-copy-label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .derive {
@@ -594,6 +625,13 @@ section {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--psi-space-16);
   margin-top: var(--psi-space-16);
+}
+
+.code-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-16);
+  min-width: 0;
 }
 
 .code-block {

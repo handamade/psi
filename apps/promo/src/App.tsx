@@ -8,19 +8,21 @@ import { AgentReady } from "./sections/AgentReady";
 import { Roadmap } from "./sections/Roadmap";
 import { Updates } from "./sections/Updates";
 import { Footer } from "./sections/Footer";
-import { useTheme } from "./theme";
+import { useMode } from "./theme";
 
 export function App() {
-  const [theme, setTheme] = useTheme();
+  const [mode, setMode, setModeEphemeral] = useMode();
 
   return (
     <>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <Header theme={theme} onTheme={setTheme} />
+      {/* The header toggle is a real, persisted choice; Hero gets the
+          ephemeral setter, since a derived brand's own mode is not one. */}
+      <Header mode={mode} onMode={setMode} />
       <main id="main" tabIndex={-1}>
-        <Hero />
+        <Hero mode={mode} onMode={setModeEphemeral} />
         <Principles />
         <Playground />
         <Theming />
