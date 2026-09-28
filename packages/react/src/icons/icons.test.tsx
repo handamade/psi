@@ -13,6 +13,10 @@ import { IconInfo } from "./IconInfo.js";
 import { IconAlertTriangle } from "./IconAlertTriangle.js";
 import { IconAlertCircle } from "./IconAlertCircle.js";
 import { IconMoreHorizontal } from "./IconMoreHorizontal.js";
+import { IconMenu } from "./IconMenu.js";
+import { IconChevronLeft } from "./IconChevronLeft.js";
+import { IconLogOut } from "./IconLogOut.js";
+import { IconSimCard } from "./IconSimCard.js";
 
 describe("Icons", () => {
   it("renders with aria-hidden by default", () => {
@@ -107,6 +111,24 @@ describe("Icons", () => {
     const svg = container.querySelector("svg")!;
     expect(svg).toHaveAttribute("width", "16");
     expect(svg).toHaveAttribute("height", "16");
+  });
+
+  // D81 — the application-shell glyphs an admin console needs: the navigation
+  // toggle, collapsing the sidebar, signing out, and a SIM card for card estates.
+  it("ships the application-shell glyphs, each with its own shape (D81)", () => {
+    const shapes = [
+      <IconMenu key="menu" />,
+      <IconChevronLeft key="chevron-left" />,
+      <IconLogOut key="log-out" />,
+      <IconSimCard key="sim-card" />,
+    ].map((icon) => {
+      const svg = render(icon).container.querySelector("svg")!;
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg).toHaveAttribute("width", "20");
+      expect(svg).toHaveAttribute("stroke", "currentColor");
+      return svg.innerHTML;
+    });
+    expect(new Set(shapes).size).toBe(4);
   });
 
   it("ships an ellipsis glyph for row-actions triggers (D70)", () => {

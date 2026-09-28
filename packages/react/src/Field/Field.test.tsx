@@ -43,6 +43,27 @@ describe("Field", () => {
     expect(screen.getByText("Invalid email.")).toHaveAttribute("aria-live", "polite");
   });
 
+  it("announce={false} renders the message line without a live region (D81)", () => {
+    render(
+      <Field label="Email" error="Invalid email." announce={false}>
+        <Input />
+      </Field>,
+    );
+    const message = screen.getByText("Invalid email.");
+    expect(message).not.toHaveAttribute("aria-live");
+    // Announcing moves out; the description association stays.
+    expect(screen.getByLabelText("Email")).toHaveAttribute("aria-describedby", message.id);
+  });
+
+  it("announce={false} leaves no live region anywhere in the field (D81)", () => {
+    const { container } = render(
+      <Field label="Email" description="Used for sign-in." announce={false}>
+        <Input />
+      </Field>,
+    );
+    expect(container.querySelector("[aria-live]")).toBeNull();
+  });
+
   it("renders required marker on the label", () => {
     const { container } = render(
       <Field label="Name" required>

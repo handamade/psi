@@ -19,6 +19,13 @@ describe("scopes vocabulary", () => {
     expect(expandScopes(["text"])).toEqual(expect.arrayContaining(["color", "fill", "stroke"]));
   });
 
+  it("text group admits background-image for CSS-drawn glyphs, surface does not (D81)", () => {
+    // A glyph drawn with gradient strokes (the Select chevron) is foreground ink,
+    // like fill/stroke on an SVG glyph — an -fg token may paint it.
+    expect(PROPERTY_GROUPS.text).toContain("background-image");
+    expect(PROPERTY_GROUPS.surface).not.toContain("background-image");
+  });
+
   it("passes concrete property names through and dedupes", () => {
     const out = expandScopes(["color", "text"]);
     expect(out.filter((p) => p === "color")).toHaveLength(1);

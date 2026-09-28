@@ -51,6 +51,24 @@ const { filename, source, registration } = serializeCustomerTheme(pair); // cust
 - `deriveTheme` solves both members of the pair independently to WCAG AA by binary-searching lightness; it never returns a below-AA theme, because it throws instead of returning one if the solver can't clear the matrix.
 - `serializeCustomerTheme` emits `customers/<name>.ts` source in the CLI's own layout (`pnpm new-theme`'s `Palette` + `SlotMap`), extended to a pair: two `SlotMap`s (light and dark) and, unlike the CLI's override-free scaffold, the solved `ThemeDef` overrides each member needs to clear AA — the same kind of hand-tuned correction `acmeOverrides` carries in `customers/acme.ts`, but derived rather than hand-tuned.
 
+## Building a theme outside this repo
+
+`@handamade/psi-tokens/theme` (D81) builds a gated theme from a definition the consumer keeps in its own repository, so a client brand never has to ship in this package:
+
+```ts
+import { buildThemeCss, ThemeGateError } from "@handamade/psi-tokens/theme";
+
+const { css, warnings } = buildThemeCss("acme-portal", {
+  palette: { /* anchors */ },
+  slots: { ink, canvas, accent, success, warning, danger },
+  base: "light",            // or "dark" — e.g. a dark sidebar sub-tree
+});
+```
+
+The definition has the same shape as a `customers/<name>.ts` theme. It passes the same gates as Psi's shipped themes, which run the same code (`src/theme/gate.ts`): a WCAG AA contrast failure or a D46 scope violation throws `ThemeGateError`, naming every failure. The CSS is scoped to `[data-psi-theme="<name>"]`; load it after `base.css` and set the attribute on any element.
+
+From a build script: `psi-theme <definition.mjs|.ts> --name <name> [--out <file.css>]`, where the definition module default-exports the theme. Exit codes: 0 built, 1 refused by a gate, 2 usage error.
+
 ## Machine-readable artifacts
 
 For AI and tooling, see [llms.txt](./llms.txt):
@@ -58,6 +76,7 @@ For AI and tooling, see [llms.txt](./llms.txt):
 - `dist/guidance.json` — Variant intent, usage rules, state derivation
 - `dist/dtcg/{theme}.json` — W3C DTCG format export
 - `dist/components/{name}.vars.css` — Component-specific token declarations
+- `dist/theme/`, `dist/cli/psi-theme.js` — Compiled `./theme` subpath and the `psi-theme` bin (D81)
 - `dist/generate/` — Compiled `./generate` subpath (`parsePrompt`, `deriveTheme`, `serializeCustomerTheme`, and lower-level helpers)
 
 ## Note

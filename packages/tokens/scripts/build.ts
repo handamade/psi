@@ -7,42 +7,20 @@ import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
 import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
 import type { BrandFonts } from "../src/themes/customers/index.js";
-import { validate, validateScopeConsistency, validateNoScalePrefixShadow } from "../src/dsl/validator.js";
-import { resolve } from "../src/dsl/resolver.js";
-import { checkContrast, wcagAAPairs, componentLabelPairs } from "../src/contrast-matrix.js";
-import { checkScopes, checkOverrideScopes } from "../src/scope-gate.js";
+import { validateScopeConsistency, validateNoScalePrefixShadow } from "../src/dsl/validator.js";
 import { SCALE_SCOPES, PROPERTY_GROUPS, keyGroup } from "../src/scopes.js";
 
 import { emitBaseCSS, emitThemeCSS, camelToKebab } from "./emit-css.js";
+import { componentVars } from "../src/components/registry.js";
+import { gateTheme, ThemeGateError } from "../src/theme/gate.js";
 import { emitResolvedJSON } from "./emit-json.js";
 import { emitTokenTypes } from "./emit-types.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS, emitUtilitiesRoster } from "./emit-utilities.js";
 import { emitComponentVarsCSS } from "./emit-components.js";
 import { emitDTCG } from "./emit-dtcg.js";
-import { gamutWarnings } from "../src/gamut.js";
-import { buttonVars, BUTTON_VARIANTS } from "../src/components/button.js";
+import { BUTTON_VARIANTS } from "../src/components/button.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { breakpoints } from "../src/scales/layout.js";
-import { inputVars } from "../src/components/input.js";
-import { selectVars } from "../src/components/select.js";
-import { surfaceVars } from "../src/components/surface.js";
-import { checkboxVars } from "../src/components/checkbox.js";
-import { switchVars } from "../src/components/switch.js";
-import { tableVars } from "../src/components/table.js";
-import { tagVars } from "../src/components/tag.js";
-import { toolbarVars } from "../src/components/toolbar.js";
-import { tooltipVars } from "../src/components/tooltip.js";
-import { cardVars } from "../src/components/card.js";
-import { controlVars } from "../src/components/control.js";
-import { dialogVars } from "../src/components/dialog.js";
-import { navbarVars } from "../src/components/navbar.js";
-import { panelVars } from "../src/components/panel.js";
-import { mediaVars } from "../src/components/media.js";
-import { menuVars } from "../src/components/menu.js";
-import { toastVars } from "../src/components/toast.js";
-import { tabsVars } from "../src/components/tabs.js";
-import { fieldVars } from "../src/components/field.js";
-import { descriptionListVars } from "../src/components/description-list.js";
 import { guidance } from "../src/guidance.js";
 
 import type { Palette, SlotMap } from "../src/dsl/types.js";
@@ -73,31 +51,6 @@ const dtcgDir = join(distDir, "dtcg");
 
 // ── Build ─────────────────────────────────────────────────────────
 
-// Component var registry — used by the D46 scope gate in the theme loop
-// below, and by the component-vars CSS emit (step 5).
-const componentVars: Record<string, Record<string, string>> = {
-  button: buttonVars,
-  card: cardVars,
-  checkbox: checkboxVars,
-  control: controlVars,
-  dialog: dialogVars,
-  field: fieldVars,
-  input: inputVars,
-  media: mediaVars,
-  menu: menuVars,
-  navbar: navbarVars,
-  panel: panelVars,
-  select: selectVars,
-  surface: surfaceVars,
-  switch: switchVars,
-  table: tableVars,
-  tabs: tabsVars,
-  "description-list": descriptionListVars,
-  tag: tagVars,
-  toolbar: toolbarVars,
-  toast: toastVars,
-  tooltip: tooltipVars,
-};
 
 function build(): void {
   console.log("[tokens] Building...");
@@ -133,43 +86,29 @@ function build(): void {
   for (const [themeName, config] of Object.entries(themes)) {
     const { theme: themeDef, palette, slots } = config;
 
-    // Validate
-    validate(themeDef, slots);
-    console.log(`  validated ${themeName} theme`);
-
-    // Resolve (static values for JSON)
-    const resolved = resolve(themeDef, palette, slots);
-
-    // Check gamut warnings (non-fatal)
-    for (const w of gamutWarnings(resolved, themeDef, palette, slots)) {
-      console.warn(`  GAMUT WARNING [${themeName}] ${w}`);
-    }
-
-    // Check contrast
-    const contrastResults = checkContrast(resolved, [...wcagAAPairs, ...componentLabelPairs]);
-    const failures = contrastResults.filter((r) => !r.pass);
-    if (failures.length > 0) {
-      console.error(`  CONTRAST FAILURES in ${themeName}:`);
-      for (const f of failures) {
-        console.error(`    ${f.fg} on ${f.bg}: ${f.ratio} (need ${f.minRatio})`);
+    // Validate, resolve, and gate: WCAG AA contrast + D46 scopes. D81: one
+    // implementation (src/theme/gate.ts), shared with a consumer's theme build.
+    let gated;
+    try {
+      gated = gateTheme(themeName, themeDef, palette, slots, config.componentOverrides);
+    } catch (e) {
+      if (e instanceof ThemeGateError) {
+        if (e.contrastFailures.length > 0) {
+          console.error(`  CONTRAST FAILURES in ${themeName}:`);
+          for (const f of e.contrastFailures) console.error(`    ${f.fg} on ${f.bg}: ${f.ratio} (need ${f.minRatio})`);
+        }
+        if (e.scopeViolations.length > 0) {
+          console.error(`  SCOPE VIOLATIONS in ${themeName}:`);
+          for (const v of e.scopeViolations) {
+            console.error(`    --psi-${v.component}-${v.key} (${v.group}) binds ${v.token} [${v.scopes.join(", ") || "unknown token"}]`);
+          }
+        }
       }
-      throw new Error(`${themeName} theme has ${failures.length} contrast failures`);
+      throw e;
     }
-    console.log(`  contrast check passed for ${themeName}`);
-
-    // D46 scope gate — same posture as the contrast gate.
-    const scopeViolations = [
-      ...checkScopes(componentVars, themeDef),
-      ...checkOverrideScopes(config.componentOverrides ?? {}, componentVars, themeDef),
-    ];
-    if (scopeViolations.length > 0) {
-      console.error(`  SCOPE VIOLATIONS in ${themeName}:`);
-      for (const v of scopeViolations) {
-        console.error(`    --psi-${v.component}-${v.key} (${v.group}) binds ${v.token} [${v.scopes.join(", ") || "unknown token"}]`);
-      }
-      throw new Error(`${themeName} theme has ${scopeViolations.length} scope violations`);
-    }
-    console.log(`  scope gate passed for ${themeName}`);
+    const { resolved } = gated;
+    for (const w of gated.warnings) console.warn(`  GAMUT WARNING [${themeName}] ${w}`);
+    console.log(`  validated ${themeName} theme; contrast and scope gates passed`);
 
     // Emit theme CSS (live oklch formulas)
     const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots, {

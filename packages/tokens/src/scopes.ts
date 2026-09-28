@@ -6,7 +6,10 @@
 // ── Property groups ──────────────────────────────────────────────────
 
 export const PROPERTY_GROUPS: Record<string, readonly string[]> = {
-  text: ["color", "fill", "stroke", "caret-color", "text-decoration-color"],
+  // background-image (D81): a glyph drawn with CSS gradients — the Select
+  // chevron, which a strict CSP forbids as a data: SVG — is foreground ink,
+  // the same role fill/stroke play on an SVG glyph.
+  text: ["color", "fill", "stroke", "caret-color", "text-decoration-color", "background-image"],
   surface: ["background", "background-color", "accent-color"],
   border: [
     "border", "border-color", "border-top-color", "border-right-color",

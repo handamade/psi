@@ -61,4 +61,11 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - Lower-level helpers are also exported for callers that need one step in isolation: `fnv1a`, `seededRandom`, `buildBrandPalette`, `hexFor`, `contrastOf`, `solveL`, `isBrandVector`, and the `BrandVector`/`ChromaWord`/`RadiusRung` types plus `CHROMA_WORDS`/`RADIUS_RUNGS` constants.
 - `isBrandVector` is the runtime guard for untrusted input (e.g. the `api/theme.ts` Vercel Function) — narrow before calling `deriveTheme`, never trust a client-supplied vector shape directly.
 
+## Building a theme outside this repo (`./theme`, D81)
+- `import { buildThemeCss, ThemeGateError } from "@handamade/psi-tokens/theme"` — `buildThemeCss(name, definition)` returns `{ css, warnings }` for a definition shaped like `customers/<name>.ts` (`palette`, `slots`, optional `base: "light" | "dark"`, `overrides`, `fonts`, `componentOverrides`). It runs the same gates as Psi's own build, through the same code (`src/theme/gate.ts`), and throws `ThemeGateError` (`contrastFailures`, `scopeViolations`) instead of returning a failing theme. The names `light` and `dark` are refused.
+- Use it to keep a client brand in the client's repository: nothing client-named has to ship in this public package.
+- The CSS is scoped to `[data-psi-theme="<name>"]`, never `:root`, so a `base: "dark"` theme can style a sub-tree such as a dark sidebar.
+- `psi-theme <definition-module> --name <name> [--out <file.css>]` is the same build as a bin, for a consumer's build script. The module default-exports the definition. Exit codes: 0 built · 1 refused by a gate · 2 usage error.
+- The token builders (`token`, `set`, `delta`, `cap`, `slot`, `ref`) and the definition types are re-exported from `./theme` for writing `overrides`.
+
 Live MCP access to this data: see packages/mcp/llms.txt (hosted: https://psi.kurkin.de/mcp).
