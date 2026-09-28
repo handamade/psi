@@ -31,7 +31,7 @@ export function gamutWarnings(
     const def = theme[name]!;
     const base =
       def.from.type === "slot"
-        ? palette[(slots as Record<string, string>)[def.from.name]]!
+        ? palette[slots[def.from.name as keyof SlotMap]]!
         : rawOf(def.from.name);
     const val = {
       l: applyOp(base.l, def.l),

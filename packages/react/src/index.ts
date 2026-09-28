@@ -74,6 +74,7 @@ export {
   IconCheck,
   IconChevronDown,
   IconChevronRight,
+  IconChevronLeft,
   IconSearch,
   IconSettings,
   IconUser,
@@ -94,4 +95,7 @@ export {
   IconAlertTriangle,
   IconAlertCircle,
   IconMoreHorizontal,
+  IconMenu,
+  IconLogOut,
+  IconSimCard,
 } from "./icons/index.js";

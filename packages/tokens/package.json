@@ -16,7 +16,14 @@
       "types": "./dist/generate/index.d.ts",
       "import": "./dist/generate/index.js"
     },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "import": "./dist/theme/index.js"
+    },
     "./guidance.json": "./dist/guidance.json"
+  },
+  "bin": {
+    "psi-theme": "./dist/cli/psi-theme.js"
   },
   "files": [
     "dist",
@@ -32,6 +39,7 @@
     "culori": "^4.0.0"
   },
   "devDependencies": {
+    "@types/node": "^24.19.0",
     "tsx": "^4.19.0"
   }
 }

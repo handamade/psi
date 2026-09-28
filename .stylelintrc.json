@@ -1,5 +1,13 @@
 {
   "plugins": ["./tools/stylelint-plugin-psi-tokens.mjs"],
   "ignoreFiles": ["**/node_modules/**", "**/storybook-static/**", "**/dist/**", "**/site-dist/**"],
-  "rules": { "psi/component-tokens-only": true, "psi/token-scopes": true }
+  "rules": { "psi/component-tokens-only": true, "psi/token-scopes": true },
+  "overrides": [
+    {
+      "files": ["packages/react/src/**/*.module.css"],
+      "rules": {
+        "function-disallowed-list": [["url"], { "message": "url() in component CSS loads a resource a strict CSP (default-src 'self', no data:) blocks — draw it with CSS or render a component (D81)" }]
+      }
+    }
+  ]
 }

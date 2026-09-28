@@ -23,6 +23,10 @@ import {
   IconGitHub,
   IconX,
   IconInstagram,
+  IconMenu,
+  IconChevronLeft,
+  IconLogOut,
+  IconSimCard,
 } from "./index.js";
 
 const icons = [
@@ -48,6 +52,10 @@ const icons = [
   { name: "IconGitHub", Component: IconGitHub },
   { name: "IconX", Component: IconX },
   { name: "IconInstagram", Component: IconInstagram },
+  { name: "IconMenu", Component: IconMenu },
+  { name: "IconChevronLeft", Component: IconChevronLeft },
+  { name: "IconLogOut", Component: IconLogOut },
+  { name: "IconSimCard", Component: IconSimCard },
 ];
 
 const meta: Meta = {

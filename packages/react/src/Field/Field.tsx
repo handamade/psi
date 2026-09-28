@@ -33,13 +33,18 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
   group?: boolean;
   /** Override the generated control id (pair it with the same id on the control). */
   htmlFor?: string;
+  /** When false, the message line is not a live region: an application that
+   * routes every announcement through one announcer of its own sets this and
+   * announces field errors itself. The message still describes the control
+   * (aria-describedby). @default true (D81) */
+  announce?: boolean;
   /** Forwarded ref to the root element. */
   ref?: Ref<HTMLDivElement | HTMLFieldSetElement>;
 }
 
 /** Labeled form-row wrapper: label above, control, one message line below —
- * description normally, error when set (aria-live). Auto-wires
- * id/aria-describedby/aria-invalid into Input and Select (D49). */
+ * description normally, error when set (aria-live unless `announce={false}`).
+ * Auto-wires id/aria-describedby/aria-invalid into Input and Select (D49). */
 export function Field({
   label,
   description,
@@ -47,6 +52,7 @@ export function Field({
   required = false,
   group = false,
   htmlFor,
+  announce = true,
   className,
   children,
   ref,
@@ -86,7 +92,7 @@ export function Field({
         {children}
       </FieldContext.Provider>
       {messageId && (
-        <p id={messageId} className={styles.message} aria-live="polite">
+        <p id={messageId} className={styles.message} aria-live={announce ? "polite" : undefined}>
           {message}
         </p>
       )}

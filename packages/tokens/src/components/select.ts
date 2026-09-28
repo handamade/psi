@@ -28,7 +28,8 @@ export const selectVars: Record<string, string> = {
   "40-font": "var(--psi-control-value-40-font)",
   "48-font": "var(--psi-control-value-48-font)",
 
-  // Chevron well: the glyph is a fixed 12x12 data URI, so the end padding is
+  // Chevron well: the glyph is two 4px gradient strokes centred in a 12px well
+  // (D81 — it was a 12x12 data URI, which a strict CSP blocks), so the end padding is
   // offset + 12 + 4 breathing = offset + 16. 28px is not on the spacing
   // scale, so the +16 is expressed as calc rather than a scale step.
   "24-chevron-offset": "var(--psi-control-value-24-padding-inline)",
