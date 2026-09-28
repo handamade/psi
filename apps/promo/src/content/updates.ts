@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-09-28",
+    tag: "release",
+    title: "0.20.0 — ready for a strict CSP, one announcer, and a brand kept elsewhere",
+    body: "The first production consumer with a strict content security policy found three things Psi could not do yet, and this release closes them. Select's chevron was a data: SVG, which default-src 'self' refuses; it is now drawn with two CSS gradient strokes, and it follows the theme instead of a hard-coded grey. A lint rule now forbids url() in any component stylesheet, so the class of bug cannot come back. Field wrote its own live region on every form; announce={false} hands announcing to an application that routes every message through one announcer, while the message still describes its control. And a brand theme could only be built inside this repository: @handamade/psi-tokens/theme and the psi-theme command now build a theme from a definition the consumer keeps in its own repo, through the same WCAG AA contrast and token-scope gates as Psi's own themes — the same code, not a copy — so a client's brand never has to ship in a public package. Four application-shell icons round it out: menu, chevron-left, log-out and SIM card.",
+  },
+  {
     date: "2026-08-13",
     tag: "release",
     title: "0.19.0 — a brand from a prompt, solved to AA",
