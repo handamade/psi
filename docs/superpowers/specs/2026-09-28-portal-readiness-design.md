@@ -2,7 +2,7 @@
 
 Date: 2026-09-28. Status: **Implemented** on branch `d81-portal-readiness`.
 
-Provenance: the first production consumer, the VEGA.OTA Web Portal, audited
+Provenance: the first production consumer, an operator web portal, audited
 Psi 0.19.0 against its own rules before building on it. Its rules are stricter
 than any earlier consumer's:
 
@@ -90,6 +90,6 @@ The audit found four gaps. Each is closed here.
     chevron replaces the SVG polyline, and the gallery gains four cells.
   - Baselines must be refreshed from CI's `vr-baselines` artifact, per
     `apps/storybook/vr/README.md`. They cannot be regenerated on macOS.
-- **The VEGA.OTA Portal** keeps its NSD themes (light, and a dark sidebar
+- **That portal** keeps its brand themes (light, and a dark sidebar
   sub-tree) in its own repository and builds them with `psi-theme`. Nothing
   client-named ships in Psi.
