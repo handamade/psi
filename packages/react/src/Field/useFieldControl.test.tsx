@@ -19,6 +19,10 @@ describe("useFieldControl (D84)", () => {
     const el = screen.getByTestId("custom");
     expect(el.id).not.toBe("");
     expect(screen.getByText("Airline")).toHaveAttribute("for", el.id);
+    // A <label for> names only a labelable element, and a div is not one — so
+    // the hook must also hand over aria-labelledby, or the control has no name.
+    expect(el).toHaveAttribute("aria-labelledby", screen.getByText("Airline").id);
+    expect(screen.getByRole("combobox", { name: "Airline" })).toBe(el);
     expect(el).toHaveAttribute("aria-describedby", screen.getByText("Pick one.").id);
     expect(el).toHaveAttribute("aria-invalid", "true");
     expect(el).toHaveAttribute("aria-required", "true");
@@ -33,6 +37,7 @@ describe("useFieldControl (D84)", () => {
     );
     const el = screen.getByTestId("custom");
     expect(el).toHaveAttribute("aria-describedby", screen.getByText("Optional.").id);
+    expect(screen.getByRole("combobox", { name: "Airline" })).toBe(el);
     expect(el).not.toHaveAttribute("aria-invalid");
     expect(el).not.toHaveAttribute("aria-required");
     expect(el).not.toHaveAttribute("required");

@@ -12,6 +12,7 @@ Labeled form-row wrapper: label above, control, one message line below — descr
 | `description` | `ReactNode` | — | no | Helper line under the control; replaced by error when error is set. |
 | `error` | `ReactNode` | — | no | Error content; when truthy it replaces the description and switches the field (and a wrapped Input/Select) into error state. |
 | `required` | `boolean` | false | no | Renders the required marker and flows `required` to the control. |
+| `requiredText` | `string` | — | no | With `required`, the label shows this text — "(Required)", say — instead of the asterisk, so the requirement is stated in words and not by a glyph alone (D84). Visible and aria-hidden: the control carries the programmatic signal (`required` / `aria-required`), and a screen reader that heard both would say it twice. Without `required` it renders nothing. |
 | `group` | `boolean` | false | no | Group mode: fieldset/legend wrapping several self-labeled controls (Checkbox/Switch); the message describes the whole group. |
 | `htmlFor` | `string` | — | no | Override the generated control id (pair it with the same id on the control). |
 | `announce` | `boolean` | true | no | When false, the message line is not a live region: an application that routes every announcement through one announcer of its own sets this and announces field errors itself. The message still describes the control (aria-describedby). |
@@ -24,7 +25,7 @@ Labeled form-row wrapper: label above, control, one message line below — descr
 |---|---|
 | Tab | Focus moves to the wrapped control; the label is announced with it. |
 
-Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend.
+Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend. required marks the label with an aria-hidden asterisk and flows required to the control; requiredText replaces the asterisk with a visible word such as "(Required)", also aria-hidden, because the control's required/aria-required is what assistive tech reads (D84). A control Psi did not write joins the same wiring through useFieldControl(): spread its result — id, aria-labelledby (a label-for names only a labelable element, and a custom control is usually not one), aria-describedby, aria-invalid, aria-required, required, each present only when the Field sets it — onto the element that takes focus (D84).
 
 ## Theming
 

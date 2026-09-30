@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Revised during Task 3.** The browser check showed the stand-in combobox had no accessible name: a `<label for>` names only a labelable element. The hook now also returns `aria-labelledby`, and `Field` gives its label an id. The stand-in also needed the shared focus ring (D82's sweep caught it), so it has a story-only stylesheet.
+
 **Goal:** A `Field` can mark a required control with a word instead of an asterisk, and a control built outside Psi can take the Field's wiring through one hook.
 
 **Architecture:** `Field` already provides `FieldContext` (`id`, `describedBy`, `invalid`, `required`) that `Input` and `Select` read. `useFieldControl` turns that context into spreadable props; `requiredText` is a second rendering of the existing `required` marker. One new token, one new pattern.

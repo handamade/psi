@@ -6,6 +6,10 @@ import styles from "./field.module.css";
 export interface FieldContextValue {
   /** Generated (or htmlFor-overridden) id the label points at. */
   id: string;
+  /** id of the rendered <label>, when there is one and the Field is not a
+   * group. A <label for> names only a labelable element, so a control that is
+   * not one (a combobox div, say) names itself with aria-labelledby (D84). */
+  labelId?: string;
   /** id of the rendered message line, if any — joins aria-describedby. */
   describedBy?: string;
   /** True when the Field carries an error. */
@@ -70,6 +74,7 @@ export function Field({
   const invalid = Boolean(error);
   const message = invalid ? error : description;
   const messageId = message != null && message !== false ? `${id}-message` : undefined;
+  const labelId = label != null && !group ? `${id}-label` : undefined;
 
   const cls = [styles.field, invalid && styles.invalid, className].filter(Boolean).join(" ");
 
@@ -97,11 +102,11 @@ export function Field({
         (group ? (
           <legend className={styles.label}>{labelContent}</legend>
         ) : (
-          <label className={styles.label} htmlFor={id}>
+          <label id={labelId} className={styles.label} htmlFor={id}>
             {labelContent}
           </label>
         ))}
-      <FieldContext.Provider value={{ id, describedBy: messageId, invalid, required }}>
+      <FieldContext.Provider value={{ id, labelId, describedBy: messageId, invalid, required }}>
         {children}
       </FieldContext.Provider>
       {messageId && (

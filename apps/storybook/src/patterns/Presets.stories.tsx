@@ -60,6 +60,10 @@ export const FilterToolbar: Story = {
   render: preset("filter-toolbar"),
 };
 
+export const RequiredField: Story = {
+  render: preset("required-field"),
+};
+
 export const RowActions: Story = {
   render: preset("row-actions"),
 };

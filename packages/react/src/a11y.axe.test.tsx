@@ -7,7 +7,14 @@ import {
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination,
   Toast, ToastRegion, Announcement,
   Tabs, TabList, Tab, TabPanel,
+  useFieldControl,
 } from "./index.js";
+
+/** A control Psi did not write, joined to a Field through useFieldControl (D84). */
+function CustomCombobox() {
+  const field = useFieldControl();
+  return <div role="combobox" tabIndex={0} aria-expanded="false" aria-label="Airline" {...field} />;
+}
 
 const cases: Array<[string, React.ReactElement]> = [
   ["Button", <Button>Save</Button>],
@@ -23,6 +30,8 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Field with Input", <Field label="Email" description="We never share it."><Input size={40} /></Field>],
   ["Field error", <Field label="Email" error="Invalid email." required><Input size={40} /></Field>],
   ["Field group", <Field group label="Notifications" description="Pick channels."><Checkbox>Email</Checkbox><Switch>Push</Switch></Field>],
+  ["Field required in text", <Field label="Name" required requiredText="(Required)" description="As on the passport."><Input size={40} /></Field>],
+  ["Field with a custom control", <Field label="Airline" error="Pick one." required><CustomCombobox /></Field>],
   ["Dialog", <Dialog open onClose={() => {}} title="Confirm" footer={<Button variant="danger">Delete</Button>}>Are you sure?</Dialog>],
   ["Dialog aria-label only", <Dialog open onClose={() => {}} aria-label="Quick action">Content</Dialog>],
   ["Dialog forced choice", <Dialog open onClose={() => {}} title="Pick one" dismissible={false} footer={<Button variant="accent">Keep</Button>}>No escape hatch.</Dialog>],

@@ -1,6 +1,6 @@
 # Required in text, and custom controls join a Field: `requiredText` and `useFieldControl` (D84)
 
-Date: 2026-09-30. Status: **In progress** on branch `d84-field-required`.
+Date: 2026-09-30. Status: **Implemented** on branch `d84-field-required`.
 
 Provenance: the third item of the Psi 0.21 portal handoff
 (`docs/superpowers/plans/2026-09-30-psi-0.21-portal-handoff.md`, brief D84).
@@ -46,7 +46,7 @@ required wiring `Input` gets.
     a custom control spreads onto its focusable element:
 
     ```ts
-    { id, "aria-describedby", "aria-invalid", "aria-required", required }
+    { id, "aria-labelledby", "aria-describedby", "aria-invalid", "aria-required", required }
     ```
 
     each present only when the Field supplies it (`aria-invalid` and the two
@@ -54,6 +54,15 @@ required wiring `Input` gets.
     returns `{}`. The consumer's element must carry a role that admits
     `aria-required` (`combobox`, `textbox`, `listbox`, …), which any control
     worth a Field already does.
+    - **`aria-labelledby` is not in the brief.** It is there because the
+      first version without it was looked at in a browser: the stand-in
+      combobox rendered as `combobox [invalid]` with no name. A `<label for>`
+      names only a labelable element — `input`, `select`, `textarea`,
+      `button` — and a custom control is usually a `div`. So the Field's
+      `<label>` now carries an id (`<id>-label`), `FieldContext` exposes it as
+      `labelId`, and the hook hands it over. With it the same tree reads
+      `combobox "Airline" [invalid]`. `Input` and `Select` are labelable and
+      unchanged.
     - It is the same wiring `Input` and `Select` do by hand, expressed once.
       They are not rewritten onto it here: they also merge the consumer's own
       `id`, `required` and `aria-describedby`, and changing their DOM was not
@@ -70,20 +79,44 @@ required wiring `Input` gets.
 
 ## Verification
 
-To be filled in when implemented. Tests that go red first:
-
-- `requiredText="(Required)"` renders that text inside the label, `aria-hidden`,
-  and no asterisk; without `requiredText` the asterisk renders as today;
-  `requiredText` without `required` renders neither;
-- a test component using `useFieldControl` inside a `Field` with `error` and
-  `required` gets the label's `htmlFor` as its `id`, `aria-describedby`
-  pointing at the message, `aria-invalid="true"`, `aria-required="true"` and
-  `required`; inside a Field with neither, none of the three flags; outside a
-  `Field`, an empty object;
-- `useFieldControl` and `FieldContext` are importable from the package index;
-- the pattern: `seed-patterns.test.ts` red on the missing `required-field`;
-- the token: `field-tokens.test.ts` red on the missing key.
+- **Tests first**, each red before its change:
+  - the token, on the missing key;
+  - `requiredText`: the word in the label, `aria-hidden`, no asterisk, and
+    the control still `required` (red on assertion); nothing without
+    `required`;
+  - the hook, red on the missing module, then 3 tests: the full wiring under
+    `error` + `required`, flags absent (not `false`) without them, `{}`
+    outside a Field. The accessible-name assertions were added after the
+    browser check above and went red on the version without
+    `aria-labelledby`;
+  - the pattern, on the missing `required-field`.
+- **Regression.** No existing Field, Input or Select test was edited. The one
+  DOM change to an existing render is an `id` on the Field's `<label>`.
+- **In a browser** (Chromium 149, built Storybook), the accessibility tree of
+  the `CustomControl` story: `combobox "Airline" [invalid]`, described by
+  *Pick one.*; of `RequiredText`: the textbox is named *Passport number*, the
+  word is not in the tree.
+- **The D82 sweep caught the story's stand-in** drawing no focus ring, as it
+  should: a focusable `div` with inline styles. The stand-in now takes its
+  styles from `Field.stories.css`, which binds the focus-ring tokens the way a
+  consumer's own control must. That file is story-only and not shipped.
+- **The five gates** green: 2326 tests in 94 files (2319 in 93 before), docs
+  drift at 35 components and 15 patterns, site gate 9 of 9. Interaction set
+  151 of 151.
 
 ## Consequences
 
-To be filled in when implemented.
+- **Visual regression: six new baselines, none changed.** `RequiredText`,
+  `CustomControl` and the generated `required-field` preset, in light and
+  ember, from CI's artifact.
+- **Every non-group `Field` label now has an `id`** (`<control id>-label`).
+  Nothing reads it but the hook.
+- **A custom control is named by the Field only through the hook.** A
+  consumer who spreads only `id` gets a `<label for>` that points at a
+  non-labelable element and a nameless control. The hook's docs say so.
+- **The word is `aria-hidden` by decision.** A screen reader hears "required"
+  from the control. A consumer who wants the word spoken as well can put it
+  in the `label` itself.
+- **The portal** wraps its React Aria combo box and date-time picker in
+  `Field` and spreads `useFieldControl()` onto their focusable element, and
+  marks required fields with `requiredText`.

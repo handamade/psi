@@ -18,7 +18,7 @@ const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
   .filter((n) => existsSync(join(root, "src/icons", `${n}.tsx`)));
 
 describe("seed patterns against the real manifest", () => {
-  it("all fourteen load and validate; the backlog is empty (D67)", () => {
+  it("all fifteen load and validate; the backlog is empty (D67)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
@@ -30,6 +30,7 @@ describe("seed patterns against the real manifest", () => {
       "detail-drawer",
       "empty-state",
       "filter-toolbar",
+      "required-field",
       "row-actions",
       "settings-form-row",
       "summary-tiles",

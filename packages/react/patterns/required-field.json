@@ -1,0 +1,17 @@
+{
+  "id": "required-field",
+  "intent": "A required field that says so in text, not by a glyph alone: a Field with required and requiredText around an Input, with a description",
+  "match": ["required field", "mandatory field", "required in text", "required label", "(Required)"],
+  "compose": {
+    "component": "Field",
+    "props": { "required": true, "requiredText": "{content:required-text}" },
+    "slots": {
+      "label": ["{content:label}"],
+      "body": [{ "component": "Input", "props": { "size": "{param:size}" } }],
+      "description": ["{content:description}"]
+    }
+  },
+  "parameters": [{ "key": "size", "ask": "Control size?", "options": [32, 40], "default": 32 }],
+  "content": { "label": "[field name]", "required-text": "(Required)", "description": "[why it is needed]" },
+  "gaps": []
+}
