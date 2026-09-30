@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
+import { Announcement } from "./Announcement.js";
 import { Toast } from "./Toast.js";
 import { ToastRegion } from "./ToastRegion.js";
 
@@ -116,5 +117,79 @@ describe("ToastRegion", () => {
     // contract instead; the behavioural proof is the Playwright spec.
     const { container } = render(<ToastRegion>{null}</ToastRegion>);
     expect((container.firstChild as HTMLElement).className).toContain("region");
+  });
+
+  describe("routing by politeness (D83)", () => {
+    it("sends an assertive success toast to the alert wrapper", () => {
+      render(
+        <ToastRegion>
+          <Toast variant="success" politeness="assertive">accepted</Toast>
+        </ToastRegion>,
+      );
+      expect(within(assertive()).getByText("accepted")).toBeInTheDocument();
+      expect(polite()).toBeEmptyDOMElement();
+    });
+
+    it("sends a polite danger toast to the status wrapper", () => {
+      render(
+        <ToastRegion>
+          <Toast variant="danger" politeness="polite">link lost</Toast>
+        </ToastRegion>,
+      );
+      expect(within(polite()).getByText("link lost")).toBeInTheDocument();
+      expect(assertive()).toBeEmptyDOMElement();
+    });
+
+    it.each(["polite", "assertive"] as const)("routes a %s Announcement to its wrapper", (politeness) => {
+      render(
+        <ToastRegion>
+          <Announcement politeness={politeness}>spoken</Announcement>
+        </ToastRegion>,
+      );
+      const [home, other] = politeness === "polite" ? [polite(), assertive()] : [assertive(), polite()];
+      expect(within(home).getByText("spoken")).toBeInTheDocument();
+      expect(other).toBeEmptyDOMElement();
+    });
+
+    it("treats an Announcement with no politeness as polite", () => {
+      render(
+        <ToastRegion>
+          <Announcement>spoken</Announcement>
+        </ToastRegion>,
+      );
+      expect(within(polite()).getByText("spoken")).toBeInTheDocument();
+    });
+
+    it("still holds exactly two live regions, whatever it is given", () => {
+      const { container } = render(
+        <ToastRegion>
+          <Toast variant="success" politeness="assertive">accepted</Toast>
+          <Toast variant="danger">failed</Toast>
+          <Announcement>row updated</Announcement>
+          <Announcement politeness="assertive">2 fields need attention</Announcement>
+        </ToastRegion>,
+      );
+      expect(
+        container.querySelectorAll('[aria-live], [role="status"], [role="alert"], [role="log"]'),
+      ).toHaveLength(2);
+    });
+  });
+
+  describe("rest props (D83)", () => {
+    it("puts data-* and other HTML attributes on the root", () => {
+      const { container } = render(
+        <ToastRegion data-react-aria-top-layer="" id="announcer">{null}</ToastRegion>,
+      );
+      expect(container.firstChild).toHaveAttribute("data-react-aria-top-layer");
+      expect(container.firstChild).toHaveAttribute("id", "announcer");
+    });
+
+    it("does not let a passed attribute displace its own", () => {
+      const hostile = { popover: "auto", "data-placement": "nowhere", "data-psi-toast-region": "no" } as object;
+      const { container } = render(<ToastRegion {...hostile}>{null}</ToastRegion>);
+      expect(container.firstChild).toHaveAttribute("popover", "manual");
+      expect(container.firstChild).toHaveAttribute("data-placement", "bottom-end");
+      expect(container.firstChild).toHaveAttribute("data-psi-toast-region", "true");
+    });
   });
 });
