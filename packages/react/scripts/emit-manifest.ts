@@ -37,6 +37,7 @@ const COMPONENTS = [
   "ToastRegion",
   "ToastProvider",
   "Announcement",
+  "Banner",
   "Tabs",
   "TabList",
   "Tab",

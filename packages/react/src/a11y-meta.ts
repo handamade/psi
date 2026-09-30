@@ -130,6 +130,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region: it renders no role and no aria-live, and outside a ToastRegion it announces nothing. It is visually hidden text that ToastRegion places in its polite or assertive wrapper, by the politeness prop (default polite) — for an event that must be spoken and has nothing to show. Keep one ToastRegion as the application's only announcer and put every Announcement inside it; never use an Announcement as a second one. Controlled like Toast: it never removes itself, so remove it once it has been spoken. To announce the same text again, remove it and render it again with a new key — a live region speaks changes, and an unchanged node is not one. Not focusable, and it takes no space in the toast stack.",
   },
+  Banner: {
+    keyboard: [
+      { keys: "Tab", behavior: "Reaches the action and the dismiss button, in that order, when present. The banner itself is not focusable." },
+      { keys: "Enter / Space", behavior: "Activates the focused action or the dismiss button." },
+    ],
+    notes:
+      "Not a live region: it renders no role and no aria-live, so mounting a Banner announces nothing; announcing stays the application's (route the same event through a ToastRegion or an Announcement if it must be spoken). Presentational and controlled (D86): onDismiss reports and the owner disposes; Banner never removes itself. The variant's meaning is carried by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no word. statusLabel replaces that word with a translated one, or drops it with null (D83). The dismiss button is labelled \"Dismiss\". Put it first in the page content so it is met before the content it qualifies.",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },
