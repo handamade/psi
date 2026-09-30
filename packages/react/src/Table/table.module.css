@@ -21,6 +21,13 @@
   border-bottom: 1px solid var(--psi-table-cell-border);
 }
 
+/* A row header (D85): the cell that names its row. Weight marks it; the
+   colour stays the body's, unlike a column header's. */
+.rowHeader {
+  font: var(--psi-text-14-20-medium);
+  text-align: start;
+}
+
 .cell[data-numeric],
 .headerCell[data-numeric] {
   text-align: end;

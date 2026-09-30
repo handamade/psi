@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, Ref, ThHTMLAttributes } from "react";
 import styles from "./table.module.css";
 import { TableContext } from "./TableContext.js";
 
-export interface TableHeaderCellProps {
+export interface TableHeaderCellProps extends Omit<ThHTMLAttributes<HTMLTableCellElement>, "children"> {
   /** Sort key this column emits. Enables the sort control when the table is `sortable`. */
   sortKey?: string;
   /** Right-aligns and renders tabular figures (D62). */
@@ -11,11 +11,13 @@ export interface TableHeaderCellProps {
   /** Header label. */
   children?: ReactNode;
   className?: string;
+  /** Forwarded ref to the `<th>`. */
+  ref?: Ref<HTMLTableCellElement>;
 }
 
 /** `<th scope="col">`. `aria-sort` belongs on the th, never on the inner
  * button — assistive tech reads the sort state from the column header. */
-export function TableHeaderCell({ sortKey, numeric, children, className }: TableHeaderCellProps) {
+export function TableHeaderCell({ sortKey, numeric, children, className, ref, ...rest }: TableHeaderCellProps) {
   const { sortable, sort, onSortChange } = useContext(TableContext);
   const isSortable = sortable && sortKey !== undefined;
   const isActive = isSortable && sort?.key === sortKey;
@@ -36,6 +38,8 @@ export function TableHeaderCell({ sortKey, numeric, children, className }: Table
 
   return (
     <th
+      {...rest}
+      ref={ref}
       scope="col"
       className={[styles.headerCell, className].filter(Boolean).join(" ")}
       data-numeric={numeric || undefined}
