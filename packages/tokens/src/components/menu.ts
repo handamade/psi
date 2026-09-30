@@ -16,4 +16,6 @@ export const menuVars: Record<string, string> = {
   "item-fg-danger": "var(--psi-fg-danger)",
   "item-fg-disabled": "var(--psi-fg-quaternary)",
   "separator-border": "var(--psi-border-faint)",
+  // D82 — the ring on a focused item; until then the browser drew its own.
+  "focus-ring": "var(--psi-border-focus)",
 };
