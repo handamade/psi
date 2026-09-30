@@ -142,8 +142,9 @@ button that copies a value. None of them announces anything.
 
 ## Consequences
 
-- **Visual regression: 52 new baselines, none changed.** Twenty-two new
-  stories and four new presets, in light and ember. From CI's artifact.
+- **Visual regression: 44 new baselines, none changed.** Eighteen new
+  stories and four new presets, in light and ember, from CI run
+  36780478405's artifact; the other 480 screenshots passed unchanged.
 - **Consumer themes are held to three more contrast pairs** and may bind
   `fgSuccess`/`fgWarning` to borders. A theme built with `psi-theme` that
   fails `fgPrimary` on a status tint fails its build now; every shipped
