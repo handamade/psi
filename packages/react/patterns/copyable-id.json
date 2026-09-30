@@ -1,0 +1,29 @@
+{
+  "id": "copyable-id",
+  "intent": "A labelled identifier with a button that copies it; the button announces nothing, the application speaks the result",
+  "match": ["copy id", "copyable identifier", "copy to clipboard", "reference number", "request id"],
+  "compose": {
+    "component": "DescriptionList",
+    "props": { "layout": "inline" },
+    "slots": {
+      "body": [
+        {
+          "component": "DescriptionItem",
+          "props": { "term": "{content:term}" },
+          "slots": {
+            "body": [
+              "{content:value}",
+              { "component": "CopyButton", "props": { "value": "{content:value}", "size": 24 } }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "term": "[identifier name]",
+    "value": "[the identifier — set it in a mono class such as psi-text-mono-14-20-regular]"
+  },
+  "gaps": []
+}

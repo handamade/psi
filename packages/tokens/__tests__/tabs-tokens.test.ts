@@ -36,7 +36,7 @@ describe("tabs tokens", () => {
     // fgAccent and fgSecondary on bgPrimary are in wcagAAPairs already. Pinning
     // the counts so a later edit that quietly introduces an ungated colour, or
     // adds a pair for disabled text, is visible in the diff rather than silent.
-    expect(wcagAAPairs).toHaveLength(28);
+    expect(wcagAAPairs).toHaveLength(31); // 28 + the three D86 tint pairs
     expect(componentLabelPairs).toHaveLength(5);
   });
 

@@ -1,0 +1,28 @@
+{
+  "id": "page-banner",
+  "intent": "A full-width, page-level message above the content, with a Refresh action; it is what the page shows, and announcing stays the application's (route the same event through the announcer)",
+  "match": ["page banner", "site-wide message", "stale data", "service notice", "maintenance banner"],
+  "compose": {
+    "component": "Banner",
+    "props": { "variant": "{param:variant}" },
+    "slots": {
+      "title": ["{content:title}"],
+      "body": ["{content:message}"],
+      "action": [{ "component": "Button", "props": { "variant": "ghost", "size": 32 }, "content": "action-label" }]
+    }
+  },
+  "parameters": [
+    {
+      "key": "variant",
+      "ask": "What kind of message is this?",
+      "options": ["neutral", "warning", "danger", "success"],
+      "default": "neutral"
+    }
+  ],
+  "content": {
+    "title": "[what changed, in a few words]",
+    "message": "[what it means for the user and what to do]",
+    "action-label": "Refresh"
+  },
+  "gaps": []
+}

@@ -1,0 +1,24 @@
+{
+  "id": "form-feedback",
+  "intent": "A message above a form after a rejected submission, holding the reason and a copyable identifier; not a live region — the application speaks it",
+  "match": ["form error summary", "submission failed", "rejected form", "error id", "support reference"],
+  "compose": {
+    "component": "InlineAlert",
+    "props": { "variant": "danger" },
+    "slots": {
+      "title": ["{content:title}"],
+      "body": [
+        "{content:message}",
+        { "component": "CopyButton", "props": { "value": "{content:identifier}", "label": "{content:copy-label}" } }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "title": "[what was rejected]",
+    "message": "[why, and what to change]",
+    "identifier": "[the request or error id, for support]",
+    "copy-label": "Copy id"
+  },
+  "gaps": []
+}

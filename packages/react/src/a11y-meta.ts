@@ -145,6 +145,34 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region: it renders no role and no aria-live, and outside a ToastRegion it announces nothing. It is visually hidden text that ToastRegion places in its polite or assertive wrapper, by the politeness prop (default polite) — for an event that must be spoken and has nothing to show. Keep one ToastRegion as the application's only announcer and put every Announcement inside it; never use an Announcement as a second one. Controlled like Toast: it never removes itself, so remove it once it has been spoken. To announce the same text again, remove it and render it again with a new key — a live region speaks changes, and an unchanged node is not one. Not focusable, and it takes no space in the toast stack.",
   },
+  Banner: {
+    keyboard: [
+      { keys: "Tab", behavior: "Reaches the action and the dismiss button, in that order, when present. The banner itself is not focusable." },
+      { keys: "Enter / Space", behavior: "Activates the focused action or the dismiss button." },
+    ],
+    notes:
+      "Not a live region: it renders no role and no aria-live, so mounting a Banner announces nothing; announcing stays the application's (route the same event through a ToastRegion or an Announcement if it must be spoken). Presentational and controlled (D86): onDismiss reports and the owner disposes; Banner never removes itself. The variant's meaning is carried by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no word. statusLabel replaces that word with a translated one, or drops it with null (D83). The dismiss button is labelled \"Dismiss\". Put it first in the page content so it is met before the content it qualifies.",
+  },
+  InlineAlert: {
+    keyboard: [
+      { keys: "Tab", behavior: "Reaches the action when present. The alert itself is not focusable." },
+      { keys: "Enter / Space", behavior: "Activates the focused action." },
+    ],
+    notes:
+      "Not a live region, and not role=\"alert\" despite its name: it renders no role and no aria-live, so mounting an InlineAlert announces nothing; announcing stays the application's (route the same event through a ToastRegion or an Announcement if it must be spoken). Presentational (D86): it holds no state and has no dismiss button. The variant's meaning is carried by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour, border and icon shape alone; the icon is aria-hidden. neutral has no status and gets no word. statusLabel replaces that word with a translated one, or drops it with null (D83). Place it in reading order before the content it qualifies, such as above the form it is about.",
+  },
+  Skeleton: {
+    keyboard: [],
+    notes:
+      "Not a live region: it renders no role and no aria-live, and it is always aria-hidden=\"true\", so assistive tech skips it entirely. Put aria-busy=\"true\" on the region the skeleton stands for (a table body, a card, a list) and remove it when the content arrives; that, not the skeleton, is what tells a screen reader the content is loading. Not focusable. The pulse is an opacity animation that stops under prefers-reduced-motion: reduce, because zeroing the duration of an infinite alternating animation flickers instead of stopping (D86).",
+  },
+  CopyButton: {
+    keyboard: [
+      { keys: "Enter / Space", behavior: "Copies the value to the clipboard." },
+    ],
+    notes:
+      "Not a live region: it renders no role and no aria-live, announces nothing, and does not change its label or icon after a copy, so a screen reader hears the same button before and after. The application speaks the result: onCopy reports \"copied\" or \"failed\" (a rejected write, or no clipboard API), and the application routes that through its announcer or a Toast (D86). The label is visible text; the icon is aria-hidden and only reinforces it. Focus stays on the button.",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },

@@ -97,6 +97,19 @@ describe("contrast matrix", () => {
   });
 });
 
+describe("body text on the status tints (D86)", () => {
+  // Banner and InlineAlert set body text in fgPrimary on the tinted surfaces,
+  // which the matrix gated only for fgPrimary on fillTintAccent (D62) before.
+  it("gates fgPrimary on the success, warning and danger tints", () => {
+    for (const bg of ["fillTintSuccess", "fillTintWarning", "fillTintDanger"]) {
+      expect(
+        wcagAAPairs.some((p) => p.fg === "fgPrimary" && p.bg === bg && p.minRatio === 4.5),
+        `fgPrimary on ${bg} must be gated at 4.5`,
+      ).toBe(true);
+    }
+  });
+});
+
 describe("component label pairs", () => {
   it("includes solid-variant label pairs", () => {
     const key = (p: { fg: string; bg: string }) => `${p.fg}/${p.bg}`;

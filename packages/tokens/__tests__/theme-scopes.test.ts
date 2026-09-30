@@ -19,6 +19,10 @@ describe("authored scopes (D46)", () => {
 
   it("cross-family design decisions are declared, not smuggled", () => {
     expect(lightTheme.fgDanger.scopes).toEqual(["text", "border"]);
+    // D86: InlineAlert draws its border in the variant's foreground, so the
+    // two other status foregrounds carry the border scope fgDanger already had.
+    expect(lightTheme.fgSuccess.scopes).toEqual(["text", "border"]);
+    expect(lightTheme.fgWarning.scopes).toEqual(["text", "border"]);
     expect(lightTheme.fillAccent.scopes).toEqual(["surface", "border"]);
     expect(lightTheme.fgPrimary.scopes).toEqual(["text"]);
     expect(lightTheme.bgInverted.scopes).toEqual(["surface"]);

@@ -1,0 +1,47 @@
+/* packages/react/src/Banner/banner.module.css */
+/* The stylelint plugin derives the allowed namespace from the filename, so
+   every custom property here must be --psi-banner-* or one of the global
+   scale prefixes. Every colour goes through packages/tokens/src/components/
+   banner.ts, never a literal here. */
+
+.banner {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: start;
+  gap: var(--psi-space-12);
+
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--psi-space-12) var(--psi-space-16);
+
+  color: var(--psi-banner-fg);
+  font: var(--psi-text-14-20-regular);
+}
+
+.banner[data-variant="neutral"] { background: var(--psi-banner-bg-neutral); }
+.banner[data-variant="success"] { background: var(--psi-banner-bg-success); }
+.banner[data-variant="warning"] { background: var(--psi-banner-bg-warning); }
+.banner[data-variant="danger"]  { background: var(--psi-banner-bg-danger); }
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.iconNeutral { color: var(--psi-banner-icon-fg-neutral); }
+.iconSuccess { color: var(--psi-banner-icon-fg-success); }
+.iconWarning { color: var(--psi-banner-icon-fg-warning); }
+.iconDanger  { color: var(--psi-banner-icon-fg-danger); }
+
+.body {
+  min-width: 0; /* let a long message wrap instead of stretching the grid */
+}
+
+.title {
+  display: block;
+  font: var(--psi-text-14-20-medium);
+}
+
+.action {
+  display: inline-flex;
+}
