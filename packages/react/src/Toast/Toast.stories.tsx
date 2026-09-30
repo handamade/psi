@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Button } from "../Button/Button.js";
 import { Dialog } from "../Dialog/Dialog.js";
+import { Announcement } from "./Announcement.js";
 import { Toast } from "./Toast.js";
 import { ToastProvider } from "./ToastProvider.js";
 import { ToastRegion } from "./ToastRegion.js";
@@ -74,6 +75,41 @@ export const InRegion: StoryObj<typeof ToastRegion> = {
       <Toast variant="danger" onDismiss={() => {}}>
         Could not reach the ledger service.
       </Toast>
+    </ToastRegion>
+  ),
+};
+
+/** D83 — politeness is the owner's call, and tone is only the default. The
+ * outcome of the user's own action interrupts even though it succeeded, so it
+ * is sent `assertive`; the background save stays polite.
+ *
+ * The stack is grouped by wrapper, polite above assertive (D64), so the
+ * assertive success sorts below the polite one regardless of arrival order. */
+export const RoutedByPoliteness: StoryObj<typeof ToastRegion> = {
+  render: () => (
+    <ToastRegion placement="bottom-end">
+      <Toast variant="success" politeness="assertive" onDismiss={() => {}}>
+        Application accepted.
+      </Toast>
+      <Toast variant="success" onDismiss={() => {}}>
+        Draft saved.
+      </Toast>
+    </ToastRegion>
+  ),
+};
+
+/** D83 — an Announcement is spoken and not shown. This story must look like a
+ * region holding one toast: the two announcements take no space in the stack.
+ * apps/storybook/vr/toast.interaction.spec.ts measures that, and that each one
+ * sits in the wrapper its politeness names. */
+export const WithAnnouncements: StoryObj<typeof ToastRegion> = {
+  render: () => (
+    <ToastRegion placement="bottom-end">
+      <Toast variant="success" onDismiss={() => {}}>
+        Transaction voided.
+      </Toast>
+      <Announcement>Row 12 updated.</Announcement>
+      <Announcement politeness="assertive">2 fields need attention.</Announcement>
     </ToastRegion>
   ),
 };

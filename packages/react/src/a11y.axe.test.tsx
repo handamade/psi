@@ -5,7 +5,7 @@ import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination,
-  Toast, ToastRegion,
+  Toast, ToastRegion, Announcement,
   Tabs, TabList, Tab, TabPanel,
 } from "./index.js";
 
@@ -58,6 +58,9 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Toast danger routes assertive", <ToastRegion><Toast variant="danger">Could not void the transaction</Toast></ToastRegion>],
   ["Toast with action and dismiss", <ToastRegion><Toast variant="success" action={<Button variant="ghost" size={32}>Undo</Button>} onDismiss={() => {}}>Transaction voided</Toast></ToastRegion>],
   ["Toast region empty", <ToastRegion>{null}</ToastRegion>],
+  ["Toast success routed assertive", <ToastRegion><Toast variant="success" politeness="assertive">Application accepted</Toast></ToastRegion>],
+  ["Toast with a translated status word", <ToastRegion><Toast variant="danger" statusLabel="Fehler:">Nicht gespeichert</Toast></ToastRegion>],
+  ["Announcements beside a toast", <ToastRegion data-react-aria-top-layer=""><Toast variant="success">Saved</Toast><Announcement>Row 12 updated</Announcement><Announcement politeness="assertive">2 fields need attention</Announcement></ToastRegion>],
   ["Tabs horizontal", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs vertical", <Tabs value="all" onValueChange={() => {}} orientation="vertical"><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs with a disabled tab", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="archived" disabled>Archived</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="archived">Archived rows</TabPanel></Tabs>],

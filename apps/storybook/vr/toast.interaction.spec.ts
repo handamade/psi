@@ -80,3 +80,37 @@ test("the region's empty band stays click-through @interaction", async ({ page }
   );
   expect(fellThrough).toBe(true);
 });
+
+test("an Announcement is exposed in its wrapper and takes no space in the stack @interaction", async ({
+  page,
+}) => {
+  // D83. jsdom applies neither .psi-sr-only nor the region's flex layout, so
+  // "spoken and not shown" is a claim only a browser can check.
+  await page.goto("/iframe.html?id=feedback-toast--with-announcements&globals=theme:light", {
+    waitUntil: "networkidle",
+  });
+  await expect(page.locator(toast)).toBeVisible();
+
+  // Exposed: each is in the accessibility tree, under the wrapper its
+  // politeness names. getByRole skips anything hidden from assistive tech.
+  await expect(page.getByRole("status")).toContainText("Row 12 updated.");
+  await expect(page.getByRole("alert")).toContainText("2 fields need attention.");
+  await expect(page.getByRole("alert")).not.toContainText("Row 12 updated.");
+
+  // Not shown: clipped to a single pixel.
+  const announcements = page.locator("[data-psi-announcement]");
+  await expect(announcements).toHaveCount(2);
+  for (const box of await announcements.evaluateAll((els) => els.map((el) => el.getBoundingClientRect()))) {
+    expect(box.width).toBeLessThanOrEqual(1);
+    expect(box.height).toBeLessThanOrEqual(1);
+  }
+
+  // No space in the stack: the region measures the same with them as without.
+  const withThem = await page.locator(region).boundingBox();
+  await announcements.evaluateAll((els) => els.forEach((el) => el.remove()));
+  const without = await page.locator(region).boundingBox();
+  expect(withThem).toEqual(without);
+
+  // And still exactly two live regions on the page.
+  await expect(page.locator('[aria-live], [role="status"], [role="alert"], [role="log"]')).toHaveCount(2);
+});

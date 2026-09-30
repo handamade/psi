@@ -7,10 +7,6 @@ import styles from "./toast.module.css";
 
 export type ToastPlacement = "top-start" | "top-end" | "bottom-start" | "bottom-end";
 
-/** Remaining HTML attributes, `data-*` included, land on the region's root
- * element (D83) — that is how a consumer marks it `data-react-aria-top-layer`
- * so a React Aria overlay does not hide the two live regions. The region's
- * own attributes (`popover`, `data-placement`) always win. */
 export interface ToastRegionProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   /** Corner the stack occupies. @default "bottom-end" */
   placement?: ToastPlacement;
@@ -69,7 +65,13 @@ function isAssertive(child: ReactNode): boolean {
  * live region with a politeness that changes per message, which is the thing
  * the two wrappers exist to avoid. Accepted: at `limit` 3 the grouping reads as
  * severity ordering, and the newest toast still lands nearest the screen edge
- * within its group. */
+ * within its group.
+ *
+ * Remaining HTML attributes, `data-*` included, are spread onto the root
+ * element (D83). That is how an application marks the region
+ * `data-react-aria-top-layer`, so that a React Aria overlay — which hides
+ * everything outside itself with `aria-hidden` — leaves the two live regions
+ * exposed. The region's own attributes always win. */
 export function ToastRegion({
   placement = "bottom-end",
   "aria-label": ariaLabel = "Notifications",

@@ -109,14 +109,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Enter / Space", behavior: "Activates the focused action or dismiss button." },
     ],
     notes:
-      "Presentational and controlled (D64): onDismiss reports and the owner disposes; Toast never removes itself. It carries no role/aria-live of its own — politeness belongs to ToastRegion's two persistent wrappers. The variant's meaning is announced by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no prefix. The dismiss button requires no props — it is labelled \"Dismiss notification\".",
+      "Presentational and controlled (D64): onDismiss reports and the owner disposes; Toast never removes itself. It carries no role/aria-live of its own — politeness belongs to ToastRegion's two persistent wrappers. The variant's meaning is announced by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no prefix. statusLabel replaces that word with a translated one, or drops it with null (D83). politeness tells ToastRegion which wrapper speaks the toast; unset, the variant decides. The dismiss button requires no props — it is labelled \"Dismiss notification\".",
   },
   ToastRegion: {
     keyboard: [
       { keys: "Tab", behavior: "Moves into the stacked toasts' controls in DOM order; the region itself is not focusable." },
     ],
     notes:
-      "Renders two always-present live wrappers — role=\"status\"/aria-live=\"polite\" and role=\"alert\"/aria-live=\"assertive\" — and routes each toast into one by variant (neutral/success polite, warning/danger assertive). Both stay in the DOM when the queue is empty: a live region announces mutations to a subtree that already existed, so a wrapper mounting with its first toast would leave that toast unannounced. Sits on the native top layer via popover=\"manual\", so a toast raised from inside a modal Dialog is still painted above the backdrop and still announced — though showModal() makes everything outside the dialog inert, so it cannot be clicked until the dialog closes; manual (not auto) means no light dismiss, so the click that raised the toast cannot close it. The region is click-through (pointer-events: none) and each toast takes its own clicks back.",
+      "Renders two always-present live wrappers — role=\"status\"/aria-live=\"polite\" and role=\"alert\"/aria-live=\"assertive\" — and routes each child into one. A Toast or an Announcement that names its politeness goes where it says (D83); a Toast that names none is routed by variant (neutral/success polite, warning/danger assertive). Whatever it holds, the region contains exactly two live regions. Remaining HTML attributes, data-* included, land on the root element, so it can be marked data-react-aria-top-layer and stay exposed while a React Aria overlay is open. Both stay in the DOM when the queue is empty: a live region announces mutations to a subtree that already existed, so a wrapper mounting with its first toast would leave that toast unannounced. Sits on the native top layer via popover=\"manual\", so a toast raised from inside a modal Dialog is still painted above the backdrop and still announced — though showModal() makes everything outside the dialog inert, so it cannot be clicked until the dialog closes; manual (not auto) means no light dismiss, so the click that raised the toast cannot close it. The region is click-through (pointer-events: none) and each toast takes its own clicks back.",
   },
   ToastProvider: {
     keyboard: [
@@ -124,6 +124,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     ],
     notes:
       "Owns the queue, the auto-dismiss timers and the single ToastRegion (D65). Timers pause while the pointer or focus is inside the region and resume with the time remaining, satisfying WCAG 2.2.1 for content that disappears on a timer. Toasts carrying an action get a longer default lifetime, so the affordance cannot vanish before it is reached. useToast() throws outside a provider rather than silently no-opping.",
+  },
+  Announcement: {
+    keyboard: [],
+    notes:
+      "Not a live region: it renders no role and no aria-live, and outside a ToastRegion it announces nothing. It is visually hidden text that ToastRegion places in its polite or assertive wrapper, by the politeness prop (default polite) — for an event that must be spoken and has nothing to show. Keep one ToastRegion as the application's only announcer and put every Announcement inside it; never use an Announcement as a second one. Controlled like Toast: it never removes itself, so remove it once it has been spoken. To announce the same text again, remove it and render it again with a new key — a live region speaks changes, and an unchanged node is not one. Not focusable, and it takes no space in the toast stack.",
   },
   Tabs: {
     keyboard: [
