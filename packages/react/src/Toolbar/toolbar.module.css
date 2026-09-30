@@ -8,6 +8,10 @@
 .gap12 { gap: var(--psi-space-12); }
 .gap16 { gap: var(--psi-space-16); }
 
+/* D87: controls under Field labels and a button without one share their
+   bottom edge — the control line. */
+.alignEnd { align-items: flex-end; }
+
 .toolbar > input,
 .toolbar > select {
   width: var(--psi-toolbar-control-width);
