@@ -172,14 +172,17 @@ the focused element. 130 stories.
 
 ## Consequences
 
-- **Visual regression.** These baselines change by design and must be
-  refreshed from CI's `vr-baselines` artifact, per
+- **Visual regression: 16 baselines changed, as predicted, and no others.**
+  Refreshed from CI run 36743382347's actual renders, per
   `apps/storybook/vr/README.md`:
-  - every story that opens a Menu, because its first item is focused: the
-    browser's ring becomes Psi's;
-  - `drawer-long-content`: the panel's ring becomes Psi's.
-  A story with no focused element is pixel-identical, which includes every
-  `Input` and `Select` story.
+  - the seven Menu stories, in light and ember. Each opens with its first
+    item focused, and every diff is confined to that one item (184 × 40 px):
+    the browser's ring becomes Psi's;
+  - `drawer-long-content`, in light and ember. The diff is confined to a 4px
+    frame at the panel's edge: the browser's ring becomes Psi's.
+  The other 256 screenshots passed unchanged, which includes every `Input`,
+  `Select` and `Tabs` story: none renders a focused element. The sweep passed
+  130 of 130 on CI's Linux Chromium as well.
 - **Consumers see one change without touching their code:** the ring on
   `Input` and `Select` sits one pixel further in. It is a `minor`.
 - **Safari and Firefox were not measured.** Only Chromium is installed for
