@@ -1,0 +1,24 @@
+{
+  "id": "cursor-pagination",
+  "intent": "Page-size selector and previous/next control beneath a list that pages by opaque token — no page count, no page numbers; pair with a TableCaption whose detail states the range and takes focus after a page change",
+  "match": ["cursor pagination", "token pagination", "next page token", "previous next", "load more", "keyset pagination", "page size"],
+  "compose": {
+    "component": "Toolbar",
+    "props": { "gap": 12 },
+    "slots": {
+      "body": [
+        {
+          "component": "Field",
+          "slots": {
+            "label": ["{content:page-size-label}"],
+            "body": [{ "component": "Select", "props": { "size": 32 } }]
+          }
+        },
+        { "component": "CursorPagination", "props": { "hasPrevious": true, "hasNext": true } }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": { "page-size-label": "Rows per page" },
+  "gaps": []
+}

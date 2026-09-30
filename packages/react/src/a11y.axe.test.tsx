@@ -4,7 +4,7 @@ import axe from "axe-core";
 import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator,
-  Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, Pagination,
+  Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
   Toast, ToastRegion, Announcement,
   Tabs, TabList, Tab, TabPanel,
   useFieldControl,
@@ -61,6 +61,18 @@ const cases: Array<[string, React.ReactElement]> = [
       </TableBody>
     </Table>
   )],
+  ["Table with caption, row headers and a spanning cell", (
+    <Table aria-busy="false">
+      <TableCaption detail="Rows 51–100 of more than 100,000" tabIndex={-1}>Applications</TableCaption>
+      <TableHead><TableRow><TableHeaderCell>Id</TableHeaderCell><TableHeaderCell>Status</TableHeaderCell></TableRow></TableHead>
+      <TableBody>
+        <TableRow><TableCell rowHeader>APP-1042</TableCell><TableCell>Pending</TableCell></TableRow>
+        <TableRow><TableCell colSpan={2}>No more applications match.</TableCell></TableRow>
+      </TableBody>
+    </Table>
+  )],
+  ["CursorPagination", <CursorPagination hasPrevious hasNext onPrevious={() => {}} onNext={() => {}} />],
+  ["CursorPagination at the first page", <CursorPagination hasPrevious={false} hasNext onPrevious={() => {}} onNext={() => {}} />],
   ["Pagination", <Pagination page={4} pageCount={13} onPageChange={() => {}} />],
   ["Pagination single page", <Pagination page={1} pageCount={1} onPageChange={() => {}} />],
   ["Toast in a region", <ToastRegion><Toast variant="success">Transaction voided</Toast></ToastRegion>],

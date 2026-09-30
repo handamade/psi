@@ -11,6 +11,7 @@
 | `numeric` | `boolean` | — | no | Right-aligns and renders tabular figures (D62). |
 | `children` | `ReactNode` | — | no | Header label. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
+| `ref` | `Ref<HTMLTableCellElement>` | — | no | Forwarded ref to the `<th>`. |
 
 ## Theming
 

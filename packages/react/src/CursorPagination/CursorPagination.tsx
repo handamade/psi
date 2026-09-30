@@ -45,10 +45,13 @@ export function CursorPagination({
     <nav aria-label={ariaLabel} className={[styles.nav, className].filter(Boolean).join(" ")}>
       <Button variant="ghost" size={size} disabled={!hasPrevious} onClick={onPrevious}>
         <IconChevronLeft size={16} aria-hidden="true" />
-        {previousLabel}
+        <span>{previousLabel}</span>
       </Button>
+      {/* The label is an element, not a text node, so Button's trailing-icon
+          inset (`svg:last-child:not(:first-child)`) can tell this chevron from
+          a leading one. */}
       <Button variant="ghost" size={size} disabled={!hasNext} onClick={onNext}>
-        {nextLabel}
+        <span>{nextLabel}</span>
         <IconChevronRight size={16} aria-hidden="true" />
       </Button>
     </nav>

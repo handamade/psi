@@ -18,12 +18,13 @@ const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
   .filter((n) => existsSync(join(root, "src/icons", `${n}.tsx`)));
 
 describe("seed patterns against the real manifest", () => {
-  it("all fifteen load and validate; the backlog is empty (D67)", () => {
+  it("all sixteen load and validate; the backlog is empty (D67)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
       "announcer",
       "bulk-action-bar",
+      "cursor-pagination",
       "data-table",
       "date-range-filter",
       "destructive-confirm",
@@ -112,7 +113,7 @@ describe("the manifest describes children (D72)", () => {
   // react-docgen-typescript reports `children` only when the declaration
   // carries a JSDoc comment — not because of propFilter, extends, or the type
   // spelling, all of which D70 wrongly blamed and D72 disproved with a probe.
-  const TAKES_NO_CHILDREN = ["Input", "Pagination", "MenuSeparator"];
+  const TAKES_NO_CHILDREN = ["Input", "Pagination", "MenuSeparator", "CursorPagination"];
 
   it("lists children for every component that accepts it", () => {
     const missing = manifest.components
@@ -122,7 +123,7 @@ describe("the manifest describes children (D72)", () => {
     expect(missing).toEqual([]);
   });
 
-  it("omits children from the three that take none", () => {
+  it("omits children from the four that take none", () => {
     // Publishing a prop that does not apply is worse than omitting one that
     // does — an agent cross-checking the manifest would pass children to an
     // <input>.

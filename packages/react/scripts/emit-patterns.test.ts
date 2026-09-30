@@ -7,7 +7,7 @@ const root = join(import.meta.dirname, "..");
 const distPath = join(root, "dist", "patterns.json");
 
 describe("emitPatterns (real-dist posture)", () => {
-  it("writes dist/patterns.json: 15 patterns sorted by id, none blocked (D67)", () => {
+  it("writes dist/patterns.json: 16 patterns sorted by id, none blocked (D67)", () => {
     emitPatterns(root);
     const output = JSON.parse(readFileSync(distPath, "utf8"));
 
@@ -15,6 +15,7 @@ describe("emitPatterns (real-dist posture)", () => {
       "action-feedback",
       "announcer",
       "bulk-action-bar",
+      "cursor-pagination",
       "data-table",
       "date-range-filter",
       "destructive-confirm",
