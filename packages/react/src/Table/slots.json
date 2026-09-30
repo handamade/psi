@@ -2,7 +2,7 @@
   "slots": [
     {
       "name": "body",
-      "accepts": { "components": ["TableHead", "TableBody"] },
+      "accepts": { "components": ["TableCaption", "TableHead", "TableBody"] },
       "cardinality": "1..*",
       "order": 1
     }
