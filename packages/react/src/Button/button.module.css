@@ -39,7 +39,9 @@
    leading icon sits closer to the edge than text does. :has() replaces the
    Figma construction (container + text wrapper inset) with no DOM wrapper —
    identical pixels, no API change. A consumer who wraps their icon in a
-   <span> gets no inset and can set --psi-button-{n}-padding-inline-icon. */
+   <span> gets no inset and can set --psi-button-{n}-padding-inline-icon.
+   A trailing icon (`> svg:last-child`) gets the mirror inset on the end
+   side (D85) — a solid shape has no side bearing at either end. */
 
 .size24 {
   height: var(--psi-button-24-height);
@@ -49,6 +51,9 @@
 }
 .size24:has(> svg:first-child) {
   padding-inline-start: var(--psi-button-24-padding-inline-icon);
+}
+.size24:has(> svg:last-child) {
+  padding-inline-end: var(--psi-button-24-padding-inline-icon);
 }
 
 .size32 {
@@ -60,6 +65,9 @@
 .size32:has(> svg:first-child) {
   padding-inline-start: var(--psi-button-32-padding-inline-icon);
 }
+.size32:has(> svg:last-child) {
+  padding-inline-end: var(--psi-button-32-padding-inline-icon);
+}
 
 .size40 {
   height: var(--psi-button-40-height);
@@ -70,6 +78,9 @@
 .size40:has(> svg:first-child) {
   padding-inline-start: var(--psi-button-40-padding-inline-icon);
 }
+.size40:has(> svg:last-child) {
+  padding-inline-end: var(--psi-button-40-padding-inline-icon);
+}
 
 .size48 {
   height: var(--psi-button-48-height);
@@ -79,6 +90,9 @@
 }
 .size48:has(> svg:first-child) {
   padding-inline-start: var(--psi-button-48-padding-inline-icon);
+}
+.size48:has(> svg:last-child) {
+  padding-inline-end: var(--psi-button-48-padding-inline-icon);
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */
