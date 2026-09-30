@@ -41,7 +41,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Tab", behavior: "Focus moves to the wrapped control; the label is announced with it." },
     ],
     notes:
-      "Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend.",
+      "Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend. required marks the label with an aria-hidden asterisk and flows required to the control; requiredText replaces the asterisk with a visible word such as \"(Required)\", also aria-hidden, because the control's required/aria-required is what assistive tech reads (D84). A control Psi did not write joins the same wiring through useFieldControl(): spread its result — id, aria-labelledby (a label-for names only a labelable element, and a custom control is usually not one), aria-describedby, aria-invalid, aria-required, required, each present only when the Field sets it — onto the element that takes focus (D84).",
   },
   Dialog: {
     keyboard: [
