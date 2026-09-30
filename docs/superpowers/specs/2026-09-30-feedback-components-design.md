@@ -1,6 +1,6 @@
 # Feedback that is not a toast: `Banner`, `InlineAlert`, `Skeleton`, `CopyButton` (D86)
 
-Date: 2026-09-30. Status: **In progress** on branch `d86-feedback-components`.
+Date: 2026-09-30. Status: **Implemented** on branch `d86-feedback-components`.
 
 Provenance: the fifth item of the Psi 0.21 portal handoff
 (`docs/superpowers/plans/2026-09-30-psi-0.21-portal-handoff.md`, brief D86).
@@ -107,15 +107,56 @@ button that copies a value. None of them announces anything.
 
 ## Verification
 
-To be filled in when implemented. Tests that go red first, per component:
-renders its anatomy; has no `role`, no `aria-live` and no `role="alert"`;
-axe clean. `CopyButton`: calls `writeText` with `value`, then
-`onCopy("copied")`; a rejected `writeText` gives `onCopy("failed")`; no
-clipboard API gives `onCopy("failed")`. `Skeleton`: `aria-hidden`; in a
-browser under reduced motion its animation duration is 0.01ms and its
-animation name is `none`. The status maps: `Toast`'s existing tests pass
-unchanged after the move.
+- **How it was built.** The four component tasks and the patterns task were
+  executed by five Sonnet subagents, one after another, from the plan's
+  per-task briefs; this session wrote the spec, the plan and Task 0, reviewed
+  each commit, resolved the merge with D85, and did Task 6. Every agent
+  reported its red run before its green one.
+- **Tests first**, per the agents' reports and the commits:
+  - Task 0: the scope pins and the three contrast pairs, 2 tests red;
+  - `Banner` 23 + 4 token tests, `InlineAlert` 23 + 4, `Skeleton` 10 + 4,
+    `CopyButton` 11 — each file red on the missing module, then green;
+  - the patterns: the id lists red on the four missing files.
+- **What the agents changed beyond their briefs**, each reviewed here:
+  - `Skeleton`'s text line takes its 12px from `padding-block:
+    var(--psi-space-6)` rather than `height: var(--psi-space-12)`: the plan's
+    line failed `psi/token-scopes`, which scopes the space family to gap,
+    padding and margin. Correct, and the CSS says why;
+  - the D72 childless list gained `Skeleton` and `CopyButton`;
+  - the MCP overview-envelope tests (D61) synthesise patterns on top of the
+    real ones and went past the edge at 20 real. The agent re-measured the
+    edge — the component floor holds through 23 patterns and breaks at 24 —
+    and lowered the synthetic counts to keep the same margins (21 and 39
+    total). See Consequences.
+- **In a browser** (Chromium 149, built Storybook): every component and
+  preset in light and ember, looked at; on every one of those ten pages the
+  count of `[aria-live], [role=status], [role=alert], [role=log]` is **0**.
+  `Skeleton` with motion allowed animates `skeleton-pulse` for `0.6s`; under
+  reduced motion its animation name is `none`, its opacity stays `1` across
+  frames, and `--psi-duration-600` resolves to 0.01ms. Pinned in
+  `apps/storybook/vr/skeleton.interaction.spec.ts`.
+- **axe:** seven new cases, no violations.
+- **The five gates** green: 2431 tests in 103 files (2344 in 96 before), docs
+  drift at 41 components and 20 patterns, site gate 9 of 9. Interaction set
+  182 of 182, the D82 sweep over the 22 new stories included.
 
 ## Consequences
 
-To be filled in when implemented.
+- **Visual regression: 52 new baselines, none changed.** Twenty-two new
+  stories and four new presets, in light and ember. From CI's artifact.
+- **Consumer themes are held to three more contrast pairs** and may bind
+  `fgSuccess`/`fgWarning` to borders. A theme built with `psi-theme` that
+  fails `fgPrimary` on a status tint fails its build now; every shipped
+  theme clears it by a wide margin.
+- **The MCP overview envelope has three patterns of headroom.** The real
+  catalog is 20; the component floor breaks at 24. D87 adds one and D88
+  adds one, reaching 22. The next pattern cycle after this release should
+  revisit the D61 budget before adding more.
+- **`InlineAlert` is not an alert.** Its name follows what a page shows; a
+  consumer who wants it spoken routes the same text through the announcer.
+- **`CopyButton` gives no visible confirmation.** A consumer outside the
+  portal who wants one raises a `Toast` from `onCopy`.
+- **The portal** shows a `Banner` when its data is stale, an `InlineAlert`
+  above a rejected form, `Skeleton` rows while a page loads with
+  `aria-busy` on the body, and `CopyButton` beside identifiers — and speaks
+  each event through its one announcer.
