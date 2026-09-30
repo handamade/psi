@@ -36,6 +36,10 @@ export const BulkActionBar: Story = {
   render: preset("bulk-action-bar"),
 };
 
+export const CopyableId: Story = {
+  render: preset("copyable-id"),
+};
+
 export const CursorPagination: Story = {
   render: preset("cursor-pagination"),
 };
@@ -62,6 +66,18 @@ export const EmptyState: Story = {
 
 export const FilterToolbar: Story = {
   render: preset("filter-toolbar"),
+};
+
+export const FormFeedback: Story = {
+  render: preset("form-feedback"),
+};
+
+export const LoadingTable: Story = {
+  render: preset("loading-table"),
+};
+
+export const PageBanner: Story = {
+  render: preset("page-banner"),
 };
 
 export const RequiredField: Story = {

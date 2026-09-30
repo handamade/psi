@@ -1,0 +1,56 @@
+{
+  "id": "loading-table",
+  "intent": "A table whose rows are still loading — Skeleton lines in the cells, aria-busy on the body; the skeletons are hidden from assistive tech, the busy state is what it reads",
+  "match": ["loading table", "table skeleton", "placeholder rows", "loading state", "busy table"],
+  "compose": {
+    "component": "Table",
+    "props": { "aria-label": "{content:table-label}" },
+    "slots": {
+      "body": [
+        {
+          "component": "TableHead",
+          "slots": {
+            "body": [
+              {
+                "component": "TableRow",
+                "slots": {
+                  "body": [
+                    { "component": "TableHeaderCell", "content": "col-1" },
+                    { "component": "TableHeaderCell", "content": "col-2" },
+                    { "component": "TableHeaderCell", "content": "col-3" }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "component": "TableBody",
+          "props": { "aria-busy": "true" },
+          "slots": {
+            "body": [
+              {
+                "component": "TableRow",
+                "slots": {
+                  "body": [
+                    { "component": "TableCell", "slots": { "body": [{ "component": "Skeleton" }] } },
+                    { "component": "TableCell", "slots": { "body": [{ "component": "Skeleton" }] } },
+                    { "component": "TableCell", "slots": { "body": [{ "component": "Skeleton" }] } }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "table-label": "[what the table lists], loading",
+    "col-1": "[first column]",
+    "col-2": "[second column]",
+    "col-3": "[third column]"
+  },
+  "gaps": []
+}

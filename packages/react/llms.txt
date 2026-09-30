@@ -1,10 +1,10 @@
 # @handamade/psi-react
 
-37 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+41 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
-- dist/patterns.json: 16 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
+- dist/patterns.json: 20 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
@@ -60,6 +60,12 @@
 - `<Dialog open onClose={(reason) => …} title footer width={400|560|720} dismissible>`: modal on the native `<dialog>` top layer. **Controlled-only** (D50) — every dismissal path (`"esc"`, `"backdrop"`, `"close-button"`) only *reports* via `onClose(reason)`; the consumer flips `open`. `dismissible={false}` swallows Esc and backdrop, leaving the footer as the only exit.
 - **A drawer / side sheet is `<Dialog placement="inline-end">`, not a separate component (D66).** `placement` is `center | inline-start | inline-end`; the `inline-*` values pin the panel full-height to that edge. Do not import `Drawer` — it does not exist and never will. `width` is then the drawer's width; the height is always the viewport.
 - Placement changes position and nothing else: modality, the focus trap, `aria-modal`, focus restore and the dismissal reasons are identical. Logical (`inline-*`, not left/right), so RTL flips for free. Consult dist/patterns.json for the `detail-drawer` pattern.
+
+## Feedback (4)
+- `<Banner variant="neutral|success|warning|danger" title action onDismiss statusLabel>message</Banner>` is **not a live region** (D86): a page-level message, full width, above the content. It shows the message and announces nothing; speak the same event through the announcer. Same status vocabulary as Toast; `action` takes a ghost Button, `onDismiss` renders a labelled Dismiss button, `statusLabel` replaces or drops the hidden status word. Consult dist/patterns.json for `page-banner`.
+- `<InlineAlert variant title>message</InlineAlert>` is **not a live region** (D86), and despite its name it is **not `role="alert"`**: a message inside content, bordered in the variant's foreground colour. Put it above a form after a rejected submission and speak the result separately. Consult dist/patterns.json for `form-feedback`.
+- `<Skeleton>` is **not a live region** (D86): a loading placeholder that is always `aria-hidden`, so it says nothing. Put `aria-busy` on the region it stands in for (a `TableBody`, a list) — that is what assistive tech reads. The shimmer stops under `prefers-reduced-motion`. Consult dist/patterns.json for `loading-table`.
+- `<CopyButton value label size onCopy>` is **not a live region** (D86): a Button with a visible label that copies `value` to the clipboard and reports `"copied" | "failed"` through `onCopy`. It never changes its label or icon and announces nothing; speak the result through the announcer or a Toast. Consult dist/patterns.json for `copyable-id`.
 
 ## Toast family (4) + useToast
 - `<Toast variant="neutral|success|warning|danger" action={...} onDismiss={...}>message</Toast>` is presentational and **controlled** (D64): it holds no state, runs no timer and never removes itself — `onDismiss` reports and the owner disposes. Variants are Tag's **status** axis, not the flat action variants; there is deliberately no `accent`. The variant's meaning is announced by a visually hidden status word, so never rely on the icon colour alone; `statusLabel="Fehler:"` replaces that word with a translated one and `statusLabel={null}` drops it (D83).

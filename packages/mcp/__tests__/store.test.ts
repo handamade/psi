@@ -88,11 +88,12 @@ describe("search", () => {
   }
 
   it("keeps every pattern and the component floor inside the operating envelope (D61)", () => {
-    // 6 synthetic patterns on top of 13 real = 19 total. Measured directly
+    // 1 synthetic pattern on top of 20 real = 21 total. Measured directly
     // against this store.ts (see docs/superpowers/specs/2026-08-05-overview-allocation-design.md,
     // "Operating envelope"): with realistic ~20-char pattern ids the floor
-    // holds through 21 patterns and first breaks at 22. 19 keeps a margin
-    // below that edge.
+    // holds through 23 patterns and first breaks at 24 (re-measured at D86,
+    // when the real catalog reached 20). 21 keeps a margin below that edge;
+    // the synthetic count is what you lower when the real catalog grows.
     //
     // The envelope is a function of per-pattern *cost*, not pattern count:
     // id, kind, title and the never-capped `blocked (gaps: …)` tail are not
@@ -100,7 +101,7 @@ describe("search", () => {
     // count of dearer ones does not. A sweep with short synthetic ids puts
     // the edge at 25; this test deliberately uses long ids, which is the
     // conservative case and the one closer to Psi's real ids.
-    const grown = synthesizePatterns(6);
+    const grown = synthesizePatterns(1);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 
@@ -122,7 +123,7 @@ describe("search", () => {
   });
 
   it("degrades by shedding components, not patterns, past the envelope (D61)", () => {
-    // Triple today's catalog (26 synthetic on top of 13 real = 39 total),
+    // Roughly double today's catalog (19 synthetic on top of 20 real = 39 total),
     // well past the ~21-pattern envelope documented in the spec's Operating
     // envelope section. At this size the component floor provably cannot
     // hold: 39 patterns' irreducible per-item JSON overhead (id/kind/title,
@@ -134,7 +135,7 @@ describe("search", () => {
     // one at a time rather than vanishing, and neither topics nor patterns
     // are ever sacrificed to make room. If a future change makes patterns
     // start vanishing instead of components, this test must fail.
-    const grown = synthesizePatterns(26);
+    const grown = synthesizePatterns(19);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 
