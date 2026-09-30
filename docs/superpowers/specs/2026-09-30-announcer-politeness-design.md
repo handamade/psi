@@ -1,6 +1,6 @@
 # Announcements route by politeness, not only by tone: `politeness` and `statusLabel` on Toast, a speech-only `Announcement` (D83)
 
-Date: 2026-09-30. Status: **In progress** on branch `d83-announcer-politeness`.
+Date: 2026-09-30. Status: **Implemented** on branch `d83-announcer-politeness`.
 
 Provenance: the second item of the Psi 0.21 portal handoff
 (`docs/superpowers/plans/2026-09-30-psi-0.21-portal-handoff.md`, brief D83).
@@ -84,25 +84,57 @@ with `aria-hidden` except elements marked `data-react-aria-top-layer`.
 
 ## Verification
 
-To be filled in when implemented. Tests that go red first:
-
-- a `success` Toast with `politeness="assertive"` renders inside the
-  `role="alert"` wrapper; a `danger` Toast with `politeness="polite"` inside
-  the `role="status"` wrapper;
-- an `Announcement` renders in the wrapper its `politeness` names, is visually
-  hidden, and has no `role`, no `aria-live` and no icon;
-- `statusLabel={null}` renders no status word; `statusLabel="Fehler:"` renders
-  that word and not *Error:*;
-- `data-react-aria-top-layer` passed to `ToastRegion` appears on its root, and
-  a passed `popover` does not displace `manual`;
-- `show({ politeness, statusLabel })` reaches the rendered toast;
-- a region holding toasts and announcements of both kinds still contains
-  exactly two live regions;
-- in a browser: an `Announcement` takes no space in the stack and is exposed
-  inside its wrapper.
-
-Regression: with no new props, every existing Toast test passes unchanged.
+- **Tests first.** Each went red before its change, on assertion unless
+  noted:
+  - `Toast`: `statusLabel` replaces the word, `null` drops it, and a string
+    gives a `neutral` toast one (3 tests). A fourth pins that `politeness`
+    renders nothing on the toast; it was green from the start, because the
+    prop is never forwarded;
+  - `ToastRegion`: an assertive `success` lands in the `role="alert"` wrapper,
+    a polite `danger` in `role="status"`, an assertive `Announcement` in
+    `role="alert"`, and `data-react-aria-top-layer` reaches the root (4 tests
+    red; 4 more pin the polite default, the two-live-regions count, and that a
+    passed `popover` or `data-placement` does not displace the region's own);
+  - `Announcement`: red on the missing module, then 2 tests for hidden text
+    with no `role`, no `aria-live` and no icon;
+  - `ToastProvider`: `show({ politeness })` and `show({ statusLabel })`, 3 red,
+    and 2 pinning the unchanged defaults;
+  - the pattern: `seed-patterns.test.ts` red on the missing `announcer`.
+- **Regression.** No existing Toast test was edited. With none of the new
+  props the rendered DOM is what it was, and no existing VR baseline is
+  expected to change.
+- **In a browser** (Chromium 149, built Storybook), which jsdom cannot show
+  because it applies neither `.psi-sr-only` nor the region's layout:
+  - each `Announcement` is in the accessibility tree under the wrapper its
+    politeness names — `status: … Row 12 updated.`, `alert: 2 fields need
+    attention.`;
+  - each measures 1 × 1 px, and the region is the same size with them as with
+    them removed: 346 × 98. With `.psi-sr-only` taken off them it grows to
+    346 × 142, so the measurement would catch a visible one;
+  - the page holds exactly two live regions.
+  This is pinned in `apps/storybook/vr/toast.interaction.spec.ts`.
+- **axe:** three new cases, no violations.
+- **The five gates** green: 2319 tests in 93 files (2297 in 92 before), docs
+  drift at 35 components and 14 patterns, site gate 9 of 9. The interaction
+  set is 148 of 148, which includes D82's focus sweep over the three new
+  stories.
 
 ## Consequences
 
-To be filled in when implemented.
+- **Visual regression: six new baselines, none changed.** Three new stories
+  in light and ember — `RoutedByPoliteness`, `WithAnnouncements` and the
+  generated `announcer` preset. They come from CI's `vr-baselines` artifact.
+- **`ToastRegion` now forwards every attribute it is given.** A consumer who
+  passes `role` or `aria-live` to it creates a third live region. The types
+  allow it, because `HTMLAttributes` does; the docs say the region is exactly
+  two.
+- **An `Announcement` left in the region stays readable** to a screen-reader
+  user browsing the page, as hidden text. Removing it once spoken is the
+  owner's job, as removing a `Toast` is.
+- **Speech itself is not tested.** The tests show the text is exposed inside
+  a live region that existed before it. What a given screen reader then says,
+  and whether it queues or interrupts, was not measured with one.
+- **The portal** writes both wrappers from its one module: a `Toast` with
+  `politeness="assertive"` for the outcome of the operator's own action, an
+  `Announcement` for a state change or for field errors, and
+  `data-react-aria-top-layer` on the region.
