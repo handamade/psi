@@ -1,7 +1,7 @@
 /** Focus-ring geometry in px (D82). One ring for every focusable part:
  * `width` is the outline width, `offset` places the ring outside a control,
  * `offsetInset` inside one whose outside ring would be clipped or would land
- * on a neighbour (Input, Select, Tab, TabPanel, Menu item, Dialog).
+ * on a neighbour (Input, Select, Tab, Menu item, Dialog).
  *
  * px, not rem: a ring is a hairline. And `offsetInset` is a literal rather
  * than -1 × width: a custom property holding var() is computed where it is

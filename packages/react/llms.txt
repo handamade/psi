@@ -13,6 +13,7 @@
 - size is a px number (24|32|40|48), never "sm"/"md"/"lg".
 - variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline.
 - One accent per visual group. danger only for destructive actions.
+- Every focusable part Psi renders draws one focus ring on `:focus-visible` (D82). For your own focusable element, bind the same tokens rather than writing a literal: `outline: var(--psi-focus-ring-width) solid var(--psi-border-focus); outline-offset: var(--psi-focus-ring-offset)` (or `--psi-focus-ring-offset-inset` to draw it inside). Never `outline: none`.
 - Before composing multi-component UI, consult dist/patterns.json (or psi-mcp search) for a matching pattern and honor its clarifying parameters; presets are copy-paste JSX generated from the compose tree.
 - Pattern `content` text in `[square brackets]` is a placeholder to replace with real copy. Never `<angle brackets>` or `{braces}` — those do not parse as JSX text, so the build rejects them (D48 class 9).
 

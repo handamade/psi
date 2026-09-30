@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Revised during Task 5, Step 7.** The first draft made `TabPanel` inset, following the brief. Looked at in a browser, the inset ring was drawn over the panel's text, so `TabPanel` keeps its ring outside. The plan below is the plan as executed.
+
 **Goal:** Every focusable part Psi owns draws one focus ring, whose width and two offsets are scale tokens, and two gates keep it so.
 
 **Architecture:** Three scale tokens are emitted with the other scales into `base.css`, `resolved/*.json` and DTCG. Every component CSS Module binds them on `:focus-visible`; Menu and Dialog gain a colour token and a rule. A stylelint rule forbids literal outline geometry, and a Playwright `@interaction` spec tabs through every built story and reads the computed outline.
@@ -15,7 +17,7 @@ Spec: `docs/superpowers/specs/2026-09-30-focus-ring-design.md`.
 - Node 24 (`.nvmrc`); check `node -v` before the first pnpm command.
 - Token names, exactly: `--psi-focus-ring-width: 2px`, `--psi-focus-ring-offset: 2px`, `--psi-focus-ring-offset-inset: -2px`. Values are `px` literals.
 - The focus rule shape, exactly: `outline: var(--psi-focus-ring-width) solid var(--psi-<name>-focus-ring);` plus `outline-offset: var(--psi-focus-ring-offset);` or `var(--psi-focus-ring-offset-inset)`.
-- Inset: `Input`, `Select`, `Tab`, `TabPanel`, Menu item, `<dialog>` and its panel. Everything else outside.
+- Inset: `Input`, `Select`, `Tab`, Menu item, `<dialog>` and its panel. Everything else outside, `TabPanel` included.
 - Toast gets no rule and no token. No descendant focus rules over slots.
 - No new prop, no runtime dependency, no `url()`, no `style` prop.
 - Never edit `dist/`; new values go in `packages/tokens/src`.
@@ -110,7 +112,7 @@ Expected: FAIL — `scales.test.ts` cannot resolve `../src/scales/focus-ring.js`
 /** Focus-ring geometry in px (D82). One ring for every focusable part:
  * `width` is the outline width, `offset` places the ring outside a control,
  * `offsetInset` inside one whose outside ring would be clipped or would land
- * on a neighbour (Input, Select, Tab, TabPanel, Menu item, Dialog).
+ * on a neighbour (Input, Select, Tab, Menu item, Dialog).
  *
  * px, not rem: a ring is a hairline. And `offsetInset` is a literal rather
  * than -1 × width: a custom property holding var() is computed where it is
@@ -416,11 +418,14 @@ for (const s of stories) {
 
 - [ ] **Step 1: Outside rings.** In `button`, `icon-button`, `checkbox`, `switch`, `tag`, `table`, `navbar`: replace `outline: 2px solid var(--psi-X-focus-ring);` with `outline: var(--psi-focus-ring-width) solid var(--psi-X-focus-ring);` and `outline-offset: 2px;` with `outline-offset: var(--psi-focus-ring-offset);`. Keep each file's own `X`.
 
-- [ ] **Step 2: Tabs.** Both rules take the width token; both take `outline-offset: var(--psi-focus-ring-offset-inset);`. Above `.panel:focus-visible` add:
+- [ ] **Step 2: Tabs.** Both rules take the width token. `.tab:focus-visible` takes `outline-offset: var(--psi-focus-ring-offset-inset);` and `.panel:focus-visible` takes `outline-offset: var(--psi-focus-ring-offset);`, each with a comment saying why:
 
 ```css
-/* Inset (D82): outside, the ring ran under the tab list's rule and was cut by
-   any clipping ancestor. */
+/* Inset (D82): tabs sit 4px apart on the list's rule, so an outside ring
+   would touch the neighbouring tab and cross the rule and the indicator. */
+
+/* Outside, unlike the tab (D82): a panel has no padding of its own, so an
+   inset ring would be drawn over the first pixels of its content. */
 ```
 
 - [ ] **Step 3: Input and Select.** In each file:
