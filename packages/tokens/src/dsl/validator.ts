@@ -125,7 +125,7 @@ export function validateScopeConsistency(themes: Record<string, ThemeDef>): void
 
 // Both gates resolve --psi-* names scale-first, so a semantic token whose
 // kebab name starts with a scale-family prefix would be silently shadowed.
-const SCALE_FAMILY_PREFIX = /^(space|size|radius|text|font|duration|ease|z)-/;
+const SCALE_FAMILY_PREFIX = /^(space|size|radius|text|font|duration|ease|z|focus-ring)-/;
 
 /** D46 follow-up (HAN-21): reject semantic token kebab names that a
  * scale-family lookup would shadow before the semantic lookup runs. */

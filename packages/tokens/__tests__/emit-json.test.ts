@@ -13,4 +13,7 @@ describe("emitResolvedJSON (D46 scopes)", () => {
   it("scales carry family scopes", () => {
     expect(json.scales.scopes).toEqual({ space: ["gap"] });
   });
+  it("scales carry the focus ring (D82)", () => {
+    expect(json.scales.focusRing).toEqual({ width: 2, offset: 2, offsetInset: -2 });
+  });
 });

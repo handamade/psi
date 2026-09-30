@@ -6,6 +6,7 @@ import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
 import { durationScale, easings } from "../src/scales/motion.js";
 import { breakpoints, container } from "../src/scales/layout.js";
+import { focusRing } from "../src/scales/focus-ring.js";
 import { SCALE_SCOPES } from "../src/scopes.js";
 
 const GROUPS = ["bg", "fg", "fill", "border", "scrim"] as const;
@@ -38,6 +39,10 @@ export function emitDTCG(themeName: string, resolved: ResolvedTheme): string {
       radius: Object.fromEntries(radiusScale.map((px) => [String(px), dim(px)])),
       breakpoint: Object.fromEntries(Object.entries(breakpoints).map(([k, v]) => [k, { $type: "dimension", $value: `${v}px` }])),
       container: { max: dim(container.max), gutter: dim(container.gutter), gutterNarrow: dim(container.gutterNarrow) },
+      // px, not rem (D82) — see scales/focus-ring.ts.
+      focusRing: Object.fromEntries(
+        Object.entries(focusRing).map(([k, px]) => [k, { $type: "dimension", $value: `${px}px` }]),
+      ),
     },
     typography: Object.fromEntries(typographyCombos.map((c) => [comboName(c), {
       $type: "typography",
