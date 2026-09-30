@@ -166,6 +166,13 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region: it renders no role and no aria-live, and it is always aria-hidden=\"true\", so assistive tech skips it entirely. Put aria-busy=\"true\" on the region the skeleton stands for (a table body, a card, a list) and remove it when the content arrives; that, not the skeleton, is what tells a screen reader the content is loading. Not focusable. The pulse is an opacity animation that stops under prefers-reduced-motion: reduce, because zeroing the duration of an infinite alternating animation flickers instead of stopping (D86).",
   },
+  CopyButton: {
+    keyboard: [
+      { keys: "Enter / Space", behavior: "Copies the value to the clipboard." },
+    ],
+    notes:
+      "Not a live region: it renders no role and no aria-live, announces nothing, and does not change its label or icon after a copy, so a screen reader hears the same button before and after. The application speaks the result: onCopy reports \"copied\" or \"failed\" (a rejected write, or no clipboard API), and the application routes that through its announcer or a Toast (D86). The label is visible text; the icon is aria-hidden and only reinforces it. Focus stays on the button.",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },

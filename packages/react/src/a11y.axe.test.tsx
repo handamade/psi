@@ -5,7 +5,7 @@ import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
-  Toast, ToastRegion, Announcement, Banner, InlineAlert, Skeleton,
+  Toast, ToastRegion, Announcement, Banner, InlineAlert, Skeleton, CopyButton,
   Tabs, TabList, Tab, TabPanel,
   useFieldControl,
 } from "./index.js";
@@ -88,6 +88,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["InlineAlert danger with action", <InlineAlert variant="danger" title="Payment failed" action={<Button variant="ghost" size={32}>Retry</Button>}>Your card was declined.</InlineAlert>],
   ["Skeleton text", <div aria-busy="true"><Skeleton lines={3} /></div>],
   ["Skeleton block", <div aria-busy="true"><Skeleton variant="block" size={48} /></div>],
+  ["CopyButton", <CopyButton value="ORD-1042" />],
   ["Tabs horizontal", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs vertical", <Tabs value="all" onValueChange={() => {}} orientation="vertical"><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs with a disabled tab", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="archived" disabled>Archived</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="archived">Archived rows</TabPanel></Tabs>],

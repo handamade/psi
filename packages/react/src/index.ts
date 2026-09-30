@@ -71,6 +71,8 @@ export { InlineAlert } from "./InlineAlert/InlineAlert.js";
 export type { InlineAlertProps, InlineAlertVariant } from "./InlineAlert/InlineAlert.js";
 export { Skeleton } from "./Skeleton/Skeleton.js";
 export type { SkeletonProps } from "./Skeleton/Skeleton.js";
+export { CopyButton } from "./CopyButton/CopyButton.js";
+export type { CopyButtonProps } from "./CopyButton/CopyButton.js";
 export { Tabs, TabsContext } from "./Tabs/Tabs.js";
 export type { TabsProps, TabsOrientation, TabsContextValue } from "./Tabs/Tabs.js";
 export { TabList } from "./Tabs/TabList.js";
