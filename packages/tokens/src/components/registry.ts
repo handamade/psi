@@ -1,6 +1,7 @@
 // Component var registry (D81: moved out of scripts/build.ts) — the D46 scope
 // gate reads it, in Psi's own build and in a consumer's theme build alike.
 import { bannerVars } from "./banner.js";
+import { inlineAlertVars } from "./inline-alert.js";
 import { buttonVars } from "./button.js";
 import { inputVars } from "./input.js";
 import { selectVars } from "./select.js";
@@ -32,6 +33,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   dialog: dialogVars,
   field: fieldVars,
   input: inputVars,
+  "inline-alert": inlineAlertVars,
   media: mediaVars,
   menu: menuVars,
   navbar: navbarVars,

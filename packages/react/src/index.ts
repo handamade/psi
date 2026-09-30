@@ -63,6 +63,8 @@ export { Announcement } from "./Toast/Announcement.js";
 export type { AnnouncementProps } from "./Toast/Announcement.js";
 export { Banner } from "./Banner/Banner.js";
 export type { BannerProps, BannerVariant } from "./Banner/Banner.js";
+export { InlineAlert } from "./InlineAlert/InlineAlert.js";
+export type { InlineAlertProps, InlineAlertVariant } from "./InlineAlert/InlineAlert.js";
 export { Tabs, TabsContext } from "./Tabs/Tabs.js";
 export type { TabsProps, TabsOrientation, TabsContextValue } from "./Tabs/Tabs.js";
 export { TabList } from "./Tabs/TabList.js";

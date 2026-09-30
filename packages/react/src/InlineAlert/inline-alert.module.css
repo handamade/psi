@@ -1,0 +1,59 @@
+/* packages/react/src/InlineAlert/inline-alert.module.css */
+/* The stylelint plugin derives the allowed namespace from the filename, so
+   every custom property here must be --psi-inline-alert-* or one of the global
+   scale prefixes. Every colour goes through packages/tokens/src/components/
+   inline-alert.ts, never a literal here. */
+
+.inlineAlert {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: var(--psi-space-12);
+
+  box-sizing: border-box;
+  padding: var(--psi-space-12) var(--psi-space-16);
+  border-radius: var(--psi-inline-alert-radius);
+
+  color: var(--psi-inline-alert-fg);
+  font: var(--psi-text-14-20-regular);
+}
+
+.inlineAlert[data-variant="neutral"] {
+  background: var(--psi-inline-alert-bg-neutral);
+  border: 1px solid var(--psi-inline-alert-border-neutral);
+}
+.inlineAlert[data-variant="success"] {
+  background: var(--psi-inline-alert-bg-success);
+  border: 1px solid var(--psi-inline-alert-border-success);
+}
+.inlineAlert[data-variant="warning"] {
+  background: var(--psi-inline-alert-bg-warning);
+  border: 1px solid var(--psi-inline-alert-border-warning);
+}
+.inlineAlert[data-variant="danger"] {
+  background: var(--psi-inline-alert-bg-danger);
+  border: 1px solid var(--psi-inline-alert-border-danger);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.iconNeutral { color: var(--psi-inline-alert-icon-fg-neutral); }
+.iconSuccess { color: var(--psi-inline-alert-icon-fg-success); }
+.iconWarning { color: var(--psi-inline-alert-icon-fg-warning); }
+.iconDanger  { color: var(--psi-inline-alert-icon-fg-danger); }
+
+.body {
+  min-width: 0; /* let a long message wrap instead of stretching the grid */
+}
+
+.title {
+  display: block;
+  font: var(--psi-text-14-20-medium);
+}
+
+.action {
+  display: inline-flex;
+}

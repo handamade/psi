@@ -38,6 +38,7 @@ const COMPONENTS = [
   "ToastProvider",
   "Announcement",
   "Banner",
+  "InlineAlert",
   "Tabs",
   "TabList",
   "Tab",
