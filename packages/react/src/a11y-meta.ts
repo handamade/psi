@@ -103,6 +103,21 @@ export const a11yMeta: Record<string, A11yEntry> = {
     keyboard: [],
     notes: "Non-interactive rule with role=\"separator\" — exposed to assistive tech as a separator, never focusable, and skipped by roving navigation.",
   },
+  TableCaption: {
+    keyboard: [
+      { keys: "Tab", behavior: "Not a tab stop. With tabIndex={-1} the consumer moves focus to it after a page change, and the shared ring is drawn inside the caption." },
+    ],
+    notes:
+      "Renders <caption>, which names the table for assistive tech and is visible, unlike an aria-label on Table. Put the range in `detail` (\"Rows 51–100 of more than 100,000\") so that moving focus to the caption after a token-paged page change reads the new range (D85). Remaining attributes land on the element.",
+  },
+  CursorPagination: {
+    keyboard: [
+      { keys: "Tab", behavior: "Reaches the Previous and Next buttons in order; a disabled direction is skipped." },
+      { keys: "Enter / Space", behavior: "Activates the focused button (native button behavior)." },
+    ],
+    notes:
+      "A <nav> named \"Pagination\" (override with aria-label) holding two ghost Buttons with visible words — Previous and Next, translatable through previousLabel/nextLabel — each with a chevron that only reinforces the word (D85). A direction that is unavailable is disabled, not hidden. It holds no state: the consumer holds the page tokens and answers hasPrevious/hasNext. Pair it with a TableCaption whose detail states the range, and move focus there after a page change.",
+  },
   Toast: {
     keyboard: [
       { keys: "Tab", behavior: "Reaches the action and the dismiss button in DOM order. Esc is not a dismissal — a toast is not modal and traps nothing." },

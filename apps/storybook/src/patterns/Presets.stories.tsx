@@ -36,6 +36,10 @@ export const BulkActionBar: Story = {
   render: preset("bulk-action-bar"),
 };
 
+export const CursorPagination: Story = {
+  render: preset("cursor-pagination"),
+};
+
 export const DataTable: Story = {
   render: preset("data-table"),
 };

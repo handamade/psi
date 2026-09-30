@@ -11,6 +11,7 @@
 | `selectLabel` | `string` | — | no | Accessible name for this row's selection checkbox. |
 | `children` | `ReactNode` | — | yes | The row's cells. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
+| `ref` | `Ref<HTMLTableRowElement>` | — | no | Forwarded ref to the `<tr>`. |
 
 ## Theming
 
