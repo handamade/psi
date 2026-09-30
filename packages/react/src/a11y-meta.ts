@@ -146,6 +146,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region, and not role=\"alert\" despite its name: it renders no role and no aria-live, so mounting an InlineAlert announces nothing; announcing stays the application's (route the same event through a ToastRegion or an Announcement if it must be spoken). Presentational (D86): it holds no state and has no dismiss button. The variant's meaning is carried by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour, border and icon shape alone; the icon is aria-hidden. neutral has no status and gets no word. statusLabel replaces that word with a translated one, or drops it with null (D83). Place it in reading order before the content it qualifies, such as above the form it is about.",
   },
+  Skeleton: {
+    keyboard: [],
+    notes:
+      "Not a live region: it renders no role and no aria-live, and it is always aria-hidden=\"true\", so assistive tech skips it entirely. Put aria-busy=\"true\" on the region the skeleton stands for (a table body, a card, a list) and remove it when the content arrives; that, not the skeleton, is what tells a screen reader the content is loading. Not focusable. The pulse is an opacity animation that stops under prefers-reduced-motion: reduce, because zeroing the duration of an infinite alternating animation flickers instead of stopping (D86).",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },

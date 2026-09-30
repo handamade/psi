@@ -39,6 +39,7 @@ const COMPONENTS = [
   "Announcement",
   "Banner",
   "InlineAlert",
+  "Skeleton",
   "Tabs",
   "TabList",
   "Tab",

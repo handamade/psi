@@ -112,7 +112,7 @@ describe("the manifest describes children (D72)", () => {
   // react-docgen-typescript reports `children` only when the declaration
   // carries a JSDoc comment — not because of propFilter, extends, or the type
   // spelling, all of which D70 wrongly blamed and D72 disproved with a probe.
-  const TAKES_NO_CHILDREN = ["Input", "Pagination", "MenuSeparator"];
+  const TAKES_NO_CHILDREN = ["Input", "Pagination", "MenuSeparator", "Skeleton"];
 
   it("lists children for every component that accepts it", () => {
     const missing = manifest.components
@@ -122,7 +122,7 @@ describe("the manifest describes children (D72)", () => {
     expect(missing).toEqual([]);
   });
 
-  it("omits children from the three that take none", () => {
+  it("omits children from the ones that take none", () => {
     // Publishing a prop that does not apply is worse than omitting one that
     // does — an agent cross-checking the manifest would pass children to an
     // <input>.

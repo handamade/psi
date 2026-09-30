@@ -1,0 +1,50 @@
+/* packages/react/src/Skeleton/skeleton.module.css */
+/* The stylelint plugin derives the allowed namespace from the filename, so
+   every custom property here must be --psi-skeleton-* or one of the global
+   scale prefixes. Every colour goes through packages/tokens/src/components/
+   skeleton.ts, never a literal here. */
+
+@keyframes skeleton-pulse {
+  from { opacity: 1; }
+  to { opacity: 0.45; }
+}
+
+.skeleton {
+  width: 100%;
+  box-sizing: border-box;
+  animation: skeleton-pulse var(--psi-duration-600) var(--psi-ease-in-out) infinite alternate;
+}
+
+.skeleton[data-variant="block"] {
+  border-radius: var(--psi-skeleton-radius);
+  background: var(--psi-skeleton-bg);
+}
+
+.skeleton[data-size="24"] { height: var(--psi-size-24); }
+.skeleton[data-size="32"] { height: var(--psi-size-32); }
+.skeleton[data-size="40"] { height: var(--psi-size-40); }
+.skeleton[data-size="48"] { height: var(--psi-size-48); }
+
+.line {
+  display: block;
+  /* 12px tall: the space scale is scoped to gap, padding and margin (D46), so
+     an empty line takes its height from padding, which the background paints. */
+  padding-block: var(--psi-space-6);
+  margin-block: var(--psi-space-4);
+  border-radius: var(--psi-skeleton-radius);
+  background: var(--psi-skeleton-bg);
+}
+
+/* With several lines the last one is short, the way a paragraph ends. */
+.line:last-child:not(:first-child) {
+  width: 60%;
+}
+
+/* D30 zeroes durations under reduced motion, which is not enough here: an
+   infinite alternating animation with a zeroed period flickers instead of
+   stopping. The animation itself has to go. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

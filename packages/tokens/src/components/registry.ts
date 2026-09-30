@@ -3,6 +3,7 @@
 import { bannerVars } from "./banner.js";
 import { inlineAlertVars } from "./inline-alert.js";
 import { buttonVars } from "./button.js";
+import { skeletonVars } from "./skeleton.js";
 import { inputVars } from "./input.js";
 import { selectVars } from "./select.js";
 import { surfaceVars } from "./surface.js";
@@ -39,6 +40,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   navbar: navbarVars,
   panel: panelVars,
   select: selectVars,
+  skeleton: skeletonVars,
   surface: surfaceVars,
   switch: switchVars,
   table: tableVars,
