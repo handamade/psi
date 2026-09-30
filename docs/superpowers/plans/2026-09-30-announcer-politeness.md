@@ -188,7 +188,7 @@ describe("rest props (D83)", () => {
     const { container } = render(<ToastRegion {...hostile}>{null}</ToastRegion>);
     expect(container.firstChild).toHaveAttribute("popover", "manual");
     expect(container.firstChild).toHaveAttribute("data-placement", "bottom-end");
-    expect(container.firstChild).toHaveAttribute("data-psi-toast-region", "");
+    expect(container.firstChild).toHaveAttribute("data-psi-toast-region", "true");
   });
 });
 ```
@@ -293,7 +293,6 @@ Destructure `...rest` and spread it as the **first** attribute of the root `<div
   "match": ["announcer", "live region", "screen reader announcement", "aria-live", "status message", "announce without a toast", "polite and assertive"],
   "compose": {
     "component": "ToastRegion",
-    "props": { "aria-label": "{content:region-label}" },
     "slots": {
       "body": [
         {
@@ -315,7 +314,6 @@ Destructure `...rest` and spread it as the **first** attribute of the root `<div
     }
   ],
   "content": {
-    "region-label": "Notifications",
     "outcome": "[the outcome of the action the user just took]",
     "state-change": "[a change to the object on screen, spoken and not shown]",
     "field-errors": "[how many fields need attention, spoken after a failed submission]"
