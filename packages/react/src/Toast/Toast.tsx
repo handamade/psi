@@ -1,15 +1,12 @@
 import type { ReactNode, Ref } from "react";
 import { IconButton } from "../IconButton/IconButton.js";
-import {
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconCheck,
-  IconClose,
-  IconInfo,
-} from "../icons/index.js";
+import { IconClose } from "../icons/index.js";
+import { resolveStatusPrefix, statusIcons } from "./status.js";
+import type { StatusVariant } from "./status.js";
 import styles from "./toast.module.css";
 
-export type ToastVariant = "neutral" | "success" | "warning" | "danger";
+/** Toast's variants are the shared status axis (see status.ts). */
+export type ToastVariant = StatusVariant;
 
 /** Which of ToastRegion's two live wrappers speaks a child (D83). */
 export type ToastPoliteness = "polite" | "assertive";
@@ -37,22 +34,6 @@ export interface ToastProps {
   /** Forwarded ref to the underlying `<div>`. */
   ref?: Ref<HTMLDivElement>;
 }
-
-const icons: Record<ToastVariant, typeof IconInfo> = {
-  neutral: IconInfo,
-  success: IconCheck,
-  warning: IconAlertTriangle,
-  danger: IconAlertCircle,
-};
-
-/** Visually hidden status word, so the variant's meaning never rests on colour
- * and shape alone. `neutral` carries no status, so it gets no prefix. */
-const statusPrefix: Record<ToastVariant, string | null> = {
-  neutral: null,
-  success: "Success:",
-  warning: "Warning:",
-  danger: "Error:",
-};
 
 const variantIconClass: Record<ToastVariant, string> = {
   neutral: styles.iconNeutral,
@@ -82,10 +63,10 @@ export function Toast({
   className,
   ref,
 }: ToastProps) {
-  const Icon = icons[variant];
+  const Icon = statusIcons[variant];
   // `politeness` is deliberately not read here: ToastRegion reads it off the
   // element to pick a wrapper, the same way it reads `variant`.
-  const prefix = statusLabel === undefined ? statusPrefix[variant] : statusLabel;
+  const prefix = resolveStatusPrefix(variant, statusLabel);
   const cls = [styles.toast, className].filter(Boolean).join(" ");
 
   return (

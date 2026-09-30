@@ -149,6 +149,15 @@ export const wcagAAPairs: ContrastPair[] = [
   // body text, it does not recolor it to the accent.
   { fg: "fgPrimary", bg: "fillTintAccent", minRatio: 4.5 },
 
+  // Body text on the status tints (D86): Banner and InlineAlert set their
+  // title and body in fgPrimary on fill-tint-{success,warning,danger}. The
+  // tints are 12–15% of the status foreground over the canvas, so every
+  // shipped theme clears this by a wide margin; it is gated because a
+  // consumer theme built with psi-theme (D81) is held to the same matrix.
+  { fg: "fgPrimary", bg: "fillTintSuccess", minRatio: 4.5 },
+  { fg: "fgPrimary", bg: "fillTintWarning", minRatio: 4.5 },
+  { fg: "fgPrimary", bg: "fillTintDanger", minRatio: 4.5 },
+
   // Toast's status icon on the elevated surface (D64/D65). The three pairs
   // above gate these foregrounds on bgPrimary; --psi-surface-bg — what Toast,
   // Menu and Dialog all alias — resolves to bgSecondary, which was ungated for

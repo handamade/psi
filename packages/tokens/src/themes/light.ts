@@ -21,8 +21,10 @@ export const lightTheme: ThemeDef = {
   fgAccent: token({ from: slot.accent, l: set(0.48), c: cap(0.23), scopes: ["text"] }),
   // D39: status-fg caps lowered to each hue's in-gamut max at l 0.48 — the
   // values these tokens were already clamping to, so rendered hex is unchanged.
-  fgSuccess: token({ from: slot.success, l: set(0.48), c: cap(0.1187), scopes: ["text"] }),
-  fgWarning: token({ from: slot.warning, l: set(0.48), c: cap(0.1013), scopes: ["text"] }),
+  // text + border on all three status foregrounds: fgDanger for Input's error
+  // border (D46), fgSuccess and fgWarning for InlineAlert's (D86).
+  fgSuccess: token({ from: slot.success, l: set(0.48), c: cap(0.1187), scopes: ["text", "border"] }),
+  fgWarning: token({ from: slot.warning, l: set(0.48), c: cap(0.1013), scopes: ["text", "border"] }),
   fgDanger: token({ from: slot.danger, l: set(0.48), c: cap(0.1946), scopes: ["text", "border"] }),
 
   fillNeutral1: token({ from: slot.canvas, l: delta(+0.016), c: delta(-0.001), scopes: ["surface"] }),

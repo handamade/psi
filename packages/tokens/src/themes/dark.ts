@@ -22,8 +22,8 @@ export const darkTheme: ThemeDef = {
   // tokens were already clamping to, so rendered hex is unchanged. fgSuccess
   // keeps the loose cap: emerald at l 0.75 is already in-gamut.
   fgAccent: token({ from: slot.accent, l: set(0.75), c: cap(0.1286), scopes: ["text"] }),
-  fgSuccess: token({ from: slot.success, l: set(0.75), c: cap(0.23), scopes: ["text"] }),
-  fgWarning: token({ from: slot.warning, l: set(0.75), c: cap(0.1582), scopes: ["text"] }),
+  fgSuccess: token({ from: slot.success, l: set(0.75), c: cap(0.23), scopes: ["text", "border"] }),
+  fgWarning: token({ from: slot.warning, l: set(0.75), c: cap(0.1582), scopes: ["text", "border"] }),
   fgDanger: token({ from: slot.danger, l: set(0.75), c: cap(0.1505), scopes: ["text", "border"] }),
 
   fillNeutral1: token({ from: slot.ink, l: set(0.18), c: set(0.012), scopes: ["surface"] }),
