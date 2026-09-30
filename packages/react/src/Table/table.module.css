@@ -40,8 +40,8 @@
 }
 
 .sortButton:focus-visible {
-  outline: 2px solid var(--psi-table-focus-ring);
-  outline-offset: 2px;
+  outline: var(--psi-focus-ring-width) solid var(--psi-table-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset);
 }
 
 .sortIndicator {

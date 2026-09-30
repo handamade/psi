@@ -55,9 +55,11 @@
   background: var(--psi-tabs-bg-hover);
 }
 
+/* Inset (D82): tabs sit 4px apart on the list's rule, so an outside ring
+   would touch the neighbouring tab and cross the rule and the indicator. */
 .tab:focus-visible {
-  outline: 2px solid var(--psi-tabs-focus-ring);
-  outline-offset: -2px;
+  outline: var(--psi-focus-ring-width) solid var(--psi-tabs-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
 }
 
 .tab[aria-disabled="true"] {
@@ -98,7 +100,9 @@
   min-width: 0;
 }
 
+/* Outside, unlike the tab (D82): a panel has no padding of its own, so an
+   inset ring would be drawn over the first pixels of its content. */
 .panel:focus-visible {
-  outline: 2px solid var(--psi-tabs-focus-ring);
-  outline-offset: 2px;
+  outline: var(--psi-focus-ring-width) solid var(--psi-tabs-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset);
 }

@@ -17,13 +17,14 @@
   color: var(--psi-input-placeholder);
 }
 
-.input:hover:not(:disabled):not(:focus) {
+.input:hover:not(:disabled):not(:focus-visible) {
   border-color: var(--psi-input-border-hover);
 }
 
-.input:focus {
-  outline: 2px solid var(--psi-input-focus-ring);
-  outline-offset: -1px;
+/* Inset (D82): the ring replaces the border, inside the control's own box. */
+.input:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-input-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
   border-color: transparent;
 }
 
@@ -64,6 +65,6 @@
   border-color: var(--psi-input-border-error);
 }
 
-.error:hover:not(:disabled):not(:focus) {
+.error:hover:not(:disabled):not(:focus-visible) {
   border-color: var(--psi-input-border-error);
 }
