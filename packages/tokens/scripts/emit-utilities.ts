@@ -4,6 +4,7 @@ import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, comboFontVar, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
 import { durationScale, easings } from "../src/scales/motion.js";
 import { breakpoints, container, zIndex } from "../src/scales/layout.js";
+import { focusRing } from "../src/scales/focus-ring.js";
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -66,6 +67,11 @@ export function emitScaleVarsCSS(): string {
   lines.push(`    --psi-container-max: ${pxToRem(container.max)};`);
   lines.push(`    --psi-gutter: ${pxToRem(container.gutter)};`);
   for (const [name, z] of Object.entries(zIndex)) lines.push(`    --psi-z-${name}: ${z};`);
+
+  // Focus ring (D82) — px literals; see scales/focus-ring.ts.
+  lines.push(`    --psi-focus-ring-width: ${focusRing.width}px;`);
+  lines.push(`    --psi-focus-ring-offset: ${focusRing.offset}px;`);
+  lines.push(`    --psi-focus-ring-offset-inset: ${focusRing.offsetInset}px;`);
 
   lines.push("");
 

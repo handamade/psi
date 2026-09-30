@@ -103,6 +103,7 @@ describe("scope validation (D46)", () => {
   it("rejects semantic token names that shadow a scale-family prefix", () => {
     expect(() => validateNoScalePrefixShadow(["space-hero"])).toThrow(ValidationError);
     expect(() => validateNoScalePrefixShadow(["z-banner"])).toThrow(ValidationError);
+    expect(() => validateNoScalePrefixShadow(["focus-ring-accent"])).toThrow(ValidationError);
     expect(() => validateNoScalePrefixShadow(["fg-primary", "spacing-x", "texture-1"])).not.toThrow();
   });
 });

@@ -32,6 +32,15 @@ describe("emitDTCG", () => {
     expect(parsed.color.bg.primary.$value).toMatch(/^#[0-9a-f]{6}([0-9a-f]{2})?$/i);
   });
 
+  it("exports the focus ring as px dimensions (D82)", () => {
+    const parsed = JSON.parse(emitDTCG("light", resolve(lightTheme, defaultPalette, defaultSlots)));
+    expect(parsed.dimension.focusRing).toEqual({
+      width: { $type: "dimension", $value: "2px" },
+      offset: { $type: "dimension", $value: "2px" },
+      offsetInset: { $type: "dimension", $value: "-2px" },
+    });
+  });
+
   it("has dimension tokens with correct structure", () => {
     const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
     const json = emitDTCG("light", resolved);

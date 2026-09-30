@@ -21,7 +21,7 @@ export const guidance = {
     "Field is for a control with a *visible* label. A toolbar filter control named by aria-label or placeholder takes neither a Field nor a hand-rolled label row — compare filter-toolbar (no labels) with table-pagination (\"Rows per page\" visible, so Field).",
     "Use Dialog for blocking modal flows — title/footer slots, dismissible gate; danger stays on the footer Buttons, one accent per group.",
   ],
-  states: { hover: "L - 0.04", active: "L - 0.08", disabled: "element opacity 0.4 (keeps hue)", focus: "2px ring var(--psi-{component}-focus-ring)" },
+  states: { hover: "L - 0.04", active: "L - 0.08", disabled: "element opacity 0.4 (keeps hue)", focus: "outline: var(--psi-focus-ring-width) solid var(--psi-{component}-focus-ring) on :focus-visible, at --psi-focus-ring-offset (outside) or --psi-focus-ring-offset-inset (inside) — D82" },
   typographyDefaults: { body: "16-24-regular", compactUI: "14-20-regular", heading: "24-32-medium", caption: "12-16-regular" },
   fonts: {
     roles: ["sans", "serif", "mono", "display"],

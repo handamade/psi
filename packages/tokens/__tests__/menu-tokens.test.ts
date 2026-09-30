@@ -16,6 +16,7 @@ describe("menu tokens", () => {
       "item-fg-danger": "var(--psi-fg-danger)",
       "item-fg-disabled": "var(--psi-fg-quaternary)",
       "separator-border": "var(--psi-border-faint)",
+      "focus-ring": "var(--psi-border-focus)",
     });
   });
 

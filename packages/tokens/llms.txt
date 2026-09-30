@@ -26,6 +26,11 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - --psi-z-sticky (1), --psi-z-nav (100), --psi-z-overlay (1000), --psi-z-tooltip (1100). sticky is for elements that stack within their own local scroll container (e.g. a sticky table header), not above page chrome.
 - Breakpoints (sm 560 / md 960) are build-time constants (D31), not CSS vars: `import { breakpoints } from "@handamade/psi-tokens/types"` for any @media-driven JS/CSS-in-JS.
 
+## Focus ring (--psi-focus-ring-*)
+- One ring for every focusable part (D82): `outline: var(--psi-focus-ring-width) solid <colour>` on `:focus-visible`, never on `:focus`, never a literal width or offset.
+- --psi-focus-ring-width (2px). --psi-focus-ring-offset (2px) draws the ring outside the control. --psi-focus-ring-offset-inset (-2px) draws it inside, for a control whose outside ring would be clipped or would land on a neighbour: a text field, a tab, a menu item, a row in a list, a panel against the viewport edge.
+- The colour is the component's own --psi-{component}-focus-ring in component CSS, and --psi-border-focus in app CSS. The three geometry tokens are independent px values, so an override on any sub-tree takes effect there; the inset offset is not derived from the width, so override both together.
+
 ## Typography: display, serif, mono
 - Fluid display tier: --psi-display-{min}-{max}-{weight} (e.g. --psi-display-56-128-black), clamp-based and pixel-true at both endpoints; pair with the matching .psi-display-* utility class for tracking/uppercase.
 - Serif and mono are first-class combo roles alongside sans: --psi-text-serif-{size}-{lh}-{weight} and --psi-text-mono-{size}-{lh}-{weight}, same naming shape as the sans scale.

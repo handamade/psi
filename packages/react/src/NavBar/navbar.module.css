@@ -44,7 +44,7 @@
 
 .links a:focus-visible,
 .brand a:focus-visible {
-  outline: 2px solid var(--psi-navbar-focus-ring);
-  outline-offset: 2px;
+  outline: var(--psi-focus-ring-width) solid var(--psi-navbar-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset);
 }
 .actions { display: flex; align-items: center; gap: var(--psi-space-8); }

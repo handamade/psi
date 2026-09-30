@@ -56,6 +56,14 @@
   background: var(--psi-menu-item-bg-active);
 }
 
+/* Inset (D82): items stack with no gap inside a 4px-padded popover, so an
+   outside ring would land on the neighbouring item and on the menu's border.
+   Until this rule the browser's own ring showed, in every open-Menu story. */
+.item:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-menu-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
 .item[data-variant="danger"] {
   color: var(--psi-menu-item-fg-danger);
 }

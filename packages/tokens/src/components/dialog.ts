@@ -10,4 +10,7 @@ export const dialogVars: Record<string, string> = {
   backdrop: "var(--psi-scrim-heavy)",
   fg: "var(--psi-fg-primary)",
   "title-fg": "var(--psi-fg-primary)",
+  // D82 — the ring on the <dialog> and on a drawer's scrolling panel, which
+  // are tab stops themselves; the controls inside carry their own.
+  "focus-ring": "var(--psi-border-focus)",
 };

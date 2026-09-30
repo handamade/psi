@@ -11,6 +11,7 @@ describe("dialog tokens", () => {
       backdrop: "var(--psi-scrim-heavy)",
       fg: "var(--psi-fg-primary)",
       "title-fg": "var(--psi-fg-primary)",
+      "focus-ring": "var(--psi-border-focus)",
     });
   });
 

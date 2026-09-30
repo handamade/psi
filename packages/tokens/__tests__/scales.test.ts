@@ -5,6 +5,7 @@ import { radiusScale } from "../src/scales/radius.js";
 import { breakpoints, container, zIndex } from "../src/scales/layout.js";
 import { comboName, WEIGHT_VALUES, typographyCombos } from "../src/scales/typography.js";
 import { durationScale, easings } from "../src/scales/motion.js";
+import { focusRing } from "../src/scales/focus-ring.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
 
 describe("scales", () => {
@@ -82,6 +83,19 @@ describe("scales", () => {
       expect(css).toContain(".psi-container { max-width: var(--psi-container-max); margin-inline: auto; padding-inline: var(--psi-gutter); }");
       expect(css).toContain("@media (max-width: 960px)");
       expect(css).toContain("--psi-gutter: 1.5rem;");
+    });
+  });
+
+  describe("focus ring (D82)", () => {
+    it("is 2px wide, 2px outside or 2px inside", () => {
+      expect(focusRing).toEqual({ width: 2, offset: 2, offsetInset: -2 });
+    });
+
+    it("emits px custom properties, not rem", () => {
+      const css = emitScaleVarsCSS();
+      expect(css).toContain("--psi-focus-ring-width: 2px;");
+      expect(css).toContain("--psi-focus-ring-offset: 2px;");
+      expect(css).toContain("--psi-focus-ring-offset-inset: -2px;");
     });
   });
 
