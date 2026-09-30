@@ -1,17 +1,19 @@
 import { Children, isValidElement, useEffect, useRef } from "react";
-import type { ReactNode, Ref } from "react";
+import type { HTMLAttributes, ReactNode, Ref } from "react";
+import { Announcement } from "./Announcement.js";
 import { Toast } from "./Toast.js";
-import type { ToastVariant } from "./Toast.js";
+import type { ToastPoliteness, ToastVariant } from "./Toast.js";
 import styles from "./toast.module.css";
 
 export type ToastPlacement = "top-start" | "top-end" | "bottom-start" | "bottom-end";
 
-export interface ToastRegionProps {
+export interface ToastRegionProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   /** Corner the stack occupies. @default "bottom-end" */
   placement?: ToastPlacement;
   /** Accessible name for the region. @default "Notifications" */
   "aria-label"?: string;
-  /** The toast stack — `Toast` elements, routed to a live wrapper by variant. */
+  /** The stack — `Toast` and `Announcement` elements, each routed to a live
+   * wrapper by its `politeness`, or by a Toast's variant when it names none. */
   children: ReactNode;
   className?: string;
   /** Forwarded ref to the region element. */
@@ -20,13 +22,19 @@ export interface ToastRegionProps {
 
 const ASSERTIVE: ReadonlySet<ToastVariant> = new Set<ToastVariant>(["warning", "danger"]);
 
-/** True when this child is a Toast whose variant interrupts. Anything that is
- * not a Toast element falls through to polite — the region must not throw on
- * unexpected children. */
+/** True when this child belongs in the assertive wrapper. A Toast or an
+ * Announcement that names its `politeness` decides for itself (D83); a Toast
+ * that does not falls back to its variant (D64). Anything else is polite —
+ * the region must not throw on unexpected children. */
 function isAssertive(child: ReactNode): boolean {
-  if (!isValidElement(child) || child.type !== Toast) return false;
-  const { variant } = child.props as { variant?: ToastVariant };
-  return ASSERTIVE.has(variant ?? "neutral");
+  if (!isValidElement(child)) return false;
+  if (child.type !== Toast && child.type !== Announcement) return false;
+  const { politeness, variant } = child.props as {
+    politeness?: ToastPoliteness;
+    variant?: ToastVariant;
+  };
+  if (politeness !== undefined) return politeness === "assertive";
+  return child.type === Toast && ASSERTIVE.has(variant ?? "neutral");
 }
 
 /** The positioned live region that holds the toast stack (D64).
@@ -45,8 +53,10 @@ function isAssertive(child: ReactNode): boolean {
  *    confirmation for the action a user just took inside a dialog. And `auto`
  *    would be dismissed by the very click that raised the toast.
  *
- * Routing reads `variant` off each child, the same Children.map technique
- * Table uses for select-all injection.
+ * Routing reads `politeness`, then `variant`, off each child — the same
+ * Children.map technique Table uses for select-all injection. `politeness`
+ * wins (D83): the owner of an announcement knows what kind of event it is,
+ * and tone is only the default.
  *
  * Consequence of the split, visible in the `InRegion` VR baseline: the stack is
  * grouped by politeness, not strictly chronological — every assertive toast
@@ -55,13 +65,20 @@ function isAssertive(child: ReactNode): boolean {
  * live region with a politeness that changes per message, which is the thing
  * the two wrappers exist to avoid. Accepted: at `limit` 3 the grouping reads as
  * severity ordering, and the newest toast still lands nearest the screen edge
- * within its group. */
+ * within its group.
+ *
+ * Remaining HTML attributes, `data-*` included, are spread onto the root
+ * element (D83). That is how an application marks the region
+ * `data-react-aria-top-layer`, so that a React Aria overlay — which hides
+ * everything outside itself with `aria-hidden` — leaves the two live regions
+ * exposed. The region's own attributes always win. */
 export function ToastRegion({
   placement = "bottom-end",
   "aria-label": ariaLabel = "Notifications",
   children,
   className,
   ref,
+  ...rest
 }: ToastRegionProps) {
   const innerRef = useRef<HTMLDivElement | null>(null);
 
@@ -99,6 +116,8 @@ export function ToastRegion({
 
   return (
     <div
+      // Spread first, so nothing passed in can displace the attributes below.
+      {...rest}
       ref={setRef}
       popover="manual"
       aria-label={ariaLabel}

@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
-import type { ToastVariant } from "./Toast.js";
+import type { ToastPoliteness, ToastVariant } from "./Toast.js";
 
 export interface ToastOptions {
   /** @default "neutral" */
@@ -10,6 +10,11 @@ export interface ToastOptions {
   /** Trailing affordance — a ghost Button. Its presence also selects the
    * longer auto-dismiss (`actionDuration`). */
   action?: ReactNode;
+  /** Which live wrapper speaks the toast (D83). Unset, the variant decides. */
+  politeness?: ToastPoliteness;
+  /** The visually hidden status word (D83): a string replaces the default,
+   * `null` drops it, unset keeps it. */
+  statusLabel?: string | null;
 }
 
 export interface ToastHandle {

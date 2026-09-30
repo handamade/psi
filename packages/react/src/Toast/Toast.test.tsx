@@ -91,4 +91,33 @@ describe("Toast", () => {
     const prefix = screen.getByText("Success:");
     expect(prefix.className).toContain("psi-sr-only");
   });
+
+  describe("statusLabel (D83)", () => {
+    it("replaces the status word", () => {
+      render(<Toast variant="danger" statusLabel="Fehler:">Nicht gespeichert</Toast>);
+      expect(screen.getByText("Fehler:").className).toContain("psi-sr-only");
+      expect(screen.queryByText("Error:")).toBeNull();
+    });
+
+    it("null drops the status word", () => {
+      const { container } = render(<Toast variant="danger" statusLabel={null}>Not saved</Toast>);
+      expect(screen.queryByText("Error:")).toBeNull();
+      expect(container.querySelector(".psi-sr-only")).toBeNull();
+    });
+
+    it("gives a neutral toast a word when one is passed", () => {
+      render(<Toast statusLabel="Note:">Export queued</Toast>);
+      expect(screen.getByText("Note:")).toBeInTheDocument();
+    });
+  });
+
+  describe("politeness (D83)", () => {
+    it("is read by ToastRegion and renders nothing on the toast itself", () => {
+      const { container } = render(<Toast variant="success" politeness="assertive">Accepted</Toast>);
+      const el = container.firstChild as HTMLElement;
+      expect(el).not.toHaveAttribute("politeness");
+      expect(el).not.toHaveAttribute("role");
+      expect(el).not.toHaveAttribute("aria-live");
+    });
+  });
 });

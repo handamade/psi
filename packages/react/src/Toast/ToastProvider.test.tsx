@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act, fireEvent } from "@testing-library/react";
+import { render, screen, act, fireEvent, within } from "@testing-library/react";
 import { ToastProvider } from "./ToastProvider.js";
 import { useToast } from "./useToast.js";
+import type { ToastOptions } from "./useToast.js";
 
 /** Renders a button per action so tests drive the hook the way an app does. */
 function Harness() {
@@ -247,5 +248,51 @@ describe("ToastProvider", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Harness />)).toThrow(/ToastProvider/);
     spy.mockRestore();
+  });
+
+  describe("politeness and statusLabel through show() (D83)", () => {
+    function Raise({ options }: { options: ToastOptions }) {
+      const toast = useToast();
+      return (
+        <button type="button" onClick={() => toast.show(options)}>
+          raise
+        </button>
+      );
+    }
+    const raise = (options: ToastOptions) => {
+      render(
+        <ToastProvider>
+          <Raise options={options} />
+        </ToastProvider>,
+      );
+      click("raise");
+    };
+
+    it("routes a success toast to the alert wrapper when asked", () => {
+      raise({ variant: "success", message: "Accepted", politeness: "assertive" });
+      expect(within(screen.getByRole("alert", { hidden: true })).getByText("Accepted")).toBeInTheDocument();
+      expect(screen.getByRole("status", { hidden: true })).toBeEmptyDOMElement();
+    });
+
+    it("keeps routing by variant when politeness is not given", () => {
+      raise({ variant: "success", message: "Saved" });
+      expect(within(screen.getByRole("status", { hidden: true })).getByText("Saved")).toBeInTheDocument();
+    });
+
+    it("replaces the status word", () => {
+      raise({ variant: "danger", message: "Nicht gespeichert", statusLabel: "Fehler:" });
+      expect(screen.getByText("Fehler:")).toBeInTheDocument();
+      expect(screen.queryByText("Error:")).toBeNull();
+    });
+
+    it("drops the status word on null", () => {
+      raise({ variant: "danger", message: "first", statusLabel: null });
+      expect(screen.queryByText("Error:")).toBeNull();
+    });
+
+    it("keeps the default status word when statusLabel is not given", () => {
+      raise({ variant: "danger", message: "second" });
+      expect(screen.getByText("Error:")).toBeInTheDocument();
+    });
   });
 });

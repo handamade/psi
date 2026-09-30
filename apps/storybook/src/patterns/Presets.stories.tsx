@@ -28,6 +28,10 @@ export const ActionFeedback: Story = {
   render: preset("action-feedback"),
 };
 
+export const Announcer: Story = {
+  render: preset("announcer"),
+};
+
 export const BulkActionBar: Story = {
   render: preset("bulk-action-bar"),
 };

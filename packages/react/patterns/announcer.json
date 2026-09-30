@@ -1,0 +1,41 @@
+{
+  "id": "announcer",
+  "intent": "One announcer for a whole application: a single ToastRegion holding visible toasts and speech-only Announcements, each routed by politeness rather than by tone. For an application that owns exactly two live regions and lets nothing else write one. For a single confirmation toast, use action-feedback.",
+  "match": ["announcer", "live region", "screen reader announcement", "aria-live", "status message", "announce without a toast", "polite and assertive"],
+  "compose": {
+    "component": "ToastRegion",
+    "slots": {
+      "body": [
+        {
+          "component": "Toast",
+          "props": { "variant": "success", "politeness": "{param:outcome-politeness}" },
+          "slots": { "body": ["{content:outcome}"] }
+        },
+        {
+          "component": "Announcement",
+          "props": { "politeness": "polite" },
+          "slots": { "body": ["{content:state-change}"] }
+        },
+        {
+          "component": "Announcement",
+          "props": { "politeness": "assertive" },
+          "slots": { "body": ["{content:field-errors}"] }
+        }
+      ]
+    }
+  },
+  "parameters": [
+    {
+      "key": "outcome-politeness",
+      "ask": "Should the outcome of the user's own action interrupt, success included?",
+      "options": ["assertive", "polite"],
+      "default": "assertive"
+    }
+  ],
+  "content": {
+    "outcome": "[the outcome of the action the user just took]",
+    "state-change": "[a change to the object on screen, spoken and not shown]",
+    "field-errors": "[how many fields need attention, spoken after a failed submission]"
+  },
+  "gaps": []
+}
