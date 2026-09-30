@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Toast } from "./Toast.js";
-import type { ToastVariant } from "./Toast.js";
+import type { ToastPoliteness, ToastVariant } from "./Toast.js";
 import { ToastRegion } from "./ToastRegion.js";
 import type { ToastPlacement } from "./ToastRegion.js";
 import { ToastContext } from "./useToast.js";
@@ -26,6 +26,9 @@ interface QueuedToast {
   variant: ToastVariant;
   message: ReactNode;
   action?: ReactNode;
+  politeness?: ToastPoliteness;
+  /** Left undefined when show() did not pass one, so Toast keeps its default. */
+  statusLabel?: string | null;
   /** Total lifetime for this toast, chosen at show() time. */
   duration: number;
 }
@@ -89,12 +92,15 @@ export function ToastProvider({
   );
 
   const show = useCallback(
-    ({ variant = "neutral", message, action }: ToastOptions): string => {
+    ({ variant = "neutral", message, action, politeness, statusLabel }: ToastOptions): string => {
       const id = `${idPrefix}-${seq.current++}`;
       const lifetime = action != null ? actionDuration : duration;
 
       setToasts((prev) => {
-        const next = [...prev, { id, variant, message, action, duration: lifetime }];
+        const next = [
+          ...prev,
+          { id, variant, message, action, politeness, statusLabel, duration: lifetime },
+        ];
         // Evict oldest-first past the limit, disposing their timers as we go.
         while (next.length > limit) {
           const evicted = next.shift()!;
@@ -174,7 +180,14 @@ export function ToastProvider({
       >
         <ToastRegion placement={placement}>
           {toasts.map((t) => (
-            <Toast key={t.id} variant={t.variant} action={t.action} onDismiss={() => remove(t.id)}>
+            <Toast
+              key={t.id}
+              variant={t.variant}
+              action={t.action}
+              politeness={t.politeness}
+              statusLabel={t.statusLabel}
+              onDismiss={() => remove(t.id)}
+            >
               {t.message}
             </Toast>
           ))}
