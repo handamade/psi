@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const ruleName = "psi/component-tokens-only";
-const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|z)-/;
+const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|z|focus-ring)-/;
 // componentName derived from filename: button.module.css → button; icon-button → button (declared alias)
 const ALIASES = { "icon-button": "button" };
 
@@ -75,7 +75,34 @@ const scopeRule = (enabled) => (root, result) => {
 scopeRule.ruleName = scopeRuleName;
 scopeRule.messages = stylelint.utils.ruleMessages(scopeRuleName, {});
 
+const focusRuleName = "psi/focus-ring";
+const OUTLINE_GEOMETRY = new Set(["outline", "outline-width", "outline-offset"]);
+
+/** D82 — one focus ring. In a component CSS Module, outline geometry comes
+ * from the focus-ring scale and the ring is keyed on :focus-visible. A
+ * literal is how eleven copies of the ring came to use three offsets. */
+const focusRule = (enabled) => (root, result) => {
+  if (!enabled) return;
+  if (!/\.module\.css$/.test(root.source?.input.file ?? "")) return;
+  const report = (node, message) =>
+    stylelint.utils.report({ ruleName: focusRuleName, result, node, message: `${message} (psi/focus-ring)` });
+  root.walkDecls(/^outline(-|$)/, (decl) => {
+    const selectors = decl.parent?.type === "rule" ? decl.parent.selectors : [];
+    if (!selectors.length || !selectors.every((s) => s.includes(":focus-visible"))) {
+      report(decl, `"${decl.prop}" outside :focus-visible — the focus ring is keyed on :focus-visible in every selector`);
+    }
+    if (/^(none|hidden)\b/.test(decl.value.trim())) {
+      report(decl, `"${decl.prop}: ${decl.value}" removes the focus ring`);
+    } else if (OUTLINE_GEOMETRY.has(decl.prop) && /\d/.test(decl.value.replace(/var\([^()]*\)/g, ""))) {
+      report(decl, `literal in "${decl.prop}" — bind var(--psi-focus-ring-width) and var(--psi-focus-ring-offset) or var(--psi-focus-ring-offset-inset)`);
+    }
+  });
+};
+focusRule.ruleName = focusRuleName;
+focusRule.messages = stylelint.utils.ruleMessages(focusRuleName, {});
+
 export default [
   stylelint.createPlugin(ruleName, rule),
   stylelint.createPlugin(scopeRuleName, scopeRule),
+  stylelint.createPlugin(focusRuleName, focusRule),
 ];
