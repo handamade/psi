@@ -17,6 +17,13 @@
   color: var(--psi-field-marker-fg);
 }
 
+/* The required word (D84): the label's colour at regular weight, so it reads
+   as part of the label rather than as an error. */
+.requiredText {
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-field-required-text-fg);
+}
+
 .message {
   margin: 0;
   font: var(--psi-text-12-16-regular);

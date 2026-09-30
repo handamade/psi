@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { Field } from "./Field.js";
 import { Input } from "../Input/Input.js";
 import { Select } from "../Select/Select.js";
@@ -172,5 +172,29 @@ describe("FieldContext wiring", () => {
       </Field>,
     );
     expect(screen.getByLabelText("Nick")).not.toHaveAttribute("aria-invalid");
+  });
+
+  describe("requiredText (D84)", () => {
+    it("shows the word instead of the asterisk, hidden from assistive tech", () => {
+      const { container } = render(
+        <Field label="Name" required requiredText="(Required)">
+          <Input />
+        </Field>,
+      );
+      const label = container.querySelector("label")!;
+      expect(label).toHaveTextContent("Name (Required)");
+      expect(label).not.toHaveTextContent("*");
+      expect(within(label).getByText("(Required)")).toHaveAttribute("aria-hidden", "true");
+      expect(container.querySelector("input")).toBeRequired();
+    });
+
+    it("renders nothing when the field is not required", () => {
+      const { container } = render(
+        <Field label="Name" requiredText="(Required)">
+          <Input />
+        </Field>,
+      );
+      expect(container.querySelector("label")).toHaveTextContent(/^Name$/);
+    });
   });
 });

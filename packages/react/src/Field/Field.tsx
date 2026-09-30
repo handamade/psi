@@ -28,6 +28,12 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
   error?: ReactNode;
   /** Renders the required marker and flows `required` to the control. @default false */
   required?: boolean;
+  /** With `required`, the label shows this text — "(Required)", say — instead
+   * of the asterisk, so the requirement is stated in words and not by a glyph
+   * alone (D84). Visible and aria-hidden: the control carries the programmatic
+   * signal (`required` / `aria-required`), and a screen reader that heard both
+   * would say it twice. Without `required` it renders nothing. */
+  requiredText?: string;
   /** Group mode: fieldset/legend wrapping several self-labeled controls
    * (Checkbox/Switch); the message describes the whole group. @default false */
   group?: boolean;
@@ -50,6 +56,7 @@ export function Field({
   description,
   error,
   required = false,
+  requiredText,
   group = false,
   htmlFor,
   announce = true,
@@ -70,11 +77,17 @@ export function Field({
     label != null ? (
       <>
         {label}
-        {required && (
-          <span aria-hidden="true" className={styles.marker}>
-            {" *"}
-          </span>
-        )}
+        {required &&
+          (requiredText !== undefined ? (
+            <span aria-hidden="true" className={styles.requiredText}>
+              {" "}
+              {requiredText}
+            </span>
+          ) : (
+            <span aria-hidden="true" className={styles.marker}>
+              {" *"}
+            </span>
+          ))}
       </>
     ) : null;
 

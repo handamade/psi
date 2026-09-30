@@ -3,12 +3,13 @@ import { fieldVars } from "../src/components/field.js";
 import { emitComponentVarsCSS } from "../scripts/emit-components.js";
 
 describe("field tokens", () => {
-  it("declares the five D49 tokens bound to gated semantics", () => {
+  it("declares the five D49 tokens and the D84 required-text colour bound to gated semantics", () => {
     expect(fieldVars).toEqual({
       "label-fg": "var(--psi-fg-secondary)",
       "message-fg": "var(--psi-fg-tertiary)",
       "error-fg": "var(--psi-fg-danger)",
       "marker-fg": "var(--psi-fg-danger)",
+      "required-text-fg": "var(--psi-fg-secondary)",
       gap: "var(--psi-space-6)",
     });
   });
