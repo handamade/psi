@@ -10,6 +10,31 @@
   border-radius: var(--psi-table-radius);
 }
 
+/* ── Caption (D85) ───────────────────────────────────────────────
+   Above the table, inset to the cells. The detail line takes the header
+   foreground, so the range reads as secondary to the name. The caption can
+   take focus (tabIndex -1, moved there after a page change), so it draws
+   the shared ring, inside its own box. */
+
+.caption {
+  caption-side: top;
+  text-align: start;
+  padding-block: var(--psi-space-8);
+  color: var(--psi-table-fg);
+  font: var(--psi-text-14-20-medium);
+}
+
+.captionDetail {
+  display: block;
+  color: var(--psi-table-header-fg);
+  font: var(--psi-text-12-16-regular);
+}
+
+.caption:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-table-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
 .headerCell {
   color: var(--psi-table-header-fg);
   font: var(--psi-text-14-20-medium);
@@ -19,6 +44,13 @@
 .cell,
 .headerCell {
   border-bottom: 1px solid var(--psi-table-cell-border);
+}
+
+/* A row header (D85): the cell that names its row. Weight marks it; the
+   colour stays the body's, unlike a column header's. */
+.rowHeader {
+  font: var(--psi-text-14-20-medium);
+  text-align: start;
 }
 
 .cell[data-numeric],
@@ -58,15 +90,27 @@
   padding-inline: var(--psi-table-32-cell-padding-x);
 }
 
+.table[data-size="32"] .caption {
+  padding-inline: var(--psi-table-32-cell-padding-x);
+}
+
 .table[data-size="40"] .cell,
 .table[data-size="40"] .headerCell {
   height: var(--psi-table-40-row-height);
   padding-inline: var(--psi-table-40-cell-padding-x);
 }
 
+.table[data-size="40"] .caption {
+  padding-inline: var(--psi-table-40-cell-padding-x);
+}
+
 .table[data-size="48"] .cell,
 .table[data-size="48"] .headerCell {
   height: var(--psi-table-48-row-height);
+  padding-inline: var(--psi-table-48-cell-padding-x);
+}
+
+.table[data-size="48"] .caption {
   padding-inline: var(--psi-table-48-cell-padding-x);
 }
 

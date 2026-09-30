@@ -1,0 +1,9 @@
+/* packages/react/src/CursorPagination/cursor-pagination.module.css
+   No --psi-cursor-pagination-* family, as Pagination has none: every visual
+   comes from Button, which binds its own tokens. */
+
+.nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--psi-space-8);
+}

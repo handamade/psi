@@ -9,6 +9,7 @@
 |---|---|---|---|---|
 | `children` | `ReactNode` | — | yes | The header TableRow. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
+| `ref` | `Ref<HTMLTableSectionElement>` | — | no | Forwarded ref to the `<thead>`. |
 
 ## Theming
 

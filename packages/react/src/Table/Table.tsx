@@ -1,5 +1,5 @@
 import { Children, Fragment, isValidElement, useMemo } from "react";
-import type { ReactNode, Ref } from "react";
+import type { ReactNode, Ref, TableHTMLAttributes } from "react";
 import styles from "./table.module.css";
 import { EMPTY_SELECTION, TableContext, TableRowIdsContext } from "./TableContext.js";
 import { TableBody } from "./TableBody.js";
@@ -59,7 +59,10 @@ function collectRowIds(children: ReactNode): { ids: string[]; sawBody: boolean; 
   return { ids, sawBody, hasRowWithoutId };
 }
 
-export interface TableProps {
+/** Remaining HTML attributes land on the `<table>` (D85): `aria-label`,
+ * `aria-busy` while a page loads, `id`, `data-*`. The table's own attributes
+ * (`data-size`) win. */
+export interface TableProps extends Omit<TableHTMLAttributes<HTMLTableElement>, "children"> {
   /** Row height in px. @default 40 */
   size?: TableSize;
   /** Pins the header while the body scrolls. */
@@ -105,6 +108,7 @@ export function Table({
   children,
   className,
   ref,
+  ...rest
 }: TableProps) {
   const cls = [styles.table, stickyHeader && styles.sticky, className].filter(Boolean).join(" ");
   const { ids: rowIds, sawBody, hasRowWithoutId } = useMemo(() => collectRowIds(children), [children]);
@@ -117,7 +121,7 @@ export function Table({
   return (
     <TableContext.Provider value={{ size, sortable, sort, onSortChange, selectable, selected, onSelectionChange }}>
       <TableRowIdsContext.Provider value={rowIds}>
-        <table ref={ref} className={cls} data-size={size}>
+        <table {...rest} ref={ref} className={cls} data-size={size}>
           {children}
         </table>
       </TableRowIdsContext.Provider>

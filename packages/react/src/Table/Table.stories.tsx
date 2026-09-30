@@ -6,6 +6,7 @@ import { TableBody } from "./TableBody.js";
 import { TableRow } from "./TableRow.js";
 import { TableCell } from "./TableCell.js";
 import { TableHeaderCell } from "./TableHeaderCell.js";
+import { TableCaption } from "./TableCaption.js";
 import type { TableSortState } from "./Table.js";
 
 const meta: Meta<typeof Table> = { title: "Data/Table", component: Table };
@@ -61,6 +62,38 @@ export const Empty: Story = {
     <Table>
       <TableHead><TableRow><TableHeaderCell>Date</TableHeaderCell><TableHeaderCell numeric>Amount</TableHeaderCell></TableRow></TableHead>
       <TableBody />
+    </Table>
+  ),
+};
+
+/** D85 — a token-paged list: a caption that names the table and states the
+ * range (focus moves to it after a page change), a row header naming each
+ * row, and an empty-state row spanning the columns with `colSpan`. */
+export const WithCaption: Story = {
+  render: () => (
+    <Table>
+      <TableCaption detail="Rows 51–100 of more than 100,000" tabIndex={-1}>
+        Applications
+      </TableCaption>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Id</TableHeaderCell>
+          <TableHeaderCell>Applicant</TableHeaderCell>
+          <TableHeaderCell numeric>Amount</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {ROWS.map((r, i) => (
+          <TableRow key={r.id}>
+            <TableCell rowHeader>APP-{1042 + i}</TableCell>
+            <TableCell>{r.payee}</TableCell>
+            <TableCell numeric>{r.amount}</TableCell>
+          </TableRow>
+        ))}
+        <TableRow>
+          <TableCell colSpan={3}>No more applications match these filters.</TableCell>
+        </TableRow>
+      </TableBody>
     </Table>
   ),
 };
