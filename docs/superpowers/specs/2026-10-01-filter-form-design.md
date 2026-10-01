@@ -172,6 +172,18 @@ anything was written.
   `Toolbar` ×2, `Dialog` form, the `date-range-filter` and `required-field`
   presets) and the `cursor-pagination` preset — 13 stories, 26 baselines,
   from CI's actual renders.
+- **Measured in CI (run 36830883884): exactly those 32 failed**, and the
+  artifact's snapshot folder differed from the committed one by the 6 new
+  files alone. Each changed render was checked against its baseline: inputs
+  4 px shorter and no wider than their `Field`, what follows them moved up by
+  4 px per input, the pager moved down onto the select's line.
+  - **One difference was not D87's**: in every changed story with a `Select`,
+    the chevron is darker than in the committed baseline. D81 redrew the
+    chevron with gradients (2026-09-28); these baselines date from July. The
+    change is 20 pixels per chevron, under `maxDiffPixels: 48`, so `vr` never
+    failed on it, and every committed baseline holding a `Select` still shows
+    the old chevron. The new baselines show what `main` renders. The stale
+    ones elsewhere are left for a refresh of their own.
 - **Every text input without a consumer reset shrinks by 4 px**, to its
   stated size. That is a visible change for such consumers, and the reason
   it is named here rather than slipped in.
