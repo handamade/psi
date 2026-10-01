@@ -1,5 +1,100 @@
 # @handamade/psi-tokens
 
+## 0.21.0
+
+### Minor Changes
+
+- 55c2ca1: Announcements route by politeness, not only by tone (D83). Every default is
+  unchanged.
+
+  - **`Toast`** gains `politeness` (`"polite" | "assertive"`): when set, it
+    decides which of `ToastRegion`'s live wrappers speaks the toast, so a success
+    can interrupt; unset, the variant decides as before. It also gains
+    `statusLabel`: a string replaces the visually hidden status word ("Success:",
+    "Warning:", "Error:") with a translated one, and `null` drops it.
+  - **New `Announcement`**: visually hidden text that `ToastRegion` routes by its
+    `politeness`, for an event that must be spoken and has nothing to show. It is
+    not a live region and announces nothing outside a `ToastRegion`.
+  - **`ToastRegion`** spreads its remaining HTML attributes, `data-*` included,
+    onto its root element, so it can carry `data-react-aria-top-layer`.
+  - **`useToast().show()`** accepts `politeness` and `statusLabel`.
+  - **New pattern `announcer`**: one `ToastRegion` holding visible toasts and
+    `Announcement`s. 35 components, 14 patterns.
+
+- 59ae993: An application shell (D88): a skip link, a full-width header, a collapsible dark sidebar holding a navigation tree, and a `main` that scrolls on its own. Every new prop defaults to today's behaviour.
+
+  - **`NavBar` renders `<nav>` only when it has children.** A bar with a brand and actions and no links no longer carries an empty navigation landmark. `navLabel?: string` names the links' `<nav>` (rest props land on the `<header>`, so it could not be named before). `fluid?: boolean` drops `psi-container` for a full-width row that keeps the gutter (`--psi-navbar-gutter`). `actions` keeps the trailing edge without links.
+  - **New `SkipLink`**: a plain `<a href="#main">`, visually hidden until it takes keyboard focus, then fixed at the inline-start top corner on a surface with the shared focus ring. No script: native fragment navigation focuses a focusable target. Tokens `--psi-skip-link-*`. Do not place a `ToastRegion` at `top-start` in an app with a skip link.
+  - **New `NavTree`, `NavGroup`, `NavItem`**: a `<nav aria-label>` around a list; `NavGroup` is a controlled `<button aria-expanded aria-controls>` over a list that is `hidden` when closed; `NavItem` styles the router link passed to it, with the current page set by weight, a surface and an inline-start bar. `NavItem` also takes `href` and `current` to render its own anchor, for plain links and presets. Native keyboard only, no roving focus. Tokens `--psi-nav-tree-*`.
+  - **New `AppShell`**: a grid filling the viewport with the header in its own row and the sidebar and `main` each scrolling on their own, so nothing scrolls under the header (WCAG 2.2 Focus Not Obscured, no `scroll-padding`). Props `skipLink`, `header`, `sidebar`, `sidebarOpen` (controlled, default `true`; closed is `hidden`, not narrowed), `sidebarTheme`, `sidebarId`, `mainId`. `main` is the skip link's target (`tabIndex={-1}`). A desktop frame: no responsive drawer. Tokens `--psi-app-shell-*`.
+  - **New pattern `app-shell`**: a skip link, a fluid `NavBar` with a Menu toggle, a dark `NavTree` sidebar and a scrolling main.
+
+- a1ab416: Four feedback components (D86). None of them writes a live region; every default is unchanged.
+
+  - **New `Banner`**: a full-width, page-level message with `variant`, `title`, an `action` slot (a ghost Button), `onDismiss` and `statusLabel`. It shows the message and announces nothing; route the same event through the announcer.
+  - **New `InlineAlert`**: a message inside content, bordered in the variant's foreground colour. Despite the name it is not `role="alert"`.
+  - **New `Skeleton`**: a loading placeholder, always `aria-hidden`, that stops under `prefers-reduced-motion`. Put `aria-busy` on the region it stands in for.
+  - **New `CopyButton`**: a Button with a visible label that copies `value` and reports `"copied"` or `"failed"` through `onCopy`. It never changes its label; the application speaks the result.
+  - **Shared status vocabulary.** `Toast`'s icons and hidden status words moved into `Toast/status.ts`, now shared by `Toast`, `Banner` and `InlineAlert`. `Toast` renders as before.
+  - **Tokens.** `fgSuccess` and `fgWarning` gain the `border` scope, so the variant's foreground colour can draw a border. Three new contrast pairs are gated by the token build: `fgPrimary` on `fillTintSuccess`, `fillTintWarning` and `fillTintDanger`, each at 4.5:1. New component tokens `--psi-banner-*`, `--psi-inline-alert-*`, `--psi-skeleton-*`.
+  - **Patterns**: new `page-banner`, `form-feedback`, `loading-table` and `copyable-id`. 41 components, 20 patterns.
+
+- 563c8b9: Required in text, and custom controls join a Field (D84). Every default is
+  unchanged.
+
+  - **`Field`** gains `requiredText`: with `required`, the label shows that word
+    — "(Required)" — instead of the asterisk, in the label's colour. It is
+    aria-hidden because the control's `required` is the signal assistive tech
+    reads. New token `--psi-field-required-text-fg`.
+  - **`useFieldControl()`** is exported: inside a `Field` it returns `id`,
+    `aria-labelledby`, `aria-describedby`, `aria-invalid`, `aria-required` and
+    `required` as the Field sets them, for a control built outside Psi to spread onto its
+    focusable element; `{}` outside a Field. `FieldContext` and
+    `FieldContextValue` are exported too.
+  - **New pattern `required-field`.** 15 patterns.
+
+- cd9d918: A labelled filter form (D87). Every new prop defaults to today's behaviour.
+
+  - **`Toolbar` gains `align?: "center" | "end"`**: `end` lines items up on their bottom edge, so controls under visible `Field` labels and a button without one share a control line. A `Field` in such a row ends on its control — no description or error line under it.
+  - **`Toolbar` gains `as?: "div" | "form"`**: `form` renders a real `<form>`, so a submit `Button` and Enter in a field submit it. Labelled, it is a named form landmark and takes no `role="group"`. The ref type widens to `HTMLDivElement | HTMLFormElement`.
+  - **`Input` is the size it names.** It is now `box-sizing: border-box`; under the browser's `content-box` every size rendered 4px over (32 → 36) and overflowed a `Field`. Consumers with a global border-box reset see no change; others see text inputs 4px shorter, at their stated size.
+  - **`Button` declares `type`**, so the manifest lists it. No runtime change.
+  - **New pattern `filter-form`**; `filter-toolbar` and `filter-form` point at each other; `cursor-pagination` is end-aligned, which puts its page-size select and pager on one line (they were 13px apart).
+
+- 0a0da9d: One focus ring (D82): the ring's geometry is now three scale tokens, and
+  every focusable part Psi renders binds them on `:focus-visible`.
+
+  - **psi-tokens**: `--psi-focus-ring-width` (2px), `--psi-focus-ring-offset`
+    (2px, a ring outside the control) and `--psi-focus-ring-offset-inset`
+    (-2px, a ring inside it). Also in `resolved/<theme>.json`
+    (`scales.focusRing`) and the DTCG export (`dimension.focusRing`). Menu and
+    Dialog gain `--psi-menu-focus-ring` and `--psi-dialog-focus-ring`.
+  - **psi-react**: every component's focus rule binds the tokens instead of a
+    literal `2px`. Menu items, the `<dialog>` and a drawer's scrolling panel
+    draw the Psi ring where the browser's own showed before. `Input` and
+    `Select` key the ring on `:focus-visible`.
+  - **One visible change**: the ring on `Input` and `Select` sits one pixel
+    further in (offset `-1px` → `-2px`), wholly inside the control's box.
+
+- 7d18400: Tables for a token-paged list (D85). Every default is unchanged.
+
+  - **The Table family passes attributes through.** `Table`, `TableHead`,
+    `TableBody`, `TableRow`, `TableHeaderCell` and `TableCell` spread their
+    remaining HTML attributes onto their element (`aria-label`, `aria-busy`,
+    `id`, `data-*`) and take a `ref`; their own attributes win.
+  - **New `TableCaption`**: `<caption>` with a name line and a `detail` line for
+    the range. It takes `tabIndex` and a `ref`, so focus can move to it after a
+    page change; when focused it draws the shared ring.
+  - **`TableCell`** gains `colSpan`, and `rowHeader`, which renders
+    `<th scope="row">`.
+  - **New `CursorPagination`**: a `<nav>` of two ghost Buttons with visible
+    words, _Previous_ and _Next_, for a list that pages by opaque token. It holds
+    no state.
+  - **`Button`** insets a trailing icon (`> svg:last-child`) the way it insets a
+    leading one.
+  - **Patterns**: new `cursor-pagination`; `data-table` gains a caption with a
+    range. 37 components, 16 patterns.
+
 ## 0.20.0
 
 ### Minor Changes
