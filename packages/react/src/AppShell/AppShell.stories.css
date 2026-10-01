@@ -1,0 +1,32 @@
+/* Styles for the AppShell stories' wrapper only — not shipped. The preview
+   wraps every story in 1rem of padding; AppShell is the page (100dvh), so the
+   stories cancel it, as an app that mounts the shell at its root has no
+   padding around it. Left in, the document would scroll by 2rem and the shell
+   would slide under the viewport's top edge. */
+.psi-story-app-root {
+  margin: -1rem;
+}
+
+/* The page in main is the consumer's: its raw links stand for the app's own.
+   They draw the shared ring, as any link an app styles would (D82), so the
+   focus sweep sees one ring on every tab stop. */
+.psi-story-app-root main a:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-border-focus);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
+/* The stand-in page in main reads as a Psi page: body type and accent links
+   from the theme, rather than the browser's serif and #00e blue (unreadable on
+   ember's dark canvas). */
+.psi-story-app-root main {
+  font: var(--psi-text-16-24-regular);
+  color: var(--psi-fg-primary);
+}
+
+.psi-story-app-root main h1 {
+  font: var(--psi-text-24-32-medium);
+}
+
+.psi-story-app-root main a {
+  color: var(--psi-fg-accent);
+}

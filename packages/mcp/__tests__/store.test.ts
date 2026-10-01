@@ -88,12 +88,13 @@ describe("search", () => {
   }
 
   it("keeps every pattern and the component floor inside the operating envelope (D61)", () => {
-    // No synthetic pattern: 21 real = 21 total. Measured directly
+    // No synthetic pattern: 22 real = 22 total. Measured directly
     // against this store.ts (see docs/superpowers/specs/2026-08-05-overview-allocation-design.md,
     // "Operating envelope"): with realistic ~20-char pattern ids the floor
     // holds through 23 patterns and first breaks at 24 (re-measured at D86,
-    // when the real catalog reached 20; D87's real 21st replaces the last
-    // synthetic one). 21 keeps a margin below that edge;
+    // when the real catalog reached 20; D87's real 21st and D88's 22nd
+    // replace the last synthetic ones). 22 keeps a margin of two below that
+    // edge, so the next real pattern still fits and the one after it does not;
     // the synthetic count is what you lower when the real catalog grows.
     //
     // The envelope is a function of per-pattern *cost*, not pattern count:
@@ -124,8 +125,8 @@ describe("search", () => {
   });
 
   it("degrades by shedding components, not patterns, past the envelope (D61)", () => {
-    // Roughly double today's catalog (18 synthetic on top of 21 real = 39 total),
-    // well past the ~21-pattern envelope documented in the spec's Operating
+    // Roughly double today's catalog (17 synthetic on top of 22 real = 39 total),
+    // well past the ~22-pattern envelope documented in the spec's Operating
     // envelope section. At this size the component floor provably cannot
     // hold: 39 patterns' irreducible per-item JSON overhead (id/kind/title,
     // never capped, plus the always-uncapped `blocked (gaps: …)` tail) alone
@@ -136,7 +137,7 @@ describe("search", () => {
     // one at a time rather than vanishing, and neither topics nor patterns
     // are ever sacrificed to make room. If a future change makes patterns
     // start vanishing instead of components, this test must fail.
-    const grown = synthesizePatterns(18);
+    const grown = synthesizePatterns(17);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 

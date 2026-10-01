@@ -1,0 +1,82 @@
+{
+  "id": "app-shell",
+  "intent": "An application frame: a skip link, a full-width header with a Menu toggle that names the sidebar (aria-expanded and aria-controls — wire both and sidebarOpen to one piece of state), a dark sub-themed sidebar holding a NavTree, and a main region that scrolls on its own so nothing hides under the header. A closed sidebar is hidden, not narrowed. A desktop frame, not a responsive drawer. Put a link of your own router in each NavItem instead of href, and aria-current=\"page\" on the current one",
+  "match": ["app shell", "application shell", "sidebar layout", "admin layout", "side navigation"],
+  "compose": {
+    "component": "AppShell",
+    "props": { "sidebarOpen": true, "sidebarTheme": "dark" },
+    "slots": {
+      "skipLink": [
+        { "component": "SkipLink", "props": { "href": "#main" }, "content": "skip-label" }
+      ],
+      "header": [
+        {
+          "component": "NavBar",
+          "props": { "fluid": true },
+          "slots": {
+            "brand": [
+              {
+                "component": "Button",
+                "props": { "variant": "ghost", "size": 32, "aria-expanded": true, "aria-controls": "sidebar" },
+                "content": "menu-label"
+              },
+              "{content:brand}"
+            ],
+            "actions": [
+              { "component": "Button", "props": { "variant": "neutral", "size": 32 }, "content": "account-label" }
+            ]
+          }
+        }
+      ],
+      "sidebar": [
+        {
+          "component": "NavTree",
+          "props": { "aria-label": "{content:nav-label}" },
+          "slots": {
+            "body": [
+              { "component": "NavItem", "props": { "href": "#overview", "current": true }, "content": "overview-label" },
+              {
+                "component": "NavGroup",
+                "props": { "label": "{content:group-1-label}", "open": true },
+                "slots": {
+                  "body": [
+                    { "component": "NavItem", "props": { "href": "#group-1-first" }, "content": "group-1-first-label" },
+                    { "component": "NavItem", "props": { "href": "#group-1-second" }, "content": "group-1-second-label" }
+                  ]
+                }
+              },
+              {
+                "component": "NavGroup",
+                "props": { "label": "{content:group-2-label}", "open": true },
+                "slots": {
+                  "body": [
+                    { "component": "NavItem", "props": { "href": "#group-2-first" }, "content": "group-2-first-label" },
+                    { "component": "NavItem", "props": { "href": "#group-2-second" }, "content": "group-2-second-label" }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "body": ["{content:page}"]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "skip-label": "Skip to content",
+    "menu-label": "Menu",
+    "brand": "[product name]",
+    "account-label": "[account]",
+    "nav-label": "Main",
+    "overview-label": "Overview",
+    "group-1-label": "[group name]",
+    "group-1-first-label": "[page name]",
+    "group-1-second-label": "[page name]",
+    "group-2-label": "[group name]",
+    "group-2-first-label": "[page name]",
+    "group-2-second-label": "[page name]",
+    "page": "[the page; it scrolls on its own]"
+  },
+  "gaps": []
+}

@@ -16,6 +16,9 @@
   height: var(--psi-navbar-height);
 }
 
+/* D88: a full-width row keeps the gutter but has no max-width column. */
+.fluid { padding-inline: var(--psi-navbar-gutter); }
+
 .brand { display: flex; align-items: center; }
 .links {
   display: flex;
@@ -48,3 +51,8 @@
   outline-offset: var(--psi-focus-ring-offset);
 }
 .actions { display: flex; align-items: center; gap: var(--psi-space-8); }
+/* D88: .links carries the auto margin that pushes actions to the trailing
+ * edge. With no <nav> (no children), actions take it themselves — measured:
+ * without it they jump from the trailing edge to sit against the brand. */
+.brand + .actions,
+.actions:first-child { margin-inline-start: auto; }

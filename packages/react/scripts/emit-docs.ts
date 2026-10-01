@@ -72,6 +72,8 @@ for (const c of components) {
   const TOKEN_NAME_OVERRIDES: Record<string, string> = {
     IconButton: "button",
     NavBar: "navbar",
+    NavGroup: "nav-tree",
+    NavItem: "nav-tree",
   };
   const familyName = TOKEN_NAME_OVERRIDES[c.name] ?? toKebabCase(c.name);
   const tokenName = `--psi-${familyName}-*`;

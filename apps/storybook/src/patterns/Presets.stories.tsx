@@ -32,6 +32,10 @@ export const Announcer: Story = {
   render: preset("announcer"),
 };
 
+export const AppShell: Story = {
+  render: preset("app-shell"),
+};
+
 export const BulkActionBar: Story = {
   render: preset("bulk-action-bar"),
 };

@@ -8,4 +8,7 @@ export const navbarVars: Record<string, string> = {
   "link-fg": "var(--psi-fg-secondary)",
   "link-fg-hover": "var(--psi-fg-primary)",
   "focus-ring": "var(--psi-border-focus)",
+  // D88 — the side padding of a fluid row; the same gutter .psi-container pads
+  // with, reachable from the CSS Module only through a navbar token.
+  gutter: "var(--psi-gutter)",
 };

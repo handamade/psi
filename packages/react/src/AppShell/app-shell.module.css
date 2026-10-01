@@ -1,0 +1,58 @@
+/* packages/react/src/AppShell/app-shell.module.css */
+/* The frame of an application (D88): a header row over a sidebar and a main
+   that each scroll on their own. The header sits in a row of its own and main
+   is its own scroller, so nothing ever scrolls under the header: WCAG 2.2
+   "Focus Not Obscured" holds by construction, with no scroll-padding (measured
+   on `main` it does nothing; spec finding 4). Every custom property here is
+   --psi-app-shell-* or a global scale prefix; colours alias the semantic layer
+   in packages/tokens/src/components/app-shell.ts. */
+
+.appShell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: var(--psi-app-shell-sidebar-width) minmax(0, 1fr);
+  height: 100dvh;
+}
+
+/* A closed sidebar is hidden, not narrowed: one column, and main takes it. */
+.sidebarClosed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.header {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.sidebar {
+  grid-row: 2;
+  min-height: 0;
+  overflow: auto;
+  /* The sidebar is a panel: its tree sits inset, so a current item's surface
+     stops short of the edge instead of running into it. */
+  padding: var(--psi-space-8);
+  background: var(--psi-app-shell-sidebar-bg);
+  color: var(--psi-app-shell-sidebar-fg);
+}
+
+/* An author display rule would beat the UA's [hidden]; none is set above, and
+   this keeps it so if one is ever added. */
+.sidebar[hidden] {
+  display: none;
+}
+
+.main {
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Focused by the skip link, main draws the shared ring (psi/focus-ring forbids
+   removing it). Inset: main fills its cell, so an outside ring would be clipped
+   by the frame's edge and by the scroller itself. */
+.main:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-app-shell-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}

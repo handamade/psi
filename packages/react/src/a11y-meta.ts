@@ -173,6 +173,43 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region: it renders no role and no aria-live, announces nothing, and does not change its label or icon after a copy, so a screen reader hears the same button before and after. The application speaks the result: onCopy reports \"copied\" or \"failed\" (a rejected write, or no clipboard API), and the application routes that through its announcer or a Toast (D86). The label is visible text; the icon is aria-hidden and only reinforces it. Focus stays on the button.",
   },
+  SkipLink: {
+    keyboard: [
+      { keys: "Tab", behavior: "Takes focus and becomes visible at the inline-start top corner, drawing the shared focus ring. Put it first in the document so it is the first tab stop." },
+      { keys: "Enter", behavior: "Follows the fragment href: focus moves to the target, and the next Tab continues from inside it." },
+    ],
+    notes:
+      "A native anchor, visually hidden until it is focused (:focus-visible) and with no script (D88). Fragment navigation moves focus only to a focusable target, so the element named by href must be focusable: tabIndex={-1} is enough, and AppShell's main has it. A modal Dialog makes the link inert, so it never needs to beat one. A ToastRegion is on the native top layer and paints over the focused link whatever its z-index: do not place one at top-start in an app with a skip link.",
+  },
+  NavTree: {
+    keyboard: [
+      { keys: "Tab / Shift+Tab", behavior: "Moves through the group buttons and the links of open groups in document order. There is no roving focus and no arrow-key model: it is a list of links, not a menu or a tree widget." },
+    ],
+    notes:
+      "A native <nav> around a <ul>, named by the required aria-label (an app has more than one navigation landmark). No role=\"menu\" or role=\"tree\" is used (D88). Router-agnostic: the consumer passes its router's link inside each NavItem.",
+  },
+  NavGroup: {
+    keyboard: [
+      { keys: "Enter / Space", behavior: "Activates the group's native button, which asks the parent to open or close the group through onOpenChange." },
+    ],
+    notes:
+      "Controlled-only: open and onOpenChange are required and the group never changes its own state. Renders a <button type=\"button\"> with aria-expanded and aria-controls naming its <ul>, which carries `hidden` when closed, so the links leave the layout and the accessibility tree while aria-controls still resolves. The chevron is aria-hidden and turns on a duration token; the label and aria-expanded carry the meaning.",
+  },
+  NavItem: {
+    keyboard: [
+      { keys: "Enter", behavior: "Follows the link inside it (native anchor behavior); the link is the consumer's router link." },
+    ],
+    notes:
+      "An <li> that styles the one anchor inside it. Router apps pass their own link as the child and set aria-current=\"page\" on the current one; with href the NavItem renders the anchor itself (for plain links and presets) and current sets aria-current=\"page\" on it. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
+  },
+  AppShell: {
+    keyboard: [
+      { keys: "Tab", behavior: "The first stop is the skip link (when given), then the header, the sidebar's links and buttons, and the links of main, in document order. The shell adds no stop of its own: main has tabIndex={-1}." },
+      { keys: "Enter (on the skip link)", behavior: "Follows the fragment href: focus moves to main, drawing the shared focus ring inside its box, and the next Tab continues from main's first link." },
+    ],
+    notes:
+      "A grid filling the viewport: the header sits in a row of its own and main is its own scroller, so nothing scrolls under the header and a focused element is never obscured by it (WCAG 2.2 Focus Not Obscured) without scroll-padding, which does nothing on a main that is not the document's scroller (D88). main carries id={mainId} and tabIndex={-1}, the skip link's target. A closed sidebar is `hidden`, so it leaves the layout and the accessibility tree while its id stays in the DOM for a toggle's aria-controls; the toggle's aria-expanded and sidebarOpen are wired by the consumer, since the shell is controlled and stores nothing. The sidebar is a div, not an aside: the NavTree inside is already the navigation landmark. sidebarTheme sets data-psi-theme on the sidebar alone, so its tokens re-resolve under that theme in a page that keeps its own; the sidebar paints --psi-bg-primary itself. Desktop frame only: no responsive drawer. Do not place a ToastRegion at top-start in an app with a skip link.",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },

@@ -1,0 +1,7 @@
+{
+  "slots": [
+    { "name": "brand", "accepts": {}, "cardinality": "0..*", "order": 1 },
+    { "name": "actions", "accepts": {}, "cardinality": "0..*", "order": 2 },
+    { "name": "body", "accepts": {}, "cardinality": "0..*", "order": 3 }
+  ]
+}
