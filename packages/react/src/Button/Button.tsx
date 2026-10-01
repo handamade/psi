@@ -26,6 +26,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   /** Height in px (24 | 32 | 40 | 48). @default 32 */
   size?: Size;
+  /** Button type. Declared so the manifest lists it and a pattern can say
+   * `submit` (D87). No default is set: the platform's applies — `submit`
+   * inside a form, a plain button elsewhere. */
+  type?: "button" | "submit" | "reset";
   /** Render as an anchor with this href (D33). disabled → aria-disabled,
    * no href attribute, pointer-events: none. */
   href?: string;

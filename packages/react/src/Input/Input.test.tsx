@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Input } from "./Input.js";
 
 describe("Input", () => {
@@ -84,5 +86,17 @@ describe("Input", () => {
   it("defaults type to text when no type prop is given", () => {
     render(<Input aria-label="Name" />);
     expect(screen.getByLabelText("Name")).toHaveAttribute("type", "text");
+  });
+});
+
+describe("Input box model (D87)", () => {
+  // jsdom does no layout, so this reads the rule; the height itself is
+  // measured in a browser by apps/storybook/vr/filter-form.interaction.spec.ts.
+  // Without border-box the border and the browser's own block padding land
+  // outside the size token: every size measured 4px over (32 → 36).
+  it("the base rule is border-box, so the size token is the rendered height", () => {
+    const css = readFileSync(join(import.meta.dirname, "input.module.css"), "utf8");
+    const base = /\.input\s*\{([^}]*)\}/.exec(css)![1];
+    expect(base).toMatch(/box-sizing:\s*border-box;/);
   });
 });

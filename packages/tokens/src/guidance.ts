@@ -18,7 +18,7 @@ export const guidance = {
     "Override component tokens (--psi-{component}-*), not semantic tokens, for one-off theming.",
     "--psi-button-font overrides button typography across all sizes (documented D34 override; ember → mono).",
     "Wrap labeled form controls in Field — label association, description/error line, aria-describedby and aria-invalid come wired; don't hand-roll label+message rows.",
-    "Field is for a control with a *visible* label. A toolbar filter control named by aria-label or placeholder takes neither a Field nor a hand-rolled label row — compare filter-toolbar (no labels) with table-pagination (\"Rows per page\" visible, so Field).",
+    "Field is for a control with a *visible* label. A toolbar filter control named by aria-label or placeholder takes neither a Field nor a hand-rolled label row — compare filter-toolbar (no labels) with table-pagination (\"Rows per page\" visible, so Field). Filters with visible labels submitted together by a Find button are filter-form: a Toolbar as=\"form\" align=\"end\" of Fields (D87).",
     "Use Dialog for blocking modal flows — title/footer slots, dismissible gate; danger stays on the footer Buttons, one accent per group.",
   ],
   states: { hover: "L - 0.04", active: "L - 0.08", disabled: "element opacity 0.4 (keeps hue)", focus: "outline: var(--psi-focus-ring-width) solid var(--psi-{component}-focus-ring) on :focus-visible, at --psi-focus-ring-offset (outside) or --psi-focus-ring-offset-inset (inside) — D82" },

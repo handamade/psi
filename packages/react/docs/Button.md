@@ -10,6 +10,7 @@ Action trigger. With `href` renders an anchor with identical styling (D33); `dis
 | `children` | `ReactNode` | — | no | Label content. |
 | `variant` | `"accent" \| "accent-subtle" \| "neutral" \| "neutral-subtle" \| "ghost" \| "danger" \| "danger-subtle" \| "outline"` | neutral | no | Visual variant. |
 | `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Height in px (24 \| 32 \| 40 \| 48). |
+| `type` | `"button" \| "submit" \| "reset"` | — | no | Button type. Declared so the manifest lists it and a pattern can say `submit` (D87). No default is set: the platform's applies — `submit` inside a form, a plain button elsewhere. |
 | `href` | `string` | — | no | Render as an anchor with this href (D33). disabled → aria-disabled, no href attribute, pointer-events: none. |
 | `target` | `string` | — | no | Anchor target; only used with href. |
 | `rel` | `string` | — | no | Anchor rel; only used with href. |
@@ -50,5 +51,5 @@ Override `--psi-button-*` custom properties at any scope; interactive states der
 - Override component tokens (--psi-{component}-*), not semantic tokens, for one-off theming.
 - --psi-button-font overrides button typography across all sizes (documented D34 override; ember → mono).
 - Wrap labeled form controls in Field — label association, description/error line, aria-describedby and aria-invalid come wired; don't hand-roll label+message rows.
-- Field is for a control with a *visible* label. A toolbar filter control named by aria-label or placeholder takes neither a Field nor a hand-rolled label row — compare filter-toolbar (no labels) with table-pagination ("Rows per page" visible, so Field).
+- Field is for a control with a *visible* label. A toolbar filter control named by aria-label or placeholder takes neither a Field nor a hand-rolled label row — compare filter-toolbar (no labels) with table-pagination ("Rows per page" visible, so Field). Filters with visible labels submitted together by a Find button are filter-form: a Toolbar as="form" align="end" of Fields (D87).
 - Use Dialog for blocking modal flows — title/footer slots, dismissible gate; danger stays on the footer Buttons, one accent per group.

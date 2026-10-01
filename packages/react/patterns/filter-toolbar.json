@@ -1,6 +1,6 @@
 {
   "id": "filter-toolbar",
-  "intent": "Toolbar of filter controls: search, category select, active-filter tags — controls are named by aria-label/placeholder, not a visible label, so no Field (contrast table-pagination)",
+  "intent": "Toolbar of filter controls that apply as they change: search, category select, active-filter tags — controls are named by aria-label/placeholder, not a visible label, so no Field (contrast table-pagination). For filters with visible labels, submitted together with a Find button, use filter-form",
   "match": [
     "filter toolbar",
     "filter bar",

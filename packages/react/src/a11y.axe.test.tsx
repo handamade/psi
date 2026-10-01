@@ -44,6 +44,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Tooltip", <Tooltip content="Info"><button>Trigger</button></Tooltip>],
   ["Toolbar labeled", <Toolbar aria-label="Filters"><label>Search<Input size={32} /></label><Tag variant="neutral">Active</Tag></Toolbar>],
   ["Toolbar unlabeled", <Toolbar><Button size={32} variant="ghost">Clear</Button></Toolbar>],
+  ["Toolbar as a filter form (D87)", <Toolbar as="form" align="end" gap={12} aria-label="Filters"><Field label="Device ID"><Input size={32} /></Field><Field label="Status"><Select size={32}><option>Any</option></Select></Field><Button type="submit" variant="accent" size={32}>Find</Button></Toolbar>],
   ["Menu open", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Row actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuSeparator /><MenuItem onSelect={() => {}} variant="danger">Delete</MenuItem></Menu>],
   ["Menu with a disabled item", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuItem onSelect={() => {}} disabled>Archive</MenuItem></Menu>],
   ["Table plain", (

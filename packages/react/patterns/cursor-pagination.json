@@ -4,7 +4,7 @@
   "match": ["cursor pagination", "token pagination", "next page token", "previous next", "load more", "keyset pagination", "page size"],
   "compose": {
     "component": "Toolbar",
-    "props": { "gap": 12 },
+    "props": { "gap": 12, "align": "end" },
     "slots": {
       "body": [
         {
