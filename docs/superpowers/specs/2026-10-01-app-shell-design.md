@@ -1,6 +1,6 @@
 # An application shell: `AppShell`, the `NavTree` family, `SkipLink`, and a `NavBar` that labels its links (D88)
 
-Date: 2026-10-01. Status: **Proposed** on branch `d88-app-shell`.
+Date: 2026-10-01. Status: **Implemented** on branch `d88-app-shell`.
 
 Provenance: the seventh and last item of the Psi 0.21 portal handoff
 (`docs/superpowers/plans/2026-09-30-psi-0.21-portal-handoff.md`, brief D88,
@@ -140,6 +140,42 @@ injected into a page, before anything was written.
   - **Counts:** 46 components (+5), 22 patterns (+1). The MCP overview
     envelope (D61) holds through 23.
 
+  - **As built — where the build corrected this spec**, each found by a
+    lint rule, a generator or a browser:
+    - **Token prefixes are kebab-case**: `--psi-skip-link-*`,
+      `--psi-nav-tree-*`, `--psi-app-shell-*`, as `inline-alert` and
+      `description-list` are. The draft copied `NavBar`'s historical
+      `navbar`, and the docs generator then claimed the families had no
+      tokens. Renamed before release, while they are not yet API.
+    - **`NavBar` binds `--psi-navbar-gutter`** (aliasing `--psi-gutter`) for
+      `fluid`, and **`SkipLink` binds `--psi-skip-link-radius`**:
+      `psi/component-tokens-only` admits only a component's own prefix and
+      the scale families.
+    - **`SkipLink`'s 8 px offset rides `margin`**, not `inset-*`:
+      `psi/token-scopes` binds the space scale to gap, padding and margin.
+      It shows on `:focus-visible` only — it is invisible, so a pointer
+      cannot reach it.
+    - **`NavItem` gains `href` and `current`**: with `href` it renders its
+      own `<a>` (`aria-current="page"` when `current`). A pattern can compose
+      only manifest components, and a raw `<a>` is not one, so without this
+      the `app-shell` preset could not hold a link. A router app still
+      passes its own link as the child.
+    - **`NavBar` has a `slots.json`** (`brand`, `actions`, `body`), so a
+      pattern can fill its brand and actions with nodes.
+    - **The sidebar pads its tree** by `--psi-space-8`: the current item's
+      surface measured 0 px from the sidebar's edge. With no `sidebar`
+      content, the sidebar is `hidden` and the grid has one column, so no
+      empty 16rem column shows.
+    - **`AppShell` must mount at the page root**, with no margin or padding
+      around it: it is `100dvh`, and Storybook's 1rem story padding made the
+      document scroll by 2rem and slide the header — the stories cancel it.
+    - **`main`, focused by the skip link, draws the ring inset**:
+      `psi/focus-ring` forbids removing a ring.
+    - **The preset's `NavGroup`s carry no `onOpenChange`** (a pattern cannot
+      hold a function), so clicking one in the generated preset story
+      throws — the same limit `tabbed-workspace` has with `Tabs`. A consumer
+      wires the callback; the type requires it.
+
 ## Implementation split
 
 Three tasks for subagents, run one after another, because each touches the
@@ -151,29 +187,65 @@ same registration files (`index.ts`, `emit-manifest.ts`, `a11y-meta.ts`,
 3. `AppShell` + pattern `app-shell` + docs, counts, changeset, and the
    browser spec.
 
-## Verification (to measure)
+## Verification
 
-- **Tests first**: `NavBar` with no children renders no `<nav>`, `navLabel`
-  names it, `fluid` drops the container class; `SkipLink` is an anchor with
-  its `href` and the hidden-until-focused class; `AppShell` with
-  `sidebarOpen={false}` renders the sidebar `hidden`, `sidebarTheme` sets
-  `data-psi-theme` on the sidebar only, `main` has the id and
-  `tabIndex={-1}`; `NavGroup` toggles `aria-expanded`, hides its list, and
-  its `aria-controls` names the list; axe clean, open and closed, under the
-  dark sub-theme.
-- **In a browser** (`app-shell.interaction.spec.ts`): the skip link is
-  invisible until *Tab*, then visible with the ring; *Enter* focuses `main`;
-  every tab stop in a long `main` is fully below the header, down and up;
-  `actions` stays at the trailing edge of a `NavBar` without links; the
-  current `NavItem` differs from its siblings in weight, surface and bar;
-  the sidebar's tokens resolve to dark values inside a light page.
-- **The six gates**, the D82 sweep over the new stories included.
+- **Tests first**, each red before its change, run by three sequential
+  subagents (one per task of the split), each reporting red and green:
+  - `NavBar`: 4 red on assertion (no `nav` without children, `navLabel`,
+    `fluid` on, `fluid` off); the fifth, rest props on `header`, passed
+    before and after — the regression guard. `SkipLink`: 3, red on the
+    missing module.
+  - `NavTree` family: 11, red on the missing modules; then `NavItem`
+    `href`/`current`: 3 red, 1 regression guard green.
+  - `AppShell`: 9, red on the missing module.
+  - **in a browser**, `app-shell.interaction.spec.ts`: 4 of 6 red before
+    `AppShell` existed (skip link hidden then shown, *Enter* focuses `main`,
+    no tab stop under the header, dark tokens in the sidebar); the `NavBar`
+    and `NavItem` checks were already green from tasks 1–2. A seventh, the
+    sidebar's inset, red at 0 px, then green.
+- **Measured** (Chromium 149, built Storybook, 1366 × 768):
+  - `NavBar` `NoLinks`: actions at x = 1222.6–1294, the same as `Default`;
+    `Fluid`: a full-width row with the gutter, against the 82rem container;
+  - the skip link: 1 px and clipped before *Tab*; after, fixed at 8/8 px,
+    126 × 32, `z-index` 1000, a solid 2 px ring; *Enter* focuses `main#main`;
+  - focus under the header: header bottom 65 px; the highest focused element
+    in `main` over every stop down and back up, 64.875 px — 0.125 px of
+    sub-pixel scroll rounding, nothing hidden; the test allows 1 px and says
+    why, and asserts the document itself never scrolls;
+  - `DarkSidebar` inside the light page: link colour `oklch(0.93 …/0.7)`
+    against light's `oklch(0.3 …/0.7)`; current surface `oklch(0.26 …)`
+    against `oklch(0.916 …)`; current link weight 500 against 400, a 3 px
+    accent bar against none;
+  - the `app-shell` preset's tree: link *Skip to content*; `banner` with the
+    expanded *Menu* button and no empty `navigation`; `navigation "Main"`
+    with two expanded groups; `main`.
+- **axe:** eight new cases — `NavBar` without links and labelled + fluid,
+  `SkipLink` with a target, `NavTree` open, closed and under a dark
+  sub-theme, `AppShell` open, closed and with `sidebarTheme="dark"`; no
+  violations.
+- **Regression.** No existing test edited; `NavBar`'s `Default` story renders
+  as before (its `<nav>` is still there). `wcagAAPairs` stays at 31.
+- **The six gates** green: 2479 tests in 106 files; docs drift at 46
+  components and 22 patterns; site gate 9 of 9; `pnpm test:e2e` 205 of 205,
+  the D82 sweep over all nine new stories included.
 
 ## Consequences
 
-- Visual regression: new stories for every new component and the preset,
-  in light and ember; `NavBar`'s existing story should not change.
-- A consumer whose document must scroll as a whole (a long marketing page)
-  does not use `AppShell`; it is an application frame.
-- A `ToastRegion` at `top-start` can cover a focused skip link; the docs say
-  to choose another placement.
+- **Visual regression: 18 new baselines, none changed** — `NavBar` `NoLinks`
+  and `Fluid`, `SkipLink` `Default`, `NavTree` `Default`, `Collapsed` and
+  `DarkSidebar`, `AppShell` `Default` and `SidebarClosed`, the `app-shell`
+  preset, in light and ember.
+- **A consumer whose document must scroll as a whole** (a long marketing
+  page) does not use `AppShell`; it is an application frame, mounted at the
+  root.
+- **A `ToastRegion` at `top-start` can cover a focused skip link**: the top
+  layer paints over it whatever its `z-index`. The docs say to choose
+  another placement.
+- **A dark sub-theme sidebar keeps the default font stacks** and the dark
+  theme's accent, also inside ember: brand stacks apply at `:root` only.
+- **The portal** renders `<AppShell skipLink={<SkipLink href="#main">…}
+  header={<NavBar fluid brand={…} actions={…} />} sidebar={<NavTree
+  aria-label="…">…</NavTree>} sidebarOpen={open} sidebarTheme="dark">`, its
+  Menu toggle `Button` with visible text, `aria-expanded={open}` and
+  `aria-controls="sidebar"`, and its router links inside `NavItem`s with
+  `aria-current="page"` on the current one.
