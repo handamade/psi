@@ -123,9 +123,13 @@ No changeset: nothing published changes.
 - **What changed in each image:** item 3, computed for all 18 of the probe's
   failures against their committed baselines, not sampled; and looked at,
   zoomed, for `select--default` in light and ember and `all-sizes`.
-- **The five gates** of `CLAUDE.md` green locally.
-- **`vr` on CI at budget 0:** see the PR — every screenshot must pass, with
-  no baseline refreshed by hand beyond the 12.
+- **The five gates** of `CLAUDE.md` green locally: 2437 tests in 103 files,
+  docs drift clean, the site gate 9 of 9.
+- **`vr` on CI at budget 0, rebased on D87:** run 36843237571, **537 passed,
+  0 failed**. Every screenshot in the suite matched at 0 diff pixels — the
+  12 refreshed here, the 6 D87 refreshed, and everything else. With the
+  probe, that is two full runs on CI's runner with no noise; the commit
+  recording this ran a third (see the PR).
 
 ## Consequences
 
