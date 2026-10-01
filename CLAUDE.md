@@ -35,6 +35,7 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 
   CI's full order is `build → check-docs-drift → test → vr → test:site → lint`. Of those, only `vr` cannot be run locally (see below).
 - **`pnpm vr` only passes in CI.** Baselines are ubuntu-latest renders; a macOS run fails all 188 stories on the `-darwin` snapshot suffix and its default update mode silently writes junk baselines. Let CI's `vr` job be the gate and hold the merge with auto-merge. Details in `apps/storybook/vr/README.md`.
+- **`vr` allows 0 differing pixels (D89).** It was 48 until a contrast fix to the `Select` chevron (1.71 → 8.48) measured 7 px and passed for three days. Any visual change, however small, fails `vr` until CI's render (`test-results/**/*-actual.png` in the `vr-baselines` artifact) is committed over the baseline — so a change to a shared primitive must refresh every story it reaches, not only the ones it was written for.
 
 ## Branches and releases
 
