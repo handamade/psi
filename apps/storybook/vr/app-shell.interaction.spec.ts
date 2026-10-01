@@ -156,3 +156,14 @@ test("a dark sidebar resolves dark tokens inside a light page @interaction", asy
   // The theme paints nothing on its own: the sidebar paints --psi-bg-primary.
   expect(painted).not.toBe("rgba(0, 0, 0, 0)");
 });
+
+test("the sidebar insets its tree, so the current item's surface stops short of the edge @interaction", async ({ page }) => {
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const r = await page.evaluate(() => {
+    const sidebar = (document.getElementById("sidebar") as HTMLElement).getBoundingClientRect();
+    const current = (document.querySelector('#sidebar a[aria-current="page"]') as HTMLElement).getBoundingClientRect();
+    return { left: current.left - sidebar.left, right: sidebar.right - current.right };
+  });
+  expect(r.left).toBeGreaterThanOrEqual(8);
+  expect(r.right).toBeGreaterThanOrEqual(8);
+});

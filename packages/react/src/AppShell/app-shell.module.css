@@ -29,6 +29,9 @@
   grid-row: 2;
   min-height: 0;
   overflow: auto;
+  /* The sidebar is a panel: its tree sits inset, so a current item's surface
+     stops short of the edge instead of running into it. */
+  padding: var(--psi-space-8);
   background: var(--psi-app-shell-sidebar-bg);
   color: var(--psi-app-shell-sidebar-fg);
 }
