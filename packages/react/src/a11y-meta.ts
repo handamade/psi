@@ -181,6 +181,27 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "A native anchor, visually hidden until it is focused (:focus-visible) and with no script (D88). Fragment navigation moves focus only to a focusable target, so the element named by href must be focusable: tabIndex={-1} is enough, and AppShell's main has it. A modal Dialog makes the link inert, so it never needs to beat one. A ToastRegion is on the native top layer and paints over the focused link whatever its z-index: do not place one at top-start in an app with a skip link.",
   },
+  NavTree: {
+    keyboard: [
+      { keys: "Tab / Shift+Tab", behavior: "Moves through the group buttons and the links of open groups in document order. There is no roving focus and no arrow-key model: it is a list of links, not a menu or a tree widget." },
+    ],
+    notes:
+      "A native <nav> around a <ul>, named by the required aria-label (an app has more than one navigation landmark). No role=\"menu\" or role=\"tree\" is used (D88). Router-agnostic: the consumer passes its router's link inside each NavItem.",
+  },
+  NavGroup: {
+    keyboard: [
+      { keys: "Enter / Space", behavior: "Activates the group's native button, which asks the parent to open or close the group through onOpenChange." },
+    ],
+    notes:
+      "Controlled-only: open and onOpenChange are required and the group never changes its own state. Renders a <button type=\"button\"> with aria-expanded and aria-controls naming its <ul>, which carries `hidden` when closed, so the links leave the layout and the accessibility tree while aria-controls still resolves. The chevron is aria-hidden and turns on a duration token; the label and aria-expanded carry the meaning.",
+  },
+  NavItem: {
+    keyboard: [
+      { keys: "Enter", behavior: "Follows the link inside it (native anchor behavior); the link is the consumer's router link." },
+    ],
+    notes:
+      "An <li> that styles the one anchor inside it and renders no anchor of its own. The consumer sets aria-current=\"page\" on the current link. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },

@@ -1,0 +1,9 @@
+/* Styles for the DarkSidebar story's wrapper only — not shipped. The theme CSS
+   paints no background, so a dark sub-tree paints --psi-bg-primary itself
+   (what AppShell's sidebar does). */
+.psi-story-dark-sidebar {
+  inline-size: 16rem;
+  padding: 12px;
+  background: var(--psi-bg-primary);
+  color: var(--psi-fg-primary);
+}

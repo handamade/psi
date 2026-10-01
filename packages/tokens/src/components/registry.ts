@@ -5,6 +5,7 @@ import { inlineAlertVars } from "./inline-alert.js";
 import { buttonVars } from "./button.js";
 import { skeletonVars } from "./skeleton.js";
 import { skiplinkVars } from "./skiplink.js";
+import { navtreeVars } from "./navtree.js";
 import { inputVars } from "./input.js";
 import { selectVars } from "./select.js";
 import { surfaceVars } from "./surface.js";
@@ -42,6 +43,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   panel: panelVars,
   select: selectVars,
   skeleton: skeletonVars,
+  navtree: navtreeVars,
   skiplink: skiplinkVars,
   surface: surfaceVars,
   switch: switchVars,

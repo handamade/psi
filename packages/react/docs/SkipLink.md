@@ -23,7 +23,7 @@ A native anchor, visually hidden until it is focused (:focus-visible) and with n
 
 ## Theming
 
-This component has no `--psi-skip-link-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+Override `--psi-skiplink-*` custom properties at any scope.
 
 
 

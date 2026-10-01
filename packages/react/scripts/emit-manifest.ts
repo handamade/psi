@@ -23,6 +23,9 @@ const COMPONENTS = [
   "Tooltip",
   "NavBar",
   "SkipLink",
+  "NavTree",
+  "NavGroup",
+  "NavItem",
   "AspectRatio",
   "Menu",
   "MenuItem",
@@ -100,6 +103,9 @@ const COMPONENT_DIR: Record<string, string> = {
   TabList: "Tabs",
   Tab: "Tabs",
   TabPanel: "Tabs",
+  NavTree: "NavTree",
+  NavGroup: "NavTree",
+  NavItem: "NavTree",
 };
 
 // Components with zero props by design (documented as such in their own

@@ -1,0 +1,120 @@
+/* packages/react/src/NavTree/navtree.module.css */
+/* One module serves NavTree, NavGroup and NavItem — the stylelint plugin
+   derives the allowed namespace from the filename, so every custom property
+   here must be --psi-navtree-* or a global scale prefix. Colours and the
+   radius alias the semantic layer in packages/tokens/src/components/navtree.ts. */
+
+.navTree {
+  display: block;
+}
+
+.list,
+.groupList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── Item ─────────────────────────────────────────────────────── */
+
+.item a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: var(--psi-size-32);
+  padding-block: var(--psi-space-4);
+  padding-inline: var(--psi-space-12);
+  border-radius: var(--psi-navtree-radius);
+  color: var(--psi-navtree-item-fg);
+  font: var(--psi-text-14-20-regular);
+  text-decoration: none;
+}
+
+.item a:hover {
+  background: var(--psi-navtree-item-bg-hover);
+}
+
+/* Inset (D82): items stack in a scrolling sidebar with no gap to spare, so an
+   outside ring would be clipped at its edge. */
+.item a:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-navtree-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
+/* The current page is set three ways, never by colour alone: weight, a
+   raised surface, and a bar at the inline start. The bar is a logical
+   pseudo-element rather than an inset shadow, so it follows the writing
+   direction; non-current items draw none, so their text never shifts. */
+.item a[aria-current="page"] {
+  background: var(--psi-navtree-item-bg-current);
+  color: var(--psi-navtree-item-fg-current);
+  font: var(--psi-text-14-20-medium);
+}
+
+.item a[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: var(--psi-navtree-radius);
+  background: var(--psi-navtree-indicator);
+}
+
+/* ── Group ────────────────────────────────────────────────────── */
+
+.groupButton {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--psi-space-8);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--psi-size-32);
+  padding-block: var(--psi-space-4);
+  padding-inline: var(--psi-space-12);
+  border: 0;
+  border-radius: var(--psi-navtree-radius);
+  background: none;
+  color: var(--psi-navtree-group-fg);
+  font: var(--psi-text-14-20-medium);
+  text-align: start;
+  cursor: pointer;
+}
+
+.groupButton:hover {
+  background: var(--psi-navtree-item-bg-hover);
+}
+
+.groupButton:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-navtree-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
+.groupLabel {
+  min-width: 0;
+}
+
+.chevron {
+  flex: none;
+  transition: transform var(--psi-duration-150) var(--psi-ease-standard);
+}
+
+.groupButton[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* Items under a group sit one step in from the group's own label. */
+.groupList {
+  padding-inline-start: var(--psi-space-12);
+  margin-block-start: var(--psi-space-2);
+}
+
+.groupList[hidden] {
+  display: none;
+}

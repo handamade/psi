@@ -5,7 +5,7 @@ import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
-  Toast, ToastRegion, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink,
+  Toast, ToastRegion, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, NavTree, NavGroup, NavItem,
   Tabs, TabList, Tab, TabPanel,
   useFieldControl,
 } from "./index.js";
@@ -26,6 +26,9 @@ const cases: Array<[string, React.ReactElement]> = [
   ["NavBar with no links", <NavBar brand={<a href="/">DK</a>} actions={<Button size={32}>CTA</Button>} />],
   ["NavBar labelled and fluid", <NavBar fluid navLabel="Primary" brand={<a href="/">DK</a>}><a href="/a">A</a></NavBar>],
   ["SkipLink with a target", <><SkipLink href="#main">Skip to content</SkipLink><main id="main" tabIndex={-1}><h1>Page</h1></main></>],
+  ["NavTree open", <NavTree aria-label="Main"><NavItem><a href="#o">Overview</a></NavItem><NavGroup label="Reports" open onOpenChange={() => {}}><NavItem><a href="#s" aria-current="page">Sales</a></NavItem><NavItem><a href="#t">Traffic</a></NavItem></NavGroup></NavTree>],
+  ["NavTree closed", <NavTree aria-label="Main"><NavItem><a href="#o">Overview</a></NavItem><NavGroup label="Reports" open={false} onOpenChange={() => {}}><NavItem><a href="#s">Sales</a></NavItem></NavGroup></NavTree>],
+  ["NavTree in a dark sub-theme", <div data-psi-theme="dark"><NavTree aria-label="Main"><NavGroup label="Reports" open onOpenChange={() => {}}><NavItem><a href="#s" aria-current="page">Sales</a></NavItem><NavItem><a href="#t">Traffic</a></NavItem></NavGroup></NavTree></div>],
   ["AspectRatio", <AspectRatio ratio={16 / 10}><img alt="demo" src="x.png" /></AspectRatio>],
   ["Input", <label>Name<Input size={32} /></label>],
   ["Input error", <label>Email<Input size={32} error aria-invalid="true" /></label>],

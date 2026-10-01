@@ -1,0 +1,10 @@
+{
+  "slots": [
+    {
+      "name": "body",
+      "accepts": { "components": ["NavGroup", "NavItem"] },
+      "cardinality": "1..*",
+      "order": 1
+    }
+  ]
+}
