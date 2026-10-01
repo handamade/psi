@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode, Ref } from "react";
-import styles from "./navtree.module.css";
+import styles from "./nav-tree.module.css";
 
 export interface NavItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "children"> {
   /** One anchor: your router's link. Put `aria-current="page"` on the current

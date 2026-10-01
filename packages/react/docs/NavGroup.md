@@ -23,7 +23,7 @@ Controlled-only: open and onOpenChange are required and the group never changes 
 
 ## Theming
 
-Override `--psi-navtree-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-nav-tree-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
 
 
 

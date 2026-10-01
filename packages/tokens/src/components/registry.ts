@@ -4,8 +4,8 @@ import { bannerVars } from "./banner.js";
 import { inlineAlertVars } from "./inline-alert.js";
 import { buttonVars } from "./button.js";
 import { skeletonVars } from "./skeleton.js";
-import { skiplinkVars } from "./skiplink.js";
-import { navtreeVars } from "./navtree.js";
+import { skipLinkVars } from "./skip-link.js";
+import { navTreeVars } from "./nav-tree.js";
 import { inputVars } from "./input.js";
 import { selectVars } from "./select.js";
 import { surfaceVars } from "./surface.js";
@@ -43,8 +43,8 @@ export const componentVars: Record<string, Record<string, string>> = {
   panel: panelVars,
   select: selectVars,
   skeleton: skeletonVars,
-  navtree: navtreeVars,
-  skiplink: skiplinkVars,
+  "nav-tree": navTreeVars,
+  "skip-link": skipLinkVars,
   surface: surfaceVars,
   switch: switchVars,
   table: tableVars,

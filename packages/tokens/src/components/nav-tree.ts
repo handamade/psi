@@ -1,4 +1,4 @@
-/** NavTree component tokens (--psi-navtree-*) — D88. Pure indirection onto the
+/** NavTree component tokens (--psi-nav-tree-*) — D88. Pure indirection onto the
  * semantic layer (same posture as menu.ts and tabs.ts), so every key resolves
  * under a `data-psi-theme="dark"` sidebar inside a light page: component
  * tokens are declared under `:where(:root, [data-psi-theme])`.
@@ -9,7 +9,7 @@
  * the current surface (neutral4). `indicator` and `focus-ring` are non-text
  * accents and `radius` is geometry; none carries a gated pair, so the pinned
  * pair count does not move. */
-export const navtreeVars: Record<string, string> = {
+export const navTreeVars: Record<string, string> = {
   "item-fg": "var(--psi-fg-secondary)",
   "item-fg-current": "var(--psi-fg-primary)",
   "item-bg-hover": "var(--psi-fill-neutral3)",

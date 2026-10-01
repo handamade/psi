@@ -83,7 +83,7 @@ injected into a page, before anything was written.
     - it does not try to beat the top layer: a modal makes it inert, and the
       doc says not to place a `ToastRegion` at `top-start` in an app with a
       skip link (finding 2);
-    - tokens `--psi-skiplink-{bg,fg,border,focus-ring}`, bound to the
+    - tokens `--psi-skip-link-{bg,fg,border,focus-ring}`, bound to the
       surface and focus tokens.
   - **`AppShell`** — the frame, and nothing else:
     - slots `skipLink` (rendered first), `header`, `sidebar`, `children`
@@ -94,7 +94,7 @@ injected into a page, before anything was written.
       (default `main`), `className`, `ref`, rest on the root;
     - **layout** (finding 4): a grid filling the viewport (`100dvh`); the
       header in its own row; below it the sidebar at the inline start,
-      `--psi-appshell-sidebar-width` wide, and `main`. Sidebar and `main`
+      `--psi-app-shell-sidebar-width` wide, and `main`. Sidebar and `main`
       each scroll on their own. Nothing scrolls under the header, so
       *Focus Not Obscured* holds without `scroll-padding`; the brief's
       `scroll-padding-top` is dropped, because measured on `main` it does
@@ -121,7 +121,7 @@ injected into a page, before anything was written.
       bar — never by colour alone;
     - keyboard is native: *Tab* moves through group buttons and the links of
       open groups. No roving focus: navigation is not an ARIA menu;
-    - tokens `--psi-navtree-{item-fg, item-fg-current, item-bg-hover,
+    - tokens `--psi-nav-tree-{item-fg, item-fg-current, item-bg-hover,
       item-bg-current, indicator, focus-ring}`, bound to semantic tokens so
       they resolve under a dark sub-theme (finding 3): item `fgSecondary`,
       current `fgPrimary`, hover `fillNeutral3`, current `fillNeutral4`,
@@ -129,7 +129,7 @@ injected into a page, before anything was written.
       contrast pair:** `wcagAAPairs` already gates `fgPrimary` and
       `fgSecondary` on `bgPrimary` and on `fillNeutral1–6` in every theme,
       dark included, so the pinned length (31) does not move.
-  - **Tokens:** `--psi-appshell-sidebar-width` (16rem: a standalone literal,
+  - **Tokens:** `--psi-app-shell-sidebar-width` (16rem: a standalone literal,
     as `--psi-toolbar-control-width` is); the header height stays
     `--psi-navbar-height`.
   - **Pattern `app-shell`**: `AppShell` with a `SkipLink`, a fluid `NavBar`

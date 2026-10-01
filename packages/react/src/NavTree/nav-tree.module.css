@@ -1,8 +1,8 @@
-/* packages/react/src/NavTree/navtree.module.css */
+/* packages/react/src/NavTree/nav-tree.module.css */
 /* One module serves NavTree, NavGroup and NavItem — the stylelint plugin
    derives the allowed namespace from the filename, so every custom property
-   here must be --psi-navtree-* or a global scale prefix. Colours and the
-   radius alias the semantic layer in packages/tokens/src/components/navtree.ts. */
+   here must be --psi-nav-tree-* or a global scale prefix. Colours and the
+   radius alias the semantic layer in packages/tokens/src/components/nav-tree.ts. */
 
 .navTree {
   display: block;
@@ -28,20 +28,20 @@
   min-height: var(--psi-size-32);
   padding-block: var(--psi-space-4);
   padding-inline: var(--psi-space-12);
-  border-radius: var(--psi-navtree-radius);
-  color: var(--psi-navtree-item-fg);
+  border-radius: var(--psi-nav-tree-radius);
+  color: var(--psi-nav-tree-item-fg);
   font: var(--psi-text-14-20-regular);
   text-decoration: none;
 }
 
 .item a:hover {
-  background: var(--psi-navtree-item-bg-hover);
+  background: var(--psi-nav-tree-item-bg-hover);
 }
 
 /* Inset (D82): items stack in a scrolling sidebar with no gap to spare, so an
    outside ring would be clipped at its edge. */
 .item a:focus-visible {
-  outline: var(--psi-focus-ring-width) solid var(--psi-navtree-focus-ring);
+  outline: var(--psi-focus-ring-width) solid var(--psi-nav-tree-focus-ring);
   outline-offset: var(--psi-focus-ring-offset-inset);
 }
 
@@ -50,8 +50,8 @@
    pseudo-element rather than an inset shadow, so it follows the writing
    direction; non-current items draw none, so their text never shifts. */
 .item a[aria-current="page"] {
-  background: var(--psi-navtree-item-bg-current);
-  color: var(--psi-navtree-item-fg-current);
+  background: var(--psi-nav-tree-item-bg-current);
+  color: var(--psi-nav-tree-item-fg-current);
   font: var(--psi-text-14-20-medium);
 }
 
@@ -61,8 +61,8 @@
   inset-block: 0;
   inset-inline-start: 0;
   width: 3px;
-  border-radius: var(--psi-navtree-radius);
-  background: var(--psi-navtree-indicator);
+  border-radius: var(--psi-nav-tree-radius);
+  background: var(--psi-nav-tree-indicator);
 }
 
 /* ── Group ────────────────────────────────────────────────────── */
@@ -79,20 +79,20 @@
   padding-block: var(--psi-space-4);
   padding-inline: var(--psi-space-12);
   border: 0;
-  border-radius: var(--psi-navtree-radius);
+  border-radius: var(--psi-nav-tree-radius);
   background: none;
-  color: var(--psi-navtree-group-fg);
+  color: var(--psi-nav-tree-group-fg);
   font: var(--psi-text-14-20-medium);
   text-align: start;
   cursor: pointer;
 }
 
 .groupButton:hover {
-  background: var(--psi-navtree-item-bg-hover);
+  background: var(--psi-nav-tree-item-bg-hover);
 }
 
 .groupButton:focus-visible {
-  outline: var(--psi-focus-ring-width) solid var(--psi-navtree-focus-ring);
+  outline: var(--psi-focus-ring-width) solid var(--psi-nav-tree-focus-ring);
   outline-offset: var(--psi-focus-ring-offset-inset);
 }
 

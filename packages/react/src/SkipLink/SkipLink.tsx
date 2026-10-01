@@ -1,5 +1,5 @@
 import type { AnchorHTMLAttributes, ReactNode, Ref } from "react";
-import styles from "./skiplink.module.css";
+import styles from "./skip-link.module.css";
 
 export interface SkipLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   /** Fragment of the element to skip to, such as `"#main"`. The target must be

@@ -84,7 +84,7 @@
 - `<NavTree aria-label="Main">` is a `<nav>` around a `<ul>` of `<NavItem>` and `<NavGroup>` (D88). `aria-label` is **required**: an app has more than one navigation landmark. It is native and router-agnostic — **Tab** moves through group buttons and the links of open groups; there is no roving tabindex, no arrow keys and no `role="menu"` or `role="tree"`.
 - `<NavItem>` is an `<li>` that styles the one anchor inside it: pass your router's link, with `aria-current="page"` on the current one. The current page shows by weight, a raised surface and an inline-start bar, never by colour alone. `NavItem` renders no anchor itself.
 - `<NavGroup label open onOpenChange>` is **controlled-only**, like Tabs: `open` and `onOpenChange` are required and it never opens itself. It renders a `<button aria-expanded aria-controls>` over a `<ul>` that is `hidden` when closed, so `aria-controls` always resolves. The chevron is `aria-hidden` and turns on a duration token.
-- Tokens `--psi-navtree-*` alias the semantic layer, so under a `data-psi-theme="dark"` sidebar in a light page they resolve dark. The theme paints no background: the sidebar paints `--psi-bg-primary` itself.
+- Tokens `--psi-nav-tree-*` alias the semantic layer, so under a `data-psi-theme="dark"` sidebar in a light page they resolve dark. The theme paints no background: the sidebar paints `--psi-bg-primary` itself.
 
 ## Tabs family (4)
 - `<Tabs value={v} onValueChange={setV} orientation="horizontal|vertical">` is **controlled-only** (D67): `value` and `onValueChange` are required, there is no `defaultValue`, and Tabs never selects itself. Compose `<TabList aria-label="…">` with one `<Tab value>` each, then one `<TabPanel value>` per tab.

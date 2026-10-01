@@ -21,7 +21,7 @@ An <li> that styles the one anchor inside it and renders no anchor of its own. T
 
 ## Theming
 
-Override `--psi-navtree-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-nav-tree-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
 
 
 

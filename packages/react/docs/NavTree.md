@@ -22,7 +22,7 @@ A native <nav> around a <ul>, named by the required aria-label (an app has more 
 
 ## Theming
 
-Override `--psi-navtree-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
+Override `--psi-nav-tree-*` custom properties at any scope; interactive states derive automatically (L - 0.04 hover, L - 0.08 active).
 
 
 

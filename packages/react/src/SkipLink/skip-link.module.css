@@ -33,12 +33,12 @@
   overflow: visible;
   clip: auto;
   clip-path: none;
-  background: var(--psi-skiplink-bg);
-  color: var(--psi-skiplink-fg);
-  border: 1px solid var(--psi-skiplink-border);
-  border-radius: var(--psi-skiplink-radius);
+  background: var(--psi-skip-link-bg);
+  color: var(--psi-skip-link-fg);
+  border: 1px solid var(--psi-skip-link-border);
+  border-radius: var(--psi-skip-link-radius);
   font: var(--psi-text-14-20-medium);
   text-decoration: none;
-  outline: var(--psi-focus-ring-width) solid var(--psi-skiplink-focus-ring);
+  outline: var(--psi-focus-ring-width) solid var(--psi-skip-link-focus-ring);
   outline-offset: var(--psi-focus-ring-offset);
 }

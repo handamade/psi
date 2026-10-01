@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode, Ref } from "react";
-import styles from "./navtree.module.css";
+import styles from "./nav-tree.module.css";
 
 export interface NavTreeProps extends Omit<HTMLAttributes<HTMLElement>, "aria-label" | "children"> {
   /**

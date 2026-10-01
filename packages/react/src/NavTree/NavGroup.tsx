@@ -1,7 +1,7 @@
 import { useId } from "react";
 import type { ReactNode } from "react";
 import { IconChevronDown } from "../icons/IconChevronDown.js";
-import styles from "./navtree.module.css";
+import styles from "./nav-tree.module.css";
 
 export interface NavGroupProps {
   /** The group's visible label, such as "Reports". */

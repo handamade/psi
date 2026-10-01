@@ -23,7 +23,7 @@ A native anchor, visually hidden until it is focused (:focus-visible) and with n
 
 ## Theming
 
-Override `--psi-skiplink-*` custom properties at any scope.
+Override `--psi-skip-link-*` custom properties at any scope.
 
 
 
