@@ -200,7 +200,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Enter", behavior: "Follows the link inside it (native anchor behavior); the link is the consumer's router link." },
     ],
     notes:
-      "An <li> that styles the one anchor inside it and renders no anchor of its own. The consumer sets aria-current=\"page\" on the current link. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
+      "An <li> that styles the one anchor inside it. Router apps pass their own link as the child and set aria-current=\"page\" on the current one; with href the NavItem renders the anchor itself (for plain links and presets) and current sets aria-current=\"page\" on it. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
   },
   Tabs: {
     keyboard: [

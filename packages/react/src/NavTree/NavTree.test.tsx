@@ -163,3 +163,56 @@ describe("NavItem (D88)", () => {
     expect(ref.current?.tagName).toBe("LI");
   });
 });
+
+describe("NavItem href and current (D88)", () => {
+  it("with href renders the anchor itself, children as its text", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem href="#reports">Reports</NavItem>
+      </NavTree>,
+    );
+    const link = screen.getByRole("link", { name: "Reports" });
+    expect(link).toHaveAttribute("href", "#reports");
+    expect(link.tagName).toBe("A");
+    expect(link.closest("li")).not.toBeNull();
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+  });
+
+  it("current marks the anchor aria-current=page", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem href="#a" current>
+          A
+        </NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("link", { name: "A" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("without current the anchor carries no aria-current", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem href="#a">A</NavItem>
+        <NavItem href="#b" current={false}>
+          B
+        </NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("link", { name: "A" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "B" })).not.toHaveAttribute("aria-current");
+  });
+
+  it("without href still renders the consumer's anchor child unchanged", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem current>
+          <a href="#own">Own</a>
+        </NavItem>
+      </NavTree>,
+    );
+    const links = screen.getAllByRole("link");
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute("href", "#own");
+    expect(links[0]).not.toHaveAttribute("aria-current");
+  });
+});
