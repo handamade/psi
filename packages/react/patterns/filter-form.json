@@ -1,0 +1,36 @@
+{
+  "id": "filter-form",
+  "intent": "Labelled filters above a list, submitted together with a Find button: a Toolbar rendered as a named form (as=\"form\", so Find and Enter submit — wire onSubmit), aligned to the end so every control sits on one line under its visible Field label. Fields in the row carry no description or error line. Add IconSearch before the Find label. For filters that apply as they change, named without a visible label, use filter-toolbar instead; never name a control by its placeholder alone",
+  "match": ["filter form", "search form", "labelled filters", "filters with labels", "find button", "submit filters"],
+  "compose": {
+    "component": "Toolbar",
+    "props": { "as": "form", "align": "end", "gap": 12, "aria-label": "{content:form-label}" },
+    "slots": {
+      "body": [
+        {
+          "component": "Field",
+          "slots": {
+            "label": ["{content:text-label}"],
+            "body": [{ "component": "Input", "props": { "size": 32 } }]
+          }
+        },
+        {
+          "component": "Field",
+          "slots": {
+            "label": ["{content:select-label}"],
+            "body": [{ "component": "Select", "props": { "size": 32 } }]
+          }
+        },
+        { "component": "Button", "props": { "type": "submit", "variant": "accent", "size": 32 }, "content": "find-label" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "form-label": "Filters",
+    "text-label": "[field name]",
+    "select-label": "[field name]",
+    "find-label": "Find"
+  },
+  "gaps": []
+}

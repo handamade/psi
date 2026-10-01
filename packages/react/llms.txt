@@ -4,7 +4,7 @@
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
-- dist/patterns.json: 20 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
+- dist/patterns.json: 21 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
@@ -35,6 +35,8 @@
 
 ## Toolbar
 - <Toolbar gap={8|12|16} aria-label="Filters">: horizontal wrapping row for filter/search controls (Input, Select, Tag, Button). Wraps on overflow (D52); with aria-label it announces as role=group. Deliberately not ARIA role=toolbar (no roving tabindex). Unblocks the filter-toolbar pattern — consult dist/patterns.json for the preset.
+- `align="end"` lines items up on their bottom edge, so Field-wrapped controls (label above) and a button without a label share one control line (D87). It aligns each item's last line: a Field in that row must end on its control — no description or error under it.
+- `as="form"` renders a real `<form>`: a `Button type="submit"` and Enter in a field submit it; wire `onSubmit`. With `aria-label` it is a named form landmark (no role=group). Filters that apply as they change, named by aria-label → filter-toolbar; labelled filters submitted together with *Find* → filter-form. Never name a control by its placeholder alone.
 
 ## NavBar
 - <NavBar brand={...} actions={...}>{links}</NavBar>: brand slot leading, nav links centered/inline, actions slot trailing (theme switch, CTA). Renders inside .psi-container. Background defaults to --psi-scrim-heavy so content can scroll underneath; border uses --psi-border-faint.
