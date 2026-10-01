@@ -2,6 +2,11 @@
 
 .input {
   display: block;
+  /* D87: the size token is the rendered height, border included. Under the
+     browser's content-box every size measured 4px over (32 → 36) and
+     width: 100% overflowed its Field. Select and Button are border-box by
+     the browser's own stylesheet already. */
+  box-sizing: border-box;
   width: 100%;
   border: 1px solid var(--psi-input-border);
   border-radius: var(--psi-input-radius);
