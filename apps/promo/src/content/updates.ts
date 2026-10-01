@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-10-01",
+    tag: "release",
+    title: "0.21.0 — the first screens of an operator console",
+    body: "An operator web portal held Psi to stricter rules than any earlier consumer: one announcer, every control named by visible text, required fields stated in words, lists that page by opaque token, and WCAG 2.2 AA at desktop sizes. Seven decisions close what its first four screens needed. One focus ring: width and offsets are tokens, every component binds them, and a browser test tabs through every story to prove the ring is drawn. Toasts route by politeness as well as tone, and a speech-only Announcement joins the one announcer. Field states a requirement in text and lends its wiring to custom controls through useFieldControl. Tables pass attributes through, take a focusable caption that states the range, and page by cursor with visible Previous and Next. Banner, InlineAlert, Skeleton and CopyButton show feedback without writing a live region. A filter form is a real, labelled form whose controls share one line — which surfaced that Input had been 4px taller than its size since it shipped. And an application shell: AppShell, a navigation tree, a skip link, and a NavBar that labels its links. Its main region scrolls on its own beside the header, because measured in a browser the usual scroll-padding fix left focus hidden under a sticky header. 46 components, 22 patterns.",
+  },
+  {
     date: "2026-09-28",
     tag: "release",
     title: "0.20.0 — ready for a strict CSP, one announcer, and a brand kept elsewhere",
