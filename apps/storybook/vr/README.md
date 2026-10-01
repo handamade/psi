@@ -23,7 +23,7 @@ pnpm vr      # runs Playwright against the built Storybook, diffs against baseli
 ```
 
 `pnpm vr` serves `storybook-static/` via `npx serve` on port 6208 and exits non-zero
-on any visual diff (`maxDiffPixels: 48`, per-pixel `threshold: 0.02`).
+on any visual diff (`maxDiffPixels: 0`, per-pixel `threshold: 0.02`).
 
 ### Why absolute maxDiffPixels and a strict threshold (HAN-20)
 
@@ -43,6 +43,21 @@ Same-environment re-renders are deterministic: measured 0 diff pixels across
 all stories at threshold 0. The cost of the strict config: when the CI runner
 image updates its font stack, expect a mass baseline refresh (the documented
 workflow below) rather than silent absorption — that trade is deliberate.
+
+### Why the budget is 0 (D89)
+
+HAN-20 set `maxDiffPixels: 48`, between the noise floor (0) and the smallest
+signal it had measured (54 px, the ember label fix). A smaller signal turned
+up: D81 redrew the `Select` chevron, raising its contrast from 1.71:1 to
+8.48:1 in ember (2.06 → 4.92 in light). That measures **7–10 px per chevron**
+at threshold 0.02, so every baseline holding a `Select` kept the old, faint
+chevron and `vr` stayed green. A CI run at budget 0 failed exactly those 18
+screenshots and passed the other 506 at 0 diff pixels: there is no noise for a
+budget to absorb, and any non-zero budget only sets the size of change that
+goes unseen. Spec: `docs/superpowers/specs/2026-10-01-vr-budget-design.md`.
+
+If a screenshot ever fails with no source change behind it, that is the first
+measured noise: record its pixel count and story before touching the budget.
 
 ### Why `serve.json` exists
 
@@ -64,8 +79,12 @@ CI and that replacement is authoritative).
 To refresh baselines after an intentional visual change:
 
 1. Push the change; let the `vr` CI job run and fail on the diff.
-2. Download the `vr-baselines` artifact from the failed CI run.
-3. Replace the contents of `stories.spec.ts-snapshots/` with the downloaded PNGs.
+2. Download the `vr-baselines` artifact from the failed CI run
+   (`gh run download <run-id> -n vr-baselines`).
+3. CI's renders are the `test-results/stories-<story>-<theme>/<story>--<theme>-actual.png`
+   files in it — the artifact's `vr/stories.spec.ts-snapshots/` folder is only the
+   committed baselines coming back. Copy each `-actual.png` over
+   `stories.spec.ts-snapshots/<story>--<theme>-linux.png`.
 4. Commit the updated baselines alongside the change that caused the diff.
 
 Do not hand-generate baselines on a non-Linux machine and commit them as the final
