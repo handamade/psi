@@ -37,3 +37,20 @@ export const Default: Story = {
     ),
   },
 };
+
+/** D88 — no links, no empty `<nav>`: the actions keep the trailing edge. */
+export const NoLinks: Story = {
+  args: {
+    brand: <a href="/">DK</a>,
+    actions: <Button variant="outline">Theme</Button>,
+  },
+};
+
+/** D88 — a full-width row (an application header) with a labelled `<nav>`. */
+export const Fluid: Story = {
+  args: {
+    ...Default.args,
+    fluid: true,
+    navLabel: "Primary",
+  },
+};

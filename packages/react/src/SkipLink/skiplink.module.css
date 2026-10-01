@@ -1,0 +1,44 @@
+/* Visually hidden until focused: the declarations of .psi-sr-only
+ * (utilities.css), restated here so the link works even where the
+ * utilities stylesheet is absent, and undone below on focus. */
+.skipLink {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The link is invisible, so only keyboard (and programmatic) focus can reach
+ * it: :focus-visible is the whole story. */
+.skipLink:focus-visible {
+  position: fixed;
+  /* The 8px offset rides margin: the space scale binds gap, padding and
+   * margin, not the logical inset properties. */
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  margin: var(--psi-space-8);
+  z-index: var(--psi-z-overlay);
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: auto;
+  height: var(--psi-size-32);
+  padding-inline: var(--psi-space-12);
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  background: var(--psi-skiplink-bg);
+  color: var(--psi-skiplink-fg);
+  border: 1px solid var(--psi-skiplink-border);
+  border-radius: var(--psi-skiplink-radius);
+  font: var(--psi-text-14-20-medium);
+  text-decoration: none;
+  outline: var(--psi-focus-ring-width) solid var(--psi-skiplink-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset);
+}

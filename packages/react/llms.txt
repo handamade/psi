@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-41 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+42 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -40,6 +40,10 @@
 
 ## NavBar
 - <NavBar brand={...} actions={...}>{links}</NavBar>: brand slot leading, nav links centered/inline, actions slot trailing (theme switch, CTA). Renders inside .psi-container. Background defaults to --psi-scrim-heavy so content can scroll underneath; border uses --psi-border-faint.
+- `navLabel` names the links' `<nav>` (rest props land on `<header>`, so it cannot be labelled any other way). `<nav>` renders only when there are children: a brand-and-actions bar has no empty landmark, and `actions` keeps the trailing edge. `fluid` drops .psi-container for a full-width row that keeps the `--psi-gutter` side padding — an application header (D88).
+
+## SkipLink
+- <SkipLink href="#main">Skip to content</SkipLink>: a plain anchor, no script, render it first in the document. Invisible until it takes keyboard focus, then fixed at the inline-start top corner on a surface with the shared focus ring. Fragment navigation moves focus only to a focusable target — give `<main id="main" tabIndex={-1}>` (AppShell's main will be one). A modal Dialog makes it inert; do not place a ToastRegion at `top-start` in an app with a skip link, because the top layer paints over it (D88).
 
 ## AspectRatio
 - <AspectRatio ratio={16/10}>{children}</AspectRatio>: a frame div with CSS aspect-ratio set from the numeric ratio prop — wrap images/media to reserve layout space before load. Combine with the .psi-media-tint utility for the brand media-tint treatment.

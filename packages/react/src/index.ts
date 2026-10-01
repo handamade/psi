@@ -12,6 +12,8 @@ export { DescriptionItem } from "./DescriptionList/DescriptionItem.js";
 export type { DescriptionItemProps } from "./DescriptionList/DescriptionItem.js";
 export { NavBar } from "./NavBar/NavBar.js";
 export type { NavBarProps } from "./NavBar/NavBar.js";
+export { SkipLink } from "./SkipLink/SkipLink.js";
+export type { SkipLinkProps } from "./SkipLink/SkipLink.js";
 export { AspectRatio } from "./AspectRatio/AspectRatio.js";
 export type { AspectRatioProps } from "./AspectRatio/AspectRatio.js";
 export { Field, FieldContext } from "./Field/Field.js";

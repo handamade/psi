@@ -173,6 +173,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region: it renders no role and no aria-live, announces nothing, and does not change its label or icon after a copy, so a screen reader hears the same button before and after. The application speaks the result: onCopy reports \"copied\" or \"failed\" (a rejected write, or no clipboard API), and the application routes that through its announcer or a Toast (D86). The label is visible text; the icon is aria-hidden and only reinforces it. Focus stays on the button.",
   },
+  SkipLink: {
+    keyboard: [
+      { keys: "Tab", behavior: "Takes focus and becomes visible at the inline-start top corner, drawing the shared focus ring. Put it first in the document so it is the first tab stop." },
+      { keys: "Enter", behavior: "Follows the fragment href: focus moves to the target, and the next Tab continues from inside it." },
+    ],
+    notes:
+      "A native anchor, visually hidden until it is focused (:focus-visible) and with no script (D88). Fragment navigation moves focus only to a focusable target, so the element named by href must be focusable: tabIndex={-1} is enough, and AppShell's main has it. A modal Dialog makes the link inert, so it never needs to beat one. A ToastRegion is on the native top layer and paints over the focused link whatever its z-index: do not place one at top-start in an app with a skip link.",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },

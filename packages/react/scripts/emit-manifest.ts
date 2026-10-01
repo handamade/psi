@@ -22,6 +22,7 @@ const COMPONENTS = [
   "Toolbar",
   "Tooltip",
   "NavBar",
+  "SkipLink",
   "AspectRatio",
   "Menu",
   "MenuItem",

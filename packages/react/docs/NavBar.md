@@ -9,7 +9,9 @@ Top navigation bar with brand, nav-link, and trailing-action slots.
 |---|---|---|---|---|
 | `brand` | `ReactNode` | — | no | Brand slot (wordmark / logo link), leading edge. |
 | `actions` | `ReactNode` | — | no | Trailing actions slot (theme switch, CTA). |
-| `children` | `ReactNode` | — | no | Nav links. |
+| `children` | `ReactNode` | — | no | Nav links. The `<nav>` renders only when there are children, so a bar with a brand and actions and no links has no empty landmark (D88). |
+| `navLabel` | `string` | — | no | Accessible name of the links' `<nav>` (its `aria-label`). Rest props land on the `<header>`, so this is the only way to label the `<nav>` (D88). |
+| `fluid` | `boolean` | false | no | Lay the row out at full width: it drops `psi-container` (the centred max-width column) and keeps the `--psi-gutter` side padding. For an application header over a full-width frame (D88). |
 | `ref` | `Ref<HTMLElement>` | — | no | Forwarded ref to the header element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
