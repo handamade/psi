@@ -1,6 +1,6 @@
 # A labelled filter form: `Toolbar` gains `align` and `as`, `Input` becomes pixel-true, pattern `filter-form` (D87)
 
-Date: 2026-10-01. Status: **Proposed** on branch `d87-filter-form`.
+Date: 2026-10-01. Status: **Implemented** on branch `d87-filter-form`.
 
 Provenance: the sixth item of the Psi 0.21 portal handoff
 (`docs/superpowers/plans/2026-09-30-psi-0.21-portal-handoff.md`, brief D87,
@@ -133,27 +133,41 @@ anything was written.
 ## Verification
 
 - **Tests first**, each red before its change:
-  - `Toolbar`: `align="end"` sets the end class and `center` sets none;
-    `as="form"` renders a `<form>` named by `aria-label` with no `role`;
-    submitting it calls `onSubmit`; a labelled `div` is still a `group`.
-  - `Input`: its size class computes `box-sizing: border-box` in CSS — a
-    unit test over `input.module.css`, since jsdom does no layout.
-  - the patterns: red on the missing `filter-form` in the seed and emit
-    lists; the preset render gate renders it.
-  - **in a browser**, `filter-form.interaction.spec.ts` (Chromium, built
-    Storybook): every `Input` size is its own height; in the `filter-form`
-    preset the text field, the select and *Find* share top and bottom edges;
-    *Enter* in the text field submits the form once; the `cursor-pagination`
-    preset's select and pager share their bottom edge.
+  - `Toolbar`: 3 tests red on assertion — `align="end"` sets the end class
+    while the default and `center` set none; `as="form"` renders a `form`
+    landmark named by `aria-label` with no `role`; `onSubmit` fires once and
+    a ref reaches the `HTMLFormElement`. The fourth, a labelled `div` still a
+    `group`, passed before and after: it is the regression guard.
+  - `Input`: red on assertion — the `.input` rule declares
+    `box-sizing: border-box`, read from the CSS since jsdom does no layout.
+  - **in a browser**, `filter-form.interaction.spec.ts`, all 4 red against
+    `main`'s build: sizes measured `[28, 36, 44, 52]` for `[24, 32, 40, 48]`;
+    the `filter-form` preset missing (two tests); the `cursor-pagination`
+    pager's bottom at 77 against the select's 90.
+  - the patterns: the seed and emit lists name `filter-form`; the D61
+    envelope test runs 21 real patterns and no synthetic one.
 - **Regression.** No existing `Toolbar`, `Input` or `Button` test edited.
-- **axe:** `Toolbar` as a form, and the preset.
-- **The six gates**, `pnpm test:e2e` included (the D82 sweep tabs through
-  the new preset).
+- **In a browser** (Chromium 149, built Storybook, 1366 × 768), after:
+  - the `filter-form` preset reads `form "Filters"` → `textbox` and
+    `combobox`, each named by its visible label → `button "Find"`;
+  - every control in it spans 58–90 px, in light and ember; so do the
+    `cursor-pagination` preset's select and pager, and the `FilterForm`
+    story's *Find* with `IconSearch`;
+  - text inputs fill their `Field`: 172 in 172, and the `date-range-filter`
+    preset's date inputs 141 in 141 (159 in 141 before);
+  - the `AlignEnd` story shows the step it removes: centred, the button
+    spans 45–77 beside a control at 58–90.
+- **axe:** one new case, `Toolbar` as a filter form; no violations.
+- **The six gates** green: 2437 tests in 103 files; docs drift at 41
+  components and 21 patterns; site gate 9 of 9; `pnpm test:e2e` 189 of 189,
+  the D82 focus sweep over the new stories included. No `-darwin` snapshot
+  written.
 
 ## Consequences
 
-- **Visual regression.** New: the `filter-form` preset and the new `Toolbar`
-  stories, in light and ember. Changed: the 12 stories that render a
+- **Visual regression.** New: the `filter-form` preset and the `Toolbar`
+  stories `FilterForm` and `AlignEnd` — 3 stories, 6 baselines, in light
+  and ember. Changed: the 12 stories that render a
   `content-box` `Input` (counted in the browser: `Input` ×5, `Field` ×2,
   `Toolbar` ×2, `Dialog` form, the `date-range-filter` and `required-field`
   presets) and the `cursor-pagination` preset — 13 stories, 26 baselines,
