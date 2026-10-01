@@ -6,6 +6,7 @@ import { buttonVars } from "./button.js";
 import { skeletonVars } from "./skeleton.js";
 import { skipLinkVars } from "./skip-link.js";
 import { navTreeVars } from "./nav-tree.js";
+import { appShellVars } from "./app-shell.js";
 import { inputVars } from "./input.js";
 import { selectVars } from "./select.js";
 import { surfaceVars } from "./surface.js";
@@ -28,6 +29,7 @@ import { fieldVars } from "./field.js";
 import { descriptionListVars } from "./description-list.js";
 
 export const componentVars: Record<string, Record<string, string>> = {
+  "app-shell": appShellVars,
   banner: bannerVars,
   button: buttonVars,
   card: cardVars,

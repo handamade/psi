@@ -26,6 +26,7 @@ const COMPONENTS = [
   "NavTree",
   "NavGroup",
   "NavItem",
+  "AppShell",
   "AspectRatio",
   "Menu",
   "MenuItem",

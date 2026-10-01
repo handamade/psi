@@ -18,11 +18,12 @@ const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
   .filter((n) => existsSync(join(root, "src/icons", `${n}.tsx`)));
 
 describe("seed patterns against the real manifest", () => {
-  it("all twenty-one load and validate; the backlog is empty (D67)", () => {
+  it("all twenty-two load and validate; the backlog is empty (D67)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "action-feedback",
       "announcer",
+      "app-shell",
       "bulk-action-bar",
       "copyable-id",
       "cursor-pagination",

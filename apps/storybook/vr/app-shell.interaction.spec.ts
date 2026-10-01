@@ -79,6 +79,13 @@ test("no tab stop in a long main is ever under the header, going down and back u
   const scrolls = await page.locator("main#main").evaluate((el) => el.scrollHeight > el.clientHeight);
   expect(scrolls).toBe(true);
 
+  // The frame is the page: if the document scrolled too, the header would
+  // slide and the measurement below would mean nothing.
+  const documentScrolls = await page.evaluate(
+    () => document.documentElement.scrollHeight > document.documentElement.clientHeight,
+  );
+  expect(documentScrolls).toBe(false);
+
   const headerBottom = (await rectOf(page, "header")).bottom;
 
   await page.keyboard.press("Tab");
@@ -98,9 +105,14 @@ test("no tab stop in a long main is ever under the header, going down and back u
   expect(stops).toHaveLength(2 * links - 1);
   const minTop = Math.min(...stops.map((s) => s.top));
   console.log(`header bottom ${headerBottom}, min top of a focused element in main ${minTop}`);
+  // 1px of slack for sub-pixel scroll rounding: the browser snaps main's
+  // scroll offset to whole pixels, so an inline link's box can poke out of the
+  // scrollport by a fraction (measured 0.125px) — nothing like the whole
+  // links that scrolled under a sticky header before the frame was designed.
+  const SUBPIXEL = 1;
   for (const s of stops) {
-    expect(s.top, `"${s.text}" starts under the header`).toBeGreaterThanOrEqual(headerBottom);
-    expect(s.bottom, `"${s.text}" ends below the viewport`).toBeLessThanOrEqual(s.viewport);
+    expect(s.top, `"${s.text}" starts under the header`).toBeGreaterThanOrEqual(headerBottom - SUBPIXEL);
+    expect(s.bottom, `"${s.text}" ends below the viewport`).toBeLessThanOrEqual(s.viewport + SUBPIXEL);
   }
 });
 

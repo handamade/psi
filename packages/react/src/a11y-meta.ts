@@ -202,6 +202,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "An <li> that styles the one anchor inside it. Router apps pass their own link as the child and set aria-current=\"page\" on the current one; with href the NavItem renders the anchor itself (for plain links and presets) and current sets aria-current=\"page\" on it. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
   },
+  AppShell: {
+    keyboard: [
+      { keys: "Tab", behavior: "The first stop is the skip link (when given), then the header, the sidebar's links and buttons, and the links of main, in document order. The shell adds no stop of its own: main has tabIndex={-1}." },
+      { keys: "Enter (on the skip link)", behavior: "Follows the fragment href: focus moves to main, drawing the shared focus ring inside its box, and the next Tab continues from main's first link." },
+    ],
+    notes:
+      "A grid filling the viewport: the header sits in a row of its own and main is its own scroller, so nothing scrolls under the header and a focused element is never obscured by it (WCAG 2.2 Focus Not Obscured) without scroll-padding, which does nothing on a main that is not the document's scroller (D88). main carries id={mainId} and tabIndex={-1}, the skip link's target. A closed sidebar is `hidden`, so it leaves the layout and the accessibility tree while its id stays in the DOM for a toggle's aria-controls; the toggle's aria-expanded and sidebarOpen are wired by the consumer, since the shell is controlled and stores nothing. The sidebar is a div, not an aside: the NavTree inside is already the navigation landmark. sidebarTheme sets data-psi-theme on the sidebar alone, so its tokens re-resolve under that theme in a page that keeps its own; the sidebar paints --psi-bg-primary itself. Desktop frame only: no responsive drawer. Do not place a ToastRegion at top-start in an app with a skip link.",
+  },
   Tabs: {
     keyboard: [
       { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },

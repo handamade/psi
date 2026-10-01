@@ -1,0 +1,8 @@
+{
+  "slots": [
+    { "name": "skipLink", "accepts": { "components": ["SkipLink"] }, "cardinality": "0..1", "order": 1 },
+    { "name": "header", "accepts": { "components": ["NavBar"] }, "cardinality": "0..1", "order": 2 },
+    { "name": "sidebar", "accepts": { "components": ["NavTree"] }, "cardinality": "0..1", "order": 3 },
+    { "name": "body", "accepts": {}, "cardinality": "0..*", "order": 4 }
+  ]
+}

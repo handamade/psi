@@ -1,10 +1,10 @@
 # @handamade/psi-react
 
-45 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+46 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
-- dist/patterns.json: 21 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
+- dist/patterns.json: 22 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
@@ -85,6 +85,14 @@
 - `<NavItem>` is an `<li>` that styles the one anchor inside it: pass your router's link, with `aria-current="page"` on the current one. The current page shows by weight, a raised surface and an inline-start bar, never by colour alone. `<NavItem href="#x" current>Text</NavItem>` renders the anchor itself (`aria-current="page"` when `current`): for plain links and presets, where a compose tree can hold only manifest components; router apps keep passing their own link as the child.
 - `<NavGroup label open onOpenChange>` is **controlled-only**, like Tabs: `open` and `onOpenChange` are required and it never opens itself. It renders a `<button aria-expanded aria-controls>` over a `<ul>` that is `hidden` when closed, so `aria-controls` always resolves. The chevron is `aria-hidden` and turns on a duration token.
 - Tokens `--psi-nav-tree-*` alias the semantic layer, so under a `data-psi-theme="dark"` sidebar in a light page they resolve dark. The theme paints no background: the sidebar paints `--psi-bg-primary` itself.
+
+## AppShell (D88)
+- `<AppShell skipLink header sidebar sidebarOpen sidebarTheme>` is the **frame of an application**: a grid filling the viewport (`100dvh`) with the header in a row of its own over a sidebar and a `<main>` that **each scroll on their own**. Nothing scrolls under the header, so a focused element is never obscured by it (WCAG 2.2 *Focus Not Obscured*) — no `scroll-padding` needed, and none would work: measured on a `main` that is not the document's scroller, it does nothing. It is a **desktop frame**: no responsive drawer, no stored open state. A page whose document must scroll as a whole does not use it. Mount it at the root of the page with no margin or padding around it (it is `100dvh` tall, so anything around it makes the document scroll and slides the frame). Consult dist/patterns.json for the `app-shell` pattern.
+- Slots: `skipLink` (a `<SkipLink href="#main">`, rendered first), `header` (a `<NavBar fluid>`), `sidebar` (a `<NavTree>`), and `children` as main's content. `main` carries `id="main"` (`mainId`) and `tabIndex={-1}`: the skip link's target, not a tab stop. The sidebar is a `<div id="sidebar">` (`sidebarId`), not an `<aside>`: the `NavTree` inside is already the landmark.
+- `sidebarOpen` (default `true`) is **controlled**: wire your Menu toggle's `aria-expanded`, `aria-controls="sidebar"` and `sidebarOpen` to one piece of state. Closed, the sidebar is `hidden` (out of the layout and the accessibility tree, still in the DOM so `aria-controls` resolves) and `main` takes the full width.
+- `sidebarTheme="dark"` sets `data-psi-theme` on the sidebar alone; its tokens re-resolve dark inside a light page, and the sidebar paints `--psi-bg-primary` itself (a theme paints no background). Tokens `--psi-app-shell-*`.
+- `NavItem` takes `href` and `current` for plain links and presets: `<NavItem href="#sales" current>Sales</NavItem>` renders the anchor with `aria-current="page"`. A compose tree can hold only manifest components, so a preset cannot put a raw `<a>` in a `NavItem`; router apps keep passing their own link as the child.
+- **Do not put a `ToastRegion` at `top-start` in an app with a skip link:** the native top layer paints over the focused link. Its default, `bottom-end`, is clear of it.
 
 ## Tabs family (4)
 - `<Tabs value={v} onValueChange={setV} orientation="horizontal|vertical">` is **controlled-only** (D67): `value` and `onValueChange` are required, there is no `defaultValue`, and Tabs never selects itself. Compose `<TabList aria-label="…">` with one `<Tab value>` each, then one `<TabPanel value>` per tab.
