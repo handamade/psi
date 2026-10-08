@@ -1,4 +1,4 @@
-import { createRef, useEffect, useRef } from "react";
+import { Profiler, createRef, useEffect, useRef } from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act, fireEvent, within } from "@testing-library/react";
 import { ToastProvider } from "./ToastProvider.js";
@@ -453,6 +453,41 @@ describe("ToastProvider", () => {
       act(() => void fireEvent.pointerOut(region));
       advance(1000);
       expect(screen.queryByText("spoken")).toBeNull();
+    });
+
+    it("an announcement raised while the region is paused leaves one dwell after resume", () => {
+      let handle: ToastHandle | undefined;
+      render(
+        <ToastProvider>
+          <Probe run={(t) => (handle = t)} />
+        </ToastProvider>,
+      );
+      const region = status().parentElement!;
+      act(() => void fireEvent.pointerOver(region));
+      act(() => void handle!.announce("spoken"));
+      advance(5000); // recorded but not scheduled while paused
+      expect(screen.getByText("spoken")).toBeInTheDocument();
+
+      act(() => void fireEvent.pointerOut(region));
+      advance(999);
+      expect(screen.getByText("spoken")).toBeInTheDocument();
+      advance(1);
+      expect(screen.queryByText("spoken")).toBeNull();
+    });
+
+    it("a removal that matches nothing leaves both lists alone, so nothing re-renders", () => {
+      let handle: ToastHandle | undefined;
+      const onRender = vi.fn();
+      render(
+        <Profiler id="provider" onRender={onRender}>
+          <ToastProvider>
+            <Probe run={(t) => (handle = t)} />
+          </ToastProvider>
+        </Profiler>,
+      );
+      onRender.mockClear();
+      act(() => handle!.dismiss("no-such-id"));
+      expect(onRender).not.toHaveBeenCalled();
     });
 
     it("disposes an announcement's timer on unmount", () => {

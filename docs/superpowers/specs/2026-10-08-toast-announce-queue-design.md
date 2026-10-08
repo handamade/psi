@@ -58,8 +58,10 @@ Measured on `main` at `6cda910` (D90 merged), `packages/react/src/Toast/`.
     nothing D90 did not already buy — with `aria-atomic="false"` a second
     added node is spoken on its own, without re-speaking the first. Replacing
     would need a measured reason (a screen reader that re-speaks a sibling,
-    say), and none has been measured. At most a dwell's worth of
-    announcements share a wrapper.
+    say), and none has been measured. While the region is not paused, at
+    most a dwell's worth of announcements share a wrapper. While it is
+    paused (pointer or focus inside it, below), every announcement raised
+    stays, and each leaves one dwell after the pause ends.
   - **Announcements never count against `limit`.** The provider keeps two
     lists, toasts and announcements; the eviction loop in `show()` walks the
     toast list only. A burst of announcements can therefore never evict a
@@ -146,7 +148,12 @@ Measured on `main` at `6cda910` (D90 merged), `packages/react/src/Toast/`.
   - `aria-label`, `ref` and a `data-*` attribute given to `ToastProvider`
     reach the region element.
   - Written after the implementation, so green on first run: the dwell
-    pauses while the pointer is over the region and runs out after it leaves.
+    pauses while the pointer is over the region and runs out after it leaves;
+    an announcement raised while the region is paused stays, and leaves one
+    dwell after the pause ends.
+  - `remove()` returns a list unchanged when the id is not in it, so the list
+    keeps its identity: a `dismiss` that matches nothing commits no render
+    (measured with a `Profiler`; red before the change, one commit).
 - **The region in jsdom.** As in D90, the shown popover stays
   `display: none` under the jsdom polyfill, so `getByRole` needs
   `hidden: true` and a hidden subtree computes no name. The forwarding test

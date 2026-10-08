@@ -114,9 +114,11 @@ export function ToastProvider({
     const timer = timers.current.get(id);
     if (timer?.handle !== undefined) clearTimeout(timer.handle);
     timers.current.delete(id);
-    // Ids come from one sequence, so the id names one item in one list.
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-    setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+    // Ids come from one sequence, so the id names one item in one list. The
+    // other list keeps its identity, so a removal that matches nothing (an
+    // id already gone) lets React bail out of the re-render.
+    setToasts((prev) => (prev.some((t) => t.id === id) ? prev.filter((t) => t.id !== id) : prev));
+    setAnnouncements((prev) => (prev.some((a) => a.id === id) ? prev.filter((a) => a.id !== id) : prev));
   }, []);
 
   /** Arm (or re-arm) one toast's timer for `ms`. Paused timers are recorded
