@@ -132,3 +132,102 @@ describe("Tabs", () => {
     expect(new Set(allIds).size).toBe(allIds.length);
   });
 });
+
+describe("Tabs when value matches no enabled tab (D93)", () => {
+  function Orphan({ value = "gone", firstDisabled = false }: { value?: string; firstDisabled?: boolean }) {
+    return (
+      <Tabs value={value} onValueChange={() => {}}>
+        <TabList aria-label="Views">
+          <Tab value="a" disabled={firstDisabled}>
+            A
+          </Tab>
+          <Tab value="b">B</Tab>
+        </TabList>
+        <TabPanel value="a">x</TabPanel>
+        <TabPanel value="b">y</TabPanel>
+      </Tabs>
+    );
+  }
+
+  function withWarnSpy<T>(run: (warn: ReturnType<typeof vi.spyOn>) => T): T {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      return run(warn);
+    } finally {
+      warn.mockRestore();
+    }
+  }
+
+  it("keeps exactly one tab stop and selects nothing", () => {
+    withWarnSpy(() => {
+      render(<Orphan />);
+      const tabs = screen.getAllByRole("tab");
+      const stops = tabs.filter((t) => t.getAttribute("tabindex") === "0");
+      expect(stops).toHaveLength(1);
+      expect(stops[0]).toHaveTextContent("A");
+      // The selection stays the consumer's: none is selected.
+      tabs.forEach((t) => expect(t).toHaveAttribute("aria-selected", "false"));
+    });
+  });
+
+  it("skips a disabled first tab when choosing the fallback stop", () => {
+    withWarnSpy(() => {
+      render(<Orphan firstDisabled />);
+      const stops = screen.getAllByRole("tab").filter((t) => t.getAttribute("tabindex") === "0");
+      expect(stops).toHaveLength(1);
+      expect(stops[0]).toHaveTextContent("B");
+    });
+  });
+
+  it("warns once, naming the value that matched nothing", () => {
+    withWarnSpy((warn) => {
+      const { rerender } = render(<Orphan />);
+      expect(warn).toHaveBeenCalledOnce();
+      expect(warn).toHaveBeenCalledWith(
+        'Tabs: value "gone" matches no enabled tab; the first enabled tab takes the tab stop.',
+      );
+      // A re-render with the same value is not a second report.
+      rerender(<Orphan />);
+      expect(warn).toHaveBeenCalledOnce();
+    });
+  });
+
+  it("neither warns nor moves the stop when value matches an enabled tab", () => {
+    withWarnSpy((warn) => {
+      render(<Orphan value="b" />);
+      const stops = screen.getAllByRole("tab").filter((t) => t.getAttribute("tabindex") === "0");
+      expect(stops).toHaveLength(1);
+      expect(stops[0]).toHaveTextContent("B");
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
+
+  it("hands the stop back to the selected tab once value matches", () => {
+    withWarnSpy(() => {
+      const { rerender } = render(<Orphan />);
+      rerender(<Orphan value="b" />);
+      const stops = screen.getAllByRole("tab").filter((t) => t.getAttribute("tabindex") === "0");
+      expect(stops).toHaveLength(1);
+      expect(stops[0]).toHaveTextContent("B");
+    });
+  });
+
+  it("follows document order when a tab is inserted before the first", () => {
+    withWarnSpy(() => {
+      const view = (withZero: boolean) => (
+        <Tabs value="gone" onValueChange={() => {}}>
+          <TabList aria-label="Views">
+            {withZero ? <Tab value="z">Z</Tab> : null}
+            <Tab value="a">A</Tab>
+          </TabList>
+        </Tabs>
+      );
+      const { rerender } = render(view(false));
+      rerender(view(true));
+      const stops = screen.getAllByRole("tab").filter((t) => t.getAttribute("tabindex") === "0");
+      expect(stops).toHaveLength(1);
+      expect(stops[0]).toHaveTextContent("Z");
+    });
+  });
+});
+

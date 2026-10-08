@@ -7,7 +7,7 @@ Tab set root (D67) — holds no selection state of its own, following D50, D53 a
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
-| `value` | `string` | — | yes | Controlled selected tab, matched against each `Tab`/`TabPanel` value. |
+| `value` | `string` | — | yes | Controlled selected tab, matched against each `Tab`/`TabPanel` value. A value that matches no enabled tab selects nothing, and the first enabled tab holds the list's tab stop (D93); development builds warn. |
 | `onValueChange` | `(value: string) => void` | — | yes | Fires with the newly selected value; the consumer flips `value`. |
 | `orientation` | `"horizontal" \| "vertical"` | horizontal | no | Axis of the tab list, which also picks the arrow keys. |
 | `children` | `ReactNode` | — | yes | A `TabList` and one `TabPanel` per tab. |
@@ -18,7 +18,7 @@ Tab set root (D67) — holds no selection state of its own, following D50, D53 a
 
 | Keys | Behavior |
 |---|---|
-| Tab | Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel. |
+| Tab | Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel. When value matches no enabled tab, the first enabled tab holds the stop and none is selected (D93). |
 
 Controlled-only (D67): value and onValueChange are required and Tabs never selects itself. Tab and TabPanel pair by string value, not index, so their source order need not match. Every panel renders and unselected ones carry `hidden`, so aria-controls always resolves and panel DOM state survives a switch.
 

@@ -82,7 +82,7 @@
 
 ## NavTree family (3)
 - `<NavTree aria-label="Main">` is a `<nav>` around a `<ul>` of `<NavItem>` and `<NavGroup>` (D88). `aria-label` is **required**: an app has more than one navigation landmark. It is native and router-agnostic — **Tab** moves through group buttons and the links of open groups; there is no roving tabindex, no arrow keys and no `role="menu"` or `role="tree"`.
-- `<NavItem>` is an `<li>` that styles the one anchor inside it: pass your router's link, with `aria-current="page"` on the current one. The current page shows by weight, a raised surface and an inline-start bar, never by colour alone. `<NavItem href="#x" current>Text</NavItem>` renders the anchor itself (`aria-current="page"` when `current`): for plain links and presets, where a compose tree can hold only manifest components; router apps keep passing their own link as the child.
+- `<NavItem>` is an `<li>` that styles the one anchor inside it: pass your router's link. `current` clones that single child with `aria-current="page"` (D93); without `current` the child's own `aria-current` is left alone, so a router that marks its active link keeps working. The current page shows by weight, a raised surface and an inline-start bar, never by colour alone. `<NavItem href="#x" current>Text</NavItem>` renders the anchor itself (`aria-current="page"` when `current`): for plain links and presets, where a compose tree can hold only manifest components; router apps keep passing their own link as the child.
 - `<NavGroup label open onOpenChange>` is **controlled-only**, like Tabs: `open` and `onOpenChange` are required and it never opens itself. It renders a `<button aria-expanded aria-controls>` over a `<ul>` that is `hidden` when closed, so `aria-controls` always resolves. The chevron is `aria-hidden` and turns on a duration token.
 - Tokens `--psi-nav-tree-*` alias the semantic layer, so under a `data-psi-theme="dark"` sidebar in a light page they resolve dark. The theme paints no background: the sidebar paints `--psi-bg-primary` itself.
 
@@ -99,6 +99,7 @@
 - **Values are strings, not indices**, and `Tab`/`TabPanel` pair by value — their source order need not match, though keeping it matching reads better.
 - **Activation is automatic**: arrow keys move focus and selection together. There is no manual-activation mode. Arrows follow the orientation's axis (Left/Right horizontal, Up/Down vertical) with wrap; Home/End jump to the first/last enabled tab; disabled tabs are skipped and use `aria-disabled`, not the `disabled` attribute.
 - **Every panel renders; unselected ones get `hidden`.** So `aria-controls` always resolves and panel DOM state survives a switch. If a panel is expensive, render less *inside* it (`{selected ? <Heavy/> : null}`) rather than omitting the `TabPanel` — omitting it leaves the tab's `aria-controls` pointing at nothing.
+- **`value` that matches no enabled tab** (an address naming a tab the user may not see) still leaves the list one tab stop: the first enabled tab takes it (D93), nothing is selected, and development builds warn with the value. The selection stays yours; `Tabs` never picks one.
 - `TabList` requires `aria-label`. The active panel is itself a tab stop, so a panel with no focusable content is still reachable.
 
 ## Menu family (3)
