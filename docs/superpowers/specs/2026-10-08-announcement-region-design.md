@@ -99,10 +99,9 @@ Measured on `main` at `1919655` (0.21.0), `ToastRegion.tsx`.
 - **Tests first.** Each went red before its change, on assertion
   (`ToastRegion.test.tsx`: `no role`, `role="presentation"`, `aria-atomic`
   null):
-  - the region carries `role="region"` and is the one landmark (1);
-  - the region keeps `role="region"` when a caller passes `role="presentation"`
-    (1);
-  - both wrappers carry `aria-atomic="false"` (1);
+  - the region carries `role="region"` and is the one landmark;
+  - the region keeps `role="region"` when a caller passes `role="presentation"`;
+  - both wrappers carry `aria-atomic="false"`;
   - `a11y.axe.test.tsx`: a new case in the shared list, `Toast in a region,
     region role (D90)`, which is green before and after (item 4: jsdom skips
     the hidden region), and a second `describe` that shows the region and
@@ -120,9 +119,8 @@ Measured on `main` at `1919655` (0.21.0), `ToastRegion.tsx`.
   `feedback-toast--with-announcements` stories and was deleted afterwards.
   The existing `toast.interaction.spec.ts` and `app-shell.interaction.spec.ts`
   (11 tests) pass against the built Storybook.
-- **The five gates** of `CLAUDE.md` green locally: build, docs drift (46
-  components, 22 patterns), 2484 tests in 106 files, lint, promo build, and
-  the site gate 9 of 9. `vr` is CI-only.
+- **The five gates** of `CLAUDE.md` green locally: build, docs drift,
+  the full test suite, lint, promo build and the site gate. `vr` is CI-only.
 
 ## Consequences
 
