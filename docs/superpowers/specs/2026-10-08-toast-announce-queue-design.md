@@ -145,6 +145,8 @@ Measured on `main` at `6cda910` (D90 merged), `packages/react/src/Toast/`.
   - `dismiss(id)` removes an announcement by the id `announce()` returned;
   - `aria-label`, `ref` and a `data-*` attribute given to `ToastProvider`
     reach the region element.
+  - Written after the implementation, so green on first run: the dwell
+    pauses while the pointer is over the region and runs out after it leaves.
 - **The region in jsdom.** As in D90, the shown popover stays
   `display: none` under the jsdom polyfill, so `getByRole` needs
   `hidden: true` and a hidden subtree computes no name. The forwarding test
@@ -164,6 +166,11 @@ Measured on `main` at `6cda910` (D90 merged), `packages/react/src/Toast/`.
 - **The portal can show visible toasts again.** It can raise toasts with
   `show()` and speech with `announce()` through one provider, and drop its own
   dwell and render record. Its handoff item §8 row 2 closes.
+- **`ToastHandle` gains a required member.** Code that only calls
+  `useToast()` is unaffected. Code that builds a `ToastHandle` itself — a test
+  double passed to `ToastContext.Provider`, say — must add `announce` to
+  type-check. Accepted for a minor: the handle is the provider's output, and an
+  optional `announce` would make every caller check for it.
 - **A hand-rendered `Announcement` is still the owner's to remove.** The
   lifetime rule applies to announcements the provider owns. Inside a
   hand-composed `ToastRegion`, removing it is still the owner's job, and the
