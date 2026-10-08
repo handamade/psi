@@ -78,16 +78,16 @@ workaround.
 
 ## Verification
 
-- Tests first, red before the change: four on `Tabs` (one stop and nothing
+- Tests first, red before the change. On `Tabs`: one stop and nothing
   selected; a disabled first tab skipped; the warning; document order after an
-  insertion), then, after review, a selected disabled tab keeping the stop, an
-  unmatched value with every tab disabled giving one stop on the first tab, the
-  stop following the fallback tab when it unmounts or toggles `disabled`, and a
-  bare `TabsContext.Provider` and one on `NavItem` (`current` marks a child link). The rest are
-  regression guards that pass before and after: a matching `value` neither
-  warns nor moves the stop, the stop returns to the selected tab when `value`
-  starts to match, a child's handlers survive the clone, and an `aria-current`
-  the child carries is left alone without `current`.
+  insertion. Added after review: a selected disabled tab keeping the stop; an
+  unmatched value with every tab disabled giving one stop on the first tab; the
+  stop following the fallback tab when it unmounts or toggles `disabled`; and a
+  bare `TabsContext.Provider`. On `NavItem`: `current` marks a child link.
+- The rest are regression guards that pass before and after: a matching
+  `value` neither warns nor moves the stop, the stop returns to the selected
+  tab when `value` starts to match, a child's handlers survive the clone, and
+  an `aria-current` the child carries is left alone without `current`.
 - An axe case renders a `Tabs` with an unmatched `value`.
 - The existing `NavItem` test that pinned `current` as ignored for a child link
   is rewritten, because that is the behaviour D93 changes.
