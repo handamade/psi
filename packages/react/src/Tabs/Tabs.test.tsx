@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Tabs } from "./Tabs.js";
+import { Tabs, TabsContext } from "./Tabs.js";
 import { TabList } from "./TabList.js";
 import { Tab } from "./Tab.js";
 import { TabPanel } from "./TabPanel.js";
@@ -133,7 +133,7 @@ describe("Tabs", () => {
   });
 });
 
-describe("Tabs when value matches no enabled tab (D93)", () => {
+describe("Tabs when value matches no tab (D93)", () => {
   function Orphan({ value = "gone", firstDisabled = false }: { value?: string; firstDisabled?: boolean }) {
     return (
       <Tabs value={value} onValueChange={() => {}}>
@@ -184,7 +184,7 @@ describe("Tabs when value matches no enabled tab (D93)", () => {
       const { rerender } = render(<Orphan />);
       expect(warn).toHaveBeenCalledOnce();
       expect(warn).toHaveBeenCalledWith(
-        'Tabs: value "gone" matches no enabled tab; the first enabled tab takes the tab stop.',
+        'Tabs: value "gone" matches no tab; the first enabled tab takes the tab stop.',
       );
       // A re-render with the same value is not a second report.
       rerender(<Orphan />);
@@ -229,5 +229,83 @@ describe("Tabs when value matches no enabled tab (D93)", () => {
       expect(stops[0]).toHaveTextContent("Z");
     });
   });
-});
 
+  const stopsOf = () =>
+    screen.getAllByRole("tab").filter((t) => t.getAttribute("tabindex") === "0");
+
+  it("leaves a selected disabled tab the stop when an enabled tab exists", () => {
+    withWarnSpy((warn) => {
+      // Disabled tabs stay focusable (aria-disabled), and the stop belongs to
+      // the active tab, as it did before D93.
+      render(<Orphan value="a" firstDisabled />);
+      expect(stopsOf()).toHaveLength(1);
+      expect(stopsOf()[0]).toHaveTextContent("A");
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
+
+  it("gives the first tab the stop when value matches nothing and every tab is disabled", () => {
+    withWarnSpy((warn) => {
+      render(
+        <Tabs value="gone" onValueChange={() => {}}>
+          <TabList aria-label="Views">
+            <Tab value="a" disabled>
+              A
+            </Tab>
+            <Tab value="b" disabled>
+              B
+            </Tab>
+          </TabList>
+        </Tabs>,
+      );
+      expect(stopsOf()).toHaveLength(1);
+      expect(stopsOf()[0]).toHaveTextContent("A");
+      expect(warn).toHaveBeenCalledOnce();
+    });
+  });
+
+  it("moves the stop to the next enabled tab when the fallback tab unmounts", () => {
+    withWarnSpy(() => {
+      const view = (showA: boolean) => (
+        <Tabs value="gone" onValueChange={() => {}}>
+          <TabList aria-label="Views">
+            {showA ? <Tab value="a">A</Tab> : null}
+            <Tab value="b">B</Tab>
+            <Tab value="c">C</Tab>
+          </TabList>
+        </Tabs>
+      );
+      const { rerender } = render(view(true));
+      expect(stopsOf()[0]).toHaveTextContent("A");
+      rerender(view(false));
+      expect(stopsOf()).toHaveLength(1);
+      expect(stopsOf()[0]).toHaveTextContent("B");
+    });
+  });
+
+  it("moves the stop when the fallback tab becomes disabled, and back when it is enabled", () => {
+    withWarnSpy(() => {
+      const { rerender } = render(<Orphan />);
+      expect(stopsOf()[0]).toHaveTextContent("A");
+      rerender(<Orphan firstDisabled />);
+      expect(stopsOf()).toHaveLength(1);
+      expect(stopsOf()[0]).toHaveTextContent("B");
+      rerender(<Orphan />);
+      expect(stopsOf()).toHaveLength(1);
+      expect(stopsOf()[0]).toHaveTextContent("A");
+    });
+  });
+
+  it("still works under a hand-written TabsContext.Provider, falling back to value", () => {
+    render(
+      <TabsContext.Provider
+        value={{ value: "b", onValueChange: () => {}, orientation: "horizontal", idPrefix: "x" }}
+      >
+        <Tab value="a">A</Tab>
+        <Tab value="b">B</Tab>
+      </TabsContext.Provider>,
+    );
+    expect(stopsOf()).toHaveLength(1);
+    expect(stopsOf()[0]).toHaveTextContent("B");
+  });
+});

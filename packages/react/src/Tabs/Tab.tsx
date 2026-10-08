@@ -34,7 +34,7 @@ export function Tab({ value, children, disabled = false, className, ref }: TabPr
 
   // Tell Tabs this tab exists, so it can pick the list's tab stop (D93).
   useLayoutEffect(
-    () => registerTab({ value, disabled, el: innerRef.current }),
+    () => registerTab?.({ value, disabled, el: innerRef.current }),
     [registerTab, value, disabled],
   );
 
@@ -51,8 +51,8 @@ export function Tab({ value, children, disabled = false, className, ref }: TabPr
       aria-disabled={disabled || undefined}
       // Roving tabindex: one stop for the list. Tabs decides which tab holds it
       // (D93): the selected one, or the first enabled one when `value` matches
-      // no enabled tab.
-      tabIndex={ctx.tabStop === value ? 0 : -1}
+      // no tab. A provider without `tabStop` leaves it to `value`.
+      tabIndex={(ctx.tabStop ?? ctx.value) === value ? 0 : -1}
       className={[styles.tab, className].filter(Boolean).join(" ")}
       onClick={() => {
         if (!disabled) ctx.onValueChange(value);

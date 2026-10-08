@@ -212,7 +212,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   Tabs: {
     keyboard: [
-      { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel. When value matches no enabled tab, the first enabled tab holds the stop and none is selected (D93)." },
+      { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel. When value matches no tab, the first enabled tab holds the stop (the first tab if all are disabled) and none is selected; a selected disabled tab keeps the stop (D93)." },
     ],
     notes:
       "Controlled-only (D67): value and onValueChange are required and Tabs never selects itself. Tab and TabPanel pair by string value, not index, so their source order need not match. Every panel renders and unselected ones carry `hidden`, so aria-controls always resolves and panel DOM state survives a switch.",

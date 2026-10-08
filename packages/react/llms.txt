@@ -99,7 +99,7 @@
 - **Values are strings, not indices**, and `Tab`/`TabPanel` pair by value — their source order need not match, though keeping it matching reads better.
 - **Activation is automatic**: arrow keys move focus and selection together. There is no manual-activation mode. Arrows follow the orientation's axis (Left/Right horizontal, Up/Down vertical) with wrap; Home/End jump to the first/last enabled tab; disabled tabs are skipped and use `aria-disabled`, not the `disabled` attribute.
 - **Every panel renders; unselected ones get `hidden`.** So `aria-controls` always resolves and panel DOM state survives a switch. If a panel is expensive, render less *inside* it (`{selected ? <Heavy/> : null}`) rather than omitting the `TabPanel` — omitting it leaves the tab's `aria-controls` pointing at nothing.
-- **`value` that matches no enabled tab** (an address naming a tab the user may not see) still leaves the list one tab stop: the first enabled tab takes it (D93), nothing is selected, and development builds warn with the value. The selection stays yours; `Tabs` never picks one.
+- **A `value` that matches no tab** (an address naming a tab the user may not see) still leaves the list one tab stop: the first enabled tab takes it, or the first tab when all are disabled (D93). Nothing is selected, and development builds warn with the value. The selection stays yours; `Tabs` never picks one. A selected tab that is disabled keeps the stop, as before.
 - `TabList` requires `aria-label`. The active panel is itself a tab stop, so a panel with no focusable content is still reachable.
 
 ## Menu family (3)

@@ -26,8 +26,9 @@ export interface NavItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "child
  * `href` and handlers; with `current`, `NavItem` clones it to add
  * `aria-current="page"` (D93), as `Menu` clones its trigger. `href` is for
  * plain links and for presets, where the compose tree can hold only manifest
- * components and a raw `<a>` is not one. The current page is never marked by colour alone: medium
- * weight, a raised surface and a bar at the inline start. */
+ * components and a raw `<a>` is not one. The current page is never marked by
+ * colour alone: medium weight, a raised surface and a bar at the inline
+ * start. */
 export function NavItem({ children, href, current, className, ref, ...rest }: NavItemProps) {
   const cls = [styles.item, className].filter(Boolean).join(" ");
   // D93: `current` reaches a link the consumer passes as the child. Only a

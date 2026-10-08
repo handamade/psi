@@ -11,12 +11,15 @@ export interface TabsContextValue {
   /** Stable per-instance prefix, so two tab sets on one page never collide. */
   idPrefix: string;
   /** The value of the one tab that holds the list's tab stop (D93). Equal to
-   * `value` when `value` names an enabled tab; otherwise the first enabled tab
-   * in document order, so a `value` that matches nothing still leaves the list
-   * reachable. `Tab` reads this rather than recomputing it. */
-  tabStop: string | undefined;
-  /** Called by each `Tab` from a layout effect; returns the unregister. */
-  registerTab: (entry: TabEntry) => () => void;
+   * `value` when `value` names a registered tab, disabled or not; otherwise
+   * the first enabled tab in document order (the first tab when all are
+   * disabled), so a `value` that matches nothing still leaves the list
+   * reachable. `Tab` reads this rather than recomputing it. Optional: a
+   * hand-written provider that omits it gets `value`, as before D93. */
+  tabStop?: string;
+  /** Called by each `Tab` from a layout effect; returns the unregister.
+   * Optional for the same reason as `tabStop`. */
+  registerTab?: (entry: TabEntry) => () => void;
 }
 
 /** What a `Tab` tells its `Tabs`, so the provider can pick the tab stop. */
@@ -46,7 +49,7 @@ export function useTabsContext(component: string): TabsContextValue {
 
 export interface TabsProps {
   /** Controlled selected tab, matched against each `Tab`/`TabPanel` value. A
-   * value that matches no enabled tab selects nothing, and the first enabled
+   * value that matches no tab selects nothing, and the first enabled
    * tab holds the list's tab stop (D93); development builds warn. */
   value: string;
   /** Fires with the newly selected value; the consumer flips `value`. */
@@ -93,29 +96,29 @@ export function Tabs({
   // has registered (the server render, the first client render) fall back to
   // `value` itself, which is what `Tab` did before and what keeps SSR output
   // unchanged for a value that matches.
-  const { tabStop, enabledValues } = useMemo(() => {
-    const enabled = tabs
-      .filter((t) => !t.disabled)
-      .sort((a, b) =>
-        a.el && b.el && a.el !== b.el
-          ? a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING
-            ? -1
-            : 1
-          : 0,
-      );
-    const values = enabled.map((t) => t.value);
-    if (tabs.length === 0) return { tabStop: value, enabledValues: null };
-    return {
-      tabStop: values.includes(value) ? value : values[0],
-      enabledValues: values,
-    };
+  //
+  // The fallback applies only when `value` names no registered tab. A selected
+  // tab that is disabled keeps the stop (disabled tabs stay focusable, via
+  // aria-disabled, and the stop belongs to the active tab). When every tab is
+  // disabled the first one takes it, so the list never has zero stops.
+  const { tabStop, unmatched } = useMemo(() => {
+    if (tabs.length === 0) return { tabStop: value, unmatched: false };
+    if (tabs.some((t) => t.value === value)) return { tabStop: value, unmatched: false };
+    const ordered = [...tabs].sort((a, b) =>
+      a.el && b.el && a.el !== b.el
+        ? a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING
+          ? -1
+          : 1
+        : 0,
+    );
+    const first = ordered.find((t) => !t.disabled) ?? ordered[0];
+    return { tabStop: first.value, unmatched: true };
   }, [tabs, value]);
 
-  const unmatched = enabledValues !== null && !enabledValues.includes(value);
   useEffect(() => {
     if (!unmatched || process.env.NODE_ENV === "production") return;
     console.warn(
-      `Tabs: value "${value}" matches no enabled tab; the first enabled tab takes the tab stop.`,
+      `Tabs: value "${value}" matches no tab; the first enabled tab takes the tab stop.`,
     );
   }, [unmatched, value]);
 

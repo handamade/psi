@@ -22,14 +22,19 @@ workaround.
 
 ## Decisions
 
-- **D93 — A `value` that matches no enabled tab still leaves the tab list one
-  tab stop, and `NavItem current` reaches a child link.**
-  - **`Tabs`.** When `value` matches no *enabled* tab, the first enabled tab,
-    in document order, takes `tabIndex={0}`. The selection stays the
-    consumer's: no tab is `aria-selected`, no panel is shown, and `Tabs` does
-    not call `onValueChange`. A selected tab that is itself disabled counts as
-    unmatched, because a disabled tab is skipped by arrow navigation and
-    cannot be activated.
+- **D93 — A `value` that matches no tab still leaves the tab list one tab
+  stop, and `NavItem current` reaches a child link.**
+  - **`Tabs`.** When `value` names *no registered tab*, the first enabled tab,
+    in document order, takes `tabIndex={0}`. If every tab is disabled, the first
+    registered tab takes it, so the list never has zero stops. The selection
+    stays the consumer's: no tab is `aria-selected`, no panel is shown, and
+    `Tabs` does not call `onValueChange`.
+  - **A selected disabled tab keeps the stop**, exactly as today. The handoff
+    wrote the trigger as "matches no *enabled* tab"; the human chose "matches no
+    tab" instead, to keep the existing default. Disabled tabs use
+    `aria-disabled`, not `disabled`, so they stay focusable, and the APG puts
+    the stop on the active tab. Moving it to another tab because the active one
+    is disabled would change a case that works today.
   - **Where the computation lives: in the `Tabs` provider.** Only the provider
     sees every registered tab and `value` together; a `Tab` knows itself alone.
     Each `Tab` registers `{ value, disabled, el }` from a layout effect, and
@@ -38,6 +43,9 @@ workaround.
     single place that decides who holds the stop. Document order comes from
     `compareDocumentPosition` on the registered elements, so a tab inserted
     before the first one wins correctly.
+  - **`TabsContextValue`** (exported) gains `tabStop?` and `registerTab?`, both
+    optional: a hand-written `TabsContext.Provider` still type-checks, and
+    without them `Tab` falls back to `value`, as before D93.
   - **Before any tab has registered** (the server render, the first client
     render), `tabStop` is `value` itself, which is what `Tab` did before. A
     matching `value` renders its stop in server HTML unchanged. An unmatched
@@ -46,8 +54,8 @@ workaround.
     alternative, reading the DOM, would be no better and would add a second
     source of truth.
   - **Dev warning**, once per distinct unmatched value:
-    `Tabs: value "<x>" matches no enabled tab; the first enabled tab takes the
-    tab stop.` It is a `useEffect` that returns early when
+    `Tabs: value "<x>" matches no tab; the first enabled tab takes the tab
+    stop.` It is a `useEffect` that returns early when
     `process.env.NODE_ENV === "production"`, the same effect-based shape as
     `Menu`'s trigger warning, with `Pagination`'s production gate added.
   - **`NavItem`.** With `current` and no `href`, a single element child is
@@ -72,7 +80,10 @@ workaround.
 
 - Tests first, red before the change: four on `Tabs` (one stop and nothing
   selected; a disabled first tab skipped; the warning; document order after an
-  insertion) and one on `NavItem` (`current` marks a child link). The rest are
+  insertion), then, after review, a selected disabled tab keeping the stop, an
+  unmatched value with every tab disabled giving one stop on the first tab, the
+  stop following the fallback tab when it unmounts or toggles `disabled`, and a
+  bare `TabsContext.Provider` and one on `NavItem` (`current` marks a child link). The rest are
   regression guards that pass before and after: a matching `value` neither
   warns nor moves the stop, the stop returns to the selected tab when `value`
   starts to match, a child's handlers survive the clone, and an `aria-current`

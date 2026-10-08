@@ -202,7 +202,8 @@ describe("NavItem href and current (D88)", () => {
     expect(screen.getByRole("link", { name: "B" })).not.toHaveAttribute("aria-current");
   });
 
-  it("without href still renders the consumer's single anchor child, keeping its own props", () => {
+  it("without href still renders the consumer's single anchor child, keeping its own props", async () => {
+    const user = userEvent.setup();
     const onClick = vi.fn();
     render(
       <NavTree aria-label="Main">
@@ -217,6 +218,8 @@ describe("NavItem href and current (D88)", () => {
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute("href", "#own");
     expect(links[0]).not.toHaveAttribute("aria-current");
+    await user.click(links[0]);
+    expect(onClick).toHaveBeenCalledOnce();
   });
 });
 
