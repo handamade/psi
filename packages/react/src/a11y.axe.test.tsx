@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
@@ -106,16 +106,37 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Tabs with a disabled tab", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="archived" disabled>Archived</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="archived">Archived rows</TabPanel></Tabs>],
 ];
 
+async function violationsOf(el: React.ReactElement): Promise<string[]> {
+  const { container } = render(el);
+  const results = await axe.run(container, {
+    rules: { "color-contrast": { enabled: false } }, // jsdom cannot compute; gated at token build instead
+  });
+  return results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`);
+}
+
 describe("axe: no violations in rendered components", () => {
   for (const [name, el] of cases) {
     it(name, async () => {
-      const { container } = render(el);
-      const results = await axe.run(container, {
-        rules: { "color-contrast": { enabled: false } }, // jsdom cannot compute; gated at token build instead
-      });
-      expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`)).toEqual([]);
+      expect(await violationsOf(el)).toEqual([]);
     });
   }
+
+  // Apart from the table because it warns by design (D93): the spy keeps the
+  // run's output clean and proves the warning is the only thing it does.
+  it("Tabs whose value matches no tab", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const el = (
+        <Tabs value="gone" onValueChange={() => {}}>
+          <TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList>
+          <TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel>
+        </Tabs>
+      );
+      expect(await violationsOf(el)).toEqual([]);
+    } finally {
+      warn.mockRestore();
+    }
+  });
 });
 
 describe("axe: the announcement region is a landmark (D90)", () => {

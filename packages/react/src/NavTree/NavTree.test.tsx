@@ -202,11 +202,15 @@ describe("NavItem href and current (D88)", () => {
     expect(screen.getByRole("link", { name: "B" })).not.toHaveAttribute("aria-current");
   });
 
-  it("without href still renders the consumer's anchor child unchanged", () => {
+  it("without href still renders the consumer's single anchor child, keeping its own props", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
     render(
       <NavTree aria-label="Main">
-        <NavItem current>
-          <a href="#own">Own</a>
+        <NavItem>
+          <a href="#own" onClick={onClick}>
+            Own
+          </a>
         </NavItem>
       </NavTree>,
     );
@@ -214,5 +218,75 @@ describe("NavItem href and current (D88)", () => {
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute("href", "#own");
     expect(links[0]).not.toHaveAttribute("aria-current");
+    await user.click(links[0]);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+});
+
+describe("NavItem current on a child link (D93)", () => {
+  it("current marks a child link aria-current=page", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem current>
+          <a href="/x">X</a>
+        </NavItem>
+      </NavTree>,
+    );
+    const link = screen.getByRole("link", { name: "X" });
+    expect(link).toHaveAttribute("aria-current", "page");
+    expect(link).toHaveAttribute("href", "/x");
+  });
+
+  it("current keeps the child's own props and handlers", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    render(
+      <NavTree aria-label="Main">
+        <NavItem current>
+          <a href="/x" className="router-link" onClick={onClick}>
+            X
+          </a>
+        </NavItem>
+      </NavTree>,
+    );
+    const link = screen.getByRole("link", { name: "X" });
+    expect(link).toHaveClass("router-link");
+    await user.click(link);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it("without current leaves the child's own aria-current alone", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem>
+          <a href="/x" aria-current="page">
+            X
+          </a>
+        </NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("link", { name: "X" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("current={false} also leaves the child's own aria-current alone", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem current={false}>
+          <a href="/x" aria-current="location">
+            X
+          </a>
+        </NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("link", { name: "X" })).toHaveAttribute("aria-current", "location");
+  });
+
+  it("current renders a non-element child untouched", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem current>Plain text</NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("listitem")).toHaveTextContent("Plain text");
   });
 });

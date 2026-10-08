@@ -1,4 +1,4 @@
-import { createContext, useContext, useId, useMemo } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import styles from "./tabs.module.css";
 
@@ -10,6 +10,24 @@ export interface TabsContextValue {
   orientation: TabsOrientation;
   /** Stable per-instance prefix, so two tab sets on one page never collide. */
   idPrefix: string;
+  /** The value of the one tab that holds the list's tab stop (D93). Equal to
+   * `value` when `value` names a registered tab, disabled or not; otherwise
+   * the first enabled tab in document order (the first tab when all are
+   * disabled), so a `value` that matches nothing still leaves the list
+   * reachable. `Tab` reads this rather than recomputing it. Optional: a
+   * hand-written provider that omits it gets `value`, as before D93. */
+  tabStop?: string;
+  /** Called by each `Tab` from a layout effect; returns the unregister.
+   * Optional for the same reason as `tabStop`. */
+  registerTab?: (entry: TabEntry) => () => void;
+}
+
+/** What a `Tab` tells its `Tabs`, so the provider can pick the tab stop. */
+export interface TabEntry {
+  value: string;
+  disabled: boolean;
+  /** For document-order sorting; set by the time the layout effect runs. */
+  el: HTMLElement | null;
 }
 
 export const TabsContext = createContext<TabsContextValue | null>(null);
@@ -30,7 +48,9 @@ export function useTabsContext(component: string): TabsContextValue {
 }
 
 export interface TabsProps {
-  /** Controlled selected tab, matched against each `Tab`/`TabPanel` value. */
+  /** Controlled selected tab, matched against each `Tab`/`TabPanel` value. A
+   * value that matches no tab selects nothing, and the first enabled
+   * tab holds the list's tab stop (D93); development builds warn. */
   value: string;
   /** Fires with the newly selected value; the consumer flips `value`. */
   onValueChange: (value: string) => void;
@@ -64,10 +84,47 @@ export function Tabs({
   ref,
 }: TabsProps) {
   const idPrefix = useId();
+  const [tabs, setTabs] = useState<TabEntry[]>([]);
+
+  const registerTab = useCallback((entry: TabEntry) => {
+    setTabs((prev) => [...prev, entry]);
+    return () => setTabs((prev) => prev.filter((t) => t !== entry));
+  }, []);
+
+  // D93: the tab-stop decision lives here, not in `Tab`, because only the
+  // provider sees every registered tab and `value` together. Before any tab
+  // has registered (the server render, the first client render) fall back to
+  // `value` itself, which is what `Tab` did before and what keeps SSR output
+  // unchanged for a value that matches.
+  //
+  // The fallback applies only when `value` names no registered tab. A selected
+  // tab that is disabled keeps the stop (disabled tabs stay focusable, via
+  // aria-disabled, and the stop belongs to the active tab). When every tab is
+  // disabled the first one takes it, so the list never has zero stops.
+  const { tabStop, unmatched } = useMemo(() => {
+    if (tabs.length === 0) return { tabStop: value, unmatched: false };
+    if (tabs.some((t) => t.value === value)) return { tabStop: value, unmatched: false };
+    const ordered = [...tabs].sort((a, b) =>
+      a.el && b.el && a.el !== b.el
+        ? a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING
+          ? -1
+          : 1
+        : 0,
+    );
+    const first = ordered.find((t) => !t.disabled) ?? ordered[0];
+    return { tabStop: first.value, unmatched: true };
+  }, [tabs, value]);
+
+  useEffect(() => {
+    if (!unmatched || process.env.NODE_ENV === "production") return;
+    console.warn(
+      `Tabs: value "${value}" matches no tab; the first enabled tab takes the tab stop.`,
+    );
+  }, [unmatched, value]);
 
   const ctx = useMemo<TabsContextValue>(
-    () => ({ value, onValueChange, orientation, idPrefix }),
-    [value, onValueChange, orientation, idPrefix],
+    () => ({ value, onValueChange, orientation, idPrefix, tabStop, registerTab }),
+    [value, onValueChange, orientation, idPrefix, tabStop, registerTab],
   );
 
   return (
