@@ -11,6 +11,9 @@
   font: var(--psi-text-14-20-medium);
   color: var(--psi-field-label-fg);
   padding: 0; /* legend reset (group mode) */
+  /* D92: the label's line box as a token, so Toolbar's action offset reads the
+     same height the label renders. Equal to the font's 20px line height. */
+  min-block-size: var(--psi-field-label-height);
 }
 
 .marker {

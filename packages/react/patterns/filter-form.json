@@ -1,10 +1,10 @@
 {
   "id": "filter-form",
-  "intent": "Labelled filters above a list, submitted together with a Find button: a Toolbar rendered as a named form (as=\"form\", so Find and Enter submit — wire onSubmit), aligned to the end so every control sits on one line under its visible Field label. Fields in the row carry no description or error line. Add IconSearch before the Find label. For filters that apply as they change, named without a visible label, use filter-toolbar instead; never name a control by its placeholder alone",
+  "intent": "Labelled filters above a list, submitted together with a Find button: a Toolbar rendered as a named form (as=\"form\", so Find and Enter submit — wire onSubmit), aligned to the start so every control sits on one line under its visible Field label and Find drops onto that line. A field's description or error line hangs below its control and moves nothing else; the error line is the Field's own, with its usual aria-describedby wiring — set error on the Field, not beside the row. Every label in the row must be one line: a label that wraps pushes its control off the shared line. Add IconSearch before the Find label. For filters that apply as they change, named without a visible label, use filter-toolbar instead; never name a control by its placeholder alone",
   "match": ["filter form", "search form", "labelled filters", "filters with labels", "find button", "submit filters"],
   "compose": {
     "component": "Toolbar",
-    "props": { "as": "form", "align": "end", "gap": 12, "aria-label": "{content:form-label}" },
+    "props": { "as": "form", "align": "start", "gap": 12, "aria-label": "{content:form-label}" },
     "slots": {
       "body": [
         {

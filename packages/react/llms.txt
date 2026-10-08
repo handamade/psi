@@ -35,7 +35,8 @@
 
 ## Toolbar
 - <Toolbar gap={8|12|16} aria-label="Filters">: horizontal wrapping row for filter/search controls (Input, Select, Tag, Button). Wraps on overflow (D52); with aria-label it announces as role=group. Deliberately not ARIA role=toolbar (no roving tabindex). Unblocks the filter-toolbar pattern — consult dist/patterns.json for the preset.
-- `align="end"` lines items up on their bottom edge, so Field-wrapped controls (label above) and a button without a label share one control line (D87). It aligns each item's last line: a Field in that row must end on its control — no description or error under it.
+- `align="start"` lines up the controls of Field-wrapped filters (label above) and a button without a label (D92): items share their top edge, and a direct `button`/`a` child drops by `--psi-toolbar-action-offset` (= `--psi-field-label-height` + `--psi-field-gap`, 26px) onto the control line. A Field's description or error line hangs below its control and moves nothing else — set `error` on the Field. Every label in the row must be one line; a wrapped label pushes its control off the line. filter-form uses it.
+- `align="end"` lines items up on their bottom edge (D87). It aligns each item's last line, so a Field in that row must end on its control — no description or error under it; use `start` when a field can show an error.
 - `as="form"` renders a real `<form>`: a `Button type="submit"` and Enter in a field submit it; wire `onSubmit`. With `aria-label` it is a named form landmark (no role=group). Filters that apply as they change, named by aria-label → filter-toolbar; labelled filters submitted together with *Find* → filter-form. Never name a control by its placeholder alone.
 
 ## NavBar

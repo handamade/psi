@@ -1,5 +1,7 @@
 import { createRef } from "react";
 import { fireEvent, render } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { Toolbar } from "./Toolbar.js";
 
@@ -54,5 +56,42 @@ describe("align and as (D87)", () => {
   it("a labelled div is still a group", () => {
     const { getByRole } = render(<Toolbar aria-label="Filters" align="end">x</Toolbar>);
     expect(getByRole("group", { name: "Filters" }).tagName).toBe("DIV");
+  });
+});
+
+describe("align start (D92)", () => {
+  it("align=\"start\" sets the start-alignment class, and not the end one", () => {
+    const { container } = render(<Toolbar align="start">x</Toolbar>);
+    const cls = container.firstElementChild!.className.split(" ");
+    expect(cls).toContain("alignStart");
+    expect(cls).not.toContain("alignEnd");
+  });
+  it("the default and align=\"end\" render the class names they did before", () => {
+    // The class list is the whole of what align changes, so pinning it pins
+    // every existing consumer: the default stays centred, end stays end.
+    const { container, rerender } = render(<Toolbar>x</Toolbar>);
+    expect(container.firstElementChild!.className).toBe("toolbar gap8");
+    rerender(<Toolbar align="center" gap={12}>x</Toolbar>);
+    expect(container.firstElementChild!.className).toBe("toolbar gap12");
+    rerender(<Toolbar align="end" gap={12}>x</Toolbar>);
+    expect(container.firstElementChild!.className).toBe("toolbar gap12 alignEnd");
+    rerender(<Toolbar as="form" align="end" gap={12} aria-label="Filters">x</Toolbar>);
+    expect(container.firstElementChild!.className).toBe("toolbar gap12 alignEnd");
+  });
+
+  // jsdom does no layout, so these read the rules; the geometry itself is
+  // measured in a browser by apps/storybook/vr/filter-form.interaction.spec.ts.
+  const css = readFileSync(join(import.meta.dirname, "toolbar.module.css"), "utf8");
+  const rule = (selector: string) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
+    return new RegExp(`${escaped}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+  };
+  it("aligns items to the top of the row", () => {
+    expect(rule(".alignStart")).toMatch(/align-items:\s*flex-start;/);
+  });
+  it("drops an unlabelled button or link onto the control line by the action offset", () => {
+    expect(rule(".alignStart > :is(button, a)")).toMatch(
+      /margin-block-start:\s*var\(--psi-toolbar-action-offset\);/,
+    );
   });
 });

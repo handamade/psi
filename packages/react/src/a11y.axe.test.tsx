@@ -54,6 +54,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Toolbar labeled", <Toolbar aria-label="Filters"><label>Search<Input size={32} /></label><Tag variant="neutral">Active</Tag></Toolbar>],
   ["Toolbar unlabeled", <Toolbar><Button size={32} variant="ghost">Clear</Button></Toolbar>],
   ["Toolbar as a filter form (D87)", <Toolbar as="form" align="end" gap={12} aria-label="Filters"><Field label="Device ID"><Input size={32} /></Field><Field label="Status"><Select size={32}><option>Any</option></Select></Field><Button type="submit" variant="accent" size={32}>Find</Button></Toolbar>],
+  ["Toolbar as a filter form with a field in error (D92)", <Toolbar as="form" align="start" gap={12} aria-label="Filters"><Field label="Device ID"><Input size={32} /></Field><Field label="Status" error="Pick a status."><Select size={32}><option>Any</option></Select></Field><Button type="submit" variant="accent" size={32}>Find</Button></Toolbar>],
   ["Menu open", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Row actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuSeparator /><MenuItem onSelect={() => {}} variant="danger">Delete</MenuItem></Menu>],
   ["Menu with a disabled item", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuItem onSelect={() => {}} disabled>Archive</MenuItem></Menu>],
   ["Table plain", (
@@ -115,6 +116,24 @@ describe("axe: no violations in rendered components", () => {
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`)).toEqual([]);
     });
   }
+});
+
+describe("a filter form's error line describes its control (D92)", () => {
+  it("the Status select is described by the error text, in an align=start filter form", () => {
+    const { getByRole, getByText } = render(
+      <Toolbar as="form" align="start" gap={12} aria-label="Filters">
+        <Field label="Device ID"><Input size={32} /></Field>
+        <Field label="Status" error="Pick a status."><Select size={32}><option>Any</option></Select></Field>
+        <Button type="submit" variant="accent" size={32}>Find</Button>
+      </Toolbar>,
+    );
+    const status = getByRole("combobox", { name: "Status" });
+    const describedBy = status.getAttribute("aria-describedby");
+    expect(describedBy).toBeTruthy();
+    expect(describedBy).toBe(getByText("Pick a status.").id);
+    expect(status).toHaveAccessibleDescription("Pick a status.");
+    expect(status).toHaveAttribute("aria-invalid", "true");
+  });
 });
 
 describe("axe: the announcement region is a landmark (D90)", () => {

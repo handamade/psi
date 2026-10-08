@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render, screen, within } from "@testing-library/react";
 import { Field } from "./Field.js";
 import { Input } from "../Input/Input.js";
@@ -196,5 +198,16 @@ describe("FieldContext wiring", () => {
       );
       expect(container.querySelector("label")).toHaveTextContent(/^Name$/);
     });
+  });
+});
+
+describe("label line box (D92)", () => {
+  // A Toolbar align="start" row offsets an unlabelled button by
+  // --psi-toolbar-action-offset, derived from --psi-field-label-height. The
+  // label must hold that height, so the token and the rendered line agree.
+  it("the label holds at least --psi-field-label-height", () => {
+    const css = readFileSync(join(import.meta.dirname, "field.module.css"), "utf8");
+    const label = /\.label\s*\{([^}]*)\}/.exec(css)![1];
+    expect(label).toMatch(/min-block-size:\s*var\(--psi-field-label-height\);/);
   });
 });
