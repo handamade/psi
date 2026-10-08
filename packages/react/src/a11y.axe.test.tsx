@@ -1,13 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { useEffect } from "react";
+import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
-  Toast, ToastRegion, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, NavTree, NavGroup, NavItem, AppShell,
+  Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, NavTree, NavGroup, NavItem, AppShell,
   Tabs, TabList, Tab, TabPanel,
-  useFieldControl,
+  useFieldControl, useToast,
 } from "./index.js";
 
 /** A control Psi did not write, joined to a Field through useFieldControl (D84). */
@@ -106,16 +107,37 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Tabs with a disabled tab", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="archived" disabled>Archived</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="archived">Archived rows</TabPanel></Tabs>],
 ];
 
+async function violationsOf(el: React.ReactElement): Promise<string[]> {
+  const { container } = render(el);
+  const results = await axe.run(container, {
+    rules: { "color-contrast": { enabled: false } }, // jsdom cannot compute; gated at token build instead
+  });
+  return results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`);
+}
+
 describe("axe: no violations in rendered components", () => {
   for (const [name, el] of cases) {
     it(name, async () => {
-      const { container } = render(el);
-      const results = await axe.run(container, {
-        rules: { "color-contrast": { enabled: false } }, // jsdom cannot compute; gated at token build instead
-      });
-      expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`)).toEqual([]);
+      expect(await violationsOf(el)).toEqual([]);
     });
   }
+
+  // Apart from the table because it warns by design (D93): the spy keeps the
+  // run's output clean and proves the warning is the only thing it does.
+  it("Tabs whose value matches no tab", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const el = (
+        <Tabs value="gone" onValueChange={() => {}}>
+          <TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList>
+          <TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel>
+        </Tabs>
+      );
+      expect(await violationsOf(el)).toEqual([]);
+    } finally {
+      warn.mockRestore();
+    }
+  });
 });
 
 describe("a filter form's error line describes its control (D92)", () => {
@@ -150,5 +172,29 @@ describe("axe: the announcement region is a landmark (D90)", () => {
     });
     const prohibited = [...results.violations, ...results.incomplete].filter((r) => r.id === "aria-prohibited-attr");
     expect(prohibited.map((r) => r.nodes.map((n) => n.html))).toEqual([]);
+  });
+});
+
+describe("axe: a provider that has announced (D91)", () => {
+  function AnnounceOnce() {
+    const toast = useToast();
+    useEffect(() => void toast.announce("Row 12 updated"), [toast]);
+    return <p>Rows</p>;
+  }
+
+  it("raises no violations with the announcement in its wrapper", async () => {
+    const { container } = render(
+      <ToastProvider aria-label="Notifications" data-react-aria-top-layer="">
+        <AnnounceOnce />
+      </ToastProvider>,
+    );
+    const region = container.querySelector<HTMLElement>("[data-psi-toast-region]")!;
+    expect(region.querySelector("[data-psi-announcement]")).toHaveTextContent("Row 12 updated");
+    // As in D90: jsdom leaves the shown region `display: none`; show it so axe looks.
+    region.style.display = "block";
+    const results = await axe.run(container, {
+      rules: { "color-contrast": { enabled: false } },
+    });
+    expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`)).toEqual([]);
   });
 });

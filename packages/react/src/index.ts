@@ -92,7 +92,7 @@ export type { TabProps } from "./Tabs/Tab.js";
 export { TabPanel } from "./Tabs/TabPanel.js";
 export type { TabPanelProps } from "./Tabs/TabPanel.js";
 export { useToast, ToastContext } from "./Toast/useToast.js";
-export type { ToastHandle, ToastOptions } from "./Toast/useToast.js";
+export type { AnnounceOptions, ToastHandle, ToastOptions } from "./Toast/useToast.js";
 export {
   IconPlus,
   IconMinus,

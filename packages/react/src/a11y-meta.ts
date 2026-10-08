@@ -138,12 +138,12 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Tab", behavior: "Focus entering the region pauses every auto-dismiss timer; leaving resumes them." },
     ],
     notes:
-      "Owns the queue, the auto-dismiss timers and the single ToastRegion (D65). Timers pause while the pointer or focus is inside the region and resume with the time remaining, satisfying WCAG 2.2.1 for content that disappears on a timer. Toasts carrying an action get a longer default lifetime, so the affordance cannot vanish before it is reached. useToast() throws outside a provider rather than silently no-opping.",
+      "Owns the queue, the auto-dismiss timers and the single ToastRegion (D65). Timers pause while the pointer or focus is inside the region and resume with the time remaining, satisfying WCAG 2.2.1 for content that disappears on a timer. Toasts carrying an action get a longer default lifetime, so the affordance cannot vanish before it is reached. useToast() throws outside a provider rather than silently no-opping. announce(message, { politeness }) speaks through the same region without showing anything (D91): it renders an Announcement into the wrapper its politeness names (default polite), never a live region of its own, so the application keeps one announcer. An announcement leaves after a one-second dwell, is not removed early by a later one, and never counts against limit, so it cannot evict a visible toast. Its timer pauses with the region and is disposed by dismiss, clear() and unmount like a toast's. Remaining props (aria-label, ref, className, data-* such as data-react-aria-top-layer) are forwarded to the region element.",
   },
   Announcement: {
     keyboard: [],
     notes:
-      "Not a live region: it renders no role and no aria-live, and outside a ToastRegion it announces nothing. It is visually hidden text that ToastRegion places in its polite or assertive wrapper, by the politeness prop (default polite) — for an event that must be spoken and has nothing to show. Keep one ToastRegion as the application's only announcer and put every Announcement inside it; never use an Announcement as a second one. Controlled like Toast: it never removes itself, so remove it once it has been spoken. To announce the same text again, remove it and render it again with a new key — a live region speaks changes, and an unchanged node is not one. Not focusable, and it takes no space in the toast stack.",
+      "Not a live region: it renders no role and no aria-live, and outside a ToastRegion it announces nothing. It is visually hidden text that ToastRegion places in its polite or assertive wrapper, by the politeness prop (default polite) — for an event that must be spoken and has nothing to show. Keep one ToastRegion as the application's only announcer and put every Announcement inside it; never use an Announcement as a second one. Rendered by useToast().announce() (D91), it gets a lifetime: it leaves after a one-second dwell, a later announcement does not remove it early, and it never counts against the toast limit. Rendered by hand it is controlled like Toast and never removes itself — remove it after the same one-second dwell, not before. To announce the same text again, remove it and render it again with a new key — a live region speaks changes, and an unchanged node is not one. Not focusable, and it takes no space in the toast stack.",
   },
   Banner: {
     keyboard: [
@@ -200,7 +200,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Enter", behavior: "Follows the link inside it (native anchor behavior); the link is the consumer's router link." },
     ],
     notes:
-      "An <li> that styles the one anchor inside it. Router apps pass their own link as the child and set aria-current=\"page\" on the current one; with href the NavItem renders the anchor itself (for plain links and presets) and current sets aria-current=\"page\" on it. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
+      "An <li> that styles the one anchor inside it. Router apps pass their own link as the child; current clones it with aria-current=\"page\" (D93), and without current the child keeps its own aria-current; with href the NavItem renders the anchor itself (for plain links and presets) and current sets aria-current=\"page\" on it. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
   },
   AppShell: {
     keyboard: [
@@ -212,7 +212,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   Tabs: {
     keyboard: [
-      { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel." },
+      { keys: "Tab", behavior: "Enters the tab list at its selected tab (one stop for the whole list), then moves on to the active panel. When value matches no tab, the first enabled tab holds the stop (the first tab if all are disabled) and none is selected; a selected disabled tab keeps the stop (D93)." },
     ],
     notes:
       "Controlled-only (D67): value and onValueChange are required and Tabs never selects itself. Tab and TabPanel pair by string value, not index, so their source order need not match. Every panel renders and unselected ones carry `hidden`, so aria-controls always resolves and panel DOM state survives a switch.",
