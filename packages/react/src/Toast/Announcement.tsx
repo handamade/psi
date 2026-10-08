@@ -21,10 +21,18 @@ export interface AnnouncementProps {
  * `politeness` is not read here. ToastRegion reads it off the element to pick
  * a wrapper, the same way it reads a Toast's.
  *
- * Controlled, like Toast: it holds no state and never removes itself. Remove
- * it once it has been spoken. To announce the same text again, remove it and
- * render it again with a new `key` — a live region speaks changes, and an
- * unchanged node is not one.
+ * The usual way to render one is `useToast().announce(message)` (D91), which
+ * puts it in ToastProvider's region and gives it a lifetime: it leaves one
+ * second (the dwell) after it was added, and a later announcement does not
+ * remove it early — removing a node just after it was added can cut its
+ * speech, and the region's non-atomic wrappers (D90) speak each added node on
+ * its own. It never counts against the provider's toast `limit`.
+ *
+ * Rendered by hand, it is controlled, like Toast: it holds no state and never
+ * removes itself, so follow the same rule — remove it after a one-second
+ * dwell, not before. To announce the same text again, remove it and render it
+ * again with a new `key` — a live region speaks changes, and an unchanged node
+ * is not one.
  *
  * It takes no `className`: the one thing a class could do to it is make it
  * visible, and then it is a Toast. */

@@ -1,13 +1,23 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode, Ref } from "react";
+import { Announcement } from "./Announcement.js";
 import { Toast } from "./Toast.js";
 import type { ToastPoliteness, ToastVariant } from "./Toast.js";
 import { ToastRegion } from "./ToastRegion.js";
 import type { ToastPlacement } from "./ToastRegion.js";
 import { ToastContext } from "./useToast.js";
-import type { ToastHandle, ToastOptions } from "./useToast.js";
+import type { AnnounceOptions, ToastHandle, ToastOptions } from "./useToast.js";
 
-export interface ToastProviderProps {
+/** How long an announcement stays in its live wrapper, in ms (D91). Long
+ * enough for a screen reader to start speaking a node that was added; short
+ * enough that the wrapper does not accumulate stale text. The portal ran the
+ * same value before Psi owned it. */
+const ANNOUNCEMENT_DWELL = 1000;
+
+/** Everything but the provider's own props is forwarded to its ToastRegion
+ * (D91) — the same surface ToastRegion takes, so `aria-label`, `ref`,
+ * `className` and `data-*` attributes land on the region element. */
+export interface ToastProviderProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   /** Max simultaneous toasts; the oldest is evicted first. @default 3 */
   limit?: number;
   /** Auto-dismiss for toasts with no action, in ms. @default 5000 */
@@ -19,6 +29,13 @@ export interface ToastProviderProps {
   placement?: ToastPlacement;
   /** The subtree that may call `useToast()`. The region is rendered alongside it. */
   children: ReactNode;
+  /** Accessible name for the region landmark, forwarded to ToastRegion.
+   * @default "Notifications" */
+  "aria-label"?: string;
+  /** Forwarded to the region element. */
+  className?: string;
+  /** Forwarded ref to the region element. */
+  ref?: Ref<HTMLDivElement>;
 }
 
 interface QueuedToast {
@@ -31,6 +48,13 @@ interface QueuedToast {
   statusLabel?: string | null;
   /** Total lifetime for this toast, chosen at show() time. */
   duration: number;
+}
+
+/** Speech only: rendered as an Announcement, never counted against `limit`. */
+interface QueuedAnnouncement {
+  id: string;
+  message: ReactNode;
+  politeness: ToastPoliteness;
 }
 
 interface TimerState {
@@ -57,15 +81,30 @@ interface TimerState {
  * Timers pause while the pointer or focus is inside the region (WCAG 2.2.1),
  * and resume with the time *remaining* rather than a fresh full duration —
  * restarting would let a user hold a toast open indefinitely by jiggling the
- * mouse. */
+ * mouse.
+ *
+ * **Announcements share the queue, not the limit (D91).** `announce()` adds a
+ * speech-only Announcement to the same region — never a live region of its
+ * own — and it leaves after a one-second dwell. A later announcement does not
+ * remove an earlier one early: removing a node just after it was added can cut
+ * its speech, and with non-atomic wrappers (D90) each added node is spoken on
+ * its own. Announcements live in their own list, so they never evict a visible
+ * toast; their timers live in the same map, so `dismiss`, `clear()` and
+ * unmount dispose them as they do a toast's, and they pause with the region.
+ *
+ * Remaining props go to the ToastRegion (D91): its `aria-label`, a `ref` to the
+ * region element, a `className`, and `data-*` attributes such as
+ * `data-react-aria-top-layer`. */
 export function ToastProvider({
   limit = 3,
   duration = 5000,
   actionDuration = 10000,
   placement = "bottom-end",
   children,
+  ...regionProps
 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<QueuedToast[]>([]);
+  const [announcements, setAnnouncements] = useState<QueuedAnnouncement[]>([]);
   const timers = useRef(new Map<string, TimerState>());
   const pausedRef = useRef(false);
   const seq = useRef(0);
@@ -75,7 +114,11 @@ export function ToastProvider({
     const timer = timers.current.get(id);
     if (timer?.handle !== undefined) clearTimeout(timer.handle);
     timers.current.delete(id);
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    // Ids come from one sequence, so the id names one item in one list. The
+    // other list keeps its identity, so a removal that matches nothing (an
+    // id already gone) lets React bail out of the re-render.
+    setToasts((prev) => (prev.some((t) => t.id === id) ? prev.filter((t) => t.id !== id) : prev));
+    setAnnouncements((prev) => (prev.some((a) => a.id === id) ? prev.filter((a) => a.id !== id) : prev));
   }, []);
 
   /** Arm (or re-arm) one toast's timer for `ms`. Paused timers are recorded
@@ -117,12 +160,24 @@ export function ToastProvider({
     [actionDuration, arm, duration, idPrefix, limit],
   );
 
+  const announce = useCallback(
+    (message: ReactNode, { politeness = "polite" }: AnnounceOptions = {}): string => {
+      const id = `${idPrefix}-${seq.current++}`;
+      // Its own list: the eviction loop in show() never sees it (D91).
+      setAnnouncements((prev) => [...prev, { id, message, politeness }]);
+      arm(id, ANNOUNCEMENT_DWELL);
+      return id;
+    },
+    [arm, idPrefix],
+  );
+
   const clear = useCallback(() => {
     for (const timer of timers.current.values()) {
       if (timer.handle !== undefined) clearTimeout(timer.handle);
     }
     timers.current.clear();
     setToasts([]);
+    setAnnouncements([]);
   }, []);
 
   const pause = useCallback(() => {
@@ -165,8 +220,8 @@ export function ToastProvider({
   }, []);
 
   const handle = useMemo<ToastHandle>(
-    () => ({ show, dismiss: remove, clear }),
-    [show, remove, clear],
+    () => ({ show, announce, dismiss: remove, clear }),
+    [show, announce, remove, clear],
   );
 
   return (
@@ -178,7 +233,7 @@ export function ToastProvider({
         onFocusCapture={pause}
         onBlurCapture={resume}
       >
-        <ToastRegion placement={placement}>
+        <ToastRegion {...regionProps} placement={placement}>
           {toasts.map((t) => (
             <Toast
               key={t.id}
@@ -190,6 +245,11 @@ export function ToastProvider({
             >
               {t.message}
             </Toast>
+          ))}
+          {announcements.map((a) => (
+            <Announcement key={a.id} politeness={a.politeness}>
+              {a.message}
+            </Announcement>
           ))}
         </ToastRegion>
       </div>

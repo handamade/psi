@@ -1,6 +1,6 @@
 {
   "id": "announcer",
-  "intent": "One announcer for a whole application: a single ToastRegion holding visible toasts and speech-only Announcements, each routed by politeness rather than by tone. For an application that owns exactly two live regions and lets nothing else write one. For a single confirmation toast, use action-feedback.",
+  "intent": "Under a ToastProvider, do not render this — call useToast().announce() (D91). For an application with its own ToastRegion and no provider: one region holding visible toasts and speech-only Announcements, each routed by politeness rather than by tone. For a single confirmation toast, use action-feedback.",
   "match": ["announcer", "live region", "screen reader announcement", "aria-live", "status message", "announce without a toast", "polite and assertive"],
   "compose": {
     "component": "ToastRegion",

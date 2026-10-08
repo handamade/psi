@@ -17,12 +17,22 @@ export interface ToastOptions {
   statusLabel?: string | null;
 }
 
+export interface AnnounceOptions {
+  /** Which live wrapper speaks it. @default "polite" */
+  politeness?: ToastPoliteness;
+}
+
 export interface ToastHandle {
   /** Queue a toast; returns its id. */
   show: (toast: ToastOptions) => string;
-  /** Remove one toast by id. No-op if it has already gone. */
+  /** Speak a message through the same region without showing anything (D91):
+   * an Announcement in the wrapper `politeness` names. It leaves after a
+   * one-second dwell, never counts against `limit`, and is not removed early
+   * by a later one. Returns an id `dismiss` accepts. */
+  announce: (message: ReactNode, options?: AnnounceOptions) => string;
+  /** Remove one toast or announcement by id. No-op if it has already gone. */
   dismiss: (id: string) => void;
-  /** Remove every queued toast. */
+  /** Remove every queued toast and announcement. */
   clear: () => void;
 }
 
