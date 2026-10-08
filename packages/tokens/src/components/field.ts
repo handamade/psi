@@ -1,5 +1,18 @@
 /** Field component tokens (--psi-field-*). Label/message/error colors alias
- * gated semantic fg tokens; gap is the label→control→message grid gap (D49). */
+ * gated semantic fg tokens; gap is the label→control→message grid gap (D49).
+ *
+ * label-height (D92) is the label's line box: the line height of
+ * --psi-text-14-20-medium, which the label's `font` shorthand sets. A font
+ * shorthand exposes no line-height variable to read, and --psi-space-* is
+ * scoped to gap/padding/margin, so the height is a standalone 20px literal
+ * (the --psi-toolbar-control-width precedent). The label holds it as its
+ * min-block-size, and --psi-toolbar-action-offset is derived from it, so a
+ * filter row's unlabelled button and its labelled controls read one source.
+ * Change it together with the label's font. --psi-toolbar-action-offset
+ * resolves from this token and `gap` at the theme root: overriding either on
+ * a narrower scope inside a Toolbar align="start" row also needs
+ * --psi-toolbar-action-offset set on that same scope, or the row's button
+ * keeps the theme-root offset. */
 export const fieldVars: Record<string, string> = {
   "label-fg": "var(--psi-fg-secondary)",
   "message-fg": "var(--psi-fg-tertiary)",
@@ -11,4 +24,5 @@ export const fieldVars: Record<string, string> = {
   // foreground the contrast matrix does not gate.
   "required-text-fg": "var(--psi-fg-secondary)",
   gap: "var(--psi-space-6)",
+  "label-height": "20px",
 };

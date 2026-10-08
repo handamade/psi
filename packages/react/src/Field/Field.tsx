@@ -54,7 +54,11 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
 
 /** Labeled form-row wrapper: label above, control, one message line below —
  * description normally, error when set (aria-live unless `announce={false}`).
- * Auto-wires id/aria-describedby/aria-invalid into Input and Select (D49). */
+ * Auto-wires id/aria-describedby/aria-invalid into Input and Select (D49).
+ * Overriding `--psi-field-gap` or `--psi-field-label-height` on a narrower
+ * scope than the theme root, inside a `Toolbar align="start"` row, also needs
+ * `--psi-toolbar-action-offset` set on that same scope, or the row's button
+ * keeps the theme-root offset (D92). */
 export function Field({
   label,
   description,

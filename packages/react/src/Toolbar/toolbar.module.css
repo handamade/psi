@@ -12,6 +12,13 @@
    bottom edge — the control line. */
 .alignEnd { align-items: flex-end; }
 
+/* D92: controls under one-line Field labels share their top edge, so a
+   field's description or error line hangs below its control and moves no
+   other item. A button or link has no label: it drops by one label line and
+   one field gap, onto the control line. */
+.alignStart { align-items: flex-start; }
+.alignStart > :is(button, a) { margin-block-start: var(--psi-toolbar-action-offset); }
+
 .toolbar > input,
 .toolbar > select {
   width: var(--psi-toolbar-control-width);

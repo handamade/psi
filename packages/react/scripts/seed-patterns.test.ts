@@ -139,6 +139,18 @@ describe("the manifest describes children (D72)", () => {
     }
   });
 
+  it("aligns filter-form on its controls, so a field's error line can hang below (D92)", () => {
+    const filterForm = patterns.find((p) => p.id === "filter-form")!;
+    expect(filterForm.compose.props?.align).toBe("start");
+    const preset = renderPreset(filterForm, manifest.components)!;
+    expect(preset).toContain('align="start"');
+    expect(preset).not.toContain('align="end"');
+    // The restriction D87 imposed is gone, and the two costs of D92 are stated.
+    expect(filterForm.intent).not.toMatch(/no description or error line/);
+    expect(filterForm.intent).toMatch(/error line is the Field's own/);
+    expect(filterForm.intent).toMatch(/one line/);
+  });
+
   it("gives filter-toolbar's controls accessible names (D73)", () => {
     const preset = renderPreset(patterns.find((p) => p.id === "filter-toolbar")!, manifest.components)!;
     expect(preset).toContain('<Input aria-label=');

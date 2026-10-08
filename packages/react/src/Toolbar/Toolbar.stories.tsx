@@ -51,11 +51,12 @@ export const Wrapping: Story = {
   ),
 };
 
-/** D87: labelled filters submitted together — a real `<form>`, end-aligned so
- * the controls under their labels and Find share one control line. */
+/** D87: labelled filters submitted together — a real `<form>`. Start-aligned
+ * (D92), so the controls under their one-line labels and Find share one
+ * control line. */
 export const FilterForm: Story = {
   render: () => (
-    <Toolbar as="form" align="end" gap={12} aria-label="Filters" onSubmit={(e) => e.preventDefault()}>
+    <Toolbar as="form" align="start" gap={12} aria-label="Filters" onSubmit={(e) => e.preventDefault()}>
       <Field label="Device ID">
         <Input size={32} />
       </Field>
@@ -65,6 +66,34 @@ export const FilterForm: Story = {
           <option>Online</option>
           <option>Offline</option>
         </Select>
+      </Field>
+      <Button type="submit" variant="accent" size={32}>
+        <IconSearch />
+        Find
+      </Button>
+    </Toolbar>
+  ),
+};
+
+/** D92: a filter rejected by the server shows its error at its field. The
+ * error line is the Field's own (aria-describedby on the Select) and hangs
+ * below its control; the other controls and Find stay on the control line. */
+export const FilterFormWithAFieldInError: Story = {
+  name: "Filter form with a field in error",
+  render: () => (
+    <Toolbar as="form" align="start" gap={12} aria-label="Filters" onSubmit={(e) => e.preventDefault()}>
+      <Field label="Device ID">
+        <Input size={32} defaultValue="DEV-0042" />
+      </Field>
+      <Field label="Status" error="Pick a status.">
+        <Select size={32}>
+          <option>Any status</option>
+          <option>Online</option>
+          <option>Offline</option>
+        </Select>
+      </Field>
+      <Field label="Firmware">
+        <Input size={32} />
       </Field>
       <Button type="submit" variant="accent" size={32}>
         <IconSearch />
