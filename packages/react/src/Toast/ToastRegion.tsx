@@ -7,10 +7,12 @@ import styles from "./toast.module.css";
 
 export type ToastPlacement = "top-start" | "top-end" | "bottom-start" | "bottom-end";
 
+/** The region is a `region` landmark (D90), named by `aria-label` — a name on a
+ * role-less `div` is prohibited by ARIA — and `role` is not overridable. */
 export interface ToastRegionProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   /** Corner the stack occupies. @default "bottom-end" */
   placement?: ToastPlacement;
-  /** Accessible name for the region. @default "Notifications" */
+  /** Accessible name for the region landmark. @default "Notifications" */
   "aria-label"?: string;
   /** The stack — `Toast` and `Announcement` elements, each routed to a live
    * wrapper by its `politeness`, or by a Toast's variant when it names none. */
@@ -71,7 +73,14 @@ function isAssertive(child: ReactNode): boolean {
  * element (D83). That is how an application marks the region
  * `data-react-aria-top-layer`, so that a React Aria overlay — which hides
  * everything outside itself with `aria-hidden` — leaves the two live regions
- * exposed. The region's own attributes always win. */
+ * exposed. The region's own attributes always win — `role` included.
+ *
+ * **The region is a landmark, and the wrappers speak only what is new (D90).**
+ * `role="region"` makes the `aria-label` legal (a name on a role-less `div` is
+ * prohibited) and gives the stack a place in the landmark list. Both wrappers
+ * set `aria-atomic="false"` explicitly: `role="status"` and `role="alert"`
+ * carry an implicit `true`, which lets a screen reader re-speak everything
+ * already in the wrapper whenever one message is added beside it. */
 export function ToastRegion({
   placement = "bottom-end",
   "aria-label": ariaLabel = "Notifications",
@@ -119,16 +128,17 @@ export function ToastRegion({
       // Spread first, so nothing passed in can displace the attributes below.
       {...rest}
       ref={setRef}
+      role="region"
       popover="manual"
       aria-label={ariaLabel}
       data-placement={placement}
       data-psi-toast-region
       className={[styles.region, className].filter(Boolean).join(" ")}
     >
-      <div role="status" aria-live="polite" className={styles.live}>
+      <div role="status" aria-live="polite" aria-atomic="false" className={styles.live}>
         {politeItems}
       </div>
-      <div role="alert" aria-live="assertive" className={styles.live}>
+      <div role="alert" aria-live="assertive" aria-atomic="false" className={styles.live}>
         {assertiveItems}
       </div>
     </div>

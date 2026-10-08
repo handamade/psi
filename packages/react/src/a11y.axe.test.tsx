@@ -86,6 +86,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Pagination", <Pagination page={4} pageCount={13} onPageChange={() => {}} />],
   ["Pagination single page", <Pagination page={1} pageCount={1} onPageChange={() => {}} />],
   ["Toast in a region", <ToastRegion><Toast variant="success">Transaction voided</Toast></ToastRegion>],
+  ["Toast in a region, region role (D90)", <ToastRegion><Toast variant="success">Transaction voided</Toast></ToastRegion>],
   ["Toast danger routes assertive", <ToastRegion><Toast variant="danger">Could not void the transaction</Toast></ToastRegion>],
   ["Toast with action and dismiss", <ToastRegion><Toast variant="success" action={<Button variant="ghost" size={32}>Undo</Button>} onDismiss={() => {}}>Transaction voided</Toast></ToastRegion>],
   ["Toast region empty", <ToastRegion>{null}</ToastRegion>],
@@ -114,4 +115,21 @@ describe("axe: no violations in rendered components", () => {
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`)).toEqual([]);
     });
   }
+});
+
+describe("axe: the announcement region is a landmark (D90)", () => {
+  // axe 4.12 reports a name on a role-less div as `incomplete` ("needs
+  // review"), not as a violation, so asserting on `violations` alone could
+  // never go red for this defect. Real-browser measurement is in the D90 spec.
+  it("raises neither a violation nor a needs-review result for aria-prohibited-attr", async () => {
+    const { container } = render(<ToastRegion><Toast variant="success">Transaction voided</Toast></ToastRegion>);
+    // jsdom's popover UA stylesheet leaves the shown region `display: none`,
+    // which axe skips; a real browser shows it. Show it, so axe looks.
+    (container.firstElementChild as HTMLElement).style.display = "block";
+    const results = await axe.run(container, {
+      rules: { "color-contrast": { enabled: false } },
+    });
+    const prohibited = [...results.violations, ...results.incomplete].filter((r) => r.id === "aria-prohibited-attr");
+    expect(prohibited.map((r) => r.nodes.map((n) => n.html))).toEqual([]);
+  });
 });

@@ -192,4 +192,32 @@ describe("ToastRegion", () => {
       expect(container.firstChild).toHaveAttribute("data-psi-toast-region", "true");
     });
   });
+
+  describe("a region that speaks only what is new (D90)", () => {
+    it("is a named region landmark", () => {
+      render(<ToastRegion><Toast variant="success">Saved</Toast></ToastRegion>);
+      const region = document.querySelector("[data-psi-toast-region]")!;
+      expect(region).toHaveAttribute("role", "region");
+      // `hidden: true` for the jsdom popover gap described at the top of the
+      // file. The same gap makes the computed name "" here (a display:none
+      // subtree has none), so the name is asserted as the attribute that
+      // supplies it; the browser-truth check is the axe spec in a real page.
+      expect(screen.getByRole("region", { hidden: true })).toBe(region);
+      expect(region).toHaveAttribute("aria-label", "Notifications");
+    });
+
+    it("keeps role=region when the caller passes another role", () => {
+      render(<ToastRegion role="presentation"><Toast variant="success">Saved</Toast></ToastRegion>);
+      expect(document.querySelector("[data-psi-toast-region]")).toHaveAttribute("role", "region");
+    });
+
+    it("makes both live wrappers non-atomic", () => {
+      // role=status and role=alert carry an implicit aria-atomic="true", so a
+      // screen reader may speak the whole wrapper on each change. The explicit
+      // "false" is what restricts speech to the node that was added.
+      render(<ToastRegion><Toast variant="success">Saved</Toast></ToastRegion>);
+      expect(polite()).toHaveAttribute("aria-atomic", "false");
+      expect(assertive()).toHaveAttribute("aria-atomic", "false");
+    });
+  });
 });
