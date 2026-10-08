@@ -8,7 +8,11 @@
  * (the --psi-toolbar-control-width precedent). The label holds it as its
  * min-block-size, and --psi-toolbar-action-offset is derived from it, so a
  * filter row's unlabelled button and its labelled controls read one source.
- * Change it together with the label's font. */
+ * Change it together with the label's font. --psi-toolbar-action-offset
+ * resolves from this token and `gap` at the theme root: overriding either on
+ * a narrower scope inside a Toolbar align="start" row also needs
+ * --psi-toolbar-action-offset set on that same scope, or the row's button
+ * keeps the theme-root offset. */
 export const fieldVars: Record<string, string> = {
   "label-fg": "var(--psi-fg-secondary)",
   "message-fg": "var(--psi-fg-tertiary)",

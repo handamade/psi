@@ -45,6 +45,9 @@ Measured on `main` at `6cda910` (D90).
     A description or error line then hangs below its own control and moves
     no other item. `center` and `end` are unchanged; `end` keeps its
     restriction, and its doc now points to `start` for a row with messages.
+    Only a *direct* `button` or `a` child is offset. A wrapped trigger — a
+    `Tooltip`-wrapped button, a `Menu` trigger — is not, and sits at the
+    row's top edge.
   - **New Field token `--psi-field-label-height: 20px`**, the label's line
     box. The label holds it as `min-block-size`, so the token and the
     rendered line are one value. It is a standalone literal, after
@@ -53,7 +56,8 @@ Measured on `main` at `6cda910` (D90).
   - **New Toolbar token `--psi-toolbar-action-offset:
     calc(var(--psi-field-label-height) + var(--psi-field-gap))`**, 26px. It
     is derived from `Field`'s own tokens, never restated, so a change to the
-    label metrics or the field gap cannot leave the button behind. It is how
+    label metrics or the field gap at the theme root cannot leave the
+    button behind (see Costs for a narrower scope). It is how
     Toolbar CSS reads Field, since `psi/component-tokens-only` admits only
     the component's own prefix. It binds a margin, which `psi/token-scopes`
     allows, because the token carries no `-bg`/`-fg`/`-border` segment and is

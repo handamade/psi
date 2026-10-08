@@ -8,17 +8,20 @@ export interface ToolbarProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode;
   /** Gap between controls in px. @default 8 */
   gap?: Gap;
-  /** Cross-axis alignment, for a row of Fields with visible labels and an
-   * unlabelled button.
-   * `start` (D92) lines up the controls: items share their top edge, and a
-   * direct `button` or `a` child drops by `--psi-toolbar-action-offset` (one
-   * Field label line plus the Field gap) onto the control line. A Field's
-   * description or error line hangs below its control and moves nothing
-   * else. Every label in the row must fit on one line; a label that wraps
-   * pushes its control below the others.
+  /** Cross-axis alignment of the row's items. `center` (the default) centres
+   * them, for a row of controls without visible labels such as
+   * filter-toolbar. `end` and `start` are for a row of Fields with visible
+   * labels beside an unlabelled button.
    * `end` (D87) lines items up on their bottom edge. It lines up each item's
    * *last* line, so a Field in an end-aligned row must end on its control —
    * no description or error line under it; use `start` for one.
+   * `start` (D92) lines up the controls: items share their top edge, and a
+   * *direct* `button` or `a` child drops by `--psi-toolbar-action-offset`
+   * (one Field label line plus the Field gap) onto the control line. Only a
+   * direct child is offset: a wrapped trigger (a Tooltip-wrapped button, a
+   * Menu trigger) is not. A Field's description or error line hangs below
+   * its control and moves nothing else. Every label in the row must fit on
+   * one line; a label that wraps pushes its control below the others.
    * @default "center" */
   align?: "center" | "end" | "start";
   /** Root element. `form` renders a real `<form>`, so a submit Button
