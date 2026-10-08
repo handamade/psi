@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import type { ReactNode, Ref } from "react";
 import { panelId, tabId, useTabsContext } from "./Tabs.js";
 import styles from "./tabs.module.css";
@@ -22,10 +23,24 @@ export interface TabProps {
 export function Tab({ value, children, disabled = false, className, ref }: TabProps) {
   const ctx = useTabsContext("Tab");
   const selected = ctx.value === value;
+  const innerRef = useRef<HTMLButtonElement | null>(null);
+  const { registerTab } = ctx;
+
+  const setRef = (node: HTMLButtonElement | null) => {
+    innerRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) ref.current = node;
+  };
+
+  // Tell Tabs this tab exists, so it can pick the list's tab stop (D93).
+  useLayoutEffect(
+    () => registerTab?.({ value, disabled, el: innerRef.current }),
+    [registerTab, value, disabled],
+  );
 
   return (
     <button
-      ref={ref}
+      ref={setRef}
       type="button"
       role="tab"
       id={tabId(ctx.idPrefix, value)}
@@ -34,8 +49,10 @@ export function Tab({ value, children, disabled = false, className, ref }: TabPr
       aria-selected={selected}
       aria-controls={panelId(ctx.idPrefix, value)}
       aria-disabled={disabled || undefined}
-      // Roving tabindex: the selected tab is the list's single stop.
-      tabIndex={selected ? 0 : -1}
+      // Roving tabindex: one stop for the list. Tabs decides which tab holds it
+      // (D93): the selected one, or the first enabled one when `value` matches
+      // no tab. A provider without `tabStop` leaves it to `value`.
+      tabIndex={(ctx.tabStop ?? ctx.value) === value ? 0 : -1}
       className={[styles.tab, className].filter(Boolean).join(" ")}
       onClick={() => {
         if (!disabled) ctx.onValueChange(value);
