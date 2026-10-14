@@ -15,39 +15,58 @@
     0 12px 32px color-mix(in oklab, var(--psi-fg-primary) 7%, transparent);
 }
 
-* {
-  box-sizing: border-box;
-}
+/* Element rules sit in psi.base, below Psi's component layer (D94). Unlayered,
+ * they would beat every component rule whatever its specificity: `a { color:
+ * inherit }` alone turned the hero's accent Button-as-link from white to ink.
+ * The class rules below stay unlayered on purpose: they are deliberate
+ * overrides. */
+@layer psi.base {
+  * {
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-body {
-  margin: 0;
-  background: var(--psi-bg-primary);
-  color: var(--psi-fg-primary);
-  font: var(--psi-text-16-24-regular);
-  -webkit-font-smoothing: antialiased;
-  transition: background-color var(--psi-duration-200) var(--psi-ease-soft);
-}
+  body {
+    margin: 0;
+    background: var(--psi-bg-primary);
+    color: var(--psi-fg-primary);
+    font: var(--psi-text-16-24-regular);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color var(--psi-duration-200) var(--psi-ease-soft);
+  }
 
-h1,
-h2,
-h3,
-p {
-  margin: 0;
-}
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
 
-a {
-  color: inherit;
-}
+  a {
+    color: inherit;
+  }
 
-a:focus-visible,
-button:focus-visible,
-input:focus-visible {
-  outline: var(--psi-focus-ring-width) solid var(--psi-border-focus);
-  outline-offset: var(--psi-focus-ring-offset);
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    outline: var(--psi-focus-ring-width) solid var(--psi-border-focus);
+    outline-offset: var(--psi-focus-ring-offset);
+  }
+
+  code,
+  pre {
+    font-family: var(--psi-font-mono);
+  }
+
+  section {
+    /* Budgeted from the header's tallest state (two-row wrap, ~95px),
+       not its one-row 64px minimum — the original 88px only cleared
+       the fixed-height header because it never wrapped (D76). */
+    scroll-margin-top: 119px;
+  }
 }
 
 .skip-link {
@@ -64,18 +83,6 @@ input:focus-visible {
   background: var(--psi-fill-accent);
   color: var(--psi-fg-on-accent);
   font: var(--psi-text-14-20-medium);
-}
-
-code,
-pre {
-  font-family: var(--psi-font-mono);
-}
-
-section {
-  /* Budgeted from the header's tallest state (two-row wrap, ~95px),
-     not its one-row 64px minimum — the original 88px only cleared
-     the fixed-height header because it never wrapped (D76). */
-  scroll-margin-top: 119px;
 }
 
 .container {

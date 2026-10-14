@@ -33,6 +33,23 @@ export default function App() {
 }
 ```
 
+## Cascade
+
+Component styles ship in `@layer psi.components` (D94), so utilities such as
+`psi-gap-24` or `psi-fg-secondary` win over a component's own values. The
+flip side: **unlayered CSS in your app beats every Psi component rule,
+whatever its specificity.** An unlayered reset like `button { padding: 0 }`
+will strip a `Button`. Put resets and element rules in a layer below Psi's:
+
+```css
+@layer psi.base {
+  button { padding: 0; font: inherit; }
+}
+```
+
+or declare your own layer first:
+`@layer reset, psi.base, psi.theme, psi.components, psi.utilities;`.
+
 ## Conventions
 
 - **size** is a pixel number: `24 | 32 | 40 | 48` (never `"sm"`, `"md"`, `"lg"`)

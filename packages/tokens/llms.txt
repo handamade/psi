@@ -14,6 +14,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - Override --psi-{component}-* tokens for one-off component theming; never fork semantic tokens.
 - Scales are pixel-true: --psi-space-8 is 8px (0.5rem). Typography: --psi-text-{size}-{lh}-{weight}.
 - Themes: import base.css + {theme}.css + components.css + utilities.css; set data-psi-theme="{name}" ({light,dark,acme,ember}).
+- Foreground utilities (D94): `.psi-fg-<role>` sets `color: var(--psi-fg-<role>)` for every fg token (`psi-fg-primary`, `psi-fg-secondary`, `psi-fg-tertiary`, `psi-fg-on-accent`, `psi-fg-danger`, …). Like every utility it sits in `@layer psi.utilities` and beats a component's own colour.
 - Scoped tokens bind only their declared property groups (D46): fg* → text properties, bg*/fill*/scrim* → surfaces, border* → borders, --psi-space-* → gaps/padding/margin. Cross-family bindings that are design decisions carry both scopes (fgDanger: text+border for error borders; fillAccent: surface+border for selected controls). The token build enforces component bindings; the repo's stylelint rule (psi/token-scopes) enforces first-party consumer CSS (component modules + apps/). External consumers aren't gated automatically — dist/scope-map.json carries the machine-readable scopes to lint against.
 
 ## Motion (--psi-duration-*, --psi-ease-*)

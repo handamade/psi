@@ -29,7 +29,7 @@ Then set the theme on your root element:
 
 All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, `--psi-space-12`, etc.
 
-**utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*` utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
+**utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*`, `.psi-fg-*` (D94) utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
 
 ## Creating a custom theme
 
