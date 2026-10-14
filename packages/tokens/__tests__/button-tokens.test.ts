@@ -125,11 +125,23 @@ describe("buttonVars", () => {
     });
 
     it("binds the label ramp, never the value ramp", () => {
-      const ramp = Object.entries(buttonVars).filter(([k]) => /^\d\d-/.test(k));
+      // The control aliases only: D97's {n}-icon-size is derived from the
+      // button's own height, not aliased from the control family.
+      const ramp = Object.entries(buttonVars).filter(
+        ([k]) => /^\d\d-/.test(k) && !k.endsWith("-icon-size"),
+      );
       expect(ramp).toHaveLength(20);
       for (const [, value] of ramp) {
         expect(value).not.toContain("--psi-control-value-");
       }
     });
   });
+});
+
+describe("button icon size (D97)", () => {
+  for (const n of [24, 32, 40, 48] as const) {
+    it(`${n}-icon-size is half the button's height`, () => {
+      expect(buttonVars[`${n}-icon-size`]).toBe(`calc(var(--psi-button-${n}-height) / 2)`);
+    });
+  }
 });

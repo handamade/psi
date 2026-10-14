@@ -2,6 +2,8 @@ import React from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Button } from "./Button.js";
 import { IconPlus } from "../icons/IconPlus.js";
+import { IconClose } from "../icons/IconClose.js";
+import { IconButton } from "../IconButton/IconButton.js";
 
 const meta: Meta<typeof Button> = {
   title: "Components/Button",
@@ -106,14 +108,15 @@ export const AllSizes: Story = {
 
 /** D55 optical inset: a leading icon sits one step closer to the edge than
  * text does (12 [icon] 8 [label] 16 at size 40). Compare against AllSizes,
- * whose text-only buttons must stay pixel-identical to pre-D54 output. */
+ * whose text-only buttons must stay pixel-identical to pre-D54 output. Since
+ * D97 the button sizes the icon (12/16/20/24), so none is passed here. */
 export const IconLeading: Story = {
   render: () => (
     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-      <Button variant="accent" size={24}><IconPlus size={12} />Add item</Button>
-      <Button variant="accent" size={32}><IconPlus size={14} />Add item</Button>
-      <Button variant="accent" size={40}><IconPlus size={18} />Add item</Button>
-      <Button variant="accent" size={48}><IconPlus size={21} />Add item</Button>
+      <Button variant="accent" size={24}><IconPlus />Add item</Button>
+      <Button variant="accent" size={32}><IconPlus />Add item</Button>
+      <Button variant="accent" size={40}><IconPlus />Add item</Button>
+      <Button variant="accent" size={48}><IconPlus />Add item</Button>
     </div>
   ),
 };
@@ -129,6 +132,22 @@ export const AllVariants: Story = {
       <Button variant="danger">Danger</Button>
       <Button variant="danger-subtle">Danger Subtle</Button>
       <Button variant="outline">Outline</Button>
+    </div>
+  ),
+};
+
+/** D97: a direct icon child is sized by --psi-button-{n}-icon-size, half the
+ * button's height (12, 16, 20, 24), whatever its own `size` prop. Every icon
+ * here is passed at the default 20. The IconButton at the end does not bind
+ * the ramp and keeps its 20. */
+export const IconSizes: Story = {
+  render: () => (
+    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      <Button variant="neutral" size={24}><IconPlus />Add item</Button>
+      <Button variant="neutral" size={32}><IconPlus />Add item</Button>
+      <Button variant="neutral" size={40}><IconPlus />Add item</Button>
+      <Button variant="neutral" size={48}><IconPlus />Add item</Button>
+      <IconButton variant="neutral" size={32} aria-label="Close"><IconClose aria-hidden="true" /></IconButton>
     </div>
   ),
 };
