@@ -28,7 +28,9 @@ export interface NavItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "child
  * plain links and for presets, where the compose tree can hold only manifest
  * components and a raw `<a>` is not one. The current page is never marked by
  * colour alone: medium weight, a raised surface and a bar at the inline
- * start. */
+ * start. A child link you mark `aria-current="true"` is the entry the current
+ * screen sits under (D96): medium weight and the current colour, with no
+ * surface and no bar. `NavItem` itself never sets `true`. */
 export function NavItem({ children, href, current, className, ref, ...rest }: NavItemProps) {
   const cls = [styles.item, className].filter(Boolean).join(" ");
   // D93: `current` reaches a link the consumer passes as the child. Only a

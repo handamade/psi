@@ -76,3 +76,27 @@ export const DarkSidebar: Story = {
     </div>
   ),
 };
+
+/** D96: the current screen is a customer's detail, which sits under
+ * Customers and is not in the tree. The entry's link carries
+ * `aria-current="true"`: current colour and medium weight, with no surface
+ * and no bar, which stay the marks of the page itself. */
+export const ParentCurrent: Story = {
+  render: () => (
+    <Frame>
+      <NavTree aria-label="Main">
+        <NavItem>
+          <a href="#overview">Overview</a>
+        </NavItem>
+        <NavItem>
+          <a href="#customers" aria-current="true">
+            Customers
+          </a>
+        </NavItem>
+        <NavItem>
+          <a href="#invoices">Invoices</a>
+        </NavItem>
+      </NavTree>
+    </Frame>
+  ),
+};
