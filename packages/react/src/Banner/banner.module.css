@@ -37,6 +37,16 @@
   min-width: 0; /* let a long message wrap instead of stretching the grid */
 }
 
+/* D95: a message passed as paragraphs starts on the icon's line, as bare text
+   does, and consecutive paragraphs read as separate. Direct children only. */
+.body > p {
+  margin-block: 0;
+}
+
+.body > p + p {
+  margin-block-start: var(--psi-space-8);
+}
+
 .title {
   display: block;
   font: var(--psi-text-14-20-medium);

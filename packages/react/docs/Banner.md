@@ -9,7 +9,7 @@ A full-width, page-level status message (D86). It is not a live region: it rende
 |---|---|---|---|---|
 | `variant` | `"neutral" \| "success" \| "warning" \| "danger"` | neutral | no | Status variant. |
 | `title` | `ReactNode` | — | no | A short heading, rendered before the body in the medium weight. |
-| `children` | `ReactNode` | — | yes | The message. |
+| `children` | `ReactNode` | — | yes | The message: bare text, or one or more `<p>`. A direct `<p>` has no block margin, and consecutive paragraphs are 8px apart (D95). |
 | `action` | `ReactNode` | — | no | Trailing affordance — a ghost Button (Review, Retry, Learn more). |
 | `onDismiss` | `(() => void)` | — | no | When provided, renders the dismiss button and calls this. Banner does not remove itself; the owner disposes. |
 | `statusLabel` | `string \| null` | — | no | The visually hidden status word (D83). A string replaces the default ("Success:", "Warning:", "Error:") — pass the translated word; `null` drops it. Unset keeps the default, and `neutral` has none. |

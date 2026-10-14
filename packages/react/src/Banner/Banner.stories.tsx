@@ -42,3 +42,27 @@ export const WithActionAndDismiss: Story = {
 export const TitleOnly: Story = {
   args: { variant: "warning", title: "Read-only mode", children: null },
 };
+
+/** D95: a message passed as a paragraph starts on the icon's line, as bare
+ * text does. The browser's paragraph margin is removed. */
+export const WithParagraph: Story = {
+  args: {
+    variant: "danger",
+    title: "Request failed",
+    children: <p>The server rejected the request. Try again in a few minutes.</p>,
+  },
+};
+
+/** D95: consecutive paragraphs are 8px apart. */
+export const WithParagraphs: Story = {
+  args: {
+    variant: "danger",
+    title: "Request failed",
+    children: (
+      <>
+        <p>The server rejected the request. Try again in a few minutes.</p>
+        <p>Reference: 7f3c9a1e-52b4-4d0e-9c61-0a8e2f4d1b77</p>
+      </>
+    ),
+  },
+};
