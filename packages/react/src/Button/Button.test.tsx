@@ -135,3 +135,27 @@ describe("Button icon size (D97)", () => {
     });
   }
 });
+
+describe("Button label max width (D98)", () => {
+  // jsdom does no layout, so these read the rules; the truncation itself is
+  // measured in a browser by apps/storybook/vr/button-label.interaction.spec.ts.
+  const css = readFileSync(join(import.meta.dirname, "button.module.css"), "utf8");
+  const body = new RegExp(String.raw`\.button\s*>\s*span\s*\{([^}]*)\}`).exec(css)?.[1] ?? "";
+  it("caps a direct span label by the token and ends it in an ellipsis", () => {
+    expect(body).toMatch(/max-inline-size:\s*var\(--psi-button-label-max-width\);/);
+    expect(body).toMatch(/overflow:\s*hidden;/);
+    expect(body).toMatch(/text-overflow:\s*ellipsis;/);
+  });
+  it("keeps the label from shrinking below its capped width", () => {
+    expect(body).toMatch(/flex:\s*none;/);
+  });
+  it("keeps the whole label as the accessible name", () => {
+    const name = "Alexandra Konstantinopoulou-Vasilakis";
+    render(
+      <Button style={{ ["--psi-button-label-max-width" as string]: "80px" }}>
+        <span>{name}</span>
+      </Button>,
+    );
+    expect(screen.getByRole("button", { name })).toBeInTheDocument();
+  });
+});

@@ -26,6 +26,21 @@
   cursor: not-allowed;
 }
 
+/* Label cap (D98): a label wrapped in a direct <span> stops at
+   --psi-button-label-max-width (none by default) and ends in an ellipsis.
+   The span clips its own text, since text-overflow does not apply to the
+   flex container. flex: none keeps it from shrinking below its capped width:
+   overflow makes its automatic minimum 0, so without it a label could shrink
+   in a tight row where an anonymous text label never did. A bare text label
+   is not capped; wrap it, as a trailing icon already requires (D55). The
+   full text stays the accessible name. */
+.button > span {
+  max-inline-size: var(--psi-button-label-max-width);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: none;
+}
+
 /* Disabled-as-anchor (D33): no href (non-focusable) + no pointer events. */
 .button.disabled {
   opacity: 0.4;

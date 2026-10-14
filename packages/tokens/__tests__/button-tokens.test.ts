@@ -145,3 +145,9 @@ describe("button icon size (D97)", () => {
     });
   }
 });
+
+describe("button label max width (D98)", () => {
+  it("label-max-width is off by default", () => {
+    expect(buttonVars["label-max-width"]).toBe("none");
+  });
+});

@@ -22,6 +22,7 @@
 - `outline` is a bordered-ghost variant: visible structure, no fill until hover — good for marketing CTAs and download buttons.
 - --psi-button-font overrides button typography across all sizes in one declaration; brands can set it via componentOverrides (ember → mono).
 - An icon passed straight into a Button is sized by the button (D97): `--psi-button-{24,32,40,48}-icon-size` = half the height, 12/16/20/24, whatever the icon's `size` prop. Write `<Button size={32}><IconPlus aria-hidden="true" />Add</Button>` with no icon size. A wrapped icon is not sized. IconButton keeps its icon's own size.
+- A label wrapped in a direct `<span>` can be capped (D98): set `--psi-button-label-max-width` on your own class (default `none`) and the label ends in an ellipsis past it: `<Button className="account"><IconUser aria-hidden="true" /><span>{name}</span></Button>` with `.account { --psi-button-label-max-width: 12rem; }`. A bare text label is not capped. The full text stays the accessible name; Psi adds no `title`.
 
 ## Card
 - <Card variant="stacked" | "featured" media={...} hoverLift>: stacked places media above the body, featured places media beside it (~1.6fr/1fr, stacks under the md breakpoint). hoverLift lifts the card translateY(-6px) over --psi-duration-350. Border uses --psi-border-faint.

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "storybook";
 import { Button } from "./Button.js";
 import { IconPlus } from "../icons/IconPlus.js";
 import { IconClose } from "../icons/IconClose.js";
+import { IconUser } from "../icons/IconUser.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 const meta: Meta<typeof Button> = {
@@ -148,6 +149,30 @@ export const IconSizes: Story = {
       <Button variant="neutral" size={40}><IconPlus />Add item</Button>
       <Button variant="neutral" size={48}><IconPlus />Add item</Button>
       <IconButton variant="neutral" size={32} aria-label="Close"><IconClose aria-hidden="true" /></IconButton>
+    </div>
+  ),
+};
+
+/** D98: a label wrapped in a `<span>` is capped by
+ * --psi-button-label-max-width (off by default) and ends in an ellipsis. The
+ * first button sets the token to 160px; the second is the same button with
+ * no cap. The accessible name is the whole label either way. */
+export const LabelMaxWidth: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
+      <Button
+        variant="ghost"
+        size={32}
+        style={{ ["--psi-button-label-max-width" as string]: "160px" }}
+        data-testid="capped"
+      >
+        <IconUser aria-hidden="true" />
+        <span>Alexandra Konstantinopoulou-Vasilakis</span>
+      </Button>
+      <Button variant="ghost" size={32} data-testid="uncapped">
+        <IconUser aria-hidden="true" />
+        <span>Alexandra Konstantinopoulou-Vasilakis</span>
+      </Button>
     </div>
   ),
 };

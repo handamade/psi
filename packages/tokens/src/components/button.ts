@@ -99,4 +99,9 @@ export const buttonVars: Record<string, string> = {
   "32-icon-size": "calc(var(--psi-button-32-height) / 2)",
   "40-icon-size": "calc(var(--psi-button-40-height) / 2)",
   "48-icon-size": "calc(var(--psi-button-48-height) / 2)",
+
+  // ── Label cap (D98) — off by default. A consumer sets it on its own class;
+  // it caps a label wrapped in a direct <span> and ends it in an ellipsis.
+  // Size-invariant: the surrounding layout sets the cap, not the button.
+  "label-max-width": "none",
 };
