@@ -1,4 +1,6 @@
 import { createRef } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -288,5 +290,24 @@ describe("NavItem current on a child link (D93)", () => {
       </NavTree>,
     );
     expect(screen.getByRole("listitem")).toHaveTextContent("Plain text");
+  });
+});
+
+describe("NavItem parent of the current screen (D96)", () => {
+  // jsdom does no layout, so these read the rules; the rendering itself is
+  // measured in a browser by apps/storybook/vr/nav-tree.interaction.spec.ts.
+  const css = readFileSync(join(import.meta.dirname, "nav-tree.module.css"), "utf8");
+  const rule = (selector: string) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
+    return new RegExp(`${escaped}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+  };
+  it("marks a link with aria-current=true by the current colour and medium weight", () => {
+    const body = rule('.item a[aria-current="true"]');
+    expect(body).toMatch(/color:\s*var\(--psi-nav-tree-item-fg-current\);/);
+    expect(body).toMatch(/font:\s*var\(--psi-text-14-20-medium\);/);
+  });
+  it("gives the parent no surface and no bar: those stay the marks of the page itself", () => {
+    expect(rule('.item a[aria-current="true"]')).not.toMatch(/background/);
+    expect(css).not.toMatch(/aria-current="true"\]::before/);
   });
 });

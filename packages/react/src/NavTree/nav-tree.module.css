@@ -65,6 +65,15 @@
   background: var(--psi-nav-tree-indicator);
 }
 
+/* D96: the entry the current screen sits under, when that screen is not in
+   the tree. Colour and weight, never colour alone; the surface and the bar
+   stay the marks of the page itself, so a parent and its leaf stay distinct
+   when both are visible. */
+.item a[aria-current="true"] {
+  color: var(--psi-nav-tree-item-fg-current);
+  font: var(--psi-text-14-20-medium);
+}
+
 /* ── Group ────────────────────────────────────────────────────── */
 
 .groupButton {
