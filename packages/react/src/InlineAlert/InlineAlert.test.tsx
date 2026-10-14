@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createRef } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { InlineAlert } from "./InlineAlert.js";
 
@@ -121,5 +123,21 @@ describe("InlineAlert", () => {
   it("does not let rest props overwrite its own data attributes", () => {
     render(<InlineAlert variant="success" data-variant="danger" data-testid="alert">msg</InlineAlert>);
     expect(screen.getByTestId("alert")).toHaveAttribute("data-variant", "success");
+  });
+});
+
+describe("InlineAlert body paragraphs (D95)", () => {
+  // jsdom does no layout, so these read the rules; the geometry itself is
+  // measured in a browser by apps/storybook/vr/alert-paragraph.interaction.spec.ts.
+  const css = readFileSync(join(import.meta.dirname, "inline-alert.module.css"), "utf8");
+  const rule = (selector: string) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
+    return new RegExp(`${escaped}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+  };
+  it("removes a paragraph's block margin", () => {
+    expect(rule(".body > p")).toMatch(/margin-block:\s*0;/);
+  });
+  it("puts 8px between consecutive paragraphs", () => {
+    expect(rule(".body > p + p")).toMatch(/margin-block-start:\s*var\(--psi-space-8\);/);
   });
 });

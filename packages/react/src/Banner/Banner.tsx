@@ -13,7 +13,8 @@ export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, "title
   variant?: BannerVariant;
   /** A short heading, rendered before the body in the medium weight. */
   title?: ReactNode;
-  /** The message. */
+  /** The message: bare text, or one or more `<p>`. A direct `<p>` has no
+   * block margin, and consecutive paragraphs are 8px apart (D95). */
   children: ReactNode;
   /** Trailing affordance — a ghost Button (Review, Retry, Learn more). */
   action?: ReactNode;
