@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-10-14",
+    tag: "release",
+    title: "0.22.0 — what the operator console found in 0.21",
+    body: "The operator web portal that shaped 0.21 built its first screens on it and reported four gaps. This release closes them. The toast region is now a real landmark, and its live wrappers are no longer atomic, so a screen reader speaks the message that arrived instead of reading the whole region again. Toasts and speech-only announcements share one queue: useToast().announce() speaks without showing anything, an announcement stays for one second so its speech is not cut off, and announcements never push a visible toast out. A filter row can show an error: Toolbar align=\"start\" lines up every control under its label, the field's error line hangs below its own control, and the offset comes from two new Field-derived tokens, so it changes when Field's tokens change. And tabs and the navigation tree keep working when the app's state is off the happy path: a value that matches no tab still leaves one tab focusable, and NavItem current now marks a router link passed in as its child. 46 components, 22 patterns.",
+  },
+  {
     date: "2026-10-01",
     tag: "release",
     title: "0.21.0 — the first screens of an operator console",

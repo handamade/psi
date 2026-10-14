@@ -1,5 +1,58 @@
 # @handamade/psi-react
 
+## 0.22.0
+
+### Minor Changes
+
+- 6cda910: `ToastRegion` is a region landmark, and its live wrappers speak only what is
+  new (D90). No prop changes.
+
+  - **The region element sets `role="region"`**, after the spread, so a `role`
+    passed in does not displace it. It is always named — `aria-label` defaults to
+    "Notifications" — so it is always a valid landmark. Before, it was a `div`
+    with a name and no role, which ARIA prohibits; in a real browser axe files
+    that as `aria-prohibited-attr` under needs-review (`incomplete`), not as a
+    violation.
+  - **Both live wrappers set `aria-atomic="false"`.** `role="status"` and
+    `role="alert"` carry an implicit `aria-atomic="true"`, so a screen reader
+    could speak the whole wrapper on each change; a message added beside another
+    made it speak both again. Now it speaks the added node, one `Toast` or one
+    `Announcement`.
+
+- 4da3b5f: A filter row whose fields can show an error (D92). The default and `align="end"` are unchanged.
+
+  - **`Toolbar` gains `align="start"`.** Items share their top edge, so every control under a one-line `Field` label starts on one line, and a direct `button` or `a` child drops by `--psi-toolbar-action-offset` onto that line. A field's description or error line hangs below its control and moves nothing else. Every label in such a row must be one line: a label that wraps pushes its control below the others. `align="end"` still requires a `Field` to end on its control.
+  - **New token `--psi-field-label-height`** (20px, the label's line box). `Field`'s label holds it as its `min-block-size`, which renders the same height as before.
+  - **New token `--psi-toolbar-action-offset`**: `calc(var(--psi-field-label-height) + var(--psi-field-gap))`, 26px. It is derived from `Field`'s tokens, so it moves with them when they are retuned at the theme root.
+  - **Pattern `filter-form` is start-aligned.** Its `intent` no longer forbids a description or error line in the row. The error line is the `Field`'s own, with its usual `aria-describedby` wiring, and every label must be one line.
+
+- 31372f2: Tabs and the navigation tree keep their contracts when the consumer's state is not the happy path (D93). No prop changes.
+
+  - **`Tabs`**: a `value` that matches no tab used to leave every tab at `tabIndex={-1}`, so the list had no tab stop. The first enabled tab now takes it (the first tab, when all are disabled). Nothing is selected: the selection stays yours. Development builds warn with the value that matched nothing. A selected tab that is disabled keeps the stop, as before.
+  - **`NavItem`**: `current` now also applies to a link you pass as the child. The single element child is cloned with `aria-current="page"`, so a router app no longer clones each link itself. Without `current`, the child's own `aria-current` is left alone.
+  - The exported `TabsContextValue` type gains two optional fields, `tabStop` and `registerTab`. A hand-written `TabsContext.Provider` that omits them keeps working: `Tab` falls back to `value`.
+
+- 991b477: One queue for toasts and announcements (D91). Every existing call and default
+  is unchanged.
+
+  - **`useToast().announce(message, { politeness })`** speaks without showing
+    anything. It renders an `Announcement` into the provider's one region, in the
+    wrapper its `politeness` names (default `"polite"`), and returns an id that
+    `dismiss()` accepts. It never renders a live region of its own.
+  - **An announcement has a lifetime Psi owns.** It leaves one second after it
+    was added. A later announcement does not remove it early: removing a node
+    just after it was added can cut its speech, and the non-atomic wrappers of
+    D90 speak each added node on its own.
+  - **Announcements never count against `limit`**, so they cannot evict a visible
+    toast. `clear()` removes both kinds, and unmounting the provider disposes
+    every timer.
+  - **`ToastProvider` forwards region props** to its `ToastRegion`: `aria-label`,
+    `ref`, `className` and `data-*` attributes such as
+    `data-react-aria-top-layer`.
+  - **New type `AnnounceOptions`.** `Announcement`'s docs now state the lifetime
+    rule; rendered by hand it is still the owner's to remove, after the same
+    one-second dwell.
+
 ## 0.21.0
 
 ### Minor Changes
