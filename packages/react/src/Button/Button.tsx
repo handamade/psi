@@ -21,7 +21,9 @@ type Size = 24 | 32 | 40 | 48;
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Label content. A direct icon child is sized by the button, half its
-   * height (12/16/20/24), whatever the icon's own `size` (D97). */
+   * height (12/16/20/24), whatever the icon's own `size` (D97). A label in a
+   * direct `<span>` is capped by `--psi-button-label-max-width` (default
+   * `none`) and ends in an ellipsis past it (D98). */
   children?: ReactNode;
   /** Visual variant. @default "neutral" */
   variant?: Variant;

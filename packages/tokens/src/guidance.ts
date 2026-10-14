@@ -84,6 +84,8 @@ export const guidance = {
       "A leading icon sits one step closer to the edge than text — an icon is a solid shape with no side bearing (D55). Applied by .size{n}:has(> svg:first-child) on Button. IconButton is height-only: it is square with padding 0, so no padding/gap/font token applies to it.",
     iconSize:
       "A direct svg child of a Button renders at --psi-button-{size}-icon-size, half the button's height (12/16/20/24 at 24/32/40/48), whatever the icon's own size prop: CSS width and height beat the attributes an icon writes (D97). Pass icons without a size. A wrapped icon is not sized, as it gets no inset. IconButton does not bind the ramp; its icon keeps its own size (20 by default).",
+    labelMaxWidth:
+      "A label wrapped in a direct <span> is capped by --psi-button-label-max-width, default none, and ends in an ellipsis past the cap (D98). Set the token on your own class; it is size-invariant. A bare text label is not capped (wrap it, as a trailing icon already requires). The full text stays the accessible name, and Psi adds no title.",
     iconInsetLimits:
       "The selector matches on element order, and :first-child ignores text nodes. Two consequences. (1) An icon wrapped in a <span> never matches — fails safe, no inset; set --psi-button-{size}-padding-inline-icon yourself. (2) A TRAILING icon (<Button>Next<IconChevronRight /></Button>) makes the svg the first ELEMENT child, so the rule fires and narrows the start (text) side while the icon keeps full padding — the inverse of the intent. CSS cannot tell the two apart without a DOM signal. Put the icon first, or override --psi-button-{size}-padding-inline-icon to match --psi-button-{size}-padding-inline to disable the inset.",
     radius:
