@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { emitBaseCSS, emitThemeCSS } from "../scripts/emit-css.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
@@ -219,5 +221,51 @@ describe("visually-hidden utility (D80)", () => {
     expect(family).toBeDefined();
     expect(family!.scale).toBeNull();
     expect(family!.classes).toEqual(["psi-sr-only"]);
+  });
+});
+
+describe("foreground-colour utilities (D94)", () => {
+  // The resolved JSON is the published list of tokens a consumer can see, so
+  // the utilities are checked against it rather than against the theme source
+  // the emitter reads. Every theme is checked: a customer theme that grew an
+  // fg token of its own would otherwise ship it with no utility.
+  const resolvedDir = join(import.meta.dirname, "..", "dist", "resolved");
+  const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+  const css = emitUtilitiesCSS();
+
+  const fgNames = (file: string) =>
+    Object.keys(
+      (JSON.parse(readFileSync(join(resolvedDir, file), "utf8")) as { tokens: Record<string, unknown> }).tokens,
+    ).filter((n) => /^fg[A-Z]/.test(n));
+
+  it("light.json has the 13 foreground tokens the plan names", () => {
+    expect(fgNames("light.json")).toHaveLength(13);
+  });
+
+  it("emits .psi-fg-<kebab-role> for every fg token of every theme", () => {
+    for (const file of readdirSync(resolvedDir).filter((f) => f.endsWith(".json"))) {
+      for (const name of fgNames(file)) {
+        const role = kebab(name).replace(/^fg-/, "");
+        expect(css, `${file}: ${name}`).toContain(`.psi-fg-${role} { color: var(--psi-fg-${role}); }`);
+      }
+    }
+  });
+
+  it("keeps the fg utilities inside @layer psi.utilities", () => {
+    const open = css.indexOf("@layer psi.utilities {");
+    const first = css.indexOf(".psi-fg-primary ");
+    expect(open).toBe(0);
+    expect(first).toBeGreaterThan(open);
+    // The layer block is the whole file: its closing brace is the last line.
+    expect(css.trimEnd().endsWith("}")).toBe(true);
+    expect(css.lastIndexOf(".psi-fg-")).toBeLessThan(css.trimEnd().length - 1);
+    expect(css.match(/^@layer/gm)).toHaveLength(1);
+  });
+
+  it("lists the family in the roster", () => {
+    const family = emitUtilitiesRoster().families.find((f) => f.prefix === "psi-fg-*");
+    expect(family?.property).toBe("color");
+    expect(family?.classes).toContain("psi-fg-on-accent");
+    expect(family?.classes).toHaveLength(13);
   });
 });

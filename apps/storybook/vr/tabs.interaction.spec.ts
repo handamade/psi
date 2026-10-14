@@ -62,3 +62,19 @@ test("a vertical list uses the block axis and ignores Left/Right @interaction", 
   await page.keyboard.press("ArrowDown");
   expect(await activeText(page)).toBe("Uncategorised");
 });
+
+test("a utility class beats the component's own value: psi-gap-24 on a Tabs root @interaction", async ({
+  page,
+}) => {
+  // D94. Before it, tabs.module.css was unlayered and `.tabs { gap: 16px }`
+  // beat `.psi-gap-24` in @layer psi.utilities whatever the specificity, so the
+  // class did nothing. The class is added in the page rather than through a
+  // story, so this needs no new screenshot baseline.
+  await page.goto(story("components-tabs--horizontal"), { waitUntil: "networkidle" });
+
+  const root = page.locator('[data-orientation="horizontal"]').filter({ has: page.getByRole("tablist") }).first();
+  expect(await root.evaluate((el) => getComputedStyle(el).rowGap)).toBe("16px");
+
+  await root.evaluate((el) => el.classList.add("psi-gap-24"));
+  expect(await root.evaluate((el) => getComputedStyle(el).rowGap)).toBe("24px");
+});

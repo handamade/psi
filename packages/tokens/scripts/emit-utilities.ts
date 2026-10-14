@@ -5,6 +5,7 @@ import { typographyCombos, comboName, comboFontVar, WEIGHT_VALUES, displayCombos
 import { durationScale, easings } from "../src/scales/motion.js";
 import { breakpoints, container, zIndex } from "../src/scales/layout.js";
 import { focusRing } from "../src/scales/focus-ring.js";
+import { lightTheme } from "../src/themes/light.js";
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -98,6 +99,16 @@ export function emitScaleVarsCSS(): string {
 // ── Utility classes ──────────────────────────────────────────────
 
 /**
+ * Foreground roles that get a `psi-fg-<role>` colour utility (D94): every
+ * `fg*` token of the light theme. Generated rather than listed, so a new fg
+ * token gets its utility for free; emit-css.test.ts checks every theme's
+ * resolved fg tokens against the emitted classes.
+ */
+const FG_ROLES: readonly string[] = Object.keys(lightTheme)
+  .filter((name) => /^fg[A-Z]/.test(name))
+  .map((name) => name.slice(2).replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase());
+
+/**
  * The single description of the spacing-driven utility families (D79).
  *
  * Both `emitUtilitiesCSS` and `emitUtilitiesRoster` generate from this, so the
@@ -143,6 +154,14 @@ export function emitUtilitiesCSS(): string {
     }
     lines.push("");
   }
+
+  // Foreground colour (D94) — beats a component's own colour, as every
+  // utility does now that component CSS is layered.
+  for (const role of FG_ROLES) {
+    lines.push(`  .psi-fg-${role} { color: var(--psi-fg-${role}); }`);
+  }
+
+  lines.push("");
 
   // Typography utilities
   for (const c of typographyCombos) {
@@ -227,6 +246,13 @@ export function emitUtilitiesRoster(): {
   }
 
   families.push({
+    prefix: "psi-fg-*",
+    property: "color",
+    scale: null,
+    classes: FG_ROLES.map((role) => `psi-fg-${role}`),
+  });
+
+  families.push({
     prefix: "psi-text-*",
     property: "font",
     scale: null,
@@ -270,7 +296,7 @@ export function emitUtilitiesRoster(): {
 
   return {
     note:
-      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Scaled utility families set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. The bare/fixed utilities (.psi-container, .psi-media-tint, .psi-sr-only) set several. Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
+      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Scaled utility families set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. The bare/fixed utilities (.psi-container, .psi-media-tint, .psi-sr-only) set several. Every utility sits in @layer psi.utilities, above @layer psi.components, so on a component root it beats the component's own value (D94). Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
     families,
     classes: [...new Set(families.flatMap((f) => f.classes))].sort(),
   };
