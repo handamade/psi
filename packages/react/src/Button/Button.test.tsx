@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Button } from "./Button.js";
 
 describe("Button", () => {
@@ -114,4 +116,22 @@ describe("Button", () => {
     await userEvent.click(a).catch(() => {});
     expect(onClick).not.toHaveBeenCalled();
   });
+});
+
+describe("Button icon size (D97)", () => {
+  // jsdom does no layout, so these read the rules; the rendered size is
+  // measured in a browser by apps/storybook/vr/button-icon.interaction.spec.ts.
+  const css = readFileSync(join(import.meta.dirname, "button.module.css"), "utf8");
+  const rule = (selector: string) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
+    return new RegExp(`${escaped}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+  };
+  for (const n of [24, 32, 40, 48] as const) {
+    it(`sizes a direct svg child at size ${n} by its token, and keeps it from shrinking`, () => {
+      const body = rule(`.size${n} > svg`);
+      expect(body).toMatch(new RegExp(`inline-size:\\s*var\\(--psi-button-${n}-icon-size\\);`));
+      expect(body).toMatch(new RegExp(`block-size:\\s*var\\(--psi-button-${n}-icon-size\\);`));
+      expect(body).toMatch(/flex:\s*none;/);
+    });
+  }
 });

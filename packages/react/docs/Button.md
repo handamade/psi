@@ -7,7 +7,7 @@ Action trigger. With `href` renders an anchor with identical styling (D33); `dis
 
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
-| `children` | `ReactNode` | — | no | Label content. |
+| `children` | `ReactNode` | — | no | Label content. A direct icon child is sized by the button, half its height (12/16/20/24), whatever the icon's own `size` (D97). |
 | `variant` | `"accent" \| "accent-subtle" \| "neutral" \| "neutral-subtle" \| "ghost" \| "danger" \| "danger-subtle" \| "outline"` | neutral | no | Visual variant. |
 | `size` | `24 \| 32 \| 40 \| 48` | 32 | no | Height in px (24 \| 32 \| 40 \| 48). |
 | `type` | `"button" \| "submit" \| "reset"` | — | no | Button type. Declared so the manifest lists it and a pattern can say `submit` (D87). No default is set: the platform's applies — `submit` inside a form, a plain button elsewhere. |

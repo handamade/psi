@@ -45,7 +45,12 @@
    `> svg:last-child:not(:first-child)`: with `<Icon/> Label` the svg is both
    first and last *element* child (text nodes do not count), and without the
    guard a leading icon would also lose its end inset. So a trailing icon
-   must follow an element — wrap the label: `<span>Next</span><Icon/>`. */
+   must follow an element — wrap the label: `<span>Next</span><Icon/>`.
+
+   Icon size (D97): a direct svg child takes --psi-button-{n}-icon-size, half
+   the height, whatever its own size prop; CSS beats the width and height
+   attributes an icon writes. A wrapped icon is not sized, as it gets no
+   inset. flex: none keeps it whole when a long label squeezes the row. */
 
 .size24 {
   height: var(--psi-button-24-height);
@@ -58,6 +63,11 @@
 }
 .size24:has(> svg:last-child:not(:first-child)) {
   padding-inline-end: var(--psi-button-24-padding-inline-icon);
+}
+.size24 > svg {
+  inline-size: var(--psi-button-24-icon-size);
+  block-size: var(--psi-button-24-icon-size);
+  flex: none;
 }
 
 .size32 {
@@ -72,6 +82,11 @@
 .size32:has(> svg:last-child:not(:first-child)) {
   padding-inline-end: var(--psi-button-32-padding-inline-icon);
 }
+.size32 > svg {
+  inline-size: var(--psi-button-32-icon-size);
+  block-size: var(--psi-button-32-icon-size);
+  flex: none;
+}
 
 .size40 {
   height: var(--psi-button-40-height);
@@ -85,6 +100,11 @@
 .size40:has(> svg:last-child:not(:first-child)) {
   padding-inline-end: var(--psi-button-40-padding-inline-icon);
 }
+.size40 > svg {
+  inline-size: var(--psi-button-40-icon-size);
+  block-size: var(--psi-button-40-icon-size);
+  flex: none;
+}
 
 .size48 {
   height: var(--psi-button-48-height);
@@ -97,6 +117,11 @@
 }
 .size48:has(> svg:last-child:not(:first-child)) {
   padding-inline-end: var(--psi-button-48-padding-inline-icon);
+}
+.size48 > svg {
+  inline-size: var(--psi-button-48-icon-size);
+  block-size: var(--psi-button-48-icon-size);
+  flex: none;
 }
 
 /* ── Variants ─────────────────────────────────────────────────── */

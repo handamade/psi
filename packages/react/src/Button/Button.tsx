@@ -20,7 +20,8 @@ type Variant =
 type Size = 24 | 32 | 40 | 48;
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Label content. */
+  /** Label content. A direct icon child is sized by the button, half its
+   * height (12/16/20/24), whatever the icon's own `size` (D97). */
   children?: ReactNode;
   /** Visual variant. @default "neutral" */
   variant?: Variant;

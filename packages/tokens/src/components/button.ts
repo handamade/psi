@@ -90,4 +90,13 @@ export const buttonVars: Record<string, string> = {
   "32-font": "var(--psi-control-32-font)",
   "40-font": "var(--psi-control-40-font)",
   "48-font": "var(--psi-control-48-font)",
+
+  // ── Icon size (D97) — a direct svg child, half the height: 12/16/20/24.
+  // Derived, not restated, so a height retuned at the root moves the icon.
+  // The calc() resolves where it is declared: a retune on a narrower scope
+  // must set the icon size there too. IconButton does not bind it.
+  "24-icon-size": "calc(var(--psi-button-24-height) / 2)",
+  "32-icon-size": "calc(var(--psi-button-32-height) / 2)",
+  "40-icon-size": "calc(var(--psi-button-40-height) / 2)",
+  "48-icon-size": "calc(var(--psi-button-48-height) / 2)",
 };
