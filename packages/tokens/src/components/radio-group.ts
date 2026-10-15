@@ -5,7 +5,7 @@
 export const radioGroupVars: Record<string, string> = {
   fg: "var(--psi-fg-primary)",
   "circle-bg": "var(--psi-bg-primary)",
-  "circle-border": "var(--psi-border-neutral)",
+  "circle-border": "var(--psi-border-control)",
   "circle-bg-checked": "var(--psi-fill-accent)",
   "circle-border-checked": "var(--psi-fill-accent)",
   "dot-fg": "var(--psi-fg-on-accent)",

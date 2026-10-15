@@ -179,3 +179,12 @@ export const componentLabelPairs: ContrastPair[] = [
   { fg: "fgStaticBlack", bg: "fillWarning", minRatio: 4.5 }, // Tag warning (D22)
   { fg: "fgOnInverted", bg: "bgInverted", minRatio: 4.5 },   // Tooltip label (D46 inversion pair)
 ];
+
+/** WCAG 1.4.11 non-text contrast (D106): 3:1 for the visual information that
+ * identifies a control. An unchecked checkbox or radio is identified by its
+ * outline alone, against its own fill (bgPrimary) and the surface it sits on
+ * (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). */
+export const nonTextPairs: ContrastPair[] = [
+  { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
+  { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
+];

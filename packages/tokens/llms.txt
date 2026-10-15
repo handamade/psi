@@ -39,6 +39,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 ## Scrims and borders
 - --psi-scrim-soft/medium/heavy: bgPrimary-derived translucent overlays (0.25/0.35/0.82 alpha) for text-over-media legibility.
 - --psi-border-faint: low-contrast hairline border (fgPrimary at 0.08 alpha), used by Card/NavBar and other bordered surfaces.
+- --psi-border-control: the outline that alone identifies an unchecked Checkbox or Radio (fgPrimary at 0.55 alpha in light-based themes, 0.40 in dark-based), gated at 3:1 on bgPrimary and bgSecondary by `nonTextPairs` (WCAG 1.4.11, D106). Bind it, not --psi-border-neutral (1.32-1.48:1), for any control identified by its outline alone. A consumer theme built with buildThemeCss is held to the same 3:1.
 
 ## Media tint (--psi-media-tint, .psi-media-tint)
 - --psi-media-tint is a brand-defined filter chain (D35); apply the .psi-media-tint utility class to media elements to get a tinted-at-rest, true-color-on-hover/focus treatment, transitioning over --psi-duration-450 / --psi-ease-soft.
