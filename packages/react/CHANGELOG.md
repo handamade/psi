@@ -1,5 +1,36 @@
 # @handamade/psi-react
 
+## 0.27.0
+
+### Minor Changes
+
+- f9fd47e: A checkbox and radio you can find (D106).
+
+  - **New semantic border `--psi-border-control`** — `fgPrimary` at alpha 0.55 in light-based themes and 0.40 in dark-based ones — for a control identified by its outline alone. The unchecked `Checkbox` box and `Radio` circle bind it. They bound `--psi-border-neutral`, which measured 1.32–1.48:1, and now clear WCAG 1.4.11's 3:1 in every theme (3.24:1 at worst).
+  - **The contrast gate has its first non-text pairs**, `nonTextPairs`: `borderControl` on `bgPrimary` and `bgSecondary` at 3:1. `buildThemeCss` and `deriveTheme` apply them too, so a consumer theme whose `fgPrimary` barely clears 4.5:1 could now fail; the error names the pair. Every theme `deriveTheme` can produce passes (3.22:1 at worst).
+  - Input, Select and Textarea borders are unchanged.
+
+- 0076c40: A checkbox and radio that show they are in error (D108).
+
+  - **An unchecked `Checkbox` or `Radio` marked `aria-invalid` outlines in the field error colour**, as Input, Select and Textarea do (`--psi-checkbox-box-border-error`, `--psi-radio-group-circle-border-error`, both `--psi-fg-danger`). A checked or mixed one keeps its accent.
+  - **`Checkbox` joins an invalid group `Field`:** inside `<Field group error>` every checkbox is now `aria-invalid`, as every `Radio` already was. It doesn't become `required`, because on a checkbox that would mean this particular box must be ticked. An `aria-invalid` you pass yourself still wins.
+
+- a343102: A column and a line of text for pattern trees: `Stack` and `Text` (D109).
+
+  - **`Stack`**: a column with a gap from the space scale (`gap={4|8|12|16|24|32}`, default 16) and `align="stretch|start|center|end"`. It's a plain `<div>` with no role and no wrap: Toolbar's vertical counterpart.
+  - **`Text`**: one line or paragraph at a Psi text style. `as` takes p, span, div or h2–h4; `size` takes 12, 14, 16 or 18; `weight` is regular or medium; `tone` is primary or secondary. Margin is 0, so a Stack's gap does the spacing. Tokens `--psi-text-fg` and `--psi-text-fg-secondary` alias the gated foregrounds.
+  - **The `empty-state` and `feedback-form` presets** now lay out as columns. Before, empty-state ran its headline, explanation and button together on one line, and feedback-form stacked its fields and button flush.
+
+- 83646d6: Set the page's type at your app root (D107).
+
+  - **The consumer contract now says to set the font as well as the background.** At your app root, in `@layer psi.base`: `background: var(--psi-bg-primary)` and `color: var(--psi-fg-primary)`, `font: var(--psi-text-14-20-regular)` on `body` (never on `html`: Psi's scales are rem, so a root font size resizes every control), and `font: inherit` on native `button`, `input`, `select` and `textarea`. Components set their own type, but text you place in a `Panel`, `Dialog`, `Card` or tab panel inherits the page's, which is the browser's serif until you set it. See the README's "App root" section.
+  - No stylesheet changes. The Storybook stories now set the same app-root type, so they show what an app shows.
+
+- 98d7010: A tooltip you can move onto (D105).
+
+  - **`Tooltip` stays open while the pointer is on it** (WCAG 1.4.13, hoverable). Hover is handled by the wrapper that holds the trigger and the bubble, the bubble now takes the pointer, and a transparent bridge covers the gap between them. Leaving both still closes it at once; Escape and the 150ms open delay are unchanged.
+  - The trigger is no longer cloned with mouse handlers, so a child's own `onMouseEnter`/`onMouseLeave` run natively. No pixel changes.
+
 ## 0.26.0
 
 ### Minor Changes
