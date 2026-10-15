@@ -1,5 +1,34 @@
 # @handamade/psi-react
 
+## 0.26.0
+
+### Minor Changes
+
+- 48f68a7: An indeterminate checkbox you can see (D103).
+
+  - **`Checkbox` takes `indeterminate`.** It sets the input's DOM property, which the platform exposes as `aria-checked="mixed"`, and draws a dash in the checked colours (`check-fg` on the checked fill, the pair the checkmark already uses, so no new contrast pair). While the prop is passed it is written on every render, because a click clears the property before you re-render. When the prop is absent the property is left alone, so a state you set through the ref keeps working.
+  - `Table`'s select-all checkbox now uses the prop, so its mixed state no longer goes stale after a click.
+
+- 0244081: A dialog that opens on the right control (D101). Every default is unchanged.
+
+  - **`initialFocus`**: a ref to the element to focus each time the dialog opens, after the platform's own focusing. React's `autoFocus` cannot do this, because the content mounts while the `<dialog>` is closed.
+  - **`closeOnEscape`**: whether Escape reports `onClose("esc")`, separately from the close button and the backdrop. It defaults to `dismissible`. A consequential confirmation is `<Dialog dismissible={false} closeOnEscape initialFocus={cancelRef}>`: focus starts on Cancel, Escape cancels, and there is no close button and no backdrop dismissal.
+  - **`closeLabel`**: visible text for the close button, which then renders as a ghost `Button` instead of the icon-only "Close dialog" button.
+
+- 1109743: A menu with the full menu-button keyboard (D102).
+
+  - **The trigger names the menu it controls**: `aria-controls` with the menu element's id, which is generated unless you pass `id` to `Menu`.
+  - **Arrow Down / Arrow Up on the closed trigger open the menu** on its first / last enabled item. `Menu` cannot open itself, so it clicks the trigger, which is what Enter and Space already do. Your trigger's `onClick` must toggle `open`, as it already does for a click.
+  - **Tab and Shift Tab inside an open menu report `onClose("tab")`** and let focus move on to the next control. Before, the menu stayed open over the page.
+  - **Type change:** `onClose`'s reason union gains `"tab"` and is exported as **`MenuCloseReason`**. A handler that takes `(reason) => …` or ignores the reason is unaffected. A handler annotated with the old union now fails to type-check: annotate it with `MenuCloseReason`, as this repo's own promo Playground had to. An exhaustive `switch` over the reason needs the new case.
+
+- 5906b2a: Two more form controls: Textarea and RadioGroup (D104), and a `feedback-form` pattern that demands both.
+
+  - **`Textarea`**: the Input recipe on a native `<textarea>`, wired by a `Field` like `Input`. `minLength` and `maxLength` are native. With `maxLength`, a counter under the control shows `{length} / {maxLength}`. It is not a live region; it joins `aria-describedby`, so it is read with the field on focus. `showCounter={false}` hides it. There is no `size`: the height is `rows`, 3 by default.
+  - **`RadioGroup` and `Radio`**: native radios sharing one name, so the browser supplies Tab and the arrow keys. Controlled (`value`, `onValueChange`) or uncontrolled (`defaultValue`), with `disabled` and `orientation`. Inside `<Field group>` the fieldset and legend name the group and `RadioGroup` adds no role. Standalone, it is `role="radiogroup"` and needs `aria-label`. A required or invalid Field makes every radio `required` and `aria-invalid`.
+  - **Tokens** `--psi-textarea-*` and `--psi-radio-group-*`, all aliases of existing gated semantics, so no new contrast pair. `FieldContextValue` gains an optional `group` flag.
+  - **Pattern `feedback-form`**: a required category as radios, a bounded description with a counter, and a submit button. 50 components, 24 patterns.
+
 ## 0.25.0
 
 ## 0.24.0

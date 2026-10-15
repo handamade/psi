@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-10-15",
     tag: "release",
+    title: "0.26.0 — dialogs, menus and forms that behave",
+    body: "Four changes for the forms and confirmations an operator console is built from. A Dialog can open on the right control: initialFocus takes a ref and focuses it on every open, and closeOnEscape gives Escape its own setting. A consequential confirmation can start on Cancel and still answer Escape without a close button. React's autoFocus cannot do this, because the content mounts while the dialog is closed. A Menu has the full menu-button keyboard. The trigger names the menu it controls, Arrow Down and Arrow Up open it on the first or last item, and Tab closes it and moves on, reported as onClose(\"tab\"). The reasons are now exported as MenuCloseReason. A Checkbox can be indeterminate, drawn as a dash, and Table's select-all finally shows the mixed state it was always set to. And two new form controls: Textarea, with a length counter that is read with the field but never announced on each keystroke, and RadioGroup, native radios that fit Field's group mode. A feedback-form pattern puts them together. 50 components, 24 patterns.",
+  },
+  {
+    date: "2026-10-15",
+    tag: "release",
     title: "0.25.0 — room in the MCP overview",
     body: "Psi's MCP server answers an empty search with an overview of the whole system: every topic, every pattern, and at least eight components, within a fixed response budget. At 23 patterns that overview was full. Every pattern summary had already been cut to an ellipsis, and the next pattern would have pushed out a component. Each pattern row stored its id twice, once as the id and again as the title. The overview rows now drop the repeated title. That alone keeps every guarantee through 32 patterns, and the pattern summaries get their first words back. Keyword search is unchanged: its results still carry a title, and ranking still reads the full stored briefs. No component, token or stylesheet changes in this release.",
   },
