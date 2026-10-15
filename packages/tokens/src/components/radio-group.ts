@@ -8,6 +8,8 @@ export const radioGroupVars: Record<string, string> = {
   "circle-border": "var(--psi-border-control)",
   "circle-bg-checked": "var(--psi-fill-accent)",
   "circle-border-checked": "var(--psi-fill-accent)",
+  // D108: an unchecked, aria-invalid circle, in the error colour Input uses.
+  "circle-border-error": "var(--psi-fg-danger)",
   "dot-fg": "var(--psi-fg-on-accent)",
   "focus-ring": "var(--psi-border-focus)",
 };
