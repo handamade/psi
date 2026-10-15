@@ -1,4 +1,4 @@
-import { checkContrast, componentLabelPairs, wcagAAPairs } from "../contrast-matrix.js";
+import { checkContrast, componentLabelPairs, nonTextPairs, wcagAAPairs } from "../contrast-matrix.js";
 import { resolve, type ResolvedTheme } from "../dsl/resolver.js";
 import { cap, set, slot, token } from "../dsl/builders.js";
 import type { Palette, SlotMap, ThemeDef, TokenDef } from "../dsl/types.js";
@@ -46,7 +46,10 @@ function withAlpha(hex: string, alpha: number): string {
 
 /**
  * The gate, and it must be the SAME set `scripts/build.ts` runs over every
- * committed theme: `[...wcagAAPairs, ...componentLabelPairs]`, 33 pairs.
+ * committed theme: `[...wcagAAPairs, ...componentLabelPairs, ...nonTextPairs]`,
+ * 38 pairs (this said 33 until D106; D62 and D86 had grown it). The two
+ * non-text pairs (D106) are not solved here: `borderControl` is a fixed alpha
+ * of `fgPrimary`, and the sweep test proves it holds.
  *
  * Checking only `wcagAAPairs` (28) is what let "a theme derived from any
  * prompt clears the AA matrix by construction" ship false a third time. The
@@ -61,7 +64,7 @@ function withAlpha(hex: string, alpha: number): string {
  * `accentLightness` there for why the fix has to be upstream of this loop
  * rather than another escalating target inside it).
  */
-const AA_MATRIX = [...wcagAAPairs, ...componentLabelPairs];
+const AA_MATRIX = [...wcagAAPairs, ...componentLabelPairs, ...nonTextPairs];
 
 const BASE_TARGET = 4.5;
 const TARGET_ESCALATION = 0.1;

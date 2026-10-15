@@ -8,7 +8,7 @@ Short hover/focus hint attached to a single trigger element.
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
 | `content` | `ReactNode` | — | yes | Tooltip content. |
-| `children` | `ReactElement<Record<string, unknown>, string \| JSXElementConstructor<any>>` | — | yes | The trigger element (must accept ref, onMouseEnter/Leave, onFocus/Blur). |
+| `children` | `ReactElement<Record<string, unknown>, string \| JSXElementConstructor<any>>` | — | yes | The trigger element (must accept onFocus/Blur). |
 | `placement` | `"top" \| "bottom" \| "left" \| "right"` | top | no | Preferred placement. |
 
 ## Keyboard & assistive tech

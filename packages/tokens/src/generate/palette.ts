@@ -32,7 +32,7 @@ const ACCENT_L = 0.55;
  * renders white-on-accent at **4.4979:1** — under AA, and the exact failure
  * the prompt "bold calm app" produced. It cleared CI only because `derive.ts`
  * checked the 28-pair `wcagAAPairs` while `scripts/build.ts` gates committed
- * themes on all 33.
+ * themes on the full matrix.
  *
  * So the accent is darkened — never lightened — to the lightest value that
  * still carries a white label at `LABEL_TARGET`, a deliberate margin above
@@ -51,7 +51,7 @@ const ACCENT_L = 0.55;
  * `fillDanger`, `fgStaticBlack` on `fillWarning`) sit on fixed hues and were
  * measured at 5.16 / 5.21 / 6.94:1 worst-case across the same sweep, so they
  * need no equivalent treatment — but the sweep in
- * `__tests__/generate-derive.test.ts` gates all 33 pairs, not just this one.
+ * `__tests__/generate-derive.test.ts` gates the full matrix, not just this one.
  */
 const LABEL_TARGET = 4.65;
 
