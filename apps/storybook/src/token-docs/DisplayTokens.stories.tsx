@@ -51,7 +51,7 @@ export const Specimens: Story = {
             <code
               style={{
                 font: "var(--psi-text-12-16-regular)",
-                fontFamily: "monospace",
+                fontFamily: "var(--psi-font-mono)",
                 color: "var(--psi-fg-accent)",
                 display: "block",
                 marginBottom: "var(--psi-space-8)",
