@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-10-15",
     tag: "release",
+    title: "0.25.0 — room in the MCP overview",
+    body: "Psi's MCP server answers an empty search with an overview of the whole system: every topic, every pattern, and at least eight components, within a fixed response budget. At 23 patterns that overview was full. Every pattern summary had already been cut to an ellipsis, and the next pattern would have pushed out a component. Each pattern row stored its id twice, once as the id and again as the title. The overview rows now drop the repeated title. That alone keeps every guarantee through 32 patterns, and the pattern summaries get their first words back. Keyword search is unchanged: its results still carry a title, and ranking still reads the full stored briefs. No component, token or stylesheet changes in this release.",
+  },
+  {
+    date: "2026-10-15",
+    tag: "release",
     title: "0.24.0 — the details an operator console runs into",
     body: "The operator portal built more screens on 0.23 and found five more gaps, all small, all closed here. A paragraph in a Banner or InlineAlert now starts on the icon's line, where it used to sit 14px low under the browser's default margin. A navigation link marked aria-current=\"true\", the entry above a screen that is not in the tree, now reads as current, by weight as well as colour. A Button sizes the icon inside it: half its height, 12 to 24px, from a token, instead of whatever size the icon happened to default to. A label wrapped in a span can be capped with --psi-button-label-max-width and ends in an ellipsis, while its accessible name stays whole. And a Menu can hold a line that is not an action, such as a build number. MenuText sits inside the menu, the keyboard skips it, and it is never hidden from assistive technology. Before any code, its place in the accessibility tree was measured in five variants. A new account-menu pattern puts it to use. 47 components, 23 patterns.",
   },
