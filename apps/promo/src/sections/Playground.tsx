@@ -18,6 +18,7 @@ import {
   Tooltip,
   type ButtonProps,
 } from "@handamade/psi-react";
+import type { MenuCloseReason } from "@handamade/psi-react";
 
 import { storybookDocs } from "../lib/storybook";
 import { componentCount, componentNames, storyTitles, version } from "virtual:psi-facts";
@@ -56,7 +57,7 @@ export function Playground() {
   const [lastReason, setLastReason] = useState<string | null>(null);
   const [lastAction, setLastAction] = useState<string | null>(null);
 
-  const closeMenu = (reason: "item-select" | "esc" | "outside") => {
+  const closeMenu = (reason: MenuCloseReason) => {
     setLastReason(reason);
     setMenuOpen(false);
   };
