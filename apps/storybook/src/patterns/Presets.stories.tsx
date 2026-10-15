@@ -24,6 +24,10 @@ function preset(id: string) {
   return () => renderPresetElement(pattern as any, manifestFile.components as any, Psi as any);
 }
 
+export const AccountMenu: Story = {
+  render: preset("account-menu"),
+};
+
 export const ActionFeedback: Story = {
   render: preset("action-feedback"),
 };

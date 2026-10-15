@@ -52,7 +52,7 @@ describe("loadSlotContracts", () => {
 
   it("real src: Dialog carries its three authored slots, leaves get []", () => {
     const src = join(fileURLToPath(new NodeURL("..", import.meta.url)), "src");
-    const names = ["Button", "IconButton", "Card", "Input", "Select", "Field", "Dialog", "Checkbox", "Switch", "Tag", "Tooltip", "NavBar", "AspectRatio", "Menu", "MenuItem", "MenuSeparator"];
+    const names = ["Button", "IconButton", "Card", "Input", "Select", "Field", "Dialog", "Checkbox", "Switch", "Tag", "Tooltip", "NavBar", "AspectRatio", "Menu", "MenuItem", "MenuSeparator", "MenuText"];
     const out = loadSlotContracts(src, names);
     expect(out.Dialog.map((s) => s.name)).toEqual(["title", "body", "footer"]);
     expect(out.Button).toEqual([]);
@@ -64,5 +64,6 @@ describe("loadSlotContracts", () => {
     expect(out.Menu.map((s) => s.name)).toEqual(["trigger", "body"]);
     expect(out.MenuItem).toEqual([]);
     expect(out.MenuSeparator).toEqual([]);
+    expect(out.MenuText).toEqual([]);
   });
 });

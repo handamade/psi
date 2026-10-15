@@ -17,6 +17,7 @@ describe("menu tokens", () => {
       "item-fg-disabled": "var(--psi-fg-quaternary)",
       "separator-border": "var(--psi-border-faint)",
       "focus-ring": "var(--psi-border-focus)",
+      "text-fg": "var(--psi-fg-secondary)",
     });
   });
 

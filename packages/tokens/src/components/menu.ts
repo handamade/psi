@@ -18,4 +18,7 @@ export const menuVars: Record<string, string> = {
   "separator-border": "var(--psi-border-faint)",
   // D82 — the ring on a focused item; until then the browser drew its own.
   "focus-ring": "var(--psi-border-focus)",
+  // D99 — MenuText, a line that is not an action. fgSecondary on the menu
+  // surface (bgSecondary) is already gated at 4.5:1, so no new pair.
+  "text-fg": "var(--psi-fg-secondary)",
 };

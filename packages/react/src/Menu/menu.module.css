@@ -77,6 +77,17 @@
   background: var(--psi-menu-item-bg);
 }
 
+/* ── Text (D99) ───────────────────────────────────────────────── */
+
+/* A line that is not an action: the item's padding and the menu's font, in
+   the secondary foreground (gated on the menu surface), with no hover or
+   active state. */
+.text {
+  padding: var(--psi-space-8) var(--psi-space-12);
+  color: var(--psi-menu-text-fg);
+  cursor: default;
+}
+
 /* ── Separator ────────────────────────────────────────────────── */
 
 .separator {
