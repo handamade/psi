@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from "react";
-import type { DialogHTMLAttributes, MouseEvent, ReactNode, Ref, SyntheticEvent } from "react";
+import type { DialogHTMLAttributes, MouseEvent, ReactNode, Ref, RefObject, SyntheticEvent } from "react";
+import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { IconClose } from "../icons/index.js";
 import styles from "./dialog.module.css";
@@ -30,8 +31,22 @@ export interface DialogProps
   /** Where the panel sits. `inline-start` / `inline-end` pin it full-height to
    * that edge, making it a drawer (D66). @default "center" */
   placement?: DialogPlacement;
-  /** false = no close button, Esc and backdrop swallowed — footer is the only exit. @default true */
+  /** false = no close button, Esc and backdrop swallowed — footer is the only exit.
+   * `closeOnEscape` can give Escape back on its own (D101). @default true */
   dismissible?: boolean;
+  /** Whether Escape reports onClose("esc"), separately from the close button
+   * and the backdrop (D101). A consequential confirmation is
+   * `dismissible={false} closeOnEscape`: no close button, no backdrop
+   * dismissal, and Escape cancels. @default dismissible */
+  closeOnEscape?: boolean;
+  /** The element to focus each time the dialog opens, after the platform's own
+   * focusing (D101), e.g. a ref to the footer's Cancel button. Without it, the
+   * platform focuses the first focusable control, as before. */
+  initialFocus?: RefObject<HTMLElement | null>;
+  /** Visible text for the close button (D101). When set, the close button is a
+   * ghost Button with this text instead of the icon-only "Close dialog"
+   * button. */
+  closeLabel?: string;
   /** Forwarded ref to the underlying <dialog> element. */
   ref?: Ref<HTMLDialogElement>;
 }
@@ -65,6 +80,9 @@ export function Dialog({
   width = 560,
   placement = "center",
   dismissible = true,
+  closeOnEscape,
+  initialFocus,
+  closeLabel,
   className,
   children,
   ref,
@@ -82,8 +100,13 @@ export function Dialog({
   useEffect(() => {
     const el = innerRef.current;
     if (!el) return;
-    if (open && !el.open) el.showModal();
-    else if (!open && el.open) el.close();
+    if (open && !el.open) {
+      el.showModal();
+      // D101: after the platform has focused its first control, so this wins.
+      initialFocus?.current?.focus();
+    } else if (!open && el.open) el.close();
+    // Deliberately keyed on `open` alone: initialFocus is a ref, read once per
+    // open, so a new ref object on a re-render never refocuses an open dialog.
   }, [open]);
 
   useEffect(() => {
@@ -97,7 +120,7 @@ export function Dialog({
 
   const handleCancel = (e: SyntheticEvent<HTMLDialogElement>) => {
     e.preventDefault(); // stay controlled — only onClose may flip `open`
-    if (dismissible) onClose("esc");
+    if (closeOnEscape ?? dismissible) onClose("esc");
   };
 
   const handleClick = (e: MouseEvent<HTMLDialogElement>) => {
@@ -126,16 +149,21 @@ export function Dialog({
                 {title}
               </h2>
             )}
-            {dismissible && (
-              <IconButton
-                variant="ghost"
-                size={32}
-                aria-label="Close dialog"
-                onClick={() => onClose("close-button")}
-              >
-                <IconClose aria-hidden="true" />
-              </IconButton>
-            )}
+            {dismissible &&
+              (closeLabel != null ? (
+                <Button variant="ghost" size={32} onClick={() => onClose("close-button")}>
+                  {closeLabel}
+                </Button>
+              ) : (
+                <IconButton
+                  variant="ghost"
+                  size={32}
+                  aria-label="Close dialog"
+                  onClick={() => onClose("close-button")}
+                >
+                  <IconClose aria-hidden="true" />
+                </IconButton>
+              ))}
           </div>
         )}
         {children}

@@ -1,3 +1,4 @@
+import { createRef } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -154,5 +155,75 @@ describe("Dialog placement (D66 — a drawer is a placement, not a component)", 
     const cls = container.querySelector("dialog")!.className;
     expect(cls).toContain("custom");
     expect(cls.split(" ").length).toBeGreaterThan(1);
+  });
+});
+
+describe("Dialog initial focus, Escape and the close label (D101)", () => {
+  const confirm = (props: Partial<Parameters<typeof Dialog>[0]> = {}, cancelRef = createRef<HTMLButtonElement>()) => (
+    <Dialog
+      open
+      onClose={() => {}}
+      title="Delete device?"
+      footer={
+        <>
+          <Button ref={cancelRef}>Cancel</Button>
+          <Button variant="danger">Delete</Button>
+        </>
+      }
+      initialFocus={cancelRef}
+      {...props}
+    >
+      This removes the device.
+    </Dialog>
+  );
+
+  it("focuses the initialFocus element on open", () => {
+    const cancelRef = createRef<HTMLButtonElement>();
+    render(confirm({}, cancelRef));
+    expect(cancelRef.current).not.toBeNull();
+    expect(cancelRef.current).toHaveFocus();
+  });
+
+  it("focuses it again after a close and a reopen", () => {
+    const cancelRef = createRef<HTMLButtonElement>();
+    const { rerender } = render(confirm({}, cancelRef));
+    rerender(confirm({ open: false }, cancelRef));
+    (document.body as HTMLElement).focus();
+    rerender(confirm({ open: true }, cancelRef));
+    expect(cancelRef.current).toHaveFocus();
+  });
+
+  it("dismissible={false} closeOnEscape: Escape cancels, no close button, the backdrop does nothing", () => {
+    const onClose = vi.fn();
+    render(confirm({ onClose, dismissible: false, closeOnEscape: true }));
+    const dialog = screen.getByRole("dialog");
+    expect(screen.queryByRole("button", { name: "Close dialog" })).toBeNull();
+    fireEvent.click(dialog);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent(dialog, new Event("cancel", { bubbles: false, cancelable: true }));
+    expect(onClose).toHaveBeenCalledWith("esc");
+    expect(dialog).toHaveAttribute("open");
+  });
+
+  it("closeOnEscape={false} on a dismissible dialog: Escape reports nothing, the close button still works", async () => {
+    const onClose = vi.fn();
+    render(confirm({ onClose, closeOnEscape: false }));
+    const dialog = screen.getByRole("dialog");
+    const cancel = new Event("cancel", { bubbles: false, cancelable: true });
+    fireEvent(dialog, cancel);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(cancel.defaultPrevented).toBe(true);
+    await userEvent.click(screen.getByRole("button", { name: "Close dialog" }));
+    expect(onClose).toHaveBeenCalledWith("close-button");
+  });
+
+  it("closeLabel shows a text close button named by its text", async () => {
+    const onClose = vi.fn();
+    render(confirm({ onClose, closeLabel: "Close" }));
+    const close = screen.getByRole("button", { name: "Close" });
+    expect(close).toHaveTextContent("Close");
+    expect(screen.queryByRole("button", { name: "Close dialog" })).toBeNull();
+    await userEvent.click(close);
+    expect(onClose).toHaveBeenCalledWith("close-button");
   });
 });

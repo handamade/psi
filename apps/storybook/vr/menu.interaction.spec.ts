@@ -70,3 +70,33 @@ test("Esc reports onClose(\"esc\") and the consumer closes it @interaction", asy
   await expect(page.locator(menu("a"))).toBeHidden();
   await expect(page.getByTestId("last-reason")).toHaveText("esc");
 });
+
+/** D102 — the menu-button keyboard in a real browser: Arrow Down on the
+ * focused trigger opens the menu on its first item (Menu clicks the trigger,
+ * since it cannot open itself), Arrow Up opens it on the last, and Tab
+ * reports onClose("tab") and lets focus move on to the next control — here
+ * menu B's trigger, the next tab stop after menu A's popover. */
+test("Arrow Down opens the menu on its first item, and Tab closes it and moves on @interaction", async ({ page }) => {
+  await page.goto(STORY, { waitUntil: "networkidle" });
+  const a = page.getByRole("button", { name: "A", exact: true });
+  await expect(a).toHaveAttribute("aria-controls", /.+/);
+  const controls = await a.getAttribute("aria-controls");
+  await expect(page.locator(menu("a"))).toHaveAttribute("id", controls!);
+
+  await a.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.locator(menu("a"))).toBeVisible();
+  await expect(page.locator(menu("a")).getByRole("menuitem", { name: "Edit" })).toBeFocused();
+
+  await page.keyboard.press("Tab");
+  await expect(page.locator(menu("a"))).toBeHidden();
+  await expect(page.getByTestId("last-reason")).toHaveText("tab");
+  await expect(page.getByRole("button", { name: "B", exact: true })).toBeFocused();
+});
+
+test("Arrow Up opens the menu on its last item @interaction", async ({ page }) => {
+  await page.goto(STORY, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "A", exact: true }).focus();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.locator(menu("a")).getByRole("menuitem", { name: "Duplicate" })).toBeFocused();
+});
