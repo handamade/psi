@@ -5,6 +5,8 @@ export const checkboxVars: Record<string, string> = {
   "box-border": "var(--psi-border-control)",
   "box-bg-checked": "var(--psi-fill-accent)",
   "box-border-checked": "var(--psi-fill-accent)",
+  // D108: an unchecked, aria-invalid box, in the error colour Input uses.
+  "box-border-error": "var(--psi-fg-danger)",
 
   // D56: tracks a sharper theme down, never rounder than radius-4 — the box
   // is ~16px, so the 8px control default would read as a circle.

@@ -79,6 +79,13 @@
   transform: none;
 }
 
+/* In error (D108): an unchecked box marked aria-invalid, by a group Field or
+   by the consumer, outlines in the field error colour. Checked and mixed
+   boxes keep their accent: an error on a choice means "tick this". */
+.input[aria-invalid="true"]:not(:checked):not(:indeterminate) + .indicator {
+  border-color: var(--psi-checkbox-box-border-error);
+}
+
 /* Focus visible */
 .input:focus-visible + .indicator {
   outline: var(--psi-focus-ring-width) solid var(--psi-checkbox-focus-ring);

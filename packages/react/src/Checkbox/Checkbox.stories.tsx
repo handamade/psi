@@ -1,6 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Checkbox } from "./Checkbox.js";
+import { Field } from "../Field/Field.js";
 
 const meta: Meta<typeof Checkbox> = {
   title: "Components/Checkbox",
@@ -47,5 +48,19 @@ export const Indeterminate: Story = {
       <Checkbox defaultChecked>All selected</Checkbox>
       <Checkbox indeterminate disabled>Some selected, disabled</Checkbox>
     </div>
+  ),
+};
+
+/** D108: in an invalid group Field every checkbox is aria-invalid, and the
+ * unchecked boxes outline in the error colour; a ticked one keeps its accent. */
+export const InvalidGroup: Story = {
+  render: () => (
+    <Field group label="Notify me by" error="Pick at least two.">
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--psi-space-12)" }}>
+        <Checkbox defaultChecked>Email</Checkbox>
+        <Checkbox>SMS</Checkbox>
+        <Checkbox>Push</Checkbox>
+      </div>
+    </Field>
   ),
 };

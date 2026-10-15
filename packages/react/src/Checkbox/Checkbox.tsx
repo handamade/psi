@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef } from "react";
+import { useContext, useLayoutEffect, useRef } from "react";
 import type { InputHTMLAttributes, Ref } from "react";
+import { FieldContext } from "../Field/Field.js";
 import styles from "./checkbox.module.css";
 
 export interface CheckboxProps
@@ -23,7 +24,9 @@ export interface CheckboxProps
   ref?: Ref<HTMLInputElement>;
 }
 
-/** Native checkbox with a built-in label; for independent binary choices. */
+/** Native checkbox with a built-in label; for independent binary choices.
+ * In an invalid group Field it is aria-invalid, and an unchecked box marked
+ * aria-invalid outlines in the error colour (D108). */
 export function Checkbox({
   children,
   className,
@@ -32,6 +35,11 @@ export function Checkbox({
   ref,
   ...rest
 }: CheckboxProps) {
+  // D108: in an invalid group Field, every checkbox is aria-invalid, as every
+  // Radio is (D104). Not `required`: on a checkbox that means this box must be
+  // ticked. A consumer's own aria-invalid, in `rest`, still wins.
+  const field = useContext(FieldContext);
+  const fieldInvalid = (field?.group && field.invalid) || undefined;
   const innerRef = useRef<HTMLInputElement | null>(null);
   const setRef = (node: HTMLInputElement | null) => {
     innerRef.current = node;
@@ -60,6 +68,7 @@ export function Checkbox({
         type="checkbox"
         className={`psi-sr-only ${styles.input}`}
         disabled={disabled}
+        aria-invalid={fieldInvalid}
         {...rest}
       />
       <span className={styles.indicator} aria-hidden="true" />
