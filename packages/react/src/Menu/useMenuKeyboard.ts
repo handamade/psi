@@ -8,7 +8,11 @@ interface Options {
   popoverRef: RefObject<HTMLDivElement | null>;
   triggerRef: RefObject<HTMLDivElement | null>;
   open: boolean;
+  /** Which end to focus on open (D102); reset to "first" once read. */
+  openAtRef?: RefObject<"first" | "last">;
   onEsc: () => void;
+  /** Tab or Shift Tab inside the open menu (D102). */
+  onTab?: () => void;
 }
 
 /** Roving-tabindex keyboard navigation for Menu (D53): Up/Down with wrap,
@@ -16,7 +20,7 @@ interface Options {
  * items are skipped everywhere. Psi's only keyboard-navigation JS — a
  * deliberate departure from D52, which refused role="toolbar" precisely to
  * avoid it. */
-export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options) {
+export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc, onTab }: Options) {
   const queryRef = useRef("");
   const queryAtRef = useRef(0);
 
@@ -63,11 +67,13 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options
   useEffect(() => {
     if (!open) return;
     const items = enabledItems();
-    focusItem(items[0]);
+    const atLast = openAtRef?.current === "last";
+    if (openAtRef) openAtRef.current = "first";
+    focusItem(atLast ? items[items.length - 1] : items[0]);
     return () => {
       if (popoverRef.current?.contains(document.activeElement)) focusTrigger();
     };
-  }, [open, popoverRef, enabledItems, focusItem, focusTrigger]);
+  }, [open, popoverRef, openAtRef, enabledItems, focusItem, focusTrigger]);
 
   return useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
@@ -88,6 +94,15 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options
         // handler, and a second Escape would be taken by the platform's close
         // watcher — resurfacing as onClose("outside"), the exact
         // reason-misreporting this hook exists to prevent.
+        return;
+      }
+
+      // D102: Tab and Shift Tab leave the menu. Not prevented, so focus moves
+      // on as the browser moves it; the dismissal is only reported (D50).
+      // Focus is outside the menu by the time `open` flips, so the close
+      // effect above does not pull it back to the trigger.
+      if (event.key === "Tab") {
+        onTab?.();
         return;
       }
 
@@ -136,6 +151,6 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, onEsc }: Options
         focusItem(match);
       }
     },
-    [enabledItems, focusItem, onEsc],
+    [enabledItems, focusItem, onEsc, onTab],
   );
 }
