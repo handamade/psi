@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext } from "react";
 import styles from "./table.module.css";
 import { Checkbox } from "../Checkbox/Checkbox.js";
 import { TableContext, TableRowIdsContext } from "./TableContext.js";
@@ -23,14 +23,8 @@ export function TableRowSelectionCell({ rowId, label }: { rowId: string; label: 
 export function TableSelectAllCell() {
   const { selected, onSelectionChange } = useContext(TableContext);
   const rowIds = useContext(TableRowIdsContext);
-  const ref = useRef<HTMLInputElement>(null);
-
   const all = rowIds.length > 0 && rowIds.every((id) => selected.has(id));
   const some = rowIds.some((id) => selected.has(id));
-
-  useEffect(() => {
-    if (ref.current) ref.current.indeterminate = some && !all;
-  }, [some, all]);
 
   // `selected` is the consumer's global set, but `rowIds` is only the
   // currently rendered (e.g. current page's) rows — act on the visible rows
@@ -46,7 +40,7 @@ export function TableSelectAllCell() {
 
   return (
     <th scope="col" className={`${styles.headerCell} ${styles.selectCell}`}>
-      <Checkbox ref={ref} aria-label="Select all rows" checked={all} onChange={toggle} />
+      <Checkbox aria-label="Select all rows" checked={all} indeterminate={some && !all} onChange={toggle} />
     </th>
   );
 }

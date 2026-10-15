@@ -50,6 +50,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Dialog as drawer (D66)", <Dialog open onClose={() => {}} placement="inline-end" title="Transaction detail" footer={<Button variant="neutral">Close</Button>}>Acme Corp — $1,240.00</Dialog>],
   ["Dialog as drawer, forced choice", <Dialog open onClose={() => {}} placement="inline-start" dismissible={false} title="Pick one" footer={<Button variant="accent">Keep</Button>}>No escape hatch.</Dialog>],
   ["Checkbox", <Checkbox>Beta features</Checkbox>],
+  ["Checkbox indeterminate (D103)", <Checkbox indeterminate>Select all</Checkbox>],
   ["Textarea in a Field with a counter (D104)", <Field label="Description" error="Say what happened." required><Textarea maxLength={280} /></Field>],
   ["RadioGroup standalone (D104)", <RadioGroup aria-label="Density" defaultValue="a"><Radio value="a">Compact</Radio><Radio value="b">Comfortable</Radio></RadioGroup>],
   ["RadioGroup in Field group with an error (D104)", <Field group label="Category" required error="Pick one."><RadioGroup><Radio value="a">Bug</Radio><Radio value="b">Idea</Radio></RadioGroup></Field>],

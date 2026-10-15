@@ -9,6 +9,7 @@ Native checkbox with a built-in label; for independent binary choices.
 |---|---|---|---|---|
 | `children` | `ReactNode` | — | no | Label text. |
 | `aria-label` | `string` | — | no | Accessible name when there is no visible label — a table's row-selection checkbox, say. Optional, unlike IconButton's required form (D60): a labelled checkbox is still the common case. |
+| `indeterminate` | `boolean` | — | no | The mixed state, e.g. a "select all" over a partial selection (D103). Sets the input's DOM property, which the platform exposes as aria-checked="mixed", and draws a dash. Re-applied on every render, because a click clears the property before the consumer re-renders. When absent, the property is left alone, so a state set through the ref survives. |
 | `ref` | `Ref<HTMLInputElement>` | — | no | Forwarded ref to the underlying `<input type="checkbox">` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 

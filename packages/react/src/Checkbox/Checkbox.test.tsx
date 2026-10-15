@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Checkbox } from "./Checkbox.js";
 
 describe("Checkbox", () => {
@@ -85,5 +87,49 @@ describe("Checkbox", () => {
     const classes = input.className.split(" ");
     expect(classes).toContain("psi-sr-only");
     expect(classes).not.toContain("undefined");
+  });
+});
+
+describe("Checkbox indeterminate (D103)", () => {
+  const box = () => screen.getByRole("checkbox", { name: "Select all" }) as HTMLInputElement;
+
+  it("sets the DOM property from the prop, and false clears it", () => {
+    const { rerender } = render(<Checkbox indeterminate>Select all</Checkbox>);
+    expect(box().indeterminate).toBe(true);
+    rerender(<Checkbox indeterminate={false}>Select all</Checkbox>);
+    expect(box().indeterminate).toBe(false);
+  });
+
+  it("restores the property after a click clears it, while the prop stays true", async () => {
+    const { rerender } = render(<Checkbox indeterminate onChange={() => {}}>Select all</Checkbox>);
+    await userEvent.click(box());
+    expect(box().indeterminate).toBe(false); // the browser cleared it
+    rerender(<Checkbox indeterminate onChange={() => {}}>Select all</Checkbox>);
+    expect(box().indeterminate).toBe(true);
+  });
+
+  it("still forwards its ref to the input", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Checkbox ref={ref} indeterminate>Select all</Checkbox>);
+    expect(ref.current).toBe(box());
+    expect(ref.current?.indeterminate).toBe(true);
+  });
+
+  it("leaves the property alone when the prop is not passed, so a ref-set state survives re-renders", () => {
+    const ref = createRef<HTMLInputElement>();
+    const { rerender } = render(<Checkbox ref={ref}>Select all</Checkbox>);
+    ref.current!.indeterminate = true; // the pre-D103 workaround
+    rerender(<Checkbox ref={ref} checked={false} onChange={() => {}}>Select all</Checkbox>);
+    expect(ref.current!.indeterminate).toBe(true);
+  });
+
+  it("draws an 8 by 2px dash after the checked rules", () => {
+    const css = readFileSync(join(import.meta.dirname, "checkbox.module.css"), "utf8");
+    const dash = /\.input:indeterminate\s*\+\s*\.indicator::after\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(dash).toMatch(/width:\s*8px;/);
+    expect(dash).toMatch(/height:\s*2px;/);
+    expect(css.indexOf(".input:indeterminate + .indicator")).toBeGreaterThan(
+      css.indexOf(".input:checked + .indicator::after"),
+    );
   });
 });

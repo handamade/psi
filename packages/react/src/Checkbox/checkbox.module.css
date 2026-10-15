@@ -56,6 +56,29 @@
   transform: rotate(45deg) translate(-0.5px, -0.5px);
 }
 
+/* Indeterminate (D103): the checked fill with a dash instead of the check.
+   After the :checked rules on purpose, so a box that is both checked and
+   indeterminate shows the dash, as the platform's own checkbox does. The
+   dash is check-fg on the checked fill, the pair the check already uses. */
+.input:indeterminate + .indicator {
+  background: var(--psi-checkbox-box-bg-checked);
+  border-color: var(--psi-checkbox-box-border-checked);
+}
+
+.input:indeterminate + .indicator::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 2px;
+  border: 0;
+  border-radius: 1px;
+  /* check-fg is a text-scoped token (psi/token-scopes), so it binds `color`
+     and the bar paints in currentColor, as the check's border does. */
+  color: var(--psi-checkbox-check-fg);
+  background: currentColor;
+  transform: none;
+}
+
 /* Focus visible */
 .input:focus-visible + .indicator {
   outline: var(--psi-focus-ring-width) solid var(--psi-checkbox-focus-ring);
