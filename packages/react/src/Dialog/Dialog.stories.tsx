@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Dialog } from "./Dialog.js";
 import { Button } from "../Button/Button.js";
@@ -64,6 +64,44 @@ export const ForcedChoice: Story = {
       footer={<Button variant="accent" size={40}>Keep</Button>}
     >
       No escape hatch.
+    </Dialog>
+  ),
+};
+
+/** D101 — a consequential confirmation: focus starts on Cancel, Escape
+ * cancels, and there is no close button or backdrop dismissal. */
+function ConsequentialConfirmDemo() {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  return (
+    <Dialog
+      open
+      onClose={() => {}}
+      title="Delete this device?"
+      width={400}
+      dismissible={false}
+      closeOnEscape
+      initialFocus={cancelRef}
+      footer={
+        <>
+          <Button ref={cancelRef} variant="neutral" size={32}>Cancel</Button>
+          <Button variant="danger" size={32}>Delete</Button>
+        </>
+      }
+    >
+      The device and its history are removed. This cannot be undone.
+    </Dialog>
+  );
+}
+
+export const ConsequentialConfirm: Story = {
+  render: () => <ConsequentialConfirmDemo />,
+};
+
+/** D101 — the close button with visible text instead of the icon. */
+export const TextCloseButton: Story = {
+  render: () => (
+    <Dialog open onClose={() => {}} title="Device details" closeLabel="Close">
+      The close button reads Close.
     </Dialog>
   ),
 };

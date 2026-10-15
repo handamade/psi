@@ -1,0 +1,75 @@
+/* packages/react/src/RadioGroup/radio-group.module.css — D104. One module for
+   RadioGroup and Radio, so every custom property is --psi-radio-group-* or a
+   global scale. The radio is Checkbox's recipe on a circle. */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--psi-space-8);
+}
+
+.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--psi-space-16);
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--psi-space-8);
+  cursor: pointer;
+  user-select: none;
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-radio-group-fg);
+}
+
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Hidden by .psi-sr-only in Radio.tsx; this class is only the sibling anchor. */
+
+.circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 1px solid var(--psi-radio-group-circle-border);
+  border-radius: var(--psi-radius-full);
+  background: var(--psi-radio-group-circle-bg);
+  transition:
+    background-color var(--psi-duration-150) var(--psi-ease-standard),
+    border-color var(--psi-duration-150) var(--psi-ease-standard);
+}
+
+.input:checked + .circle {
+  background: var(--psi-radio-group-circle-bg-checked);
+  border-color: var(--psi-radio-group-circle-border-checked);
+}
+
+/* The dot: dot-fg is text-scoped (psi/token-scopes), so it binds `color` and
+   paints in currentColor, as Checkbox's check does. */
+.input:checked + .circle::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--psi-radius-full);
+  color: var(--psi-radio-group-dot-fg);
+  background: currentColor;
+}
+
+.input:focus-visible + .circle {
+  outline: var(--psi-focus-ring-width) solid var(--psi-radio-group-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset);
+}
+
+.text {
+  color: var(--psi-radio-group-fg);
+}

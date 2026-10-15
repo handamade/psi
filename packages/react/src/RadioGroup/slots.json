@@ -1,0 +1,5 @@
+{
+  "slots": [
+    { "name": "body", "accepts": { "components": ["Radio"] }, "cardinality": "1..*", "order": 1 }
+  ]
+}
