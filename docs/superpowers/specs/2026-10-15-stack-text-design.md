@@ -49,9 +49,13 @@ D105 to D108 are claimed by their PRs (#143 and #144 merged, #145, #146).
     - `empty-state`: `Panel` > `Stack gap={8} align="start"` > `Text as="h3"
       size={16} weight="medium"` (headline), `Text tone="secondary"`
       (explanation), `Button`.
-    - `feedback-form`: `Panel` > `Stack gap={24} align="start"` > the two
-      Fields and the button. 24 is the field spacing `llms.txt` already
-      prescribes (`psi-gap-24` between fields).
+    - `feedback-form`: `Panel` > `Stack gap={24}` > the two Fields and a
+      `Toolbar` holding the button. 24 is the field spacing `llms.txt` already
+      prescribes (`psi-gap-24` between fields). The Stack stretches, so the
+      fields are full width; the Toolbar row keeps the button at its own
+      width. The first version used `align="start"`, and CI's render showed
+      it shrank the Description Field and its Textarea to their content; the
+      interaction spec now checks the Textarea fills the column.
 
   **What this changes.** Two new components (catalog 50 → 52) and the two
   presets' trees. `Panel` is unchanged, so no Panel story moves.

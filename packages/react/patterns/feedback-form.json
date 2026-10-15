@@ -18,8 +18,7 @@
         {
           "component": "Stack",
           "props": {
-            "gap": 24,
-            "align": "start"
+            "gap": 24
           },
           "slots": {
             "body": [
@@ -87,12 +86,19 @@
                 }
               },
               {
-                "component": "Button",
-                "props": {
-                  "type": "submit",
-                  "variant": "accent"
-                },
-                "content": "submit-label"
+                "component": "Toolbar",
+                "slots": {
+                  "body": [
+                    {
+                      "component": "Button",
+                      "props": {
+                        "type": "submit",
+                        "variant": "accent"
+                      },
+                      "content": "submit-label"
+                    }
+                  ]
+                }
               }
             ]
           }

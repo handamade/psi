@@ -106,7 +106,10 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(emptyState.preset).toMatch(/<Text\s+tone="secondary"\s*>/);
 
     const feedbackForm = output.patterns.find((p: { id: string }) => p.id === "feedback-form");
-    expect(feedbackForm.preset).toMatch(/<Stack\s+align="start"\s+gap=\{24\}\s*>/);
+    expect(feedbackForm.preset).toMatch(/<Stack\s+gap=\{24\}\s*>/);
+    // Stretched, so the fields are full width; the button sits in a Toolbar row
+    // at its own width (align="start" shrank the Textarea to its content).
+    expect(feedbackForm.preset).toMatch(/<Toolbar>\s*<Button/);
 
     const summaryTiles = output.patterns.find((p: { id: string }) => p.id === "summary-tiles");
     expect(summaryTiles.blocked).toBe(false);

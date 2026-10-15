@@ -31,4 +31,9 @@ test("the feedback-form preset spaces its fields and button 24px apart @interact
   expect(tops).toHaveLength(3);
   expect(tops[1]!.top - tops[0]!.bottom).toBeCloseTo(24, 0);
   expect(tops[2]!.top - tops[1]!.bottom).toBeCloseTo(24, 0);
+  // The fields fill the column: a first version aligned the Stack to start,
+  // which shrank the Description Field and its Textarea to their content.
+  const stackWidth = await stack.evaluate((el) => el.getBoundingClientRect().width);
+  const textarea = await page.locator("#storybook-root textarea").evaluate((el) => el.getBoundingClientRect().width);
+  expect(textarea).toBeCloseTo(stackWidth, 0);
 });
