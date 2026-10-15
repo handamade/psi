@@ -1,5 +1,26 @@
 # @handamade/psi-tokens
 
+## 0.27.0
+
+### Minor Changes
+
+- f9fd47e: A checkbox and radio you can find (D106).
+
+  - **New semantic border `--psi-border-control`** — `fgPrimary` at alpha 0.55 in light-based themes and 0.40 in dark-based ones — for a control identified by its outline alone. The unchecked `Checkbox` box and `Radio` circle bind it. They bound `--psi-border-neutral`, which measured 1.32–1.48:1, and now clear WCAG 1.4.11's 3:1 in every theme (3.24:1 at worst).
+  - **The contrast gate has its first non-text pairs**, `nonTextPairs`: `borderControl` on `bgPrimary` and `bgSecondary` at 3:1. `buildThemeCss` and `deriveTheme` apply them too, so a consumer theme whose `fgPrimary` barely clears 4.5:1 could now fail; the error names the pair. Every theme `deriveTheme` can produce passes (3.22:1 at worst).
+  - Input, Select and Textarea borders are unchanged.
+
+- 0076c40: A checkbox and radio that show they are in error (D108).
+
+  - **An unchecked `Checkbox` or `Radio` marked `aria-invalid` outlines in the field error colour**, as Input, Select and Textarea do (`--psi-checkbox-box-border-error`, `--psi-radio-group-circle-border-error`, both `--psi-fg-danger`). A checked or mixed one keeps its accent.
+  - **`Checkbox` joins an invalid group `Field`:** inside `<Field group error>` every checkbox is now `aria-invalid`, as every `Radio` already was. It doesn't become `required`, because on a checkbox that would mean this particular box must be ticked. An `aria-invalid` you pass yourself still wins.
+
+- a343102: A column and a line of text for pattern trees: `Stack` and `Text` (D109).
+
+  - **`Stack`**: a column with a gap from the space scale (`gap={4|8|12|16|24|32}`, default 16) and `align="stretch|start|center|end"`. It's a plain `<div>` with no role and no wrap: Toolbar's vertical counterpart.
+  - **`Text`**: one line or paragraph at a Psi text style. `as` takes p, span, div or h2–h4; `size` takes 12, 14, 16 or 18; `weight` is regular or medium; `tone` is primary or secondary. Margin is 0, so a Stack's gap does the spacing. Tokens `--psi-text-fg` and `--psi-text-fg-secondary` alias the gated foregrounds.
+  - **The `empty-state` and `feedback-form` presets** now lay out as columns. Before, empty-state ran its headline, explanation and button together on one line, and feedback-form stacked its fields and button flush.
+
 ## 0.26.0
 
 ### Minor Changes

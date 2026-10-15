@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-10-15",
     tag: "release",
+    title: "0.27.0 — controls you can find, and layouts that hold",
+    body: "A polish release. An unchecked checkbox or radio now draws its outline in a new border, --psi-border-control, at 3:1 or better in every theme (it was 1.32:1), and the contrast gate checks it for every theme, consumer themes included. An unchecked checkbox or radio in error outlines in the field error colour, and a checkbox inside an invalid group Field is now marked invalid too. A tooltip stays open while the pointer is on it. Two new components, Stack and Text, give pattern trees a column and a line of text, so the empty-state and feedback-form presets finally lay out. The docs now say to set the page font at your app root, on body.",
+  },
+  {
+    date: "2026-10-15",
+    tag: "release",
     title: "0.26.0 — dialogs, menus and forms that behave",
     body: "Four changes for the forms and confirmations an operator console is built from. A Dialog can open on the right control: initialFocus takes a ref and focuses it on every open, and closeOnEscape gives Escape its own setting. A consequential confirmation can start on Cancel and still answer Escape without a close button. React's autoFocus cannot do this, because the content mounts while the dialog is closed. A Menu has the full menu-button keyboard. The trigger names the menu it controls, Arrow Down and Arrow Up open it on the first or last item, and Tab closes it and moves on, reported as onClose(\"tab\"). The reasons are now exported as MenuCloseReason. A Checkbox can be indeterminate, drawn as a dash, and Table's select-all finally shows the mixed state it was always set to. And two new form controls: Textarea, with a length counter that is read with the field but never announced on each keystroke, and RadioGroup, native radios that fit Field's group mode. A feedback-form pattern puts them together. 50 components, 24 patterns.",
   },
