@@ -33,6 +33,28 @@ export default function App() {
 }
 ```
 
+## App root
+
+Theme CSS never paints the page or sets its font, so your app root does (D107):
+
+```css
+@layer psi.base {
+  html, body {
+    background: var(--psi-bg-primary);
+    color: var(--psi-fg-primary);
+  }
+  body { font: var(--psi-text-14-20-regular); }
+  button, input, select, textarea { font: inherit; }
+}
+```
+
+Set the font on `body`, never on `html`: Psi's scales are in `rem`, so a font
+size on the root element shrinks or grows every control, gap and radius.
+
+Components set their own type, but text you place in a `Panel`, `Dialog`,
+`Card` or tab panel inherits the page's, which is the browser's serif until
+you set it.
+
 ## Cascade
 
 Component styles ship in `@layer psi.components` (D94), so utilities such as

@@ -1,8 +1,34 @@
-/* The preview iframe is the app root. Per the consumer contract (llms.txt:
- * theme CSS never paints the page), the canvas paints bg/fg itself — same
- * pattern as psi-demo's app.css (HAN-38). */
-html,
-body {
-  background: var(--psi-bg-primary);
-  color: var(--psi-fg-primary);
+/* The preview iframe is the app root, and it does what a consumer's app root
+ * does (llms.txt): theme CSS never paints the page, so the canvas paints
+ * bg/fg itself (HAN-38), and it sets the body font, so text a story places in
+ * a Panel, Dialog or tab panel reads as it would in an app (D107). Same rules
+ * as promo.css, in psi.base so Psi's component layer still wins (D94). Native
+ * form controls do not inherit font by default, and code falls back to the
+ * browser's monospace; the reset any app carries fixes both. */
+@layer psi.base {
+  html,
+  body {
+    background: var(--psi-bg-primary);
+    color: var(--psi-fg-primary);
+  }
+
+  /* body, never html: Psi's scales are rem, and a font on html would move
+     the root size off 16px and shrink every control, gap and radius. */
+  body {
+    font: var(--psi-text-14-20-regular);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--psi-font-mono);
+  }
 }
