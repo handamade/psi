@@ -15,7 +15,7 @@ type Placement = "top" | "bottom" | "left" | "right";
 export interface TooltipProps {
   /** Tooltip content. */
   content: ReactNode;
-  /** The trigger element (must accept ref, onMouseEnter/Leave, onFocus/Blur). */
+  /** The trigger element (must accept onFocus/Blur). */
   children: ReactElement<Record<string, unknown>>;
   /** Preferred placement. @default "top" */
   placement?: Placement;
@@ -66,24 +66,20 @@ export function Tooltip({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [visible, hide]);
 
+  // Hover lives on the wrapper, which holds the trigger and the bubble, so
+  // the pointer can move onto the bubble without leaving (WCAG 1.4.13
+  // hoverable, D105). The child's own mouse handlers run untouched.
+  const onMouseEnter = () => {
+    clearTimer();
+    timerRef.current = window.setTimeout(show, HOVER_DELAY_MS);
+  };
+  const onMouseLeave = () => {
+    clearTimer();
+    hide();
+  };
+
   const trigger = cloneElement(children, {
     "aria-describedby": visible ? id : undefined,
-    onMouseEnter: (e: React.MouseEvent) => {
-      clearTimer();
-      timerRef.current = window.setTimeout(show, HOVER_DELAY_MS);
-      const childOnMouseEnter = children.props.onMouseEnter as
-        | ((e: React.MouseEvent) => void)
-        | undefined;
-      childOnMouseEnter?.(e);
-    },
-    onMouseLeave: (e: React.MouseEvent) => {
-      clearTimer();
-      hide();
-      const childOnMouseLeave = children.props.onMouseLeave as
-        | ((e: React.MouseEvent) => void)
-        | undefined;
-      childOnMouseLeave?.(e);
-    },
     onFocus: (e: React.FocusEvent) => {
       show();
       const childOnFocus = children.props.onFocus as
@@ -102,7 +98,11 @@ export function Tooltip({
   });
 
   return (
-    <span className={styles.wrapper}>
+    <span
+      className={styles.wrapper}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       {trigger}
       {visible && (
         <span
