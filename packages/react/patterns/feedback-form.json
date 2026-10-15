@@ -1,0 +1,52 @@
+{
+  "id": "feedback-form",
+  "intent": "A short report form: a required choice of category as radios, a bounded description with a length counter, and a submit button",
+  "match": ["feedback form", "report a problem", "radio buttons", "text area", "character counter"],
+  "compose": {
+    "component": "Panel",
+    "props": { "padding": 24 },
+    "slots": {
+      "body": [
+        {
+          "component": "Field",
+          "props": { "group": true, "required": true, "requiredText": "(Required)" },
+          "slots": {
+            "label": ["{content:category-label}"],
+            "body": [
+              {
+                "component": "RadioGroup",
+                "slots": {
+                  "body": [
+                    { "component": "Radio", "props": { "value": "problem" }, "content": "first-option" },
+                    { "component": "Radio", "props": { "value": "idea" }, "content": "second-option" },
+                    { "component": "Radio", "props": { "value": "other" }, "content": "third-option" }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "component": "Field",
+          "slots": {
+            "label": ["{content:description-label}"],
+            "body": [{ "component": "Textarea", "props": { "maxLength": 500, "rows": 4 } }],
+            "description": ["{content:description-help}"]
+          }
+        },
+        { "component": "Button", "props": { "type": "submit", "variant": "accent" }, "content": "submit-label" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "category-label": "Category",
+    "first-option": "Something is broken",
+    "second-option": "An idea",
+    "third-option": "Something else",
+    "description-label": "Description",
+    "description-help": "[what happened, and what you expected]",
+    "submit-label": "Send"
+  },
+  "gaps": []
+}

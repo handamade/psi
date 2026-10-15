@@ -27,6 +27,8 @@ import { toastVars } from "./toast.js";
 import { tabsVars } from "./tabs.js";
 import { fieldVars } from "./field.js";
 import { descriptionListVars } from "./description-list.js";
+import { textareaVars } from "./textarea.js";
+import { radioGroupVars } from "./radio-group.js";
 
 export const componentVars: Record<string, Record<string, string>> = {
   "app-shell": appShellVars,
@@ -43,6 +45,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   menu: menuVars,
   navbar: navbarVars,
   panel: panelVars,
+  "radio-group": radioGroupVars,
   select: selectVars,
   skeleton: skeletonVars,
   "nav-tree": navTreeVars,
@@ -53,6 +56,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   tabs: tabsVars,
   "description-list": descriptionListVars,
   tag: tagVars,
+  textarea: textareaVars,
   toolbar: toolbarVars,
   toast: toastVars,
   tooltip: tooltipVars,

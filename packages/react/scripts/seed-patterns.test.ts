@@ -18,7 +18,7 @@ const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
   .filter((n) => existsSync(join(root, "src/icons", `${n}.tsx`)));
 
 describe("seed patterns against the real manifest", () => {
-  it("all twenty-three load and validate; the backlog is empty (D67, D99)", () => {
+  it("all twenty-four load and validate; the backlog is empty (D67, D99, D104)", () => {
     const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "account-menu",
@@ -33,6 +33,7 @@ describe("seed patterns against the real manifest", () => {
       "destructive-confirm",
       "detail-drawer",
       "empty-state",
+      "feedback-form",
       "filter-form",
       "filter-toolbar",
       "form-feedback",
@@ -120,7 +121,7 @@ describe("the manifest describes children (D72)", () => {
   // react-docgen-typescript reports `children` only when the declaration
   // carries a JSDoc comment — not because of propFilter, extends, or the type
   // spelling, all of which D70 wrongly blamed and D72 disproved with a probe.
-  const TAKES_NO_CHILDREN = ["Input", "Pagination", "MenuSeparator", "CursorPagination", "Skeleton", "CopyButton"];
+  const TAKES_NO_CHILDREN = ["Input", "Textarea", "Pagination", "MenuSeparator", "CursorPagination", "Skeleton", "CopyButton"];
 
   it("lists children for every component that accepts it", () => {
     const missing = manifest.components

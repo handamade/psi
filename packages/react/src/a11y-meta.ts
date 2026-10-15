@@ -54,6 +54,23 @@ export const a11yMeta: Record<string, A11yEntry> = {
   Checkbox: {
     keyboard: [{ keys: "Space", behavior: "Toggles. Native <input type=checkbox> underneath (visually hidden)." }],
   },
+  Textarea: {
+    keyboard: [{ keys: "Tab", behavior: "A native <textarea>; Enter adds a line, it does not submit the form." }],
+    notes:
+      "Inside a Field, id/aria-describedby/aria-invalid/required are wired as for Input (D104). minLength and maxLength are native. With maxLength, a counter under the control shows {length} / {maxLength}; it is not a live region, and it joins aria-describedby so it is read with the field on focus, with a visually hidden \"characters\".",
+  },
+  RadioGroup: {
+    keyboard: [
+      { keys: "Tab", behavior: "Enters the group on the checked radio, or the first one; one tab stop for the group." },
+      { keys: "Arrow keys", behavior: "Move to the next or previous radio and select it (native radios sharing one name)." },
+    ],
+    notes:
+      "Native radios sharing one name (D104). Inside Field group the fieldset and legend form and name the group, so RadioGroup adds no role; standalone it is role=\"radiogroup\" and needs aria-label or aria-labelledby. A required or invalid Field makes every radio required and aria-invalid.",
+  },
+  Radio: {
+    keyboard: [{ keys: "Space", behavior: "Selects the focused radio when none is selected." }],
+    notes: "Native <input type=radio> underneath (visually hidden), drawn like Checkbox on a circle. Takes its name, checked state, required and aria-invalid from its RadioGroup.",
+  },
   Switch: {
     keyboard: [{ keys: "Space", behavior: "Toggles. Native checkbox input with role=\"switch\"; announced as a switch, not a checkbox." }],
   },

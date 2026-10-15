@@ -72,6 +72,10 @@ export const EmptyState: Story = {
   render: preset("empty-state"),
 };
 
+export const FeedbackForm: Story = {
+  render: preset("feedback-form"),
+};
+
 export const FilterForm: Story = {
   render: preset("filter-form"),
 };

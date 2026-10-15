@@ -1,0 +1,60 @@
+/* packages/react/src/Textarea/textarea.module.css — D104. The Input recipe on
+   a <textarea>: same border, radius, inset focus ring (D82), error and
+   disabled states, and the 32px value typography. Every custom property is
+   --psi-textarea-* or a global scale. */
+
+.wrap {
+  display: grid;
+  gap: var(--psi-space-4);
+}
+
+.textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding-block: var(--psi-space-6);
+  padding-inline: var(--psi-textarea-padding-inline);
+  border: 1px solid var(--psi-textarea-border);
+  border-radius: var(--psi-textarea-radius);
+  background: var(--psi-textarea-bg);
+  color: var(--psi-textarea-fg);
+  font: var(--psi-textarea-font);
+  font-family: var(--psi-font-sans);
+  resize: vertical;
+  transition:
+    border-color var(--psi-duration-150) var(--psi-ease-standard),
+    outline var(--psi-duration-150) var(--psi-ease-standard);
+}
+
+.textarea::placeholder {
+  color: var(--psi-textarea-placeholder);
+}
+
+.textarea:hover:not(:disabled):not(:focus-visible) {
+  border-color: var(--psi-textarea-border-hover);
+}
+
+.textarea:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-textarea-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+  border-color: transparent;
+}
+
+.textarea:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.error,
+.error:hover:not(:disabled):not(:focus-visible) {
+  border-color: var(--psi-textarea-border-error);
+}
+
+/* Not a live region (D104): read with the field through aria-describedby. */
+.counter {
+  justify-self: end;
+  font: var(--psi-text-12-16-regular);
+  font-variant-numeric: tabular-nums;
+  color: var(--psi-textarea-counter-fg);
+}
