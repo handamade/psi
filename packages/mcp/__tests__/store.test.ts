@@ -19,6 +19,19 @@ beforeAll(async () => {
 });
 
 describe("search", () => {
+  function synthesizePatterns(count: number) {
+    return {
+      ...index,
+      patterns: [
+        ...index.patterns,
+        ...Array.from({ length: count }, (_, n) => ({
+          ...index.patterns[n % index.patterns.length],
+          id: `synthetic-pattern-${n}`,
+        })),
+      ],
+    };
+  }
+
   it("ranks the Button component first for 'button'", () => {
     const briefs = store.search("button");
     expect(briefs[0].id).toBe("component:Button");
@@ -42,6 +55,13 @@ describe("search", () => {
   it("stays within the response budget", () => {
     for (const q of ["", "button", "color", "a"]) {
       expect(JSON.stringify(store.search(q)).length).toBeLessThanOrEqual(6000);
+    }
+    // The overview is the response that grows with the catalog, so it is
+    // held to the budget at the grown sizes the envelope tests use as well
+    // (D61, D100), not only at today's.
+    for (const extra of [5, 16]) {
+      const grown = createStore(synthesizePatterns(extra) as typeof index);
+      expect(JSON.stringify(grown.search("")).length).toBeLessThanOrEqual(6000);
     }
   });
 
@@ -74,36 +94,43 @@ describe("search", () => {
     expect(briefs[0].id).toBe("pattern:destructive-confirm");
   });
 
-  function synthesizePatterns(count: number) {
-    return {
-      ...index,
-      patterns: [
-        ...index.patterns,
-        ...Array.from({ length: count }, (_, n) => ({
-          ...index.patterns[n % index.patterns.length],
-          id: `synthetic-pattern-${n}`,
-        })),
-      ],
-    };
-  }
+  it("drops the repeated title from the overview's pattern rows only (D100)", () => {
+    // A pattern's title is its id after `pattern:`, so in the budget-capped
+    // overview it is pure cost. Every other row, and every keyword result,
+    // keeps it.
+    const overview = store.search("");
+    const patternRows = overview.filter((b) => b.kind === "pattern");
+    expect(patternRows.length).toBe(index.patterns.length);
+    for (const row of patternRows) {
+      expect(Object.keys(row)).toEqual(["id", "kind", "summary"]);
+      expect(row.id).toMatch(/^pattern:/);
+    }
+    for (const row of overview.filter((b) => b.kind !== "pattern")) {
+      expect(row).toHaveProperty("title");
+    }
 
-  it("keeps every pattern and the component floor inside the operating envelope (D61)", () => {
-    // No synthetic pattern: 22 real = 22 total. Measured directly
-    // against this store.ts (see docs/superpowers/specs/2026-08-05-overview-allocation-design.md,
+    // The stored brief is untouched: keyword search returns it whole.
+    const hit = store.search("delete confirmation")[0];
+    expect(hit).toMatchObject({ id: "pattern:destructive-confirm", title: "destructive-confirm" });
+  });
+
+  it("keeps every pattern and the component floor inside the operating envelope (D61, D100)", () => {
+    // 23 real + 5 synthetic = 28: today's catalog plus the five patterns
+    // the 0.22 handoff's tier 2 could add. Measured directly against this
+    // store.ts (docs/superpowers/specs/2026-10-15-overview-pattern-cost-design.md,
     // "Operating envelope"): with realistic ~20-char pattern ids the floor
-    // holds through 23 patterns and first breaks at 24 (re-measured at D86,
-    // when the real catalog reached 20; D87's real 21st and D88's 22nd
-    // replace the last synthetic ones). 22 keeps a margin of two below that
-    // edge, so the next real pattern still fits and the one after it does not;
-    // the synthetic count is what you lower when the real catalog grows.
+    // holds through 32 patterns and first breaks at 33. Before D100 it
+    // broke at 24, because every overview pattern row repeated its id as
+    // `title`; at 28 it showed 6 components. The synthetic count is what you
+    // lower when the real catalog grows.
     //
     // The envelope is a function of per-pattern *cost*, not pattern count:
-    // id, kind, title and the never-capped `blocked (gaps: …)` tail are not
+    // id, kind and the never-capped `blocked (gaps: …)` tail are not
     // compressible, so the same count of cheaper patterns fits and the same
     // count of dearer ones does not. A sweep with short synthetic ids puts
-    // the edge at 25; this test deliberately uses long ids, which is the
+    // the edge at 36; this test deliberately uses long ids, which is the
     // conservative case and the one closer to Psi's real ids.
-    const grown = synthesizePatterns(0);
+    const grown = synthesizePatterns(5);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 
@@ -125,11 +152,11 @@ describe("search", () => {
   });
 
   it("degrades by shedding components, not patterns, past the envelope (D61)", () => {
-    // Roughly double today's catalog (17 synthetic on top of 22 real = 39 total),
-    // well past the ~22-pattern envelope documented in the spec's Operating
-    // envelope section. At this size the component floor provably cannot
-    // hold: 39 patterns' irreducible per-item JSON overhead (id/kind/title,
-    // never capped, plus the always-uncapped `blocked (gaps: …)` tail) alone
+    // 16 synthetic on top of 23 real = 39 total, past the 32-pattern
+    // envelope documented in the D100 spec's Operating envelope section. At
+    // this size the component floor provably cannot hold: 39 patterns'
+    // irreducible per-item JSON overhead (id/kind, never capped, plus the
+    // always-uncapped `blocked (gaps: …)` tail) alone
     // exceeds what's left of the 6000-byte budget after topics and any
     // component reserve — no derived pattern-intro limit can close that
     // gap. So COMPONENT_FLOOR is deliberately NOT asserted here; instead
@@ -137,7 +164,7 @@ describe("search", () => {
     // one at a time rather than vanishing, and neither topics nor patterns
     // are ever sacrificed to make room. If a future change makes patterns
     // start vanishing instead of components, this test must fail.
-    const grown = synthesizePatterns(17);
+    const grown = synthesizePatterns(16);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 

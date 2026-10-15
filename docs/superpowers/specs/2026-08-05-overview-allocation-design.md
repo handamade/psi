@@ -1,6 +1,9 @@
 # MCP overview — derived per-kind allocation (D61)
 
-Date: 2026-08-05. Status: **Draft** — follows 0.9.0.
+Date: 2026-08-05. Status: **Implemented** (0.9.1). The operating envelope
+below was re-measured on 2026-10-15 for D100
+(`2026-10-15-overview-pattern-cost-design.md`), which dropped the repeated
+`title` from the overview's pattern rows.
 
 Provenance: the D59 cycle grew the pattern catalog from 4 to 13 and broke the
 MCP search overview twice in one branch. First the component tail fell from
@@ -73,32 +76,37 @@ The three guarantees are not universal, and this spec states where they end
 rather than implying they hold forever.
 
 **The envelope is a function of per-pattern cost, not of pattern count.** The
-capped intro is only part of what a pattern brief costs: a brief stores its id
-twice (`id: "pattern:<id>"` and `title: "<id>"`), and neither copy — nor
-`kind`, nor the never-capped gaps suffix — is compressible, so patterns with
-longer ids and gap lists exhaust the budget sooner. Measured against the real
-index (13 topics, components averaging 275 bytes), sweeping pattern count at
+capped intro is only part of what a pattern row costs: its id
+(`id: "pattern:<id>"`), its `kind` and the never-capped gaps suffix are not
+compressible, so patterns with longer ids and gap lists exhaust the budget
+sooner. (Until D100 the overview row also repeated the id as `title`, which
+doubled the id's share.) Re-measured on 2026-10-15 after D100, against the
+real index (14 topics, 47 components, 23 patterns), sweeping pattern count at
 two synthetic id lengths — components / serialized bytes at each size:
 
 | total patterns | short ids (`syn-0`, 5 chars) | realistic ids (`synthetic-pattern-0`, 19 chars) |
 |---|---|---|
-| 13 (0.9.0) | **8** / 5926 | **8** / 5926 |
-| 19 | **8** / 5842 | **8** / 5856 |
-| 21 | **8** / 5845 | **8** / 5913 |
-| 23 | **8** / 5999 | 7 / 5814 |
-| 25 | **8** / 5995 | 6 / 5743 |
-| 29 | 6 / 5769 | 5 / 5950 |
-| 33 | 5 / 5814 | 3 / 5818 |
-| 39 | 3 / 5740 | 1 / 5970 |
+| 23 (0.24.0) | **8** / 5940 | **8** / 5940 |
+| 25 | **8** / 5821 | **8** / 5849 |
+| 28 | **8** / 5787 | **8** / 5857 |
+| 30 | **8** / 5905 | **8** / 5820 |
+| 32 | **8** / 5830 | **8** / 5956 |
+| 33 | **8** / 5884 | 7 / 5757 |
+| 35 | **8** / 5994 | 7 / 5895 |
+| 36 | 7 / 5782 | 7 / 5964 |
+| 39 | 7 / 5947 | 6 / 5908 |
 
-Bold marks the sizes where the eight-component floor still holds. Reproduce
-the whole sweep with:
+Bold marks the sizes where the eight-component floor still holds. The D100
+spec has every row from 23 to 39 and the before/after comparison. The table
+this one replaces was measured on 0.9.0 with the `title` field still in the
+row; it put the realistic edge at 21, later re-measured at 23 (D86–D99).
+Reproduce the whole sweep with:
 
 ```bash
 pnpm --filter @handamade/psi-mcp exec tsx scripts/measure-overview-envelope.ts
 ```
 
-It walks every size from 13 to 39 in both columns and prints where each floor
+It walks every size from today's catalog to 39 in both columns and prints where each floor
 breaks. Its synthesis matches the store test's helper — cyclic duplication of
 the real catalog (`index.patterns[n % len]`) with a fresh id — so every
 synthetic pattern carries a real intent, match phrases and `blocked`/`gaps`
@@ -108,12 +116,12 @@ budget and the total sawtooths just under 6000. Read the component column, not
 the byte column, for where the envelope ends.
 
 Psi's real ids (`date-range-filter`, `settings-form-row`,
-`tabbed-workspace`, …) average 14.4 characters, so **the realistic column is
-the one that governs: the floor holds through 21 patterns and first breaks at
-22.** An earlier draft of this spec claimed 25–28 — that is the short-id
-column, reproduced above byte-for-byte, and it is optimistic for ids the
-length of Psi's own. Treat 21 as the planning number and re-measure rather
-than trusting it if pattern ids or gap lists grow.
+`tabbed-workspace`, …) average 13.3 characters, so **the realistic column is
+the one that governs: the floor holds through 32 patterns and first breaks at
+33.** The short-id column is optimistic for ids the length of Psi's own.
+Treat 32 as the planning number and re-measure rather than trusting it if
+pattern ids or gap lists grow; no pattern is blocked at 0.24.0, so a blocked
+one brings back the uncapped gaps suffix.
 
 Past that the arithmetic runs out: the irreducible per-pattern cost plus the
 component reserve exceeds 6000 no matter how short the intros get.
@@ -123,7 +131,7 @@ every pattern is still listed, every blocked pattern still discloses its gaps,
 and components decline one at a time from the floor. Nothing vanishes silently
 and the backlog is never lost.
 
-For scale: the D59 ledger arc is expected to add five to nine patterns across
+*Historical (written at 13 patterns, before D100):* the D59 ledger arc was expected to add five to nine patterns across
 cycles 2–5, landing near 18–22. **Most of that range is inside the envelope;
 the top of it is not.** 18–21 hold the floor; 22 — the arc's own upper
 projection — is exactly the first size that breaks it, at 7 components. So the
@@ -144,11 +152,14 @@ the shape change in the rejected alternatives, on schedule rather than as a
 surprise.
 
 **Exceeding the envelope is the signal to change the overview's shape**, not
-to tune constants — see the second rejected alternative below. The store test
-asserts the guarantees at 19 patterns — two below 21, the last size that holds
-the floor — and separately asserts the graceful degradation at 39, so the
-boundary is documented in executable form rather than in prose alone. Both
-tests use the long synthetic ids, i.e. the conservative column.
+to tune constants — see the second rejected alternative below. D100 was such a
+change: at 23 patterns the derived intro cap had reached 0 (every pattern
+summary was `"…"`), so removing the redundant `title` was the only way left to
+get terser. The store test asserts the guarantees at 28 patterns (23 real plus
+the five the 0.22 handoff's tier 2 could add, four below 32) and separately
+asserts the graceful degradation at 39, so the boundary is documented in
+executable form rather than in prose alone. Both tests use the long synthetic
+ids, i.e. the conservative column.
 
 ## Alternatives rejected
 
@@ -167,7 +178,7 @@ tests use the long synthetic ids, i.e. the conservative column.
 
 The store test gains two assertions about growth, not just today's catalog:
 
-- **Inside the envelope (26 patterns, double 0.9.0):** all topics and all
+- **Inside the envelope (26 patterns, double 0.9.0; 28 since D100):** all topics and all
   patterns appear, at least `COMPONENT_FLOOR` components appear, and every
   blocked pattern still discloses its gaps. That last one is the assertion
   whose absence let the 120-character cap ship a truncated backlog.
