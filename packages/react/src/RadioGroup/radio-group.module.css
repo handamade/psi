@@ -65,6 +65,12 @@
   background: currentColor;
 }
 
+/* In error (D108): an unchecked circle marked aria-invalid by the group's
+   Field outlines in the field error colour; the chosen one keeps its accent. */
+.input[aria-invalid="true"]:not(:checked) + .circle {
+  border-color: var(--psi-radio-group-circle-border-error);
+}
+
 .input:focus-visible + .circle {
   outline: var(--psi-focus-ring-width) solid var(--psi-radio-group-focus-ring);
   outline-offset: var(--psi-focus-ring-offset);
