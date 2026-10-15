@@ -1,0 +1,18 @@
+/* D109: one of Psi's text styles, in the gated foregrounds. Margin 0, so a
+   Stack's gap is the only spacing around it. */
+
+.text {
+  margin: 0;
+  color: var(--psi-text-fg);
+}
+
+.s12Regular { font: var(--psi-text-12-16-regular); }
+.s12Medium { font: var(--psi-text-12-16-medium); }
+.s14Regular { font: var(--psi-text-14-20-regular); }
+.s14Medium { font: var(--psi-text-14-20-medium); }
+.s16Regular { font: var(--psi-text-16-24-regular); }
+.s16Medium { font: var(--psi-text-16-24-medium); }
+.s18Regular { font: var(--psi-text-18-28-regular); }
+.s18Medium { font: var(--psi-text-18-28-medium); }
+
+.secondary { color: var(--psi-text-fg-secondary); }

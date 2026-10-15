@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-50 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+52 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -30,6 +30,10 @@
 ## Panel
 - <Panel padding={16|24}>: the elevated surface panel (D51) — bg-secondary, faint hairline border, radius-12, space-24 padding (16 for compact). Binds the shared --psi-surface-* recipe Dialog's panel also uses; brands retune both by overriding --psi-surface-*. Not a Card: no media slot, no hover lift.
 
+
+## Stack and Text
+- <Stack gap={4|8|12|16|24|32} align="stretch|start|center|end">: a column with a gap from the space scale (D109), default gap 16 and stretch. A plain <div>, no role, no wrap: Toolbar's vertical counterpart. Use it for the layout a pattern tree cannot get from Panel (which pads but lays out nothing) or from psi-gap-* (which sets gap only). `align="start"` keeps a Button at its own width. Fields in a form: gap 24.
+- <Text as="p|span|div|h2|h3|h4" size={12|14|16|18} weight="regular|medium" tone="primary|secondary">: one line or paragraph at a Psi text style (D109), margin 0, default p / 14 / regular / primary. `as` follows the document outline and `size` the design, so `<Text as="h3" size={16} weight="medium">` is the usual section headline. In a pattern tree, put each line in its own Text: adjacent bare strings render as one run.
 ## DescriptionList (2)
 - `<DescriptionList layout="stacked|inline" gap={8|12|16}>` with one `<DescriptionItem term="Date">value</DescriptionItem>` per field (D70). Renders `<dl>`; each item is a `<div><dt/><dd/></div>` group, which is the HTML5 grouping element, so the term/value association survives.
 - `stacked` (default) puts the term above its value; `inline` is a two-column grid and is what a detail drawer wants. This is the body of the `detail-drawer` pattern — do not hand-roll a `<dl>`.

@@ -1,0 +1,5 @@
+{
+  "slots": [
+    { "name": "body", "accepts": {}, "cardinality": "0..*", "order": 1 }
+  ]
+}

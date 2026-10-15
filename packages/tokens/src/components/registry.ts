@@ -15,6 +15,7 @@ import { switchVars } from "./switch.js";
 import { tableVars } from "./table.js";
 import { tagVars } from "./tag.js";
 import { toolbarVars } from "./toolbar.js";
+import { textVars } from "./text.js";
 import { tooltipVars } from "./tooltip.js";
 import { cardVars } from "./card.js";
 import { controlVars } from "./control.js";
@@ -58,6 +59,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   tag: tagVars,
   textarea: textareaVars,
   toolbar: toolbarVars,
+  text: textVars,
   toast: toastVars,
   tooltip: tooltipVars,
 };
