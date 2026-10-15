@@ -103,6 +103,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     keyboard: [],
     notes: "Non-interactive rule with role=\"separator\" — exposed to assistive tech as a separator, never focusable, and skipped by roving navigation.",
   },
+  MenuText: {
+    keyboard: [],
+    notes:
+      "A line of text that is not an action (D99): inside the role=\"menu\" element with no role of its own, never focused, skipped by the arrows, Home, End and typeahead, and never aria-hidden. In a menu's focus mode a screen reader reaches it by browse mode or the VoiceOver cursor. To have it spoken on entering the menu, give it an id and pass that id to Menu's aria-describedby; that is off by default, because a description may be spoken on every open.",
+  },
   TableCaption: {
     keyboard: [
       { keys: "Tab", behavior: "Not a tab stop. With tabIndex={-1} the consumer moves focus to it after a page change, and the shared ring is drawn inside the caption." },

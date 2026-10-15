@@ -3,6 +3,8 @@ import type { Meta, StoryObj } from "storybook";
 import { Menu } from "./Menu.js";
 import { MenuItem } from "./MenuItem.js";
 import { MenuSeparator } from "./MenuSeparator.js";
+import { MenuText } from "./MenuText.js";
+import { IconUser } from "../icons/IconUser.js";
 import { Button } from "../Button/Button.js";
 import type { MenuPlacement } from "./Menu.js";
 
@@ -66,6 +68,31 @@ export const WithDisabledItem: Story = {
       <MenuItem onSelect={() => {}} disabled>Archive</MenuItem>
       <MenuSeparator />
       <MenuItem onSelect={() => {}} variant="danger">Delete</MenuItem>
+    </Menu>
+  ),
+};
+
+/** D99: an account menu with a read-only line last, after the sign-out
+ * group, in the secondary foreground. The keyboard skips the line; it is in
+ * the accessibility tree as a child of the menu, never a menuitem. */
+export const WithText: Story = {
+  args: { open: true, onClose: () => {}, placement: "bottom-start", "aria-label": "Account" },
+  render: (args) => (
+    <Menu
+      {...args}
+      trigger={
+        <Button variant="ghost" size={32}>
+          <IconUser aria-hidden="true" />
+          <span>Alexandra Konstantinou</span>
+        </Button>
+      }
+    >
+      <MenuItem onSelect={() => {}}>Profile</MenuItem>
+      <MenuItem onSelect={() => {}}>Settings</MenuItem>
+      <MenuSeparator />
+      <MenuItem onSelect={() => {}}>Sign out</MenuItem>
+      <MenuSeparator />
+      <MenuText>Build 1.4.2 (3f9c2a1)</MenuText>
     </Menu>
   ),
 };

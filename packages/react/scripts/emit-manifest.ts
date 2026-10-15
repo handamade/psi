@@ -31,6 +31,7 @@ const COMPONENTS = [
   "Menu",
   "MenuItem",
   "MenuSeparator",
+  "MenuText",
   "Table",
   "TableHead",
   "TableBody",
@@ -87,11 +88,12 @@ const PASSTHROUGH_DESCRIPTIONS: Record<string, string> = {
 
 // Most components live at src/<Name>/<Name>.tsx. A few are child components
 // that share their parent's folder instead of getting one of their own
-// (Menu's item and separator live in Menu/, not MenuItem/ or MenuSeparator/).
+// (Menu's item, separator and text live in Menu/, not in folders of their own).
 const COMPONENT_DIR: Record<string, string> = {
   DescriptionItem: "DescriptionList",
   MenuItem: "Menu",
   MenuSeparator: "Menu",
+  MenuText: "Menu",
   TableHead: "Table",
   TableBody: "Table",
   TableRow: "Table",

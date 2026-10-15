@@ -1,0 +1,37 @@
+{
+  "id": "account-menu",
+  "intent": "The signed-in user's menu: account actions, sign out, and a read-only line such as the build, which the keyboard skips",
+  "match": ["account menu", "user menu", "profile menu", "sign out", "build number"],
+  "compose": {
+    "component": "Menu",
+    "props": {
+      "placement": "bottom-end",
+      "aria-label": "{content:menu-label}"
+    },
+    "slots": {
+      "trigger": [
+        {
+          "component": "Button",
+          "props": { "variant": "ghost", "size": 32 },
+          "content": "user-name"
+        }
+      ],
+      "body": [
+        { "component": "MenuItem", "content": "profile-label" },
+        { "component": "MenuSeparator" },
+        { "component": "MenuItem", "content": "sign-out-label" },
+        { "component": "MenuSeparator" },
+        { "component": "MenuText", "content": "build-line" }
+      ]
+    }
+  },
+  "parameters": [],
+  "content": {
+    "menu-label": "Account",
+    "user-name": "[the signed-in user's display name — wrap it in a span and cap it with --psi-button-label-max-width]",
+    "profile-label": "Profile",
+    "sign-out-label": "Sign out",
+    "build-line": "[read-only information, such as the build identifier]"
+  },
+  "gaps": []
+}

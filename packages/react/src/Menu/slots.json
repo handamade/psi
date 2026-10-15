@@ -8,7 +8,7 @@
     },
     {
       "name": "body",
-      "accepts": { "components": ["MenuItem", "MenuSeparator"] },
+      "accepts": { "components": ["MenuItem", "MenuSeparator", "MenuText"] },
       "cardinality": "1..*",
       "order": 2
     }

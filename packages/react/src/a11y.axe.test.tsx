@@ -4,7 +4,7 @@ import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
   Button, IconButton, Card, Panel, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
-  Menu, MenuItem, MenuSeparator,
+  Menu, MenuItem, MenuSeparator, MenuText,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
   Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, NavTree, NavGroup, NavItem, AppShell,
   Tabs, TabList, Tab, TabPanel,
@@ -57,6 +57,8 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Toolbar as a filter form (D87)", <Toolbar as="form" align="end" gap={12} aria-label="Filters"><Field label="Device ID"><Input size={32} /></Field><Field label="Status"><Select size={32}><option>Any</option></Select></Field><Button type="submit" variant="accent" size={32}>Find</Button></Toolbar>],
   ["Toolbar as a filter form with a field in error (D92)", <Toolbar as="form" align="start" gap={12} aria-label="Filters"><Field label="Device ID"><Input size={32} /></Field><Field label="Status" error="Pick a status."><Select size={32}><option>Any</option></Select></Field><Button type="submit" variant="accent" size={32}>Find</Button></Toolbar>],
   ["Menu open", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Row actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuSeparator /><MenuItem onSelect={() => {}} variant="danger">Delete</MenuItem></Menu>],
+  ["Menu with a text line (D99)", <Menu open onClose={() => {}} trigger={<Button size={32}>Account</Button>} aria-label="Account"><MenuItem onSelect={() => {}}>Profile</MenuItem><MenuSeparator /><MenuItem onSelect={() => {}}>Sign out</MenuItem><MenuSeparator /><MenuText>Build 1.4.2</MenuText></Menu>],
+  ["Menu with a text line as its description (D99)", <Menu open onClose={() => {}} trigger={<Button size={32}>Account</Button>} aria-label="Account" aria-describedby="build"><MenuItem onSelect={() => {}}>Profile</MenuItem><MenuText id="build">Build 1.4.2</MenuText></Menu>],
   ["Menu with a disabled item", <Menu open onClose={() => {}} trigger={<Button size={32}>Actions</Button>} aria-label="Actions"><MenuItem onSelect={() => {}}>Rename</MenuItem><MenuItem onSelect={() => {}} disabled>Archive</MenuItem></Menu>],
   ["Table plain", (
     <Table>

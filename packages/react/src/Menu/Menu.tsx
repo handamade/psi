@@ -51,7 +51,10 @@ export interface MenuProps {
   placement?: MenuPlacement;
   /** Accessible name for the menu when there is no visible label. */
   "aria-label"?: string;
-  /** MenuItem and MenuSeparator children. */
+  /** The id of a `MenuText` (or any element) that describes the menu (D99).
+   * Unset by default: a description may be spoken every time the menu opens. */
+  "aria-describedby"?: string;
+  /** MenuItem, MenuSeparator and MenuText children. */
   children: ReactNode;
   className?: string;
   /** Forwarded ref to the popover element. */
