@@ -93,6 +93,18 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Plain <div> container with no implicit role. Pass aria-* host props if the panel should announce as a region.",
   },
+  Stack: {
+    keyboard: [
+      { keys: "Tab", behavior: "Skipped — Stack itself is not focusable; focus moves through its children in source order." },
+    ],
+    notes:
+      "Plain <div> with no role (D109): a column with a gap. Visual order is source order, so reading and focus order match.",
+  },
+  Text: {
+    keyboard: [{ keys: "Tab", behavior: "Not focusable." }],
+    notes:
+      "Renders the element `as` names (p by default). Use h2–h4 for a heading at its outline level, whatever its `size`.",
+  },
   Toolbar: {
     keyboard: [
       { keys: "Tab", behavior: "Moves through the controls in DOM order — no roving tabindex (deliberately not role=toolbar, D52)." },

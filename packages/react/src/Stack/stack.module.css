@@ -1,0 +1,18 @@
+/* D109: a column with a gap from the space scale. No component tokens: it
+   binds only the global space scale, as Toolbar's gaps do. */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap4 { gap: var(--psi-space-4); }
+.gap8 { gap: var(--psi-space-8); }
+.gap12 { gap: var(--psi-space-12); }
+.gap16 { gap: var(--psi-space-16); }
+.gap24 { gap: var(--psi-space-24); }
+.gap32 { gap: var(--psi-space-32); }
+
+.alignStart { align-items: flex-start; }
+.alignCenter { align-items: center; }
+.alignEnd { align-items: flex-end; }

@@ -10,6 +10,8 @@ const COMPONENTS = [
   "IconButton",
   "Card",
   "Panel",
+  "Stack",
+  "Text",
   "DescriptionList",
   "DescriptionItem",
   "Input",

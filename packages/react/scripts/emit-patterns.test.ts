@@ -100,6 +100,13 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(emptyState.blocked).toBe(false);
     expect(emptyState.gaps).toEqual([]);
     expect(emptyState.preset).toContain("<Panel");
+    // D109: a column, and the headline and explanation each in their own element.
+    expect(emptyState.preset).toMatch(/<Stack\s+align="start"\s+gap=\{8\}\s*>/);
+    expect(emptyState.preset).toMatch(/<Text\s+as="h3"\s+size=\{16\}\s+weight="medium"\s*>/);
+    expect(emptyState.preset).toMatch(/<Text\s+tone="secondary"\s*>/);
+
+    const feedbackForm = output.patterns.find((p: { id: string }) => p.id === "feedback-form");
+    expect(feedbackForm.preset).toMatch(/<Stack\s+align="start"\s+gap=\{24\}\s*>/);
 
     const summaryTiles = output.patterns.find((p: { id: string }) => p.id === "summary-tiles");
     expect(summaryTiles.blocked).toBe(false);

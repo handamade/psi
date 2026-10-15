@@ -1,15 +1,54 @@
 {
   "id": "empty-state",
   "intent": "Placeholder shown when a list has no results, distinguishing an empty filter from an empty dataset",
-  "match": ["empty state", "no results", "nothing here", "zero state", "no data"],
+  "match": [
+    "empty state",
+    "no results",
+    "nothing here",
+    "zero state",
+    "no data"
+  ],
   "compose": {
     "component": "Panel",
-    "props": { "padding": 24 },
+    "props": {
+      "padding": 24
+    },
     "slots": {
       "body": [
-        "{content:headline}",
-        "{content:explanation}",
-        { "component": "Button", "props": { "variant": "neutral" }, "content": "reset-label" }
+        {
+          "component": "Stack",
+          "props": {
+            "gap": 8,
+            "align": "start"
+          },
+          "slots": {
+            "body": [
+              {
+                "component": "Text",
+                "props": {
+                  "as": "h3",
+                  "size": 16,
+                  "weight": "medium"
+                },
+                "content": "headline"
+              },
+              {
+                "component": "Text",
+                "props": {
+                  "tone": "secondary"
+                },
+                "content": "explanation"
+              },
+              {
+                "component": "Button",
+                "props": {
+                  "variant": "neutral"
+                },
+                "content": "reset-label"
+              }
+            ]
+          }
+        }
       ]
     }
   },
