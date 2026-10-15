@@ -14,7 +14,10 @@ Modal dialog on the native <dialog> top layer: focus trap, aria-modal and focus 
 | `footer` | `ReactNode` | — | no | Action row (Buttons — one accent per group, danger for destructive). |
 | `width` | `400 \| 560 \| 720` | 560 | no | Panel width in px (400 \| 560 \| 720). For an `inline-*` placement this is the drawer's width; the height is always the full viewport. |
 | `placement` | `"center" \| "inline-start" \| "inline-end"` | center | no | Where the panel sits. `inline-start` / `inline-end` pin it full-height to that edge, making it a drawer (D66). |
-| `dismissible` | `boolean` | true | no | false = no close button, Esc and backdrop swallowed — footer is the only exit. |
+| `dismissible` | `boolean` | true | no | false = no close button, Esc and backdrop swallowed — footer is the only exit. `closeOnEscape` can give Escape back on its own (D101). |
+| `closeOnEscape` | `boolean` | dismissible | no | Whether Escape reports onClose("esc"), separately from the close button and the backdrop (D101). A consequential confirmation is `dismissible={false} closeOnEscape`: no close button, no backdrop dismissal, and Escape cancels. |
+| `initialFocus` | `RefObject<HTMLElement \| null>` | — | no | The element to focus each time the dialog opens, after the platform's own focusing (D101), e.g. a ref to the footer's Cancel button. Without it, the platform focuses the first focusable control, as before. |
+| `closeLabel` | `string` | — | no | Visible text for the close button (D101). When set, the close button is a ghost Button with this text instead of the icon-only "Close dialog" button. |
 | `ref` | `Ref<HTMLDialogElement>` | — | no | Forwarded ref to the underlying <dialog> element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
@@ -22,7 +25,7 @@ Modal dialog on the native <dialog> top layer: focus trap, aria-modal and focus 
 
 | Keys | Behavior |
 |---|---|
-| Esc | Dismisses via onClose('esc') when dismissible; swallowed otherwise. |
+| Esc | Dismisses via onClose('esc') when closeOnEscape (default: dismissible); swallowed otherwise (D101). |
 | Tab | Focus is trapped inside by the native <dialog> top layer; restored on close. |
 
 Rendered with showModal(): aria-modal, inert background and focus restore come from the platform. title wires aria-labelledby; without title, pass aria-label. Backdrop click dismisses only when dismissible. placement="inline-start"/"inline-end" pins the panel full-height to that edge — that is Psi's drawer, and it changes nothing about modality, the focus trap, focus restore or the dismissal reasons (D66). A drawer's panel scrolls internally so a dismissible={false} footer stays reachable.

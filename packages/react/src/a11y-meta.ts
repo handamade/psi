@@ -45,7 +45,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   Dialog: {
     keyboard: [
-      { keys: "Esc", behavior: "Dismisses via onClose('esc') when dismissible; swallowed otherwise." },
+      { keys: "Esc", behavior: "Dismisses via onClose('esc') when closeOnEscape (default: dismissible); swallowed otherwise (D101)." },
       { keys: "Tab", behavior: "Focus is trapped inside by the native <dialog> top layer; restored on close." },
     ],
     notes:
