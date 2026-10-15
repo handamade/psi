@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Tooltip } from "./Tooltip.js";
@@ -154,5 +156,90 @@ describe("Tooltip", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+  describe("hoverable (WCAG 1.4.13, D105)", () => {
+    const openByHover = (trigger: HTMLElement) => {
+      fireEvent.mouseOver(trigger);
+      act(() => {
+        vi.advanceTimersByTime(150);
+      });
+    };
+
+    it("stays open when the pointer moves from the trigger onto the bubble", () => {
+      vi.useFakeTimers();
+      try {
+        render(
+          <Tooltip content="tip">
+            <button>t</button>
+          </Tooltip>,
+        );
+        const trigger = screen.getByRole("button", { name: "t" });
+        openByHover(trigger);
+        const bubble = screen.getByRole("tooltip");
+        fireEvent.mouseOut(trigger, { relatedTarget: bubble });
+        fireEvent.mouseOver(bubble, { relatedTarget: trigger });
+        act(() => {
+          vi.advanceTimersByTime(500);
+        });
+        expect(screen.getByRole("tooltip")).toHaveTextContent("tip");
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("closes when the pointer leaves the trigger and the bubble", () => {
+      vi.useFakeTimers();
+      try {
+        render(
+          <Tooltip content="tip">
+            <button>t</button>
+          </Tooltip>,
+        );
+        const trigger = screen.getByRole("button", { name: "t" });
+        openByHover(trigger);
+        const bubble = screen.getByRole("tooltip");
+        fireEvent.mouseOut(trigger, { relatedTarget: bubble });
+        fireEvent.mouseOver(bubble, { relatedTarget: trigger });
+        fireEvent.mouseOut(bubble, { relatedTarget: document.body });
+        expect(screen.queryByRole("tooltip")).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("still runs a child's own mouse handlers and opens on its hover", () => {
+      vi.useFakeTimers();
+      try {
+        const onEnter = vi.fn();
+        const onLeave = vi.fn();
+        render(
+          <Tooltip content="tip">
+            <button onMouseEnter={onEnter} onMouseLeave={onLeave}>t</button>
+          </Tooltip>,
+        );
+        const trigger = screen.getByRole("button", { name: "t" });
+        openByHover(trigger);
+        expect(onEnter).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole("tooltip")).toBeInTheDocument();
+        fireEvent.mouseOut(trigger, { relatedTarget: document.body });
+        expect(onLeave).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole("tooltip")).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("lets the bubble take the pointer and bridges the gap on every side", () => {
+      const css = readFileSync(join(import.meta.dirname, "tooltip.module.css"), "utf8");
+      const bubble = /\.tooltip\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+      expect(bubble).not.toMatch(/pointer-events:\s*none/);
+      const bridge = /\.tooltip::before\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+      expect(bridge).toMatch(/content:\s*""/);
+      expect(bridge).toMatch(/position:\s*absolute/);
+      for (const side of ["top", "bottom", "left", "right"]) {
+        const rule = new RegExp(`\\.${side}::before\\s*\\{([^}]*)\\}`).exec(css)?.[1] ?? "";
+        expect(rule, side).toMatch(/var\(--psi-space-4\)/);
+      }
+    });
   });
 });

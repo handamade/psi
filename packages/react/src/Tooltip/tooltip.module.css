@@ -16,7 +16,15 @@
   color: var(--psi-tooltip-fg);
   font: var(--psi-text-12-16-regular);
   white-space: nowrap;
-  pointer-events: none;
+}
+
+/* The bridge (D105): a transparent box over the gap between trigger and
+   bubble, so the pointer crossing it stays inside the wrapper and the bubble
+   stays open (WCAG 1.4.13 hoverable). Each placement stretches it across the
+   gap with insets (space tokens may bind insets, not width or height). */
+.tooltip::before {
+  content: "";
+  position: absolute;
 }
 
 /* ── Placements ──────────────────────────────────────────────── */
@@ -28,11 +36,23 @@
   margin-bottom: var(--psi-space-4);
 }
 
+.top::before {
+  inset-inline: 0;
+  top: 100%;
+  bottom: calc(var(--psi-space-4) * -1);
+}
+
 .bottom {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
   margin-top: var(--psi-space-4);
+}
+
+.bottom::before {
+  inset-inline: 0;
+  bottom: 100%;
+  top: calc(var(--psi-space-4) * -1);
 }
 
 .left {
@@ -42,9 +62,21 @@
   margin-right: var(--psi-space-4);
 }
 
+.left::before {
+  inset-block: 0;
+  left: 100%;
+  right: calc(var(--psi-space-4) * -1);
+}
+
 .right {
   left: 100%;
   top: 50%;
   transform: translateY(-50%);
   margin-left: var(--psi-space-4);
+}
+
+.right::before {
+  inset-block: 0;
+  right: 100%;
+  left: calc(var(--psi-space-4) * -1);
 }
