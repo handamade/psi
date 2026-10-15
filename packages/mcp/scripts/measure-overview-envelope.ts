@@ -7,10 +7,12 @@
  * reports where the component floor first breaks.
  *
  * The headline finding this script exists to make reproducible: **the
- * envelope is a function of per-pattern cost, not pattern count.** A pattern
- * brief stores its id twice (`id: "pattern:<id>"` and `title: "<id>"`), and
- * neither copy is subject to the derived intro cap — so the synthetic id
- * length chosen by the harness moves the measured edge by several patterns.
+ * envelope is a function of per-pattern cost, not pattern count.** An
+ * overview pattern row carries its id (`id: "pattern:<id>"`), which is not
+ * subject to the derived intro cap — so the synthetic id length chosen by the
+ * harness moves the measured edge by several patterns. (Until D100 the row
+ * also repeated the id as `title`, which made the effect twice as large and
+ * put the realistic edge at 24 instead of 33.)
  * Sweeping one id length alone produces a number that looks authoritative
  * and is not; that is what put "25-28" into an earlier draft of the spec.
  *

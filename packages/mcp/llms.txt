@@ -1,7 +1,7 @@
 # @handamade/psi-mcp — MCP access to Psi (Ψ)
 
 Two read-only tools over a baked index of the generated artifacts:
-- search(query): briefs {id, kind, title, summary}; empty query = overview
+- search(query): briefs {id, kind, title, summary}; empty query = overview, where pattern rows are {id, kind, summary} (the id names the pattern, D100)
 - get(id): component (props/defaults/a11y doc) | token (formula + OKLCH/hex per theme) | topic (guidance) | pattern (compose tree, clarifying parameters, content, gaps/blocked status, preset JSX)
 Ids: component:<Name>, token:<name>, topic:<key>, pattern:<id>; bare names resolve case-insensitively.
 

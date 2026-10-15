@@ -7,6 +7,16 @@ export interface Brief {
   summary: string;
 }
 
+/** A pattern row in the empty-query overview: a `Brief` without `title`,
+ * which for a pattern only repeats the id after `pattern:` (D100). At the
+ * derived intro cap of 0 the title was a quarter of the row, and the row is
+ * all the overview can no longer shorten. */
+export type OverviewPatternBrief = Omit<Brief, "title">;
+
+/** What `search()` returns: stored briefs for a keyword query; for the empty
+ * query, the overview, where pattern rows are `OverviewPatternBrief`. */
+export type SearchBrief = Brief | OverviewPatternBrief;
+
 export type Detail =
   | ({ kind: "component" } & ComponentEntry)
   | ({ kind: "token" } & TokenEntry)
@@ -14,7 +24,7 @@ export type Detail =
   | { kind: "topic"; name: string; content: unknown };
 
 export interface Store {
-  search(query: string): Brief[];
+  search(query: string): SearchBrief[];
   get(id: string): Detail | null;
 }
 
@@ -120,6 +130,8 @@ function overviewPatternSummary(p: PatternEntry, limit: number): string {
   return p.blocked ? `${intro}, blocked (gaps: ${p.gaps.join(", ")})` : intro;
 }
 
+const PATTERN_PREFIX = "pattern:";
+
 export function createStore(index: PsiIndex): Store {
   const patternsById = new Map(index.patterns.map((p) => [p.id, p]));
 
@@ -127,16 +139,17 @@ export function createStore(index: PsiIndex): Store {
    * pattern, where it re-derives the summary from the underlying
    * `PatternEntry` (via `overviewPatternSummary`) rather than slicing the
    * already-assembled, full-length `Brief.summary` — so the `blocked (gaps:
-   * …)` tail always survives the overview's trim. Always a shallow copy for
-   * patterns: the stored brief kept in `briefs` (and used by score()) is
-   * never mutated. `limit` is derived per-call by the empty-query branch
+   * …)` tail always survives the overview's trim. A pattern row is a new
+   * `{id, kind, summary}` object with no `title`, which would only repeat
+   * the id (D100); the stored brief kept in `briefs` (and used by score())
+   * is never mutated. `limit` is derived per-call by the empty-query branch
    * (D61), not a module constant, so a growing catalog shortens summaries
    * instead of evicting items. */
-  function overviewBrief(b: Brief, limit: number): Brief {
+  function overviewBrief(b: Brief, limit: number): SearchBrief {
     if (b.kind !== "pattern") return b;
-    const pattern = patternsById.get(b.title);
+    const pattern = patternsById.get(b.id.slice(PATTERN_PREFIX.length));
     if (!pattern) return b;
-    return { ...b, summary: overviewPatternSummary(pattern, limit) };
+    return { id: b.id, kind: b.kind, summary: overviewPatternSummary(pattern, limit) };
   }
 
   const briefs: Brief[] = [
@@ -147,7 +160,7 @@ export function createStore(index: PsiIndex): Store {
       summary: componentSummary(c),
     })),
     ...index.patterns.map((p) => ({
-      id: `pattern:${p.id}`,
+      id: `${PATTERN_PREFIX}${p.id}`,
       kind: "pattern" as const,
       title: p.id,
       summary: patternSummary(p),
@@ -178,7 +191,7 @@ export function createStore(index: PsiIndex): Store {
     return s;
   }
 
-  function search(query: string): Brief[] {
+  function search(query: string): SearchBrief[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
       // D61: allocate before filling. Topics take their full cost, components
@@ -200,7 +213,7 @@ export function createStore(index: PsiIndex): Store {
       let limit = OVERVIEW_PATTERN_INTRO_MAX;
       while (limit > 0 && !fits(limit)) limit -= 10;
 
-      const out: Brief[] = [...topics, ...patterns.map((b) => overviewBrief(b, limit))];
+      const out: SearchBrief[] = [...topics, ...patterns.map((b) => overviewBrief(b, limit))];
       for (const component of components) {
         out.push(component);
         if (JSON.stringify(out).length > RESPONSE_BUDGET) {
