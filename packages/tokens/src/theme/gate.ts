@@ -5,7 +5,7 @@ import type { Palette, SlotMap, ThemeDef } from "../dsl/types.js";
 import { validate } from "../dsl/validator.js";
 import { resolve, type ResolvedTheme } from "../dsl/resolver.js";
 import { gamutWarnings } from "../gamut.js";
-import { checkContrast, wcagAAPairs, componentLabelPairs, type ContrastResult } from "../contrast-matrix.js";
+import { checkContrast, wcagAAPairs, componentLabelPairs, nonTextPairs, type ContrastResult } from "../contrast-matrix.js";
 import { checkScopes, checkOverrideScopes, type ScopeViolation } from "../scope-gate.js";
 import { componentVars } from "../components/registry.js";
 
@@ -49,7 +49,7 @@ export function gateTheme(
   const resolved = resolve(theme, palette, slots);
   const warnings = gamutWarnings(resolved, theme, palette, slots);
 
-  const contrastFailures = checkContrast(resolved, [...wcagAAPairs, ...componentLabelPairs]).filter((r) => !r.pass);
+  const contrastFailures = checkContrast(resolved, [...wcagAAPairs, ...componentLabelPairs, ...nonTextPairs]).filter((r) => !r.pass);
   const scopeViolations = [
     ...checkScopes(componentVars, theme),
     ...checkOverrideScopes(componentOverrides, componentVars, theme),

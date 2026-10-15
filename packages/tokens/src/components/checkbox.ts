@@ -2,7 +2,7 @@
 export const checkboxVars: Record<string, string> = {
   fg: "var(--psi-fg-primary)",
   "box-bg": "var(--psi-bg-primary)",
-  "box-border": "var(--psi-border-neutral)",
+  "box-border": "var(--psi-border-control)",
   "box-bg-checked": "var(--psi-fill-accent)",
   "box-border-checked": "var(--psi-fill-accent)",
 

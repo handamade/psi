@@ -54,6 +54,10 @@ export const lightTheme: ThemeDef = {
   borderFaint: token({ from: ref.fgPrimary, alpha: 0.08, scopes: ["border"] }),
   borderNeutral: token({ from: ref.fgPrimary, alpha: 0.15, scopes: ["border"] }),
   borderStrong: token({ from: ref.fgPrimary, alpha: 0.3, scopes: ["border"] }),
+  /** D106: the outline that alone identifies an unchecked checkbox or radio,
+   * so WCAG 1.4.11 asks 3:1 for it (`nonTextPairs`). borderNeutral measured
+   * 1.32-1.48. Alpha chosen by sweep over every derivable theme. */
+  borderControl: token({ from: ref.fgPrimary, alpha: 0.55, scopes: ["border"] }),
   borderFocus: token({ from: ref.fgAccent, scopes: ["border"] }),
 
   // Scrims (D32): page-canvas surfaces at alpha — never text pairs, so they
