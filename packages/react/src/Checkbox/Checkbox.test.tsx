@@ -5,6 +5,7 @@ import { createRef } from "react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Checkbox } from "./Checkbox.js";
+import { Field } from "../Field/Field.js";
 
 describe("Checkbox", () => {
   it("renders a checkbox with label text", () => {
@@ -131,5 +132,40 @@ describe("Checkbox indeterminate (D103)", () => {
     expect(css.indexOf(".input:indeterminate + .indicator")).toBeGreaterThan(
       css.indexOf(".input:checked + .indicator::after"),
     );
+  });
+});
+
+describe("Checkbox in error (D108)", () => {
+  const group = (error?: string, extra: Record<string, unknown> = {}) =>
+    render(
+      <Field group label="Notify me" error={error} required>
+        <Checkbox {...extra}>Email</Checkbox>
+        <Checkbox>SMS</Checkbox>
+      </Field>,
+    );
+
+  it("takes aria-invalid, and not required, from an invalid group Field", () => {
+    group("Pick at least one.");
+    for (const box of screen.getAllByRole("checkbox")) {
+      expect(box).toHaveAttribute("aria-invalid", "true");
+      expect(box).not.toBeRequired();
+    }
+  });
+
+  it("is not aria-invalid in a valid group Field", () => {
+    group();
+    for (const box of screen.getAllByRole("checkbox")) expect(box).not.toHaveAttribute("aria-invalid");
+  });
+
+  it("keeps an aria-invalid the consumer passes", () => {
+    group("Pick at least one.", { "aria-invalid": false });
+    expect(screen.getByRole("checkbox", { name: "Email" })).toHaveAttribute("aria-invalid", "false");
+  });
+
+  it("draws the error outline on an unchecked, aria-invalid box", () => {
+    const css = readFileSync(join(import.meta.dirname, "checkbox.module.css"), "utf8");
+    const rule =
+      /\.input\[aria-invalid="true"\]:not\(:checked\):not\(:indeterminate\)\s*\+\s*\.indicator\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(rule).toMatch(/border-color:\s*var\(--psi-checkbox-box-border-error\)/);
   });
 });

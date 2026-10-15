@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -78,5 +80,13 @@ describe("RadioGroup (D104)", () => {
   it("keeps a name the consumer passes", () => {
     render(<RadioGroup aria-label="Category" name="category">{options}</RadioGroup>);
     for (const r of radios()) expect(r).toHaveAttribute("name", "category");
+  });
+});
+
+describe("Radio in error (D108)", () => {
+  it("draws the error outline on an unchecked, aria-invalid circle", () => {
+    const css = readFileSync(join(import.meta.dirname, "radio-group.module.css"), "utf8");
+    const rule = /\.input\[aria-invalid="true"\]:not\(:checked\)\s*\+\s*\.circle\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(rule).toMatch(/border-color:\s*var\(--psi-radio-group-circle-border-error\)/);
   });
 });

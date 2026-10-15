@@ -36,6 +36,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["AspectRatio", <AspectRatio ratio={16 / 10}><img alt="demo" src="x.png" /></AspectRatio>],
   ["Input", <label>Name<Input size={32} /></label>],
   ["Input error", <label>Email<Input size={32} error aria-invalid="true" /></label>],
+  ["Checkbox group in error", <Field group label="Notify me" error="Pick at least one."><Checkbox>Email</Checkbox><Checkbox>SMS</Checkbox></Field>],
   ["Select", <label>Plan<Select size={32}><option>Free</option></Select></label>],
   ["Field with Input", <Field label="Email" description="We never share it."><Input size={40} /></Field>],
   ["Field error", <Field label="Email" error="Invalid email." required><Input size={40} /></Field>],
