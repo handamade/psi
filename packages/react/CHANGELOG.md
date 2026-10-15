@@ -1,5 +1,45 @@
 # @handamade/psi-react
 
+## 0.24.0
+
+### Minor Changes
+
+- f020ee0: `Banner` and `InlineAlert` set the margins of the paragraphs in their body (D95). No prop changes.
+
+  - **A direct `<p>` child has no block margin.** It used to keep the browser's `1em` margin, so its first line sat 14px below the top of the icon and the alert was about 28px taller than the same message as bare text. A paragraph now starts on the icon's line, as bare text does.
+  - **Consecutive paragraphs are 8px apart** (`--psi-space-8`), so a message of several paragraphs still reads as several.
+  - Only direct `<p>` children are affected. Bare text renders exactly as before, and a `<p>` nested inside other markup keeps its own styling.
+  - If you strip the margin yourself with `psi-m-0`, you can drop it. To change the gap before one paragraph, set a margin on that paragraph: since D94 a utility or your own unlayered class beats the component rule.
+
+- a84fc5f: A button sizes the icon inside it (D97). **This changes how an icon in a `Button` renders.**
+
+  - **New tokens `--psi-button-{24,32,40,48}-icon-size`**, each half the button's height: 12, 16, 20 and 24px. They are derived from `--psi-button-{n}-height`, so a height retuned at the theme root moves the icon with it.
+  - **A direct `svg` child of a `Button` takes its size's token**, whatever the icon's own `size` prop: CSS beats the `width` and `height` an icon writes. An icon passed at the default 20 to a size-32 button now renders at 16, the size Psi's own buttons already drew. Pass icons to a `Button` without a `size`.
+  - A wrapped icon (`<span><Icon/></span>`) is not sized, just as it gets no optical inset. `IconButton` does not bind the ramp: its icon keeps its own size.
+  - `CopyButton` and `CursorPagination` follow the ramp: their icon is 16 at size 32 as before, and 12, 20 or 24 at the other sizes.
+  - `guidance.json` gains `geometry.label.iconSize` and `geometry.iconSize`.
+
+- 00f0396: A cap on the width of a button's label (D98). Off by default; no rendering changes unless you set it.
+
+  - **New token `--psi-button-label-max-width`**, default `none`. Set it on your own class, and a label wrapped in a direct `<span>` stops at that width and ends in an ellipsis: `<Button className="account"><IconUser aria-hidden="true" /><span>{name}</span></Button>` with `.account { --psi-button-label-max-width: 12rem; }`.
+  - A bare text label is not capped. Wrap it in a `<span>`, as a trailing icon already requires.
+  - The full text stays the button's accessible name. Psi adds no `title`; whether a truncated label needs a visible full form is your design.
+  - A direct `<span>` in a `Button` now has `overflow: hidden` and `flex: none`. With the cap off, it renders as before.
+
+- 5bb40f4: A menu holds a line of text that is not an action (D99), and a new `account-menu` pattern demands it.
+
+  - **New component `MenuText`**: a line such as a build identifier, inside the `role="menu"` element with no role of its own. It is in the accessibility tree as a child of the menu, never focused, never a `menuitem`, and the arrows, Home, End and typeahead skip it. It is never `aria-hidden`.
+  - **`Menu` declares `aria-describedby`.** Give a `MenuText` an `id` and pass that id to make the line the menu's description, which some screen readers speak when the menu opens. It is off by default.
+  - **New token `--psi-menu-text-fg`** = `--psi-fg-secondary`, already gated at 4.5:1 on the menu surface.
+  - **New pattern `account-menu`**: a ghost trigger with the user's name, account actions, _Sign out_, and a `MenuText` line last. 47 components, 23 patterns.
+  - In a menu's focus mode, a screen reader reaches the line by browse mode or the VoiceOver cursor. Placement was measured with axe and Chromium's accessibility tree, not with a screen reader; check it with yours.
+
+- 3de1c28: The navigation tree marks the entry the current screen sits under (D96). No prop changes.
+
+  - **A link in a `NavTree` with `aria-current="true"` now shows as current**: the current foreground colour and medium weight. Before, it looked like any other link, so a screen that sits under an entry, and is not in the tree itself, left no current mark anywhere.
+  - **The raised surface and the inline-start bar stay the marks of `aria-current="page"`**, the screen itself, so a parent and its leaf are still distinct when both are visible.
+  - `NavItem` still sets only `page`. To mark a parent, set `aria-current="true"` on the link you pass as its child. Links with no `aria-current`, or with `page`, render as before.
+
 ## 0.23.0
 
 ### Minor Changes
