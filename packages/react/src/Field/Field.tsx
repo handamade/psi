@@ -16,6 +16,9 @@ export interface FieldContextValue {
   invalid: boolean;
   /** Mirrors Field's required prop into the control. */
   required: boolean;
+  /** True in group mode (D104): the <fieldset> and <legend> already form and
+   * name the group, so a group control such as RadioGroup adds no role. */
+  group?: boolean;
 }
 
 export const FieldContext = createContext<FieldContextValue | null>(null);
@@ -110,7 +113,7 @@ export function Field({
             {labelContent}
           </label>
         ))}
-      <FieldContext.Provider value={{ id, labelId, describedBy: messageId, invalid, required }}>
+      <FieldContext.Provider value={{ id, labelId, describedBy: messageId, invalid, required, group }}>
         {children}
       </FieldContext.Provider>
       {messageId && (

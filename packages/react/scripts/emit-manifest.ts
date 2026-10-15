@@ -18,6 +18,9 @@ const COMPONENTS = [
   "Dialog",
   "Checkbox",
   "Switch",
+  "Textarea",
+  "RadioGroup",
+  "Radio",
   "Tag",
   "Toolbar",
   "Tooltip",
@@ -90,6 +93,7 @@ const PASSTHROUGH_DESCRIPTIONS: Record<string, string> = {
 // that share their parent's folder instead of getting one of their own
 // (Menu's item, separator and text live in Menu/, not in folders of their own).
 const COMPONENT_DIR: Record<string, string> = {
+  Radio: "RadioGroup",
   DescriptionItem: "DescriptionList",
   MenuItem: "Menu",
   MenuSeparator: "Menu",
