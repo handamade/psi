@@ -167,3 +167,97 @@ test("the sidebar insets its tree, so the current item's surface stops short of 
   expect(r.left).toBeGreaterThanOrEqual(8);
   expect(r.right).toBeGreaterThanOrEqual(8);
 });
+
+/** D110 — the frame's background and corner, proven in a browser: jsdom paints
+ * nothing. The defaults must paint nothing either, since a consumer that sets
+ * none of these keeps today's look. */
+const FRAME = "components-appshell--frame";
+
+const paint = (page: Page) =>
+  page.evaluate(() => {
+    const main = document.getElementById("main") as HTMLElement;
+    const root = main.parentElement as HTMLElement;
+    const css = (el: Element) => getComputedStyle(el);
+    return {
+      root: css(root).backgroundColor,
+      main: css(main).backgroundColor,
+      sidebar: css(document.getElementById("sidebar") as HTMLElement).backgroundColor,
+      header: css(document.querySelector("header") as HTMLElement).backgroundColor,
+      radius: css(main).borderStartStartRadius,
+      // The page's own canvas, resolved the way a color property resolves it.
+      canvas: (() => {
+        const probe = document.createElement("div");
+        probe.style.background = "var(--psi-bg-primary)";
+        root.parentElement?.appendChild(probe);
+        const value = css(probe).backgroundColor;
+        probe.remove();
+        return value;
+      })(),
+    };
+  });
+
+const heights = (page: Page) =>
+  page.locator("header").evaluate((el) => {
+    const row = el.firstElementChild as HTMLElement;
+    return { bar: el.getBoundingClientRect().height, row: row.getBoundingClientRect().height };
+  });
+
+for (const id of [SHELL, "components-appshell--sidebar-closed"]) {
+  test(`${id} paints no frame and no corner by default @interaction`, async ({ page }) => {
+    await page.goto(story(id), { waitUntil: "networkidle" });
+    const p = await paint(page);
+    expect(p.root).toBe("rgba(0, 0, 0, 0)");
+    expect(p.main).toBe("rgba(0, 0, 0, 0)");
+    expect(p.radius).toBe("0px");
+  });
+}
+
+test("the default bar is its height token plus a 1px line @interaction", async ({ page }) => {
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const { bar, row } = await heights(page);
+  expect(bar).toBe(row + 1);
+});
+
+for (const theme of ["light", "ember"]) {
+  test(`the frame paints one colour behind the corner, and the surface beside it, in ${theme} @interaction`, async ({ page }) => {
+    await page.goto(`/iframe.html?id=${FRAME}&globals=theme:${theme}`, { waitUntil: "networkidle" });
+    const p = await paint(page);
+    // A wedge shows if the root's colour drifts from the sub-theme's canvas.
+    expect(p.root).not.toBe("rgba(0, 0, 0, 0)");
+    expect(p.sidebar).toBe(p.root);
+    expect(p.header).toBe(p.root);
+    expect(p.main).toBe(p.canvas);
+    expect(p.main).not.toBe(p.root);
+    expect(p.radius).toBe("12px");
+  });
+}
+
+test("with its line at width 0, the frame's bar is exactly its height token @interaction", async ({ page }) => {
+  await page.goto(story(FRAME), { waitUntil: "networkidle" });
+  const { bar, row } = await heights(page);
+  expect(bar).toBe(row);
+});
+
+test("the frame's corner squares when the sidebar closes, and comes back @interaction", async ({ page }) => {
+  await page.goto(story(FRAME), { waitUntil: "networkidle" });
+  const menu = page.getByRole("button", { name: "Menu" });
+  await menu.click();
+  expect((await paint(page)).radius).toBe("0px");
+  await menu.click();
+  expect((await paint(page)).radius).toBe("12px");
+});
+
+test("focused by the skip link, the frame's main draws the shared ring with its corner in place @interaction", async ({ page }) => {
+  await page.goto(story(FRAME), { waitUntil: "networkidle" });
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
+  const at = await focused(page);
+  expect(at.tag).toBe("MAIN");
+  const ring = await page.locator("main#main").evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return { style: cs.outlineStyle, offset: parseFloat(cs.outlineOffset), radius: cs.borderStartStartRadius };
+  });
+  expect(ring.style).toBe("solid");
+  expect(ring.offset).toBeLessThan(0);
+  expect(ring.radius).toBe("12px");
+});

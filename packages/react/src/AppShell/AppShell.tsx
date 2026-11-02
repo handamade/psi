@@ -49,7 +49,16 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
  * tall, so anything around it makes the document scroll and slides the frame.
  *
  * Do not place a `ToastRegion` at `top-start` in an app with a skip link: the
- * native top layer paints over the focused link. */
+ * native top layer paints over the focused link.
+ *
+ * A theme can make `main` a surface beside a one-colour header and sidebar, with
+ * no CSS of the consumer's (D110): `--psi-app-shell-bg`, which must equal the
+ * canvas of the theme on the header and the sidebar, `--psi-app-shell-main-bg`
+ * and `--psi-app-shell-main-radius`. All three paint nothing by default. The
+ * corner is square unless a header and a sidebar both meet `main`. Put the
+ * header under that theme with `data-psi-theme` on the `NavBar`, whose rest
+ * props land on its `<header>`, and remove its line with
+ * `--psi-navbar-border-width: 0`. */
 export function AppShell({
   skipLink,
   header,
@@ -66,6 +75,8 @@ export function AppShell({
   // No sidebar content is the same layout as a closed one: no empty column.
   const showSidebar = sidebarOpen && sidebar != null;
   const cls = [styles.appShell, !showSidebar && styles.sidebarClosed, className].filter(Boolean).join(" ");
+  // The rounded corner needs both a header and a sidebar beside it (D110).
+  const mainCls = [styles.main, (!showSidebar || header == null) && styles.mainSquare].filter(Boolean).join(" ");
   return (
     <div ref={ref} className={cls} {...rest}>
       {skipLink}
@@ -73,7 +84,7 @@ export function AppShell({
       <div id={sidebarId} className={styles.sidebar} hidden={!showSidebar} data-psi-theme={sidebarTheme}>
         {sidebar}
       </div>
-      <main id={mainId} className={styles.main} tabIndex={-1}>
+      <main id={mainId} className={mainCls} tabIndex={-1}>
         {children}
       </main>
     </div>
