@@ -79,5 +79,12 @@ stories' `actions`.
   stories with plain text under a sub-theme, and they differ by that text's colour.
   Both builds held the text, so the comparison isolates the fix. Against `main`'s
   committed baselines the 4 also gain the text.
+- **CI's first `vr` run on #150** (41539404975): 886 passed, 8 failed. 4 are those
+  renders, differing only inside the text's box, and their baselines are that run's
+  `-actual.png`, looked at before committing. The other 4 were not predicted:
+  `icons-gallery--all-sizes` and `icons-gallery--size-20` in light and ember, 1 pixel
+  over the threshold each, on the anti-aliased edge of `IconSettings`. This branch
+  does not reach that icon, `main` passed the same baselines at `29bbc1b`, and they
+  are byte-identical locally, so those baselines stay as they are.
 - **Local gates:** build, docs drift (52 components, 24 patterns), `pnpm test` (119
   files, 2652 tests), lint, promo build, `test:site` (9) and `test:e2e` (470).
