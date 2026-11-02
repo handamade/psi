@@ -193,14 +193,12 @@ inline styles on the `AppShell` stories standing in for the tokens.
   height plus 1px.
 - **No baseline moves.** Every story in the 0.27.0 build, 204 stories and 420
   renders across the VR matrix, was rendered from both builds at VR's viewport and
-  settle and compared byte for byte: 420 identical, 0 differing. This ran in
-  Chromium on macOS, not CI's Linux render, so it shows the two builds agree. CI's
-  `vr` remains the gate.
+  settle and compared byte for byte: 420 identical, 0 differing, in Chromium on
+  macOS. CI then agreed on its Linux render: the first `vr` run on #149 passed 887
+  screenshots and failed only the 4 new ones, each for a missing snapshot.
 - **New baselines: 4**, `components-appshell--frame` and
-  `components-appshell--frame-sidebar-closed` in light and ember. They are not
-  committed. CI's first `vr` run should fail on exactly these four, and its renders
-  are the files to commit. A local render is not one: the README allows generating
-  only on Linux, and the Playwright Docker image has measured as a poor match for CI.
+  `components-appshell--frame-sidebar-closed` in light and ember. They are the
+  `-actual.png` renders from that CI run (41511641786), looked at before committing.
 - **Local gates:** build, docs drift (52 components, 24 patterns), `pnpm test` (119
   files, 2649 tests), lint, promo build, `test:site` (9), and `test:e2e` (467,
   including the focus-ring sweep over the new stories).
