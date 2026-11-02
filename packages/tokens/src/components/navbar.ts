@@ -5,6 +5,9 @@ export const navbarVars: Record<string, string> = {
   bg: "var(--psi-scrim-heavy)",
   blur: "12px",
   border: "var(--psi-border-faint)",
+  // D110 — 0 removes the line and its pixel, so the bar is exactly `height`. A
+  // transparent border hides the line and keeps the pixel.
+  "border-width": "1px",
   "link-fg": "var(--psi-fg-secondary)",
   "link-fg-hover": "var(--psi-fg-primary)",
   "focus-ring": "var(--psi-border-focus)",

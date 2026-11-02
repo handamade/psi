@@ -6,7 +6,7 @@
   background: var(--psi-navbar-bg);
   backdrop-filter: blur(var(--psi-navbar-blur));
   -webkit-backdrop-filter: blur(var(--psi-navbar-blur));
-  border-bottom: 1px solid var(--psi-navbar-border);
+  border-bottom: var(--psi-navbar-border-width) solid var(--psi-navbar-border);
 }
 
 .inner {

@@ -1,4 +1,6 @@
 import { createRef } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AppShell } from "./AppShell.js";
@@ -85,5 +87,42 @@ describe("AppShell (D88)", () => {
       </AppShell>,
     );
     expect(screen.getByRole("main")).toHaveTextContent("Only content");
+  });
+});
+
+describe("AppShell's frame tokens (D110)", () => {
+  // jsdom does no layout and no paint, so these read the rules; what they paint
+  // is measured in a browser by apps/storybook/vr/app-shell.interaction.spec.ts.
+  const css = readFileSync(join(import.meta.dirname, "app-shell.module.css"), "utf8");
+  const rule = (selector: string) => new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+
+  it("the root paints --psi-app-shell-bg", () => {
+    expect(rule(".appShell")).toContain("background: var(--psi-app-shell-bg);");
+  });
+
+  it("main paints --psi-app-shell-main-bg and rounds its top-start corner with --psi-app-shell-main-radius", () => {
+    const main = rule(".main");
+    expect(main).toContain("background: var(--psi-app-shell-main-bg);");
+    expect(main).toContain("border-start-start-radius: var(--psi-app-shell-main-radius);");
+  });
+
+  it("the corner is square where a header and a sidebar do not both meet main", () => {
+    expect(rule(".mainSquare")).toContain("border-start-start-radius: 0;");
+    const square = () => screen.getByRole("main").className;
+
+    const { unmount } = render(<Shell />);
+    expect(square()).not.toMatch(/mainSquare/);
+    unmount();
+
+    const closed = render(<Shell sidebarOpen={false} />);
+    expect(square()).toMatch(/mainSquare/);
+    closed.unmount();
+
+    const noHeader = render(<Shell header={undefined} />);
+    expect(square()).toMatch(/mainSquare/);
+    noHeader.unmount();
+
+    render(<Shell sidebar={undefined} />);
+    expect(square()).toMatch(/mainSquare/);
   });
 });
