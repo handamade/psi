@@ -1,4 +1,4 @@
-# `NavBar` sets its own text colour (D111)
+# `NavBar` sets its own text colour (D111), and the CI image (D112)
 
 Date: 2026-11-02. Status: **Implemented** on branch `fix/navbar-text-colour`.
 
@@ -85,6 +85,43 @@ stories' `actions`.
   `icons-gallery--all-sizes` and `icons-gallery--size-20` in light and ember, 1 pixel
   over the threshold each, on the anti-aliased edge of `IconSettings`. This branch
   does not reach that icon, `main` passed the same baselines at `29bbc1b`, and they
-  are byte-identical locally, so those baselines stay as they are.
+  are byte-identical locally, so those baselines stay as they are. D112 is the cause.
+
+## The CI image (D112)
+
+Found by #150's `vr`, and landed with it because that PR cannot pass without it.
+
+`ubuntu-latest` moved from Ubuntu 24.04 to 26.04 on 2026-11-02, read from each run's
+*Set up job* log:
+
+| Run | Head | Started (UTC) | Image | `vr` |
+| --- | --- | --- | --- | --- |
+| 41513921243 | #149, `3287438` | 19:52 | `ubuntu-24.04` | pass |
+| 41518489796 | `main`, `29bbc1b` | 20:21 | `ubuntu-24.04` | pass |
+| 41539404975 | #150, `7b87ab5` | 22:41 | `ubuntu-26.04` | 4 icon renders fail |
+| 41541717865 | #150, `3549b6e` | 22:58 | `ubuntu-26.04` | the same 4 fail |
+
+The 4 renders from the two 26.04 runs are byte-identical, so this is no flake: the
+image draws `IconSettings`' edge differently. Every other render passes on 26.04.
+Chromium is the same build on both, `chromium v1228`, so the difference comes from
+the system beneath it. Which library was not measured.
+
+- **D112 — The `ci` job runs on `ubuntu-24.04`, not `ubuntu-latest`.** `vr` allows 0
+  differing pixels (D89), so its baselines belong to one image, and a label that
+  moves on GitHub's schedule fails every open PR and `main` on a day nothing in this
+  repository changed.
+  - **No baseline moves.** The committed ones are already this image's renders, apart
+    from the 4 `Frame` renders above, which the pinned run checks.
+  - **Moving to 26.04 is its own change:** the label and the 4 icon baselines in one
+    PR, when this image nears retirement.
+
+  Weighed and not taken:
+
+  - **Refreshing the 4 icon baselines from 26.04, and staying on `ubuntu-latest`.** It
+    costs no config, and leaves `vr` red on any run that lands on 24.04 while the label
+    is moving. GitHub has rolled such moves out gradually, and a run's image cannot be
+    chosen under that label. The next move would fail again unannounced.
+  - **A pixel allowance for these renders.** D89 removed one after it hid a real
+    change for three days.
 - **Local gates:** build, docs drift (52 components, 24 patterns), `pnpm test` (119
   files, 2652 tests), lint, promo build, `test:site` (9) and `test:e2e` (470).
