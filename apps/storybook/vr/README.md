@@ -42,7 +42,10 @@ Two masking layers let real regressions through the old config
 Same-environment re-renders are deterministic: measured 0 diff pixels across
 all stories at threshold 0. The cost of the strict config: when the CI runner
 image updates its font stack, expect a mass baseline refresh (the documented
-workflow below) rather than silent absorption — that trade is deliberate.
+workflow below) rather than silent absorption — that trade is deliberate. The
+`ci` job is pinned to `ubuntu-24.04` for this reason (D112): when `ubuntu-latest`
+moved to 26.04, 4 icon renders failed on a day nothing in the repo had changed.
+Moving the image is its own PR, with the label and the baselines together.
 
 ### Why the budget is 0 (D89)
 

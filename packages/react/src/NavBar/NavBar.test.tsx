@@ -100,3 +100,12 @@ describe("D110", () => {
     expect(css).toContain("border-bottom: var(--psi-navbar-border-width) solid var(--psi-navbar-border);");
   });
 });
+
+describe("D111", () => {
+  it("sets its own text colour, so plain text does not inherit the page's", () => {
+    // jsdom resolves no custom properties, so this reads the rule; the colour is
+    // measured under a sub-theme by apps/storybook/vr/app-shell.interaction.spec.ts.
+    const css = readFileSync(join(import.meta.dirname, "navbar.module.css"), "utf8");
+    expect(css).toContain("color: var(--psi-navbar-fg);");
+  });
+});

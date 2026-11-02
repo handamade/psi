@@ -35,10 +35,12 @@ function Demo({
   initialOpen,
   shellStyle,
   headerProps,
+  headerText,
 }: {
   initialOpen: boolean;
   shellStyle?: CSSProperties;
   headerProps?: HTMLAttributes<HTMLElement> & { "data-psi-theme"?: string };
+  headerText?: string;
 }) {
   const [open, setOpen] = useState(initialOpen);
   const [reports, setReports] = useState(true);
@@ -68,9 +70,12 @@ function Demo({
             </>
           }
           actions={
-            <Button variant="neutral" size={32}>
-              Account
-            </Button>
+            <>
+              {headerText && <span>{headerText}</span>}
+              <Button variant="neutral" size={32}>
+                Account
+              </Button>
+            </>
           }
         />
       }
@@ -138,13 +143,18 @@ const frameHeader = {
 };
 
 /** One dark theme over the header and the sidebar, with no line between them,
- * and `main` a surface with a rounded top-start corner beside them. */
+ * and `main` a surface with a rounded top-start corner beside them. Plain text in
+ * the header takes the dark theme's foreground, not the page's (D111). */
 export const Frame: Story = {
-  render: () => <Demo initialOpen shellStyle={frameStyle} headerProps={frameHeader} />,
+  render: () => (
+    <Demo initialOpen shellStyle={frameStyle} headerProps={frameHeader} headerText="Signed in as Ada" />
+  ),
 };
 
 /** With the sidebar closed the corner squares: it would be a notch against the
  * viewport's edge. */
 export const FrameSidebarClosed: Story = {
-  render: () => <Demo initialOpen={false} shellStyle={frameStyle} headerProps={frameHeader} />,
+  render: () => (
+    <Demo initialOpen={false} shellStyle={frameStyle} headerProps={frameHeader} headerText="Signed in as Ada" />
+  ),
 };

@@ -238,6 +238,37 @@ test("with its line at width 0, the frame's bar is exactly its height token @int
   expect(bar).toBe(row);
 });
 
+// D111 — colour inherits as a resolved value, so without a colour of its own the
+// bar's text keeps the page's, whatever theme the bar is under.
+for (const theme of ["light", "ember"]) {
+  test(`plain text in a themed bar takes the bar's foreground, not the page's, in ${theme} @interaction`, async ({ page }) => {
+    await page.goto(`/iframe.html?id=${FRAME}&globals=theme:${theme}`, { waitUntil: "networkidle" });
+    const colours = await page.getByText("Signed in as Ada").evaluate((el) => {
+      const probe = (parent: Element) => {
+        const p = document.createElement("span");
+        p.style.color = "var(--psi-fg-primary)";
+        parent.appendChild(p);
+        const value = getComputedStyle(p).color;
+        p.remove();
+        return value;
+      };
+      return {
+        text: getComputedStyle(el).color,
+        bar: probe(el.closest("header") as Element),
+        page: getComputedStyle(document.body).color,
+      };
+    });
+    expect(colours.bar).not.toBe(colours.page);
+    expect(colours.text).toBe(colours.bar);
+  });
+}
+
+test("--psi-navbar-fg on the bar sets its plain text @interaction", async ({ page }) => {
+  await page.goto(story(FRAME), { waitUntil: "networkidle" });
+  await page.locator("header").evaluate((el: HTMLElement) => el.style.setProperty("--psi-navbar-fg", "rgb(1, 2, 3)"));
+  await expect(page.getByText("Signed in as Ada")).toHaveCSS("color", "rgb(1, 2, 3)");
+});
+
 test("the frame's corner squares when the sidebar closes, and comes back @interaction", async ({ page }) => {
   await page.goto(story(FRAME), { waitUntil: "networkidle" });
   const menu = page.getByRole("button", { name: "Menu" });
