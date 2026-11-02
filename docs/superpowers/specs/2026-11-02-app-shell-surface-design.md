@@ -157,6 +157,8 @@ inline styles on the `AppShell` stories standing in for the tokens.
   theme file holds its own and owns that.
 - `ember` shows the frame only faintly: its canvas (`#0c0a09`) is close to
   `dark`'s (`#080c0f`). The light theme carries the story's point.
+- Plain text in a header under `data-psi-theme` kept the page's colour, and the
+  `Frame` stories held none to show it. D111 fixes that with `--psi-navbar-fg`.
 
 ## Verification
 

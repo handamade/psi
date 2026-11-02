@@ -31,3 +31,15 @@ describe("navbar border width (D110)", () => {
     expect(componentVars.navbar["border-width"]).toBe("1px");
   });
 });
+
+describe("navbar text colour (D111)", () => {
+  it("aliases the semantic layer, so it re-resolves under a data-psi-theme on the bar", () => {
+    expect(componentVars.navbar.fg).toBe("var(--psi-fg-primary)");
+  });
+
+  it("the scope gate refuses a surface token on navbar-fg", () => {
+    const violations = checkOverrideScopes({ "navbar-fg": "var(--psi-bg-primary)" }, componentVars, lightTheme);
+    expect(violations).toHaveLength(1);
+    expect(violations[0].token).toBe("bgPrimary");
+  });
+});

@@ -21,7 +21,9 @@ export interface NavBarProps extends HTMLAttributes<HTMLElement> {
   ref?: Ref<HTMLElement>;
 }
 
-/** Top navigation bar with brand, nav-link, and trailing-action slots. */
+/** Top navigation bar with brand, nav-link, and trailing-action slots. Plain text
+ * in a slot takes `--psi-navbar-fg`, the foreground of the theme on the bar, so
+ * `data-psi-theme` on the `NavBar` reaches it (D111). */
 export function NavBar({ brand, actions, children, navLabel, fluid = false, className, ref, ...rest }: NavBarProps) {
   const cls = [styles.navbar, className].filter(Boolean).join(" ");
   const hasLinks = Children.toArray(children).length > 0;
