@@ -77,7 +77,7 @@ Ranked by benchmark frequency, then by how much each unblocks:
 6. **Disclosure/Accordion** — already scoped in D98/D99; ship with the portal's next ask.
 7. **Segmented control, Combobox, Date picker, Slider** — larger; each needs its own spec.
 
-This conflicts with one stated deviation: *"Component breadth is product-driven (portal handoffs), not benchmark-driven."* The order above is benchmark-driven. Before any of it becomes a spec, read `~/Projects/dku/psi-handoffs/` and reorder by what the portal actually asked for. Benchmark frequency measures what is common; it does not measure what VEGA.OTA needs.
+This conflicts with one stated deviation: *"Component breadth is product-driven (portal handoffs), not benchmark-driven."* The order above is benchmark-driven. Before any of it becomes a spec, read `~/Projects/dku/psi-handoffs/` and reorder by what the portal actually asked for. Benchmark frequency measures what is common; it does not measure what the portal needs.
 
 ## Not checked
 

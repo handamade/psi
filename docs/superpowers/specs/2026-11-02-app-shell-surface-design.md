@@ -4,7 +4,7 @@ Date: 2026-11-02. Status: **Implemented** on branch
 `claude/app-shell-surface-tokens-43fcf2`.
 
 Provenance: the Web Portal's review of a Figma option for its app frame
-(*AppShell (option)*, `vega`, node 246:1262). The header and the sidebar share
+(*AppShell (option)*, node 246:1262). The header and the sidebar share
 one colour with no line between them, and the main region is a surface with a
 rounded top-start corner. The hand-off is
 `psi-handoffs/2026-11-02-psi-app-shell-surface-handoff.md`, outside this
