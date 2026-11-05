@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { NavBar } from "./NavBar.js";
@@ -87,5 +89,23 @@ describe("D88", () => {
       </NavBar>,
     );
     expect(screen.getByTestId("bar").tagName).toBe("HEADER");
+  });
+});
+
+describe("D110", () => {
+  it("draws its line at --psi-navbar-border-width", () => {
+    // jsdom does no layout, so this reads the rule; the bar's height is measured
+    // in a browser by apps/storybook/vr/app-shell.interaction.spec.ts.
+    const css = readFileSync(join(import.meta.dirname, "navbar.module.css"), "utf8");
+    expect(css).toContain("border-bottom: var(--psi-navbar-border-width) solid var(--psi-navbar-border);");
+  });
+});
+
+describe("D111", () => {
+  it("sets its own text colour, so plain text does not inherit the page's", () => {
+    // jsdom resolves no custom properties, so this reads the rule; the colour is
+    // measured under a sub-theme by apps/storybook/vr/app-shell.interaction.spec.ts.
+    const css = readFileSync(join(import.meta.dirname, "navbar.module.css"), "utf8");
+    expect(css).toContain("color: var(--psi-navbar-fg);");
   });
 });

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
 import type { Meta, StoryObj } from "storybook";
 import { AppShell } from "./AppShell.js";
 import { SkipLink } from "../SkipLink/SkipLink.js";
@@ -30,7 +31,17 @@ type Story = StoryObj<typeof AppShell>;
 /** The Menu toggle, the groups and the open state are the story's: AppShell
  * and NavGroup are controlled. Links use `#` fragments so a click never
  * leaves the story. */
-function Demo({ initialOpen }: { initialOpen: boolean }) {
+function Demo({
+  initialOpen,
+  shellStyle,
+  headerProps,
+  headerText,
+}: {
+  initialOpen: boolean;
+  shellStyle?: CSSProperties;
+  headerProps?: HTMLAttributes<HTMLElement> & { "data-psi-theme"?: string };
+  headerText?: string;
+}) {
   const [open, setOpen] = useState(initialOpen);
   const [reports, setReports] = useState(true);
   const [settings, setSettings] = useState(false);
@@ -38,10 +49,12 @@ function Demo({ initialOpen }: { initialOpen: boolean }) {
     <AppShell
       sidebarOpen={open}
       sidebarTheme="dark"
+      style={shellStyle}
       skipLink={<SkipLink href="#main">Skip to content</SkipLink>}
       header={
         <NavBar
           fluid
+          {...headerProps}
           brand={
             <>
               <Button
@@ -57,9 +70,12 @@ function Demo({ initialOpen }: { initialOpen: boolean }) {
             </>
           }
           actions={
-            <Button variant="neutral" size={32}>
-              Account
-            </Button>
+            <>
+              {headerText && <span>{headerText}</span>}
+              <Button variant="neutral" size={32}>
+                Account
+              </Button>
+            </>
           }
         />
       }
@@ -108,3 +124,37 @@ export const Default: Story = { render: () => <Demo initialOpen /> };
 /** Closed: the sidebar is `hidden`, not narrowed; `main` takes the full width
  * and the Menu toggle reads `aria-expanded="false"`. */
 export const SidebarClosed: Story = { render: () => <Demo initialOpen={false} /> };
+
+/** D110 — what a theme file sets, written inline so the story shows it. The
+ * root's colour is the `dark` theme's `bgPrimary`: no `var()` reaches a sub-theme
+ * from the page's scope. app-shell.interaction.spec.ts fails if the two drift. */
+const frameStyle = {
+  "--psi-app-shell-bg": "oklch(0.15 0.01 250)",
+  "--psi-app-shell-main-bg": "var(--psi-bg-primary)",
+  "--psi-app-shell-main-radius": "var(--psi-radius-12)",
+} as CSSProperties;
+
+const frameHeader = {
+  "data-psi-theme": "dark",
+  style: {
+    "--psi-navbar-bg": "var(--psi-bg-primary)",
+    "--psi-navbar-border-width": "0",
+  } as CSSProperties,
+};
+
+/** One dark theme over the header and the sidebar, with no line between them,
+ * and `main` a surface with a rounded top-start corner beside them. Plain text in
+ * the header takes the dark theme's foreground, not the page's (D111). */
+export const Frame: Story = {
+  render: () => (
+    <Demo initialOpen shellStyle={frameStyle} headerProps={frameHeader} headerText="Signed in as Ada" />
+  ),
+};
+
+/** With the sidebar closed the corner squares: it would be a notch against the
+ * viewport's edge. */
+export const FrameSidebarClosed: Story = {
+  render: () => (
+    <Demo initialOpen={false} shellStyle={frameStyle} headerProps={frameHeader} headerText="Signed in as Ada" />
+  ),
+};

@@ -1,12 +1,15 @@
 .navbar {
   font: var(--psi-text-14-20-medium);
+  /* D111: without this, text in the bar keeps the page's resolved colour, even
+     under a data-psi-theme on the bar. */
+  color: var(--psi-navbar-fg);
   position: sticky;
   top: 0;
   z-index: var(--psi-z-nav);
   background: var(--psi-navbar-bg);
   backdrop-filter: blur(var(--psi-navbar-blur));
   -webkit-backdrop-filter: blur(var(--psi-navbar-blur));
-  border-bottom: 1px solid var(--psi-navbar-border);
+  border-bottom: var(--psi-navbar-border-width) solid var(--psi-navbar-border);
 }
 
 .inner {

@@ -12,6 +12,8 @@
   grid-template-rows: auto 1fr;
   grid-template-columns: var(--psi-app-shell-sidebar-width) minmax(0, 1fr);
   height: 100dvh;
+  /* D110: shows only behind main's rounded corner. */
+  background: var(--psi-app-shell-bg);
 }
 
 /* A closed sidebar is hidden, not narrowed: one column, and main takes it. */
@@ -47,6 +49,16 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
+  /* D110: the corner sits here because main is the scroller: on a wrapper inside
+     it the corner would scroll away. overflow clips scrolled content to it. */
+  background: var(--psi-app-shell-main-bg);
+  border-start-start-radius: var(--psi-app-shell-main-radius);
+}
+
+/* The corner marks where the header and the sidebar meet main. With either one
+   gone it would be a notch against the viewport's edge (D110). */
+.mainSquare {
+  border-start-start-radius: 0;
 }
 
 /* Focused by the skip link, main draws the shared ring (psi/focus-ring forbids

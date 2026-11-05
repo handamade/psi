@@ -11,7 +11,9 @@ concurrency:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    # D112: vr's baselines are renders of this image and allow 0 differing pixels,
+    # so the image moves on purpose, with a baseline refresh, never by itself.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
