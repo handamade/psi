@@ -22,7 +22,7 @@ stories' `actions`.
    | `light` | `oklch(0.3 0.03 250)`, dark on a dark bar | `oklch(0.93 0.01 250)` |
    | `ember` | `oklch(0.949 0.011 72)`, readable by chance | `oklch(0.93 0.01 250)` |
 
-   The Portal measured a plain `<span>` under `vega-night`: Ink `rgb(35,31,32)` on
+   The Portal measured a plain `<span>` under its dark theme: Ink `rgb(35,31,32)` on
    Night `rgb(15,21,38)`, 1.11:1.
 2. **Only plain text is affected.** `Button` and the anchors in `brand` and the
    links set their own colours. `.sidebar` sets
