@@ -39,7 +39,7 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 
 ## Branches and releases
 
-- **Branch names, three cases.** Linear issue exists → use Linear's generated name (`dkurkin/han-44-…`), which auto-links the PR to the issue. Decision work with no issue → `d56-control-radius`. Anything else → `fix/`, `docs/`, `chore/`.
+- **Branch names, two cases.** Decision work → `d56-control-radius`. Anything else → `fix/`, `docs/`, `chore/`. Psi no longer tracks work in Linear: `HAN-…` references and `han-…` branch names in older commits and docs point at a retired project.
 - **One branch, one PR, then delete it.** Squash-merge is the repo default, so a merged branch's commits never appear on `main` by hash — `git branch --merged` will not list them. **Before deleting, fetch, then scope the diff to the files the branch touched, against `origin/main`:**
 
   ```bash
