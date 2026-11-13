@@ -131,6 +131,11 @@ same token file, stylesheet and stories, so the baselines are refreshed once.
     the sidebar element. Under `sidebarTheme="dark"` it is the dark theme's
     faint border. A line is for a sidebar that shares the page's background;
     a sidebar in another theme is already set apart.
+  - **Under `sidebarTheme`, the width must come from that theme.** Component
+    tokens are declared under `:where(:root, [data-psi-theme])`, so a themed
+    sidebar declares the default `0` on itself, and a width set on the shell's
+    root does not reach it. A theme's `componentOverrides` does. The
+    `SidebarLine` story leaves the sidebar on the page's theme.
   - **Logical, so it mirrors.** `border-inline-end` is on the right in
     left-to-right and on the left in right-to-left.
   - **A closed sidebar is `hidden`**, so its line goes with it.
