@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-11-13",
     tag: "release",
+    title: "0.29.0 — a frame that pads its page",
+    body: "AppShell now pads the page inside it by 24px, from two new tokens, --psi-app-shell-main-padding-inline and --psi-app-shell-main-padding-block. If your page already pads itself, or is meant to fill the main region edge to edge, set both to 0. A new banner prop takes one page-level Banner or several. It renders inside main before the page, edge to edge, and scrolls with it, and the page starts below a banner exactly as it starts below the header without one. A value that renders nothing takes no space. A sidebar that shares the page's background can now be set apart by a line: --psi-app-shell-sidebar-border-width is 0 by default, and 1px draws it on the sidebar's inline-end edge in --psi-app-shell-sidebar-border. The banner is also a slot in the composition contract, so a pattern can fill it.",
+  },
+  {
+    date: "2026-11-13",
+    tag: "release",
     title: "0.28.0 — a frame with a rounded surface",
     body: "An app frame where the header and the sidebar share one colour and the main region is a surface with a rounded corner, with no CSS of your own. Three new AppShell tokens do it: --psi-app-shell-bg paints the shell's root, --psi-app-shell-main-bg paints the main region, and --psi-app-shell-main-radius rounds its top-start corner. They paint nothing by default, so a shell that sets none looks as it did. The corner stays square unless a header and a sidebar both meet the main region, so a closed sidebar leaves no notch at the viewport's edge. --psi-navbar-border-width removes the bar's line and its pixel: at 0, a 56px bar measures 56px. NavBar now sets its own text colour from --psi-navbar-fg, so plain text in a header under its own theme can be read. It used to keep the page's colour, which measured 1.11:1 as dark text on a dark bar. If an ancestor of your NavBar sets a colour other than --psi-fg-primary, set --psi-navbar-fg to keep it.",
   },
