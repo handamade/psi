@@ -53,12 +53,31 @@
      it the corner would scroll away. overflow clips scrolled content to it. */
   background: var(--psi-app-shell-main-bg);
   border-start-start-radius: var(--psi-app-shell-main-radius);
+  /* D113: the page's padding. On main itself, not on a wrapper, so the page
+     stays main's direct child and a consumer's layout keeps its shape. */
+  padding-block: var(--psi-app-shell-main-padding-block);
+  padding-inline: var(--psi-app-shell-main-padding-inline);
 }
 
 /* The corner marks where the header and the sidebar meet main. With either one
    gone it would be a notch against the viewport's edge (D110). */
 .mainSquare {
   border-start-start-radius: 0;
+}
+
+/* D113: a page banner sits edge to edge. The negative margins cancel main's
+   padding on three sides, and the block-end margin puts it back below, so the
+   page starts where it would without a banner. overflow on main clips the
+   banner to D110's corner. */
+.banner {
+  margin-block: calc(var(--psi-app-shell-main-padding-block) * -1) var(--psi-app-shell-main-padding-block);
+  margin-inline: calc(var(--psi-app-shell-main-padding-inline) * -1);
+}
+
+/* `banner={stale && <Banner/>}` renders nothing when false. Without this an
+   empty wrapper would add the block padding a second time. */
+.banner:empty {
+  display: none;
 }
 
 /* Focused by the skip link, main draws the shared ring (psi/focus-ring forbids
