@@ -68,8 +68,9 @@ same token file, stylesheet and stories, so the baselines are refreshed once.
 
     ```css
     .banner {
-      margin-block: calc(var(--psi-app-shell-main-padding-block) * -1) var(--psi-app-shell-main-padding-block);
+      margin-block-start: calc(var(--psi-app-shell-main-padding-block) * -1);
       margin-inline: calc(var(--psi-app-shell-main-padding-inline) * -1);
+      padding-block-end: var(--psi-app-shell-main-padding-block);
     }
     .banner:empty {
       display: none;
@@ -80,18 +81,18 @@ same token file, stylesheet and stories, so the baselines are refreshed once.
       sides, so the banner reaches the sidebar, the far edge and the top of
       `<main>`. This is what the `page-banner` pattern's "full-width" means.
     - **No gap token.** The space below the banner is the block padding, which
-      the margin puts back. Every screen gets the same space with nothing to
-      set.
-    - **That space is a margin, so it collapses with the page's first child.**
-      A heading with a top margin of its own starts one block padding below the
-      banner, not that plus its margin: the gap is the larger of the two.
-      Without a banner the two add up, because padding does not collapse. A
-      page therefore sits a little closer under a banner than under the header.
-      This is the behaviour chosen, and the browser test measures the gap
-      itself.
+      the wrapper puts back as its own block-end padding. Every screen gets the
+      same space with nothing to set.
+    - **That space is padding, not a margin, so it does not collapse.** The
+      page starts below a banner exactly as it starts below the header without
+      one: one block padding down, plus the top margin of its own first child.
+      A first version put the space back as a margin, which collapsed with a
+      heading's margin and set the page closer under a banner than under the
+      header. The renders showed the difference, and the user chose the two to
+      match. The browser test compares the two distances.
     - **`0` without a unit works.** `calc(0 * -1)` is a number, not a length,
-      so the margin is invalid at computed-value time and falls back to its
-      initial `0`, which is the right answer.
+      so each negative margin is invalid at computed-value time and falls back
+      to its initial `0`, which is the right answer.
     - **It scrolls with the page.** The banner is the first thing in the
       scroller and leaves the view as the user scrolls. Pinning it would let
       content scroll under it, and the shell exists so that a focused element
@@ -102,9 +103,9 @@ same token file, stylesheet and stories, so the baselines are refreshed once.
     - **A banner that renders nothing takes no space.** A consumer writes
       `banner={stale && <Banner …/>}`. The wrapper is rendered whenever the
       prop is neither `null` nor `undefined`, and `:empty` removes it from the
-      layout when React renders nothing inside. An empty wrapper's two
-      margins cancel, but they collapse through it and swallow up to one block
-      padding of the first child's own top margin, which pulls the page up.
+      layout when React renders nothing inside. An empty wrapper's negative
+      margin and its padding cancel, so it would add nothing; the rule keeps
+      that from resting on the arithmetic.
     - **In the accessibility tree** the banner is inside `<main>`, before the
       page, and its action is a tab stop at that place. `Banner` is not a live
       region (D86), so showing one announces nothing; that stays the

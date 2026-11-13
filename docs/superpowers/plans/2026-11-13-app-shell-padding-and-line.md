@@ -808,7 +808,7 @@ Playwright shortens long story names in `test-results/`. Tell the preset's two `
 Open each one. Check:
 
 - the preset: the page text is inset from the sidebar and from the header by 24px, and nothing else moved;
-- `with-banner`: the banner touches the sidebar, the far edge and the header; the heading is inset 24px and starts 24px below the banner: its own top margin collapses into the banner's bottom margin;
+- `with-banner`: the banner touches the sidebar, the far edge and the header; the heading is inset 24px and starts as far below the banner as the `sidebar-line` story's heading starts below the header: 24px plus its own top margin;
 - `sidebar-line`: the sidebar has the page's background and a 1px line on its right edge, full height.
 
 - [ ] **Step 7: Commit the baselines**
