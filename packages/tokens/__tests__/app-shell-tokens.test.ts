@@ -26,6 +26,46 @@ describe("app-shell tokens (D110)", () => {
   });
 });
 
+describe("app-shell main padding (D113)", () => {
+  it("pads the page by 24px on both axes by default", () => {
+    expect(componentVars["app-shell"]["main-padding-inline"]).toBe("var(--psi-space-24)");
+    expect(componentVars["app-shell"]["main-padding-block"]).toBe("var(--psi-space-24)");
+  });
+
+  it("a theme may set either from the space scale, or remove it", () => {
+    const overrides = {
+      "app-shell-main-padding-inline": "var(--psi-space-16)",
+      "app-shell-main-padding-block": "0",
+    };
+    expect(checkOverrideScopes(overrides, componentVars, lightTheme)).toEqual([]);
+  });
+});
+
+describe("app-shell sidebar line (D114)", () => {
+  it("is off by default: a faint colour at width 0", () => {
+    expect(componentVars["app-shell"]["sidebar-border"]).toBe("var(--psi-border-faint)");
+    expect(componentVars["app-shell"]["sidebar-border-width"]).toBe("0");
+  });
+
+  it("a theme may turn it on and recolour it from a border token", () => {
+    const overrides = {
+      "app-shell-sidebar-border-width": "1px",
+      "app-shell-sidebar-border": "var(--psi-border-neutral)",
+    };
+    expect(checkOverrideScopes(overrides, componentVars, lightTheme)).toEqual([]);
+  });
+
+  it("the scope gate refuses a surface token on the line's colour", () => {
+    const violations = checkOverrideScopes(
+      { "app-shell-sidebar-border": "var(--psi-bg-primary)" },
+      componentVars,
+      lightTheme,
+    );
+    expect(violations).toHaveLength(1);
+    expect(violations[0].token).toBe("bgPrimary");
+  });
+});
+
 describe("navbar border width (D110)", () => {
   it("keeps today's 1px line by default", () => {
     expect(componentVars.navbar["border-width"]).toBe("1px");
