@@ -292,3 +292,110 @@ test("focused by the skip link, the frame's main draws the shared ring with its 
   expect(ring.offset).toBeLessThan(0);
   expect(ring.radius).toBe("12px");
 });
+
+/** D113 and D114 — main's padding, the banner slot and the sidebar's line,
+ * measured in a browser: jsdom computes no padding, no margin and no border. */
+const BANNER = "components-appshell--with-banner";
+const LINE = "components-appshell--sidebar-line";
+
+const mainBox = (page: Page) =>
+  page.evaluate(() => {
+    const main = document.getElementById("main") as HTMLElement;
+    const cs = getComputedStyle(main);
+    const m = main.getBoundingClientRect();
+    const first = main.firstElementChild as HTMLElement;
+    const f = first.getBoundingClientRect();
+    const fcs = getComputedStyle(first);
+    return {
+      padding: [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft],
+      h1Inset: (main.querySelector("h1") as HTMLElement).getBoundingClientRect().left - m.left,
+      first: {
+        display: fcs.display,
+        top: f.top - m.top,
+        left: f.left - m.left,
+        // clientLeft + clientWidth is main's padding box, which leaves out a scrollbar.
+        right: m.left + main.clientLeft + main.clientWidth - f.right,
+        marginBottom: fcs.marginBottom,
+      },
+    };
+  });
+
+test("main pads its page by 24px on every side by default @interaction", async ({ page }) => {
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const b = await mainBox(page);
+  expect(b.padding).toEqual(["24px", "24px", "24px", "24px"]);
+  // The page is main's own child: its heading starts at the padding, not at twice it.
+  expect(b.h1Inset).toBe(24);
+});
+
+test("a banner keeps main's three edges, and the page starts one block padding below it @interaction", async ({ page }) => {
+  await page.goto(story(BANNER), { waitUntil: "networkidle" });
+  const b = await mainBox(page);
+  expect(b.first.top).toBe(0);
+  expect(b.first.left).toBe(0);
+  expect(b.first.right).toBe(0);
+  expect(b.first.marginBottom).toBe("24px");
+  expect(b.h1Inset).toBe(24);
+});
+
+test("with both padding tokens at 0, the banner and the page keep main's edges @interaction", async ({ page }) => {
+  await page.goto(story(BANNER), { waitUntil: "networkidle" });
+  await page.locator("#main").evaluate((main: HTMLElement) => {
+    const root = main.parentElement as HTMLElement;
+    root.style.setProperty("--psi-app-shell-main-padding-inline", "0");
+    root.style.setProperty("--psi-app-shell-main-padding-block", "0");
+  });
+  const b = await mainBox(page);
+  expect(b.padding).toEqual(["0px", "0px", "0px", "0px"]);
+  expect(b.first.left).toBe(0);
+  expect(b.first.right).toBe(0);
+  expect(b.first.marginBottom).toBe("0px");
+  expect(b.h1Inset).toBe(0);
+});
+
+test("a banner wrapper with nothing in it takes no space @interaction", async ({ page }) => {
+  await page.goto(story(BANNER), { waitUntil: "networkidle" });
+  await page.locator("#main").evaluate((main: HTMLElement) => (main.firstElementChild as HTMLElement).replaceChildren());
+  const b = await mainBox(page);
+  expect(b.first.display).toBe("none");
+});
+
+const sidebarEdges = (page: Page) =>
+  page.locator("#sidebar").evaluate((el) => {
+    const cs = getComputedStyle(el);
+    const probe = document.createElement("span");
+    probe.style.color = "var(--psi-border-faint)";
+    el.appendChild(probe);
+    const faint = getComputedStyle(probe).color;
+    probe.remove();
+    return {
+      left: cs.borderLeftWidth,
+      right: cs.borderRightWidth,
+      rightStyle: cs.borderRightStyle,
+      rightColor: cs.borderRightColor,
+      leftColor: cs.borderLeftColor,
+      faint,
+    };
+  });
+
+test("the sidebar draws no line by default @interaction", async ({ page }) => {
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const e = await sidebarEdges(page);
+  expect(e.left).toBe("0px");
+  expect(e.right).toBe("0px");
+});
+
+test("at width 1px the sidebar draws a faint line on its inline-end edge, which mirrors in right-to-left @interaction", async ({ page }) => {
+  await page.goto(story(LINE), { waitUntil: "networkidle" });
+  const ltr = await sidebarEdges(page);
+  expect(ltr.right).toBe("1px");
+  expect(ltr.rightStyle).toBe("solid");
+  expect(ltr.rightColor).toBe(ltr.faint);
+  expect(ltr.left).toBe("0px");
+
+  await page.evaluate(() => document.documentElement.setAttribute("dir", "rtl"));
+  const rtl = await sidebarEdges(page);
+  expect(rtl.left).toBe("1px");
+  expect(rtl.leftColor).toBe(rtl.faint);
+  expect(rtl.right).toBe("0px");
+});
