@@ -82,6 +82,16 @@ same token file, stylesheet and stories, so the baselines are refreshed once.
     - **No gap token.** The space below the banner is the block padding, which
       the margin puts back. Every screen gets the same space with nothing to
       set.
+    - **That space is a margin, so it collapses with the page's first child.**
+      A heading with a top margin of its own starts one block padding below the
+      banner, not that plus its margin: the gap is the larger of the two.
+      Without a banner the two add up, because padding does not collapse. A
+      page therefore sits a little closer under a banner than under the header.
+      This is the behaviour chosen, and the browser test measures the gap
+      itself.
+    - **`0` without a unit works.** `calc(0 * -1)` is a number, not a length,
+      so the margin is invalid at computed-value time and falls back to its
+      initial `0`, which is the right answer.
     - **It scrolls with the page.** The banner is the first thing in the
       scroller and leaves the view as the user scrolls. Pinning it would let
       content scroll under it, and the shell exists so that a focused element
@@ -92,8 +102,9 @@ same token file, stylesheet and stories, so the baselines are refreshed once.
     - **A banner that renders nothing takes no space.** A consumer writes
       `banner={stale && <Banner …/>}`. The wrapper is rendered whenever the
       prop is neither `null` nor `undefined`, and `:empty` removes it from the
-      layout when React renders nothing inside. Without that rule an empty
-      wrapper would add the block padding a second time.
+      layout when React renders nothing inside. An empty wrapper's two
+      margins cancel, but they collapse through it and swallow up to one block
+      padding of the first child's own top margin, which pulls the page up.
     - **In the accessibility tree** the banner is inside `<main>`, before the
       page, and its action is a tab stop at that place. `Banner` is not a live
       region (D86), so showing one announces nothing; that stays the
@@ -160,8 +171,11 @@ same token file, stylesheet and stories, so the baselines are refreshed once.
 - **Docs.** `AppShell`'s doc comment, the generated `docs/AppShell.md`, and the
   `AppShell` section of `packages/react/llms.txt` name the four tokens and the
   prop.
-- **The manifest gains `banner` on `AppShell`.** Check the pinned lists that
-  break on a catalog change: the slot tests and `TAKES_NO_CHILDREN`.
+- **`banner` is a slot, not only a prop.** `AppShell/slots.json` declares it,
+  accepting `Banner`, between `sidebar` and `body`, so a compose tree and the
+  MCP can fill it. The first draft of this spec left the slot out and the
+  whole-branch review caught it: without the entry a pattern that fills
+  `banner` throws.
 
 ## Verification
 
