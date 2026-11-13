@@ -36,6 +36,9 @@
   padding: var(--psi-space-8);
   background: var(--psi-app-shell-sidebar-bg);
   color: var(--psi-app-shell-sidebar-fg);
+  /* D114: a line for a sidebar that shares the page's background. Width 0 by
+     default, so no line and no pixel. Logical, so it mirrors in right-to-left. */
+  border-inline-end: var(--psi-app-shell-sidebar-border-width) solid var(--psi-app-shell-sidebar-border);
 }
 
 /* An author display rule would beat the UA's [hidden]; none is set above, and
@@ -53,12 +56,36 @@
      it the corner would scroll away. overflow clips scrolled content to it. */
   background: var(--psi-app-shell-main-bg);
   border-start-start-radius: var(--psi-app-shell-main-radius);
+  /* D113: the page's padding. On main itself, not on a wrapper, so the page
+     stays main's direct child and a consumer's layout keeps its shape. */
+  padding-block: var(--psi-app-shell-main-padding-block);
+  padding-inline: var(--psi-app-shell-main-padding-inline);
 }
 
 /* The corner marks where the header and the sidebar meet main. With either one
    gone it would be a notch against the viewport's edge (D110). */
 .mainSquare {
   border-start-start-radius: 0;
+}
+
+/* D113: a page banner sits edge to edge. The negative margins cancel main's
+   padding on three sides, and the wrapper puts the block padding back below as
+   its own padding. Padding, not a margin: a margin would collapse with the top
+   margin of the page's first child and set the page closer under a banner than
+   under the header. overflow on main clips the banner to D110's corner. A token
+   set to a unitless 0 works: calc(0 * -1) is a number, not a length, so the
+   margin is invalid at computed-value time and falls back to its initial 0. */
+.banner {
+  margin-block-start: calc(var(--psi-app-shell-main-padding-block) * -1);
+  margin-inline: calc(var(--psi-app-shell-main-padding-inline) * -1);
+  padding-block-end: var(--psi-app-shell-main-padding-block);
+}
+
+/* `banner={stale && <Banner/>}` renders nothing when false. An empty wrapper's
+   negative margin and its padding cancel, so it would add nothing; this keeps
+   that from resting on the arithmetic. */
+.banner:empty {
+  display: none;
 }
 
 /* Focused by the skip link, main draws the shared ring (psi/focus-ring forbids

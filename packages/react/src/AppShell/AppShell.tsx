@@ -11,6 +11,12 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
   /** The sidebar's content, usually a `NavTree` (D88). The shell wraps it in a
    * `<div>`, not an `<aside>`: a `NavTree` is already the landmark. */
   sidebar?: ReactNode;
+  /** One page-level `Banner`, or several, rendered inside `<main>` before the
+   * page (D113). It sits edge to edge: its wrapper cancels main's padding on
+   * three sides, and the page starts one block padding below it. It scrolls
+   * with the page. A value that renders nothing, such as
+   * `stale && <Banner …/>`, takes no space. */
+  banner?: ReactNode;
   /** The page, rendered inside `<main>` (D88). */
   children?: ReactNode;
   /** Whether the sidebar is shown. Controlled: wire your Menu toggle's
@@ -58,11 +64,23 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
  * corner is square unless a header and a sidebar both meet `main`. Put the
  * header under that theme with `data-psi-theme` on the `NavBar`, whose rest
  * props land on its `<header>`, and remove its line with
- * `--psi-navbar-border-width: 0`. */
+ * `--psi-navbar-border-width: 0`.
+ *
+ * `main` pads the page from `--psi-app-shell-main-padding-inline` and
+ * `--psi-app-shell-main-padding-block`, 24px by default (D113); set both to `0`
+ * if your page pads itself. A page that wants a maximum width sets
+ * `max-inline-size` itself: `.psi-container` would add a gutter of its own.
+ * The sidebar draws a line on its inline-end edge when
+ * `--psi-app-shell-sidebar-border-width` is `1px`; it is `0` by default, and
+ * its colour is `--psi-app-shell-sidebar-border` (D114). Under `sidebarTheme`
+ * the sidebar re-declares every component token, so set the width in that
+ * theme's `componentOverrides`, not on the shell's root, or for a built-in theme
+ * in a rule of your own on the sidebar element. */
 export function AppShell({
   skipLink,
   header,
   sidebar,
+  banner,
   children,
   sidebarOpen = true,
   sidebarTheme,
@@ -85,6 +103,7 @@ export function AppShell({
         {sidebar}
       </div>
       <main id={mainId} className={mainCls} tabIndex={-1}>
+        {banner != null && <div className={styles.banner}>{banner}</div>}
         {children}
       </main>
     </div>

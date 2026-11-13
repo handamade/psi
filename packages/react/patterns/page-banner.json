@@ -1,6 +1,6 @@
 {
   "id": "page-banner",
-  "intent": "A full-width, page-level message above the content, with a Refresh action; it is what the page shows, and announcing stays the application's (route the same event through the announcer)",
+  "intent": "A full-width, page-level message above the content, with a Refresh action; it is what the page shows, and announcing stays the application's (route the same event through the announcer). Inside an AppShell, pass it to the banner prop, where it sits edge to edge above the page",
   "match": ["page banner", "site-wide message", "stale data", "service notice", "maintenance banner"],
   "compose": {
     "component": "Banner",

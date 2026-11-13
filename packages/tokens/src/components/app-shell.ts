@@ -23,13 +23,29 @@
  * colour, so it is the sub-theme's value, written in the theme file. main-radius
  * is its own token: --psi-surface-radius also rounds Dialog, Panel, Menu, Table
  * and Toast. No contrast pair added: main takes page content, which fgPrimary on
- * bgPrimary already gates for the expected value. */
+ * bgPrimary already gates for the expected value.
+ *
+ * D113 — main-padding-inline and main-padding-block pad the page inside main,
+ * and the banner wrapper cancels them to sit edge to edge. The default is a
+ * real 24px, not 0: a page that touches the frame's edges is no look to keep.
+ * The keys carry no bg, fg or border segment, so they stay out of the colour
+ * scope map, as the control geometry keys do (D54).
+ *
+ * D114 — sidebar-border and sidebar-border-width draw a line on the sidebar's
+ * inline-end edge, the same pair as navbar's. Width 0 by default: no line and
+ * no pixel. A transparent colour would have kept the pixel (D110 found that on
+ * NavBar). The colour resolves under the sidebar's theme. No contrast pair: the
+ * line separates two regions and identifies no control. */
 export const appShellVars: Record<string, string> = {
   "sidebar-width": "16rem",
   "sidebar-bg": "var(--psi-bg-primary)",
   "sidebar-fg": "var(--psi-fg-primary)",
+  "sidebar-border": "var(--psi-border-faint)",
+  "sidebar-border-width": "0",
   "focus-ring": "var(--psi-border-focus)",
   bg: "transparent",
   "main-bg": "transparent",
   "main-radius": "0",
+  "main-padding-inline": "var(--psi-space-24)",
+  "main-padding-block": "var(--psi-space-24)",
 };

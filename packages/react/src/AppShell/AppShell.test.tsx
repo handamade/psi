@@ -18,6 +18,12 @@ function Shell(props: Partial<React.ComponentProps<typeof AppShell>>) {
   );
 }
 
+// jsdom does no layout and no paint, so the rule tests below read the rules;
+// what they paint is measured in a browser by
+// apps/storybook/vr/app-shell.interaction.spec.ts.
+const css = readFileSync(join(import.meta.dirname, "app-shell.module.css"), "utf8");
+const rule = (selector: string) => new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+
 describe("AppShell (D88)", () => {
   it("renders the skip link, then the header, then the sidebar, then main", () => {
     render(<Shell />);
@@ -91,11 +97,6 @@ describe("AppShell (D88)", () => {
 });
 
 describe("AppShell's frame tokens (D110)", () => {
-  // jsdom does no layout and no paint, so these read the rules; what they paint
-  // is measured in a browser by apps/storybook/vr/app-shell.interaction.spec.ts.
-  const css = readFileSync(join(import.meta.dirname, "app-shell.module.css"), "utf8");
-  const rule = (selector: string) => new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
-
   it("the root paints --psi-app-shell-bg", () => {
     expect(rule(".appShell")).toContain("background: var(--psi-app-shell-bg);");
   });
@@ -124,5 +125,73 @@ describe("AppShell's frame tokens (D110)", () => {
 
     render(<Shell sidebar={undefined} />);
     expect(square()).toMatch(/mainSquare/);
+  });
+});
+
+describe("AppShell's padded main and banner (D113)", () => {
+  it("main pads its page from the two padding tokens", () => {
+    const main = rule(".main");
+    expect(main).toContain("padding-block: var(--psi-app-shell-main-padding-block);");
+    expect(main).toContain("padding-inline: var(--psi-app-shell-main-padding-inline);");
+  });
+
+  it("the banner wrapper cancels the padding on three sides and puts the block padding back below as padding", () => {
+    const banner = rule(".banner");
+    expect(banner).toContain("margin-block-start: calc(var(--psi-app-shell-main-padding-block) * -1);");
+    expect(banner).toContain("margin-inline: calc(var(--psi-app-shell-main-padding-inline) * -1);");
+    expect(banner).toContain("padding-block-end: var(--psi-app-shell-main-padding-block);");
+    // A margin there would collapse with the page's first child and pull it up.
+    expect(banner).not.toContain("margin-block:");
+    expect(banner).not.toContain("margin-block-end");
+  });
+
+  it("an empty banner wrapper leaves the layout", () => {
+    expect(rule(".banner:empty")).toContain("display: none;");
+  });
+
+  it("renders the banner inside main, before the page", () => {
+    render(<Shell banner={<p>Data is stale</p>} />);
+    const main = screen.getByRole("main");
+    const wrapper = main.firstElementChild as HTMLElement;
+    expect(wrapper.className).toMatch(/banner/);
+    expect(wrapper).toHaveTextContent("Data is stale");
+    expect(wrapper.nextElementSibling).toHaveTextContent("Content");
+  });
+
+  it("renders no wrapper without a banner, so the page is main's first child", () => {
+    render(<Shell />);
+    const main = screen.getByRole("main");
+    expect(main.firstElementChild?.tagName).toBe("P");
+    expect(main.firstElementChild).toHaveTextContent("Content");
+  });
+
+  it("stacks several banners in order", () => {
+    render(
+      <Shell
+        banner={
+          <>
+            <p>First</p>
+            <p>Second</p>
+          </>
+        }
+      />,
+    );
+    const wrapper = screen.getByRole("main").firstElementChild as HTMLElement;
+    expect([...wrapper.children].map((el) => el.textContent)).toEqual(["First", "Second"]);
+  });
+
+  it("a banner that renders nothing leaves an empty wrapper, which the :empty rule removes", () => {
+    render(<Shell banner={false} />);
+    const wrapper = screen.getByRole("main").firstElementChild as HTMLElement;
+    expect(wrapper.className).toMatch(/banner/);
+    expect(wrapper.childNodes).toHaveLength(0);
+  });
+});
+
+describe("AppShell's sidebar line (D114)", () => {
+  it("the sidebar draws its inline-end edge from the width and colour tokens", () => {
+    expect(rule(".sidebar")).toContain(
+      "border-inline-end: var(--psi-app-shell-sidebar-border-width) solid var(--psi-app-shell-sidebar-border);",
+    );
   });
 });
