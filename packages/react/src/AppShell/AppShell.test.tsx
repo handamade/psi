@@ -135,12 +135,14 @@ describe("AppShell's padded main and banner (D113)", () => {
     expect(main).toContain("padding-inline: var(--psi-app-shell-main-padding-inline);");
   });
 
-  it("the banner wrapper cancels the padding on three sides and puts the block padding back below", () => {
+  it("the banner wrapper cancels the padding on three sides and puts the block padding back below as padding", () => {
     const banner = rule(".banner");
-    expect(banner).toContain(
-      "margin-block: calc(var(--psi-app-shell-main-padding-block) * -1) var(--psi-app-shell-main-padding-block);",
-    );
+    expect(banner).toContain("margin-block-start: calc(var(--psi-app-shell-main-padding-block) * -1);");
     expect(banner).toContain("margin-inline: calc(var(--psi-app-shell-main-padding-inline) * -1);");
+    expect(banner).toContain("padding-block-end: var(--psi-app-shell-main-padding-block);");
+    // A margin there would collapse with the page's first child and pull it up.
+    expect(banner).not.toContain("margin-block:");
+    expect(banner).not.toContain("margin-block-end");
   });
 
   it("an empty banner wrapper leaves the layout", () => {

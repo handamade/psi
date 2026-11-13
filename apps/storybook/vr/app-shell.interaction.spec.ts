@@ -309,7 +309,12 @@ const mainBox = (page: Page) =>
     return {
       padding: [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft],
       h1Inset: (main.querySelector("h1") as HTMLElement).getBoundingClientRect().left - m.left,
-      gapBelowFirst: (main.querySelector("h1") as HTMLElement).getBoundingClientRect().top - f.bottom,
+      h1FromMainTop: (main.querySelector("h1") as HTMLElement).getBoundingClientRect().top - m.top,
+      h1FromBanner:
+        first.tagName !== "H1" && first.firstElementChild
+          ? (main.querySelector("h1") as HTMLElement).getBoundingClientRect().top -
+            first.firstElementChild.getBoundingClientRect().bottom
+          : null,
       first: {
         display: fcs.display,
         top: f.top - m.top,
@@ -317,6 +322,7 @@ const mainBox = (page: Page) =>
         // clientLeft + clientWidth is main's padding box, which leaves out a scrollbar.
         right: m.left + main.clientLeft + main.clientWidth - f.right,
         marginBottom: fcs.marginBottom,
+        paddingBottom: fcs.paddingBottom,
       },
     };
   });
@@ -329,15 +335,21 @@ test("main pads its page by 24px on every side by default @interaction", async (
   expect(b.h1Inset).toBe(24);
 });
 
-test("a banner keeps main's three edges, and the page starts one block padding below it @interaction", async ({ page }) => {
+test("a banner keeps main's three edges, and the page starts below it as it starts below the header @interaction", async ({ page }) => {
   await page.goto(story(BANNER), { waitUntil: "networkidle" });
   const b = await mainBox(page);
   expect(b.first.top).toBe(0);
   expect(b.first.left).toBe(0);
   expect(b.first.right).toBe(0);
-  expect(b.first.marginBottom).toBe("24px");
-  // The heading's own top margin collapses into the wrapper's bottom margin.
-  expect(b.gapBelowFirst).toBe(24);
+  expect(b.first.marginBottom).toBe("0px");
+  expect(b.first.paddingBottom).toBe("24px");
+  // Without a banner the heading starts one block padding plus its own margin
+  // below main's top. Under a banner it starts the same distance below the banner.
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const plain = await mainBox(page);
+  expect(b.h1FromBanner).not.toBeNull();
+  expect(b.h1FromBanner as number).toBeCloseTo(plain.h1FromMainTop, 1);
+  expect(plain.h1FromMainTop).toBeGreaterThan(24);
   expect(b.h1Inset).toBe(24);
 });
 
@@ -354,6 +366,7 @@ test("with both padding tokens at 0, the banner and the page keep main's edges @
   expect(b.first.left).toBe(0);
   expect(b.first.right).toBe(0);
   expect(b.first.marginBottom).toBe("0px");
+  expect(b.first.paddingBottom).toBe("0px");
   expect(b.h1Inset).toBe(0);
 });
 
