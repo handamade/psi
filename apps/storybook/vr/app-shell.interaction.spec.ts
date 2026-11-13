@@ -309,6 +309,7 @@ const mainBox = (page: Page) =>
     return {
       padding: [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft],
       h1Inset: (main.querySelector("h1") as HTMLElement).getBoundingClientRect().left - m.left,
+      gapBelowFirst: (main.querySelector("h1") as HTMLElement).getBoundingClientRect().top - f.bottom,
       first: {
         display: fcs.display,
         top: f.top - m.top,
@@ -335,6 +336,8 @@ test("a banner keeps main's three edges, and the page starts one block padding b
   expect(b.first.left).toBe(0);
   expect(b.first.right).toBe(0);
   expect(b.first.marginBottom).toBe("24px");
+  // The heading's own top margin collapses into the wrapper's bottom margin.
+  expect(b.gapBelowFirst).toBe(24);
   expect(b.h1Inset).toBe(24);
 });
 
@@ -347,6 +350,7 @@ test("with both padding tokens at 0, the banner and the page keep main's edges @
   });
   const b = await mainBox(page);
   expect(b.padding).toEqual(["0px", "0px", "0px", "0px"]);
+  expect(b.first.top).toBe(0);
   expect(b.first.left).toBe(0);
   expect(b.first.right).toBe(0);
   expect(b.first.marginBottom).toBe("0px");

@@ -74,7 +74,8 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
  * `--psi-app-shell-sidebar-border-width` is `1px`; it is `0` by default, and
  * its colour is `--psi-app-shell-sidebar-border` (D114). Under `sidebarTheme`
  * the sidebar re-declares every component token, so set the width in that
- * theme's `componentOverrides`, not on the shell's root. */
+ * theme's `componentOverrides`, not on the shell's root, or for a built-in theme
+ * in a rule of your own on the sidebar element. */
 export function AppShell({
   skipLink,
   header,

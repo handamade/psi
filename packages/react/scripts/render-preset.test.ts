@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 // makes a bare `new URL(...)` resolve against a fake browser location instead
 // of `import.meta.url`'s file: base (same reason as scripts/slots.test.ts).
 import { fileURLToPath, URL as NodeURL } from "node:url";
-import { renderPreset } from "./patterns.js";
+import { renderPreset, validatePatterns } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
 
 // Fixture block copied from patterns.test.ts (per task-3 brief: reuse, don't import across test files).
@@ -153,5 +153,36 @@ describe("renderPreset", () => {
     expect(renderPreset(withQuote, components)).toBe(
       '<Button label="Say &quot;hi&quot; now">Say "hi" now</Button>\n',
     );
+  });
+
+  // AppShell's `banner` prop is documented for agents, so a compose tree must be
+  // able to fill it. The slot list comes from the real src/AppShell/slots.json:
+  // a missing `banner` there fails validation with `unknown slot "banner"`.
+  it("lets a compose tree fill AppShell's banner slot with a Banner (D113)", () => {
+    const shellSlots = (
+      JSON.parse(
+        readFileSync(fileURLToPath(new NodeURL("../src/AppShell/slots.json", import.meta.url)), "utf8"),
+      ) as { slots: ManifestComponent["slots"] }
+    ).slots;
+    const shellComponents: ManifestComponent[] = [
+      { name: "AppShell", slots: shellSlots, props: [] },
+      { name: "Banner", slots: [], props: [] },
+    ];
+    const withBanner: Pattern = {
+      id: "app-shell-banner-test",
+      intent: "Shell with a page banner",
+      match: ["banner"],
+      compose: {
+        component: "AppShell",
+        slots: { banner: [{ component: "Banner", content: "banner-text" }], body: ["{content:page}"] },
+      },
+      parameters: [],
+      content: { "banner-text": "Heads up", page: "Page" },
+      gaps: [],
+    };
+    expect(() => validatePatterns([withBanner], shellComponents, {})).not.toThrow();
+    const jsx = renderPreset(withBanner, shellComponents);
+    expect(jsx).toContain("banner={");
+    expect(jsx).toContain("<Banner");
   });
 });

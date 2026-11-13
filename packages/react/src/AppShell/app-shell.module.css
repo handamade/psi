@@ -69,16 +69,20 @@
 }
 
 /* D113: a page banner sits edge to edge. The negative margins cancel main's
-   padding on three sides, and the block-end margin puts it back below, so the
-   page starts where it would without a banner. overflow on main clips the
-   banner to D110's corner. */
+   padding on three sides, and the block-end margin puts the block padding back
+   below. That margin collapses with the top margin of the page's first child,
+   so the page starts one block padding below the banner, not that plus its own
+   margin. overflow on main clips the banner to D110's corner. A token set to a
+   unitless 0 works: calc(0 * -1) is a number, not a length, so the margin is
+   invalid at computed-value time and falls back to its initial 0. */
 .banner {
   margin-block: calc(var(--psi-app-shell-main-padding-block) * -1) var(--psi-app-shell-main-padding-block);
   margin-inline: calc(var(--psi-app-shell-main-padding-inline) * -1);
 }
 
-/* `banner={stale && <Banner/>}` renders nothing when false. Without this an
-   empty wrapper would add the block padding a second time. */
+/* `banner={stale && <Banner/>}` renders nothing when false. An empty wrapper's
+   two margins cancel, but they collapse through it and swallow up to one block
+   padding of the first child's own top margin, pulling the page up. */
 .banner:empty {
   display: none;
 }
