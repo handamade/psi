@@ -36,6 +36,9 @@
   padding: var(--psi-space-8);
   background: var(--psi-app-shell-sidebar-bg);
   color: var(--psi-app-shell-sidebar-fg);
+  /* D114: a line for a sidebar that shares the page's background. Width 0 by
+     default, so no line and no pixel. Logical, so it mirrors in right-to-left. */
+  border-inline-end: var(--psi-app-shell-sidebar-border-width) solid var(--psi-app-shell-sidebar-border);
 }
 
 /* An author display rule would beat the UA's [hidden]; none is set above, and

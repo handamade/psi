@@ -185,3 +185,11 @@ describe("AppShell's padded main and banner (D113)", () => {
     expect(wrapper.childNodes).toHaveLength(0);
   });
 });
+
+describe("AppShell's sidebar line (D114)", () => {
+  it("the sidebar draws its inline-end edge from the width and colour tokens", () => {
+    expect(rule(".sidebar")).toContain(
+      "border-inline-end: var(--psi-app-shell-sidebar-border-width) solid var(--psi-app-shell-sidebar-border);",
+    );
+  });
+});
