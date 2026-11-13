@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-11-13",
+    tag: "release",
+    title: "0.28.0 — a frame with a rounded surface",
+    body: "An app frame where the header and the sidebar share one colour and the main region is a surface with a rounded corner, with no CSS of your own. Three new AppShell tokens do it: --psi-app-shell-bg paints the shell's root, --psi-app-shell-main-bg paints the main region, and --psi-app-shell-main-radius rounds its top-start corner. They paint nothing by default, so a shell that sets none looks as it did. The corner stays square unless a header and a sidebar both meet the main region, so a closed sidebar leaves no notch at the viewport's edge. --psi-navbar-border-width removes the bar's line and its pixel: at 0, a 56px bar measures 56px. NavBar now sets its own text colour from --psi-navbar-fg, so plain text in a header under its own theme can be read. It used to keep the page's colour, which measured 1.11:1 as dark text on a dark bar. If an ancestor of your NavBar sets a colour other than --psi-fg-primary, set --psi-navbar-fg to keep it.",
+  },
+  {
     date: "2026-10-15",
     tag: "release",
     title: "0.27.0 — controls you can find, and layouts that hold",

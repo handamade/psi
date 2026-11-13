@@ -1,5 +1,22 @@
 # @handamade/psi-tokens
 
+## 0.28.0
+
+### Minor Changes
+
+- 29bbc1b: A frame with a rounded surface, with no CSS of your own (D110).
+
+  - **Three new `AppShell` tokens.** `--psi-app-shell-bg` paints the shell's root, `--psi-app-shell-main-bg` paints `<main>`, and `--psi-app-shell-main-radius` rounds `<main>`'s top-start corner. They paint nothing by default, so a shell that sets none looks as it did. `--psi-app-shell-bg` shows only behind the corner and must equal the canvas of the theme on the header and the sidebar. No `var()` reaches a sub-theme from the page's scope, so write the value, in a theme's `componentOverrides` or on the root.
+  - **The corner is square unless a header and a sidebar both meet `<main>`.** With the sidebar closed it would be a notch against the viewport's edge. `<main>` takes a class of its own in that case; nothing else changes.
+  - **New `--psi-navbar-border-width`**, default `1px`. `0` removes the line and its pixel, so a `--psi-navbar-height` of 56px gives a bar of 56px. A transparent `--psi-navbar-border` hid the line and kept the pixel.
+  - The `Frame` story shows the design: one dark theme over the header and the sidebar, with `data-psi-theme` on the `NavBar`. The skip link's inset ring follows the corner.
+
+- 7671af6: `NavBar` sets its own text colour, so plain text in a themed header can be read (D111).
+
+  - **New `--psi-navbar-fg`**, default `var(--psi-fg-primary)`, and `.navbar` paints it. Text in the bar used to inherit the page's colour as a resolved value, so under `data-psi-theme` on the `NavBar` it kept the page's: dark text on a dark bar, 1.11:1 where the Web Portal measured it. It now re-resolves under the bar's theme, as `--psi-app-shell-sidebar-fg` does in the sidebar.
+  - **What can change for you.** If your `body`, or an ancestor of the `NavBar`, sets a colour other than `--psi-fg-primary`, plain text and `currentColor` icons in the bar now take `--psi-fg-primary`. Set `--psi-navbar-fg` to keep your colour. Buttons and links in the bar are unchanged.
+  - The `Frame` stories show plain text in the header.
+
 ## 0.27.0
 
 ### Minor Changes
