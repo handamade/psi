@@ -48,7 +48,9 @@ spec on another branch.
   - **The `Field`'s own prop wins** over its `FieldStack`'s. The name `FieldGroup` was avoided because
     `<Field group>` already means fieldset mode.
   - **The position reaches a `Field` by context** (a `FieldStackContext` holding the stack's position), not by
-    cloning children, so a `Field` wrapped in a component of the consumer's own still lines up.
+    cloning children, so a consumer's component that renders a `Field` still lines up, provided it adds no element
+    of its own around the `Field`. Subgrid shares the stack's columns only with a direct grid child: a `Field`
+    inside a wrapper `<div>` keeps its label beside its control, in columns of its own.
 
   **Layout of one `Field` with `labelPosition="start"`, outside a `FieldStack`**
   - The field is a two-column grid: `grid-template-columns: auto auto` and `column-gap: --psi-field-column-gap`. The
@@ -84,15 +86,22 @@ spec on another branch.
   - Group mode keeps its `<fieldset>` and `<legend>`, and the legend takes column 1. A browser draws a fieldset's
     first legend on the fieldset's border (the *rendered legend*) and leaves it out of the fieldset's own layout.
     A floated legend is not a rendered legend, and `float` has no effect on a grid item, so a legend with
-    `float: inline-start` becomes an ordinary item of the fieldset's grid. The plan proves this in the three engines
-    before the CSS is final; if one of them fails, the fallback is a visually hidden `<legend>` that names the group
-    and an `aria-hidden` copy of the label in column 1.
+    `float: inline-start` becomes an ordinary item of the fieldset's grid.
+  - In a `FieldStack`, the fieldset must also take `grid-template-columns: subgrid`. A fieldset lays its content out
+    through an anonymous box, so whether that box can be a subgrid is the less certain half.
+  - The plan proves both in the three engines before the CSS is final. If either fails, the fallback is a group
+    `Field` in the `start` position rendered as `<div role="group" aria-labelledby>` with its label in a `<div>`:
+    the group keeps its name and its description, and `RadioGroup`, which adds no role inside a group `Field`
+    (D104), is unchanged.
 
   **Narrow containers**
-  - A `FieldStack` with `labelPosition="start"` is a size container (`container-type: inline-size`). Below 480px of
-    its own width, every `Field` in it returns to the label above its control, and the label column is dropped.
-  - 480 is a build-time constant, `containers.fieldStackColumns`, exported from `scales/layout.ts` beside
-    `breakpoints` and written as a literal in the CSS, as `Card` writes 960. A test asserts that the two agree. It is
+  - A `FieldStack` with `labelPosition="start"` is a size container named `psi-field-stack`. Below 480px of its own
+    width, every `Field` in it returns to the label above its control. A container query styles only the
+    container's descendants, so the rule lives in `field.module.css` and switches each `Field` to one column; the
+    stack's own columns stay, unused, because every child spans both.
+  - 480 is a build-time constant, `containerQueries.fieldStackColumns`, exported from `scales/layout.ts` beside
+    `breakpoints` (the name `container` is taken there by the page container) and written as a literal in the CSS,
+    as `Card` writes 960. A test asserts that the two agree. It is
     below `breakpoints.sm` (560) because it measures a form, not the viewport: a form in a 520px dialog keeps its
     column.
   - A size container takes no width from its content, so a `FieldStack` placed where it would shrink to fit, such as
@@ -127,9 +136,11 @@ spec on another branch.
 ```
 packages/react/src/Field/Field.tsx            — labelPosition prop; reads FieldStackContext; data-label-position
 packages/react/src/Field/field.module.css     — the start layout, standalone and under a FieldStack
-packages/react/src/Field/FieldStack.tsx       — new: the grid, the container, FieldStackContext
-packages/react/src/Field/fieldStack.module.css — new
-packages/react/src/Field/Field.stories.tsx    — new stories below
+packages/react/src/FieldStack/FieldStack.tsx        — new: the grid and the container
+packages/react/src/FieldStack/FieldStackContext.ts  — new: the context and the FieldLabelPosition type
+packages/react/src/FieldStack/fieldStack.module.css — new
+packages/react/src/FieldStack/slots.json            — new: one body slot, like Stack
+packages/react/src/Field/Field.stories.tsx, FieldStack/FieldStack.stories.tsx — new stories below
 packages/react/src/index.ts                   — export FieldStack and its types
 packages/tokens/src/components/field.ts       — three tokens
 packages/tokens/src/scales/layout.ts          — containers.fieldStackColumns
@@ -137,8 +148,9 @@ packages/react/patterns/table-pagination.json, cursor-pagination.json — the pr
 packages/tokens/src/guidance.ts               — one steering line
 ```
 
-`Field` renders `data-label-position="start"` when the resolved position is `start`, and the CSS keys off that
-attribute and off the stack's class, so a `Field` needs no knowledge of its column beyond the context's value.
+Each component has its own folder, as the slot and manifest scripts expect. `Field` renders
+`data-label-position="start"` when the resolved position is `start`, and `data-in-stack` inside a `FieldStack`; the
+CSS keys off those two attributes, so a `Field` needs no knowledge of its column beyond the context's value.
 
 ## Testing
 
