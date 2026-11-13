@@ -170,17 +170,24 @@ Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
 
 **Interfaces:**
 - Consumes: `--psi-app-shell-main-padding-inline`, `--psi-app-shell-main-padding-block` from Task 1.
-- Produces: `AppShellProps.banner?: ReactNode`; the CSS classes `.banner` and `.banner:empty`. The wrapper is `<main>`'s first element child whenever `banner` is neither `null` nor `undefined`. Task 4's stories and browser tests rely on both.
+- Produces: module-scope `css` and `rule(selector)` helpers in `AppShell.test.tsx`, which Task 3's test uses; `AppShellProps.banner?: ReactNode`; the CSS classes `.banner` and `.banner:empty`. The wrapper is `<main>`'s first element child whenever `banner` is neither `null` nor `undefined`. Task 4's stories and browser tests rely on both.
 
 - [ ] **Step 1: Write the failing tests**
 
-In `packages/react/src/AppShell/AppShell.test.tsx`, add at the end of the file:
+In `packages/react/src/AppShell/AppShell.test.tsx`, first share the two helpers that the `describe("AppShell's frame tokens (D110)", …)` block declares. Move its comment and its `css` and `rule` constants out of that block to module scope, directly below the `Shell` function, unchanged:
+
+```tsx
+// jsdom does no layout and no paint, so the rule tests below read the rules;
+// what they paint is measured in a browser by
+// apps/storybook/vr/app-shell.interaction.spec.ts.
+const css = readFileSync(join(import.meta.dirname, "app-shell.module.css"), "utf8");
+const rule = (selector: string) => new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+```
+
+The D110 block keeps its three tests and loses only those lines. Then add at the end of the file:
 
 ```tsx
 describe("AppShell's padded main and banner (D113)", () => {
-  const css = readFileSync(join(import.meta.dirname, "app-shell.module.css"), "utf8");
-  const rule = (selector: string) => new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
-
   it("main pads its page from the two padding tokens", () => {
     const main = rule(".main");
     expect(main).toContain("padding-block: var(--psi-app-shell-main-padding-block);");
@@ -339,7 +346,7 @@ Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
 - Test: `packages/react/src/AppShell/AppShell.test.tsx`
 
 **Interfaces:**
-- Consumes: `--psi-app-shell-sidebar-border`, `--psi-app-shell-sidebar-border-width` from Task 1.
+- Consumes: `--psi-app-shell-sidebar-border`, `--psi-app-shell-sidebar-border-width` from Task 1; the module-scope `rule(selector)` helper that Task 2 put in `AppShell.test.tsx`.
 - Produces: `border-inline-end` on `.sidebar`. Task 4's `SidebarLine` story and browser tests rely on it.
 
 - [ ] **Step 1: Write the failing test**
@@ -348,9 +355,6 @@ In `packages/react/src/AppShell/AppShell.test.tsx`, add at the end of the file:
 
 ```tsx
 describe("AppShell's sidebar line (D114)", () => {
-  const css = readFileSync(join(import.meta.dirname, "app-shell.module.css"), "utf8");
-  const rule = (selector: string) => new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
-
   it("the sidebar draws its inline-end edge from the width and colour tokens", () => {
     expect(rule(".sidebar")).toContain(
       "border-inline-end: var(--psi-app-shell-sidebar-border-width) solid var(--psi-app-shell-sidebar-border);",
