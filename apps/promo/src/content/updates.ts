@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-11-16",
+    tag: "release",
+    title: "0.30.0 — labels beside their controls, and a page heading",
+    body: "A Field can put its label beside its control: labelPosition=\"start\" sets the label before the control, with the message line under the control. FieldStack lines up a whole form's labels in one column, as wide as the longest label up to 240px, and returns them above their controls when the stack is narrower than 480px. The pagination presets use it, so a pager is one line high. PageHeading is the page's one h1, at 24/32 medium in the brand's display face with margin 0, so a page sits the same distance below the header and below a banner. Its text style is also a token and a utility, --psi-text-display-24-32-medium. Every theme now declares its color-scheme, so on a dark theme the browser draws its own parts dark: a date field's picker icon, a native select's list, scrollbars. A data-psi-theme=\"dark\" region takes the dark scheme with its tokens, and resolved theme JSON gains colorScheme. A theme still paints no background. Toast, show() and ToastProvider take dismissLabel, the dismiss button's accessible name, for a translated app. 54 components, 24 patterns.",
+  },
+  {
     date: "2026-11-13",
     tag: "release",
     title: "0.29.0 — a frame that pads its page",
