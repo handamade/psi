@@ -1,0 +1,6 @@
+---
+import HeadingAnchor from "./HeadingAnchor.astro";
+const { id } = Astro.props as { id: string };
+---
+
+<HeadingAnchor level={3} id={id}><slot /></HeadingAnchor>

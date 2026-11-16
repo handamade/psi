@@ -1,0 +1,16 @@
+---
+interface Props {
+  level: 2 | 3;
+  id: string;
+}
+const { level, id } = Astro.props;
+const Tag = `h${level}` as "h2" | "h3";
+---
+
+<!-- The # link is a sibling of the heading, not inside it: inside, it made
+     every heading's accessible name end in "Link to this section". Its own
+     label ("Link to") plus the heading it points at names it. -->
+<div class="docs-heading-row">
+  <Tag id={id} class="docs-heading"><slot /></Tag>
+  <a class="docs-heading-anchor" data-pagefind-ignore href={`#${id}`} id={`${id}-anchor`} aria-label="Link to" aria-labelledby={`${id}-anchor ${id}`}>#</a>
+</div>

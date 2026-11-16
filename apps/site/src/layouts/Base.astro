@@ -1,0 +1,59 @@
+---
+// The five stylesheets every Psi consumer imports — four from the token
+// package, then the component rules (CLAUDE.md house rule) — and the
+// site's own shared layer.
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css";
+import "@handamade/psi-tokens/dark.css";
+import "@handamade/psi-tokens/acme.css";
+import "@handamade/psi-tokens/ember.css";
+import "@handamade/psi-tokens/components.css";
+import "@handamade/psi-tokens/utilities.css";
+import "@handamade/psi-react/styles";
+import "../styles/site.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-psi-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <slot name="head" />
+    <script is:inline>
+      (function () {
+        var doc = document.documentElement;
+        var mode = null;
+        var brand = null;
+        try {
+          var storedMode = localStorage.getItem("psi-theme");
+          if (storedMode === "light" || storedMode === "dark") mode = storedMode;
+          brand = JSON.parse(localStorage.getItem("psi-brand") || "null");
+        } catch (_) {
+          /* storage unavailable */
+        }
+        doc.dataset.psiTheme =
+          mode || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        if (brand && brand.cache && typeof brand.cache === "object") {
+          for (var name in brand.cache) {
+            if (name.indexOf("--psi-") === 0) {
+              doc.style.setProperty(name, brand.cache[name]);
+            }
+          }
+          doc.dataset.psiCustom = "";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

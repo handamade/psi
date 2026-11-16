@@ -1,0 +1,25 @@
+---
+import { getCollection, render } from "astro:content";
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import { guideMd } from "../../../lib/markdown";
+import H2 from "../../../components/H2.astro";
+import H3 from "../../../components/H3.astro";
+
+export async function getStaticPaths() {
+  const guides = await getCollection("guides");
+  return guides.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+---
+
+<DocsLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  headings={headings}
+  mdHref={`/docs/get-started/${entry.id}.md`}
+  mdSource={guideMd(entry)}
+>
+  <Content components={{ h2: H2, h3: H3 }} />
+</DocsLayout>

@@ -1,0 +1,125 @@
+---
+title: Theming
+description: How Psi themes work, how to scope one to part of a page, and how to build your own.
+order: 2
+---
+
+A theme is one stylesheet that sets values for the same token names. Components bind the token names, so they never change when the theme does.
+
+## Colors are formulas
+
+Semantic colors such as `--psi-bg-primary` and `--psi-fg-accent` are OKLCH formulas over a small set of palette anchors, not a ladder of fixed swatches. Change an anchor and every color derived from it moves with it. The token build checks WCAG AA contrast and fails when a pair does not pass.
+
+The [Color tokens](/docs/tokens/color/) page lists every semantic color with its value in all four themes.
+
+## Built-in themes
+
+Psi ships four: `light`, `dark`, `acme` and `ember`. Each is a stylesheet in `@handamade/psi-tokens`. Import the ones you use after `base.css`, with `light.css` first among the theme files. Its rule matches `:root` at the same specificity as `[data-psi-theme="ember"]`, so a theme file imported before it loses the tie and the attribute has no effect:
+
+```tsx
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css";
+import "@handamade/psi-tokens/ember.css";
+```
+
+`ember` is a dark-first brand: its colors derive from the dark palette, not from an inverted light one.
+
+## Scope a theme to part of a page
+
+`data-psi-theme` works on any element. Everything inside it uses that theme. A theme never paints a background, so paint the wrapper yourself:
+
+```html
+<html data-psi-theme="light">
+  <aside class="sidebar" data-psi-theme="ember">
+    <!-- this subtree is ember -->
+  </aside>
+</html>
+```
+
+```css
+.sidebar {
+  background: var(--psi-bg-primary);
+  color: var(--psi-fg-primary);
+}
+```
+
+Without the paint rule the aside keeps the page's background with ember's foreground colors. Brand fonts apply only when the attribute is on `<html>`: in a subtree the text style combos keep the default font stacks.
+
+Tokens you set on the page's theme do not cross into a sub-themed element. Set them on that element or inside its theme.
+
+## Build a theme of your own
+
+`@handamade/psi-tokens/theme` builds a theme from a definition that lives in your repository. It runs the same contrast and token-scope gates as Psi's own themes and throws a `ThemeGateError` instead of returning a theme that fails them.
+
+```ts
+import { buildThemeCss } from "@handamade/psi-tokens/theme";
+
+const { css, warnings } = buildThemeCss("acme-portal", {
+  palette: {
+    charcoal: { l: 0.22, c: 0.015, h: 30 },
+    cream: { l: 0.96, c: 0.01, h: 80 },
+    coral: { l: 0.55, c: 0.2, h: 30 },
+    mint: { l: 0.52, c: 0.15, h: 160 },
+    gold: { l: 0.78, c: 0.15, h: 85 },
+    crimson: { l: 0.55, c: 0.22, h: 15 },
+  },
+  slots: {
+    ink: "charcoal",
+    canvas: "cream",
+    accent: "coral",
+    success: "mint",
+    warning: "gold",
+    danger: "crimson",
+  },
+  base: "light",
+});
+```
+
+The palette holds your anchors as OKLCH values. The six slots say which anchor plays which role. `base` is `"light"` or `"dark"`. The CSS is scoped to `[data-psi-theme="acme-portal"]`: load it after `base.css`, then set the attribute on any element. The names `light` and `dark` are refused.
+
+From a build script, the `psi-theme` command does the same:
+
+```bash
+npx psi-theme ./theme.mjs --name acme-portal --out acme-portal.css
+```
+
+The module default-exports the definition. It exits 0 when built, 1 when a gate refuses the theme, and 2 on a usage error.
+
+## Derive a brand from a prompt
+
+`@handamade/psi-tokens/generate` derives a light and dark pair from a description. It is deterministic: the same prompt gives the same brand. Feed each member to `buildThemeCss` to get stylesheets you can load:
+
+```ts
+import { parsePrompt, deriveTheme } from "@handamade/psi-tokens/generate";
+import { buildThemeCss } from "@handamade/psi-tokens/theme";
+
+const vector = parsePrompt("a calm dark fintech brand");
+const pair = deriveTheme(vector);
+
+const light = buildThemeCss(`${vector.name}-light`, pair.light.customerTheme);
+const dark = buildThemeCss(`${vector.name}-dark`, pair.dark.customerTheme);
+// light.css and dark.css are strings of CSS
+```
+
+Exported signatures:
+
+```ts
+export declare function parsePrompt(prompt: string): BrandVector;
+export declare function deriveTheme(v: BrandVector): DerivedPair;
+```
+
+`deriveTheme` solves each member of the pair to WCAG AA. It never returns a theme below AA: when it cannot reach AA, it throws.
+
+`serializeCustomerTheme(pair)` is for a different job. It writes the TypeScript source of a theme file plus the registry lines that add it, for a theme registry such as Psi's own repository. Use `buildThemeCss` when you only need CSS.
+
+## One-off changes: override component tokens
+
+To change one component, override its own tokens, which are named `--psi-{component}-*`. Do not override the semantic tokens, which would move every component that uses them.
+
+```css
+.marketing-cta {
+  --psi-button-font: var(--psi-text-mono-14-20-regular);
+}
+```
+
+`--psi-button-font` sets the typography of every Button size under that class in one declaration. Each component page has a Theming section.

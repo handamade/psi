@@ -1,0 +1,64 @@
+---
+title: Dark mode
+description: Import both themes, switch with one attribute, and set the mode before first paint.
+order: 3
+---
+
+Dark mode is a theme, not a separate build. Import `dark.css` next to `light.css` and switch with one attribute.
+
+## Turn it on
+
+```tsx
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css";
+import "@handamade/psi-tokens/dark.css";
+import "@handamade/psi-tokens/components.css";
+import "@handamade/psi-tokens/utilities.css";
+import "@handamade/psi-react/styles";
+```
+
+Import `light.css` before `dark.css`. Both rules have the same specificity, so the later file wins a tie, and `light.css` matches `:root`. With `dark.css` first, `<html data-psi-theme="dark">` renders light.
+
+Then set the theme on `<html>`:
+
+```html
+<html data-psi-theme="dark">
+```
+
+`light.css` also applies at the document root, so a page with no attribute is light. `dark.css` applies only where `data-psi-theme="dark"` is set.
+
+Remember to paint the page: a theme never sets a background or text color on its own. The rules are in [Installation](/docs/get-started/installation/#set-up-the-app-root).
+
+## What a theme does to browser controls
+
+Each theme declares `color-scheme` from its base: `light` and `acme` declare `light`, `dark` and `ember` declare `dark`. That makes the parts the browser draws, such as date pickers, select lists and scrollbars, match the theme. It also works inside a subtree.
+
+The declaration is a single keyword, not `light dark`, so the browser does not follow the operating system: the theme has already decided.
+
+It is the one theme declaration that is not a custom property. It fills no element, so it still paints no background.
+
+Your own `color-scheme` rule overrides it if the rule is unlayered, sits in a layer declared after `psi.theme`, or is inline. A rule in `@layer psi.base` does not.
+
+The page's own scrollbar and canvas follow `<html>`'s scheme. A theme set on a wrapper below `<html>` changes only that subtree.
+
+## Avoid a flash on load
+
+If you pick the mode in JavaScript after the page loads, visitors in dark mode see a light flash. Set the attribute before first paint with a small inline script in `<head>`, before your stylesheets render anything:
+
+```html
+<script>
+  (function () {
+    var mode = null;
+    try {
+      var stored = localStorage.getItem("psi-theme");
+      if (stored === "light" || stored === "dark") mode = stored;
+    } catch (_) {
+      /* storage unavailable */
+    }
+    document.documentElement.dataset.psiTheme =
+      mode || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  })();
+</script>
+```
+
+It uses the stored choice when there is one, and your visitor's system setting otherwise. When your toggle changes the mode, set `document.documentElement.dataset.psiTheme` and write the same `psi-theme` key to `localStorage`.

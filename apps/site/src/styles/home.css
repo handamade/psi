@@ -1,0 +1,768 @@
+/* ------------------------------------------------------------------ hero */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(72px, 14vh, 148px) var(--promo-section-gap);
+}
+
+/* blueprint grid + accent glow, both token-derived so they re-theme */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--promo-hairline-faint) 1px, transparent 1px),
+    linear-gradient(90deg, var(--promo-hairline-faint) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(120% 90% at 50% 0%, black 20%, transparent 78%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  inset-inline: -10%;
+  height: 80%;
+  background: radial-gradient(
+    50% 60% at 70% 30%,
+    color-mix(in oklab, var(--psi-fill-accent) 16%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.hero .container {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 6vw, 72px);
+  align-items: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--psi-space-8);
+  margin-bottom: var(--psi-space-24);
+}
+
+.hero-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  /* decorative rule reads as text-strength ink — bind the fg token to color
+   * and paint via currentColor (D46: fg tokens are text-scope only) */
+  color: var(--psi-fg-accent);
+  background: currentColor;
+}
+
+.hero h1 {
+  font: var(--psi-display-36-64-black);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--psi-fg-accent);
+}
+
+.hero-lede {
+  margin-top: var(--psi-space-24);
+  max-width: 52ch;
+  font: var(--psi-text-18-28-medium);
+  font-weight: 400;
+  color: var(--psi-fg-secondary);
+  text-wrap: pretty;
+}
+
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--psi-space-12);
+  margin-top: var(--psi-space-32);
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--psi-space-8) var(--psi-space-20);
+  margin-top: var(--psi-space-40);
+  padding-top: var(--psi-space-20);
+  border-top: 1px solid var(--promo-hairline-faint);
+}
+
+/* theme console */
+
+.console-card {
+  border: 1px solid var(--promo-hairline);
+  border-radius: var(--psi-radius-12);
+  background: var(--psi-bg-secondary);
+  box-shadow: var(--promo-shadow-1);
+  overflow: hidden;
+}
+
+.console-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--psi-space-12) var(--psi-space-20);
+  border-bottom: 1px solid var(--promo-hairline-faint);
+}
+
+.console-prompt {
+  display: flex;
+  gap: var(--psi-space-8);
+  padding: var(--psi-space-16) var(--psi-space-20);
+  border-bottom: 1px dashed var(--promo-hairline-faint);
+}
+
+.console-prompt input {
+  flex: 1;
+  min-width: 0;
+}
+
+.console-transcript {
+  display: grid;
+  gap: var(--psi-space-4);
+  min-height: 56px;
+  padding: var(--psi-space-16) var(--psi-space-20) 0;
+}
+
+.console-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--psi-space-12);
+  padding: var(--psi-space-16) var(--psi-space-20);
+  border-top: 1px dashed var(--promo-hairline-faint);
+}
+
+/* The vector name can run to 48 chars — long enough on its own to overflow
+ * a 320px viewport. flex-shrink alone won't do it: a flex item's default
+ * min-width is its content's intrinsic (unbreakable, nowrap) size, so
+ * min-width: 0 here is what lets the button shrink at all, and the same on
+ * the label span is what lets *it* shrink enough for text-overflow to have
+ * something to truncate. */
+.console-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.console-copy-label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.derive {
+  padding: var(--psi-space-16) var(--psi-space-20) var(--psi-space-20);
+  border-top: 1px dashed var(--promo-hairline);
+  display: grid;
+  gap: var(--psi-space-12);
+}
+
+.derive-row {
+  display: flex;
+  gap: var(--psi-space-8);
+}
+
+.derive-cell {
+  flex: 1;
+  display: grid;
+  gap: var(--psi-space-4);
+  min-width: 0;
+}
+
+/* The label sits below the swatch, not on it: white-on-accent measures
+ * 3.2:1 at the slider's far end, and this demo is *about* contrast (D76). */
+.derive-swatch {
+  height: 64px;
+  border-radius: var(--psi-radius-6);
+}
+
+.derive-swatch--base {
+  background: oklch(from var(--psi-fill-accent) calc(l + var(--delta, 0)) c h);
+}
+
+.derive-swatch--hover {
+  background: oklch(
+    from var(--psi-fill-accent) calc(l + var(--delta, 0) - 0.04) c h
+  );
+}
+
+.derive-swatch--active {
+  background: oklch(
+    from var(--psi-fill-accent) calc(l + var(--delta, 0) - 0.08) c h
+  );
+}
+
+.derive-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--psi-space-12);
+}
+
+.derive-controls input[type="range"] {
+  flex: 1;
+  accent-color: var(--psi-fill-accent);
+}
+
+.shape-dial {
+  display: flex;
+  align-items: center;
+  gap: var(--psi-space-12);
+  margin-bottom: var(--psi-space-20);
+  flex-wrap: wrap;
+}
+
+.shape-dial input[type="range"] {
+  flex: 1;
+  min-width: 160px;
+  max-width: 320px;
+  accent-color: var(--psi-fill-accent);
+}
+
+/* -------------------------------------------------------------- sections */
+
+.section {
+  padding-block: 0 var(--promo-section-gap);
+}
+
+.section-head {
+  max-width: 62ch;
+  margin-bottom: clamp(32px, 5vh, 56px);
+}
+
+.section-head .annot {
+  display: block;
+  margin-bottom: var(--psi-space-12);
+}
+
+.section-head h2 {
+  font: var(--psi-display-32-32-extrabold);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.section-head .lede {
+  margin-top: var(--psi-space-16);
+  color: var(--psi-fg-secondary);
+  text-wrap: pretty;
+}
+
+/* principles */
+
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--psi-space-16);
+}
+
+.principle {
+  display: grid;
+}
+
+.principle > .card {
+  height: 100%;
+}
+
+.principle h3 {
+  font: var(--psi-text-16-24-medium);
+  margin-block: var(--psi-space-40) var(--psi-space-8);
+  text-wrap: balance;
+}
+
+.principle p {
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-fg-secondary);
+}
+
+.principle code {
+  font-size: 0.85em;
+  color: var(--psi-fg-accent);
+  background: var(--psi-fill-tint-accent);
+  padding: 1px 5px;
+  border-radius: var(--psi-radius-4);
+}
+
+/* components playground */
+
+.playground {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--psi-space-16);
+}
+
+.playground .card h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--psi-space-12);
+  font: var(--psi-text-14-20-medium);
+  font-family: var(--psi-font-mono);
+  color: var(--psi-fg-secondary);
+  margin-bottom: var(--psi-space-20);
+}
+
+.sb-link {
+  font: var(--psi-text-12-16-medium);
+  font-family: var(--psi-font-mono);
+  color: var(--psi-fg-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.sb-link:hover {
+  text-decoration: underline;
+}
+
+.pg-index {
+  margin-top: var(--psi-space-24);
+}
+
+.pg-index a {
+  color: var(--psi-fg-secondary);
+  text-underline-offset: 3px;
+}
+
+.pg-index a:hover {
+  color: var(--psi-fg-accent);
+}
+
+.pg-buttons {
+  grid-column: span 7;
+}
+
+.pg-controls {
+  grid-column: span 5;
+  display: flex;
+  flex-direction: column;
+}
+
+.pg-surface {
+  grid-column: span 12;
+}
+
+.pg-menu {
+  grid-column: span 12;
+}
+
+.pg-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--psi-space-12);
+}
+
+.pg-row + .pg-row {
+  margin-top: var(--psi-space-20);
+}
+
+.pg-row > input[type="text"],
+.pg-row > input:not([type]) {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+.pg-sizes {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--psi-space-16);
+  margin-top: var(--psi-space-32);
+  padding-top: var(--psi-space-20);
+  border-top: 1px dashed var(--promo-hairline-faint);
+}
+
+.pg-size {
+  display: grid;
+  gap: var(--psi-space-8);
+  justify-items: center;
+}
+
+.pg-stack {
+  display: grid;
+  gap: var(--psi-space-16);
+}
+
+.pg-note,
+.roadmap-foot,
+.derive p {
+  max-width: 70ch;
+}
+
+.pg-note {
+  margin-top: auto;
+  padding-top: var(--psi-space-20);
+}
+
+/* theming */
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--psi-space-16);
+}
+
+.theme-card {
+  margin: 0;
+  display: grid;
+  gap: var(--psi-space-8);
+}
+
+.theme-card-ui {
+  border: 1px solid var(--promo-hairline);
+  border-radius: var(--psi-radius-12);
+  background: var(--psi-bg-primary);
+  color: var(--psi-fg-primary);
+  padding: var(--psi-space-20);
+  display: grid;
+  gap: var(--psi-space-16);
+  box-shadow: var(--promo-shadow-1);
+}
+
+.theme-card-ui header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: var(--psi-text-16-24-medium);
+}
+
+.theme-card-ui p {
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-fg-secondary);
+}
+
+.theme-card-ui .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--psi-space-12);
+  flex-wrap: wrap;
+}
+
+.theming-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--psi-space-16);
+  margin-top: var(--psi-space-16);
+}
+
+.code-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-16);
+  min-width: 0;
+}
+
+.code-block {
+  border: 1px solid var(--promo-hairline-faint);
+  border-radius: var(--psi-radius-12);
+  background: var(--psi-bg-secondary);
+  overflow: hidden;
+}
+
+.code-block-head {
+  padding: var(--psi-space-8) var(--psi-space-16);
+  border-bottom: 1px solid var(--promo-hairline-faint);
+}
+
+.code-block pre {
+  margin: 0;
+  padding: var(--psi-space-16) var(--psi-space-20);
+  font: var(--psi-text-12-16-regular);
+  font-family: var(--psi-font-mono);
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--psi-space-16);
+  align-content: center;
+}
+
+.check-list li {
+  display: flex;
+  gap: var(--psi-space-12);
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-fg-secondary);
+}
+
+.check-list li strong {
+  color: var(--psi-fg-primary);
+  font-weight: 500;
+}
+
+.check-list svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--psi-fg-success);
+}
+
+/* pipeline */
+
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--psi-space-16);
+}
+
+.pipeline-grid .card > p {
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-fg-secondary);
+  margin-bottom: var(--psi-space-20);
+}
+
+.var-list {
+  display: grid;
+  gap: 1px;
+  background: var(--promo-hairline-faint);
+  border: 1px solid var(--promo-hairline-faint);
+  border-radius: var(--psi-radius-8);
+  overflow: hidden;
+}
+
+.var-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: start;
+  gap: var(--psi-space-12);
+  padding: var(--psi-space-8) var(--psi-space-12);
+  background: var(--psi-bg-primary);
+  font: var(--psi-text-12-16-regular);
+  font-family: var(--psi-font-mono);
+  min-width: 0;
+}
+
+/* ARTIFACTS rows have no dot: an invisible spacer reserves the same
+ * 14px track width so both var-lists' second column starts at the
+ * same x offset (D76). */
+.var-row .dot-spacer {
+  visibility: hidden;
+}
+
+/* Unbreakable tokens (manifest.json, guidance.json) have no wrap
+ * opportunity at the narrow end of the 1fr track and would otherwise
+ * overflow the cell and paint over the value column (D76). */
+.var-row > :nth-child(2) {
+  overflow-wrap: anywhere;
+}
+
+.var-row .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--psi-radius-4);
+  border: 1px solid var(--promo-hairline);
+}
+
+/* A FLOAT variable has no color. An empty swatch is honest; a borrowed one is not. */
+.var-row .dot--none {
+  border-style: dashed;
+  background: none;
+}
+
+.var-row .val {
+  color: var(--psi-fg-secondary);
+  min-width: 0;
+}
+
+/* grid/flex items must be allowed to shrink below content width */
+.playground > .card,
+.pipeline-grid > .card,
+.roadmap-grid > .card,
+.theming-cols > *,
+.footer-grid > *,
+.var-list {
+  min-width: 0;
+}
+
+/* roadmap */
+
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--psi-space-16);
+}
+
+.roadmap-foot {
+  margin-top: var(--psi-space-24);
+}
+
+/* updates */
+
+.updates-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 78ch;
+  display: grid;
+  gap: var(--psi-space-12);
+}
+
+.update .card {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: var(--psi-space-24);
+}
+
+.update-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--psi-space-8);
+}
+
+.update h3 {
+  font: var(--psi-text-16-24-medium);
+  margin-bottom: var(--psi-space-8);
+}
+
+.update p {
+  font: var(--psi-text-14-20-regular);
+  color: var(--psi-fg-secondary);
+  max-width: 70ch;
+}
+
+.update-link {
+  display: inline-block;
+  margin-top: var(--psi-space-12);
+  font: var(--psi-text-14-20-medium);
+  color: var(--psi-fg-accent);
+  text-decoration: none;
+}
+
+.update-link:hover {
+  text-decoration: underline;
+}
+
+/* footer */
+
+.site-footer {
+  border-top: 1px solid var(--promo-hairline-faint);
+  background: var(--psi-bg-secondary);
+  padding-block: var(--psi-space-64);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--psi-space-32);
+  align-items: start;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--psi-space-8) var(--psi-space-24);
+  margin-top: var(--psi-space-32);
+}
+
+.footer-links a {
+  font: var(--psi-text-14-20-medium);
+  color: var(--psi-fg-secondary);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--psi-fg-accent);
+}
+
+.footer-note {
+  margin-top: var(--psi-space-40);
+  padding-top: var(--psi-space-20);
+  border-top: 1px solid var(--promo-hairline-faint);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--psi-space-16);
+  flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------- motion */
+
+@keyframes promo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: promo-rise var(--psi-duration-600) var(--psi-ease-soft) both;
+  animation-delay: var(--rise, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .rise {
+    animation: none;
+  }
+
+  body {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 960px) {
+  .hero .container {
+    grid-template-columns: 1fr;
+  }
+
+  .principles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pg-buttons,
+  .pg-controls {
+    grid-column: span 12;
+  }
+
+  .theme-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .theming-cols,
+  .pipeline-grid,
+  .roadmap-grid,
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .update .card {
+    grid-template-columns: 1fr;
+    gap: var(--psi-space-12);
+  }
+
+  .update-meta {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .principles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pg-sizes {
+    flex-wrap: wrap;
+  }
+}

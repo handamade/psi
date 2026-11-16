@@ -1,4 +1,4 @@
-// Assembles the public website: promo at /, static Storybook at /storybook/.
+// Assembles the public website: site at /, static Storybook at /storybook/.
 // Run after `pnpm -r build` (see root `build:web` script).
 import { cp, rm, access, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -7,14 +7,14 @@ import path from "node:path";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(root, "..");
 
-const promoDist = path.join(repo, "apps/promo/dist");
+const siteDist = path.join(repo, "apps/site/dist");
 const storybookDist = path.join(repo, "apps/storybook/storybook-static");
 const rootLlmsTxt = path.join(repo, "llms.txt");
 const tokensLlmsTxt = path.join(repo, "packages/tokens/llms.txt");
 const reactLlmsTxt = path.join(repo, "packages/react/llms.txt");
 const out = path.join(repo, "site-dist");
 
-for (const dir of [promoDist, storybookDist]) {
+for (const dir of [siteDist, storybookDist]) {
   try {
     await access(dir);
   } catch {
@@ -33,7 +33,7 @@ for (const file of [rootLlmsTxt, tokensLlmsTxt, reactLlmsTxt]) {
 }
 
 await rm(out, { recursive: true, force: true });
-await cp(promoDist, out, { recursive: true });
+await cp(siteDist, out, { recursive: true });
 await cp(storybookDist, path.join(out, "storybook"), { recursive: true });
 
 // §04 (Pipeline.tsx ARTIFACTS) advertises "llms.txt" unqualified — the root
@@ -51,5 +51,5 @@ await cp(tokensLlmsTxt, path.join(out, "packages/tokens/llms.txt"));
 await cp(reactLlmsTxt, path.join(out, "packages/react/llms.txt"));
 
 console.log(
-  `site-dist assembled: / (promo) + /storybook/ + /llms.txt + /packages/tokens/llms.txt + /packages/react/llms.txt (${out})`,
+  `site-dist assembled: / (site) + /storybook/ + /llms.txt + /packages/tokens/llms.txt + /packages/react/llms.txt (${out})`,
 );

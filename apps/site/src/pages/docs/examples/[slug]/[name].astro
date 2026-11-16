@@ -1,0 +1,25 @@
+---
+import Base from "../../../../layouts/Base.astro";
+import { ExampleHost } from "../../../../components/ExampleHost";
+import { examples, isFramed } from "../../../../examples/registry";
+
+export function getStaticPaths() {
+  return examples.map((e) => ({ params: { slug: e.slug, name: e.name }, props: { e } }));
+}
+
+const { e } = Astro.props;
+const ownLandmarks = isFramed(e.slug, e.name);
+---
+
+<Base title={`${e.slug} ${e.name} example — Psi`} description={`A live ${e.slug} example.`}>
+  <meta slot="head" name="robots" content="noindex" />
+  {
+    ownLandmarks ? (
+      <ExampleHost client:load slug={e.slug} name={e.name} />
+    ) : (
+      <main>
+        <ExampleHost client:load slug={e.slug} name={e.name} />
+      </main>
+    )
+  }
+</Base>

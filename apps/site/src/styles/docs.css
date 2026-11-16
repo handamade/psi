@@ -1,0 +1,268 @@
+:root {
+  --site-docs-measure: 72ch;
+  --site-docs-toc-width: 224px;
+  --site-docs-anchor-offset: 24px;
+  --site-pre-pad: 16px;
+  --site-swatch-pad: 4px;
+  --site-chip-gap: 8px;
+}
+
+.docs-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--psi-space-48);
+}
+
+@media (min-width: 1200px) {
+  .docs-page {
+    grid-template-columns: minmax(0, var(--site-docs-measure)) var(--site-docs-toc-width);
+  }
+}
+
+.docs-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.docs-content {
+  min-width: 0;
+  max-width: var(--site-docs-measure);
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-16);
+}
+
+.docs-content :where(p, li) {
+  font: var(--psi-text-16-24-regular);
+  color: var(--psi-fg-primary);
+}
+
+.docs-content :where(ul, ol) {
+  margin: 0;
+  padding-inline-start: var(--psi-space-24);
+}
+
+.docs-content :where(a) {
+  color: var(--psi-fg-accent);
+}
+
+.docs-content :where(code):not(pre code) {
+  overflow-wrap: anywhere;
+  font-family: var(--psi-font-mono);
+  font-size: 0.9em;
+  padding: 0 var(--psi-space-4);
+  border-radius: var(--psi-radius-4);
+  background: var(--psi-bg-secondary);
+}
+
+.docs-content :where(table):not([class]) {
+  border-collapse: collapse;
+  width: 100%;
+  font: var(--psi-text-14-20-regular);
+}
+
+.docs-content :where(table):not([class]) :where(th, td) {
+  text-align: start;
+  padding: var(--psi-space-8);
+  border-bottom: 1px solid var(--psi-border-faint);
+}
+
+/* The anchor sits beside the heading, not in it, so the heading's accessible
+ * name stays its text. The row keeps them on one line. */
+.docs-heading-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--psi-space-8);
+  margin-block-start: var(--psi-space-24);
+  scroll-margin-top: var(--site-docs-anchor-offset);
+}
+
+.docs-heading {
+  margin: 0;
+  scroll-margin-top: var(--site-docs-anchor-offset);
+}
+
+h2.docs-heading {
+  font: var(--psi-text-20-28-semibold);
+}
+
+h3.docs-heading {
+  font: var(--psi-text-16-24-medium);
+}
+
+.docs-heading-anchor {
+  color: var(--psi-fg-secondary);
+  text-decoration: none;
+  opacity: 0;
+}
+
+.docs-heading-row:hover .docs-heading-anchor,
+.docs-heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.docs-toc {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .docs-toc {
+    display: block;
+    position: sticky;
+    top: 0;
+    align-self: start;
+  }
+}
+
+.docs-toc-sub {
+  padding-inline-start: var(--psi-space-12);
+}
+
+/* AppShell collapses its sidebar by `hidden` only; below the md breakpoint
+ * (960, guidance.json layout.breakpoints) the toggle is how it comes back. */
+@media (min-width: 960px) {
+  .docs-menu-toggle {
+    display: none;
+  }
+}
+
+/* Server HTML and no-JS, narrow: the shell has not measured the viewport yet
+ * (DocsShell sets data-hydrated). Without this the 16rem sidebar column is
+ * drawn and the toggle is dead. Single column; override AppShell's grid. */
+@media (max-width: 959px) {
+  .docs-shell:not([data-hydrated]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-shell:not([data-hydrated]) #docs-sidebar,
+  .docs-shell:not([data-hydrated]) .docs-menu-toggle {
+    display: none;
+  }
+}
+
+.code-view pre,
+.docs-content > pre {
+  margin: 0;
+  overflow-x: auto;
+  font: var(--psi-text-mono-14-20-regular);
+  background: transparent;
+  --shiki-foreground: var(--psi-fg-primary);
+  --shiki-background: transparent;
+  --shiki-token-constant: var(--psi-fg-accent);
+  --shiki-token-string: var(--psi-fg-success);
+  --shiki-token-string-expression: var(--psi-fg-success);
+  --shiki-token-comment: var(--psi-fg-secondary);
+  --shiki-token-keyword: var(--psi-fg-accent);
+  --shiki-token-parameter: var(--psi-fg-primary);
+  --shiki-token-function: var(--psi-fg-primary);
+  --shiki-token-punctuation: var(--psi-fg-secondary);
+  --shiki-token-link: var(--psi-fg-accent);
+}
+
+/* Fenced code in a guide is a <pre> directly under .docs-content. A CodeView's
+ * pre is nested in its own Panel, so it is not matched and draws no second
+ * box. Shiki paints the background from --shiki-background, so set that. */
+.docs-content > pre {
+  padding: var(--site-pre-pad);
+  border: 1px solid var(--psi-border-faint);
+  border-radius: var(--psi-radius-8);
+  --shiki-background: var(--psi-bg-secondary);
+}
+
+/* In flow above the code, never over it: the label is visible text. */
+.code-view-copy {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-end: var(--psi-space-8);
+}
+
+.example-preview {
+  overflow-x: auto;
+  padding: var(--psi-space-24);
+  border: 1px solid var(--psi-border-faint);
+  border-radius: var(--psi-radius-12);
+  background: var(--psi-bg-primary);
+}
+
+/* A horizontally scrolling region is a tab stop (ScrollRegion.astro gives it
+ * role, name and tabindex), so a keyboard user can scroll it. */
+.docs-scroll {
+  overflow-x: auto;
+}
+
+.docs-scroll :where(td:first-child code) {
+  white-space: nowrap;
+}
+
+.props-required {
+  font: var(--psi-text-12-16-regular);
+  color: var(--psi-fg-secondary);
+}
+
+.example-frame {
+  display: block;
+  inline-size: 100%;
+  block-size: 320px;
+  border: 1px solid var(--psi-border-faint);
+  border-radius: var(--psi-radius-8);
+}
+
+.token-swatch {
+  display: inline-flex;
+  padding: var(--site-swatch-pad);
+  border-radius: var(--psi-radius-6);
+  background: var(--psi-bg-primary);
+  border: 1px solid var(--psi-border-faint);
+}
+
+.token-swatch-chip {
+  width: var(--psi-size-24);
+  height: var(--psi-size-24);
+  border-radius: var(--psi-radius-4);
+}
+
+.token-value {
+  display: block;
+  font: var(--psi-text-mono-13-20-regular);
+}
+
+.token-chip {
+  display: inline-block;
+  margin: 0 var(--site-chip-gap) var(--site-chip-gap) 0;
+}
+
+.search-results {
+  list-style: none;
+  margin: var(--psi-space-16) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-4);
+}
+
+.search-results a {
+  display: flex;
+  flex-direction: column;
+  gap: var(--psi-space-4);
+  padding: var(--psi-space-8);
+  border-radius: var(--psi-radius-8);
+  text-decoration: none;
+}
+
+.search-results a:hover {
+  background: var(--psi-bg-secondary);
+}
+
+.search-result-title {
+  font: var(--psi-text-14-20-medium);
+}
+
+.search-result-excerpt {
+  font: var(--psi-text-12-16-regular);
+  color: var(--psi-fg-secondary);
+}
+
+.search-result-excerpt mark {
+  background: transparent;
+  color: var(--psi-fg-accent);
+}

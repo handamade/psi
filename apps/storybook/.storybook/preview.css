@@ -2,7 +2,7 @@
  * does (llms.txt): theme CSS never paints the page, so the canvas paints
  * bg/fg itself (HAN-38), and it sets the body font, so text a story places in
  * a Panel, Dialog or tab panel reads as it would in an app (D107). Same rules
- * as promo.css, in psi.base so Psi's component layer still wins (D94). Native
+ * as the site's site.css, in psi.base so Psi's component layer still wins (D94). Native
  * form controls do not inherit font by default, and code falls back to the
  * browser's monospace; the reset any app carries fixes both. */
 @layer psi.base {
