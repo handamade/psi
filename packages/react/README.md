@@ -35,7 +35,7 @@ export default function App() {
 
 ## App root
 
-Theme CSS never paints the page or sets its font, so your app root does (D107). It does declare `color-scheme` (`light` or `dark`, from the theme's base), so date pickers, select lists and scrollbars match the theme; a `color-scheme` rule of your own overrides it (D116):
+Theme CSS never paints the page or sets its font, so your app root does (D107). Theme CSS does declare `color-scheme` (`light` or `dark`, from the theme's base), so date pickers, select lists and scrollbars match the theme (D116). An unlayered `color-scheme` rule of your own, one in a layer declared after `psi.theme`, or an inline style overrides it; one in `@layer psi.base` does not. Put the paint and font rules below in `@layer psi.base`, but do not put `color-scheme` there:
 
 ```css
 @layer psi.base {

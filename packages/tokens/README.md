@@ -27,7 +27,7 @@ Then set the theme on your root element:
 </html>
 ```
 
-All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, `--psi-space-12`, etc. Each theme also declares `color-scheme` (`light` or `dark`, from its base), so date pickers, select lists and scrollbars match it; a `color-scheme` rule of your own overrides it (D116).
+All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, `--psi-space-12`, etc. Each theme also declares `color-scheme` (`light` or `dark`, from its base), so date pickers, select lists and scrollbars match it; an unlayered `color-scheme` rule of your own, one in a layer declared after `psi.theme`, or an inline style overrides it; one in `@layer psi.base` does not (D116).
 
 **utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*`, `.psi-fg-*` (D94) utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
 

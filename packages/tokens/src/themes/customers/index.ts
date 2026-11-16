@@ -28,7 +28,7 @@ export interface CustomerTheme {
  * none. The one place that default lives, so Psi's build and buildThemeCss
  * cannot disagree. */
 export function customerColorScheme(c: CustomerTheme): ColorScheme {
-  return c.base ?? "light";
+  return c.base === "dark" ? "dark" : "light";
 }
 
 /** Assemble the full semantic ThemeDef for a customer brand (D27). D46: an

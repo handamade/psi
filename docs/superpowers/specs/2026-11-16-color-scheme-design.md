@@ -1,6 +1,6 @@
 # A theme declares its color scheme (D116)
 
-Date: 2026-11-16. Status: **Approved**, not implemented. Branch
+Date: 2026-11-16. Status: **Implemented** on branch
 `d116-color-scheme`.
 
 Provenance: a consumer running Psi's dark themes found the calendar icon of a
@@ -68,7 +68,9 @@ D115 is claimed by a spec on another branch. Check again when the PR opens.
     helper holds that default, so the build and `buildThemeCss` cannot
     disagree.
   - **`emitThemeCSS` takes the scheme as a required argument.** A caller that
-    forgets it fails to compile instead of shipping a theme with no scheme.
+    forgets it fails to compile instead of shipping a theme with no scheme. That
+    holds for `src/`, which the package build type-checks. `scripts/build.ts`
+    runs under `tsx`, unchecked, so the dist tests guard that path.
   - **A single keyword.** Not `light dark`: that lets the browser follow the
     operating system, and a theme has already decided. Not `only light` /
     `only dark`: `only` stops a browser's forced dark mode from recolouring the
@@ -83,8 +85,9 @@ D115 is claimed by a spec on another branch. Check again when the PR opens.
       is what the browser drew anyway;
     - when two themes match one element, load order settles the scheme exactly
       as it settles the tokens, so the two cannot disagree.
-  - **A consumer overrides it with any rule of its own.** The declaration sits
-    in `@layer psi.theme`, so an unlayered rule or an inline style wins.
+  - **A consumer overrides it with a rule that beats `@layer psi.theme`.** An
+    unlayered rule, one in a layer declared after `psi.theme`, or an inline
+    style overrides it; one in `@layer psi.base` does not.
   - **The rule stands, with a clause.** *A theme paints no background. It
     declares its `color-scheme`, so the browser draws its own parts — form
     controls, scrollbars, and a root canvas nobody paints — for that scheme.*
@@ -102,8 +105,10 @@ D115 is claimed by a spec on another branch. Check again when the PR opens.
 
 - **A visible change for consumers on dark themes**, and the point of the
   decision: date pickers, native select lists, spin buttons and scrollbars
-  render dark. A consumer that set its own `color-scheme` keeps it. On a light
-  theme nothing changes.
+  render dark. A consumer that set its own `color-scheme` in an unlayered rule,
+  a later layer or an inline style keeps it. On a light theme nothing changes,
+  except on a page that let the OS choose (`<meta name="color-scheme"
+  content="light dark">`), which `light` now pins.
 - **A consumer's theme picks it up on its next build.** `buildThemeCss` emits
   the declaration from the theme's `base`, so a theme built with `base: "dark"`
   needs no change of its own.

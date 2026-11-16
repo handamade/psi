@@ -1,7 +1,7 @@
 // D116 — a theme declares its color-scheme from its base, so the browser
 // draws its own parts (date pickers, select lists, scrollbars) to match.
 import { describe, expect, it } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { customerColorScheme, customerThemes } from "../src/themes/customers/index.js";
 
@@ -15,6 +15,11 @@ describe("customerColorScheme (D116)", () => {
   it("is light when the theme names no base", () => {
     expect(customerThemes.acme.base).toBeUndefined();
     expect(customerColorScheme(customerThemes.acme)).toBe("light");
+  });
+
+  it("is light for a base that is not exactly \"dark\", so CSS never carries a stray keyword", () => {
+    const untyped = { ...customerThemes.acme, base: "Dark" as unknown as "dark" };
+    expect(customerColorScheme(untyped)).toBe("light");
   });
 });
 
@@ -33,8 +38,8 @@ describe("the shipped themes (D116)", () => {
   }
 
   it("every resolved theme carries a scheme, so a new theme cannot ship without one", () => {
-    for (const file of readdirSync(join(dist, "resolved")).filter((f) => f.endsWith(".json"))) {
-      expect(["light", "dark"], file).toContain(resolved(file.replace(/\.json$/, "")).colorScheme);
+    for (const theme of ["light", "dark", ...Object.keys(customerThemes)]) {
+      expect(["light", "dark"], theme).toContain(resolved(theme).colorScheme);
     }
   });
 });
