@@ -1,10 +1,10 @@
 // D115 engine spike. Opens fixture.html in Chromium, WebKit and Firefox and
 // checks the five things the plan's CSS depends on. Run from the repo root:
-//   node docs/superpowers/plans/assets/d115-spike/spike.mjs
+//   node docs/superpowers/plans/assets/d115-spike/spike.mjs [fixture-file]   (default fixture.html)
 // Needs `pnpm exec playwright install webkit firefox` once.
 import { chromium, webkit, firefox } from "@playwright/test";
 
-const url = new URL("./fixture.html", import.meta.url).href;
+const url = new URL(`./${process.argv[2] ?? "fixture.html"}`, import.meta.url).href;
 const WIDE = ["name", "group", "status", "long", "combo", "s24", "s40", "s48", "ta"];
 const ONE_LINE = ["name", "group", "combo", "s24", "s40", "s48"];
 
@@ -26,7 +26,13 @@ function judge(m) {
 }
 
 for (const [name, type] of [["chromium", chromium], ["webkit", webkit], ["firefox", firefox]]) {
-  const browser = await type.launch();
+  let browser;
+  try {
+    browser = await type.launch({ timeout: 30000 });
+  } catch (e) {
+    console.log(`\n== ${name}: launch failed, not measured (${String(e.message).split("\n")[0]})`);
+    continue;
+  }
   const page = await browser.newPage({ viewport: { width: 900, height: 1200 } });
   await page.goto(url);
   const m = await page.evaluate(() => {
