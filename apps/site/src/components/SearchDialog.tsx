@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Dialog, Field, Input } from "@handamade/psi-react";
 
+import { announce } from "../lib/announce";
+
 interface Hit {
   url: string;
   title: string;
@@ -15,30 +17,44 @@ interface Pagefind {
 let pagefind: Promise<Pagefind> | null = null;
 function loadPagefind(): Promise<Pagefind> {
   // Loaded on first open only; the path is outside Vite's graph on purpose.
-  pagefind ??= import(/* @vite-ignore */ "/pagefind/pagefind.js" as string) as Promise<Pagefind>;
+  // A rejected import is dropped from the cache so the next search retries it.
+  pagefind ??= (import(/* @vite-ignore */ "/pagefind/pagefind.js" as string) as Promise<Pagefind>).catch(
+    (err: unknown) => {
+      pagefind = null;
+      throw err;
+    },
+  );
   return pagefind;
 }
 
 export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
+  const [status, setStatus] = useState<"idle" | "searching" | "done" | "error">("idle");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open || query.trim() === "") {
       setHits([]);
+      setStatus("idle");
       return;
     }
     let cancelled = false;
+    setStatus("searching");
     loadPagefind()
       .then((pf) => pf.search(query))
       .then((res) => Promise.all(res.results.slice(0, 8).map((r) => r.data())))
       .then((data) => {
-        if (!cancelled)
-          setHits(data.map((d) => ({ url: d.url, title: d.meta.title, excerpt: d.excerpt })));
+        if (cancelled) return;
+        setHits(data.map((d) => ({ url: d.url, title: d.meta.title, excerpt: d.excerpt })));
+        setStatus("done");
+        announce(data.length === 0 ? "No results" : `${data.length} ${data.length === 1 ? "result" : "results"}`);
       })
       .catch(() => {
-        if (!cancelled) setHits([]);
+        if (cancelled) return;
+        setHits([]);
+        setStatus("error");
+        announce("Search is unavailable");
       });
     return () => {
       cancelled = true;
@@ -55,7 +71,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
           onChange={(e) => setQuery(e.currentTarget.value)}
         />
       </Field>
-      <ul className="search-results" aria-live="polite">
+      <ul className="search-results">
         {hits.map((h) => (
           <li key={h.url}>
             <a href={h.url}>
@@ -68,7 +84,8 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
             </a>
           </li>
         ))}
-        {query.trim() !== "" && hits.length === 0 && <li className="search-empty">No results</li>}
+        {status === "done" && hits.length === 0 && <li className="search-empty">No results</li>}
+        {status === "error" && <li className="search-empty">Search is unavailable</li>}
       </ul>
     </Dialog>
   );

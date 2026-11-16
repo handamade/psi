@@ -218,3 +218,22 @@ test("⌘K finds the Button page", async ({ page }) => {
   await input.fill("button");
   await expect(page.getByRole("link", { name: /^Button/ }).first()).toBeVisible();
 });
+
+test("a search that matches nothing says so once it has settled", async ({ page }) => {
+  await page.goto(`${BASE}/docs/`, { waitUntil: "networkidle" });
+  await page.keyboard.press("ControlOrMeta+k");
+  await page.getByRole("searchbox", { name: "Search the docs" }).fill("zzqxv");
+  await expect(page.locator(".search-empty", { hasText: "No results" })).toBeVisible();
+});
+
+test("a failed index load says so, and the next search retries it", async ({ page }) => {
+  await page.goto(`${BASE}/docs/`, { waitUntil: "networkidle" });
+  await page.route("**/pagefind/pagefind.js", (r) => r.abort());
+  await page.keyboard.press("ControlOrMeta+k");
+  const input = page.getByRole("searchbox", { name: "Search the docs" });
+  await input.fill("button");
+  await expect(page.locator(".search-empty", { hasText: "Search is unavailable" })).toBeVisible();
+  await page.unroute("**/pagefind/pagefind.js");
+  await input.fill("buttons");
+  await expect(page.getByRole("link", { name: /^Button/ }).first()).toBeVisible();
+});
