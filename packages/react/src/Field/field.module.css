@@ -60,3 +60,33 @@
   grid-column: 1;
   text-align: var(--psi-field-label-align);
 }
+
+/* In a FieldStack (D115): every Field spans the stack's two columns; a start
+   Field shares them, so all labels in the stack line up in one column. */
+
+.field[data-in-stack] {
+  grid-column: 1 / -1;
+}
+
+.field[data-in-stack][data-label-position="start"] {
+  grid-template-columns: subgrid;
+}
+
+/* Below 480px of the stack's width (containerQueries.fieldStackColumns), the
+   label returns above its control. The label aligns to start here whatever
+   --psi-field-label-align says: an end-aligned label above a control reads
+   as a mistake. */
+@container psi-field-stack (width < 480px) {
+  .field[data-in-stack][data-label-position="start"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .field[data-in-stack][data-label-position="start"] > *,
+  .field[data-in-stack][data-label-position="start"] > .label {
+    grid-column: 1;
+  }
+
+  .field[data-in-stack][data-label-position="start"] > .label {
+    text-align: start;
+  }
+}
