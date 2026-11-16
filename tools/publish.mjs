@@ -14,7 +14,7 @@
 // Safe to rerun: a version already on the registry is skipped, so a release
 // that stopped after one package picks up where it left off.
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { publishOrder, workspaceLeaks } from "./lib/publish-plan.mjs";
@@ -25,10 +25,17 @@ const fail = (msg) => {
   process.exit(1);
 };
 
+// `--dry-run` prints what would be published and stops before packing.
+const dryRun = process.argv.includes("--dry-run");
+
+// Only folders that are packages: a checkout can also hold `packages/node_modules`
+// (a hoisted install), which has no package.json of its own. The 0.31.0 release
+// stopped here with ENOENT before publishing anything.
 const pkgs = readdirSync(join(root, "packages"), { withFileTypes: true })
-  .filter((d) => d.isDirectory())
-  .map((d) => {
-    const dir = join(root, "packages", d.name);
+  .filter((d) => d.isDirectory() && d.name !== "node_modules")
+  .map((d) => join(root, "packages", d.name))
+  .filter((dir) => existsSync(join(dir, "package.json")))
+  .map((dir) => {
     const json = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
     return { name: json.name, dir, json };
   })
@@ -50,6 +57,14 @@ const isPublished = (name, version) => {
 
 const order = publishOrder(pkgs);
 console.log(`publish: ${order.map((p) => `${p.name}@${p.json.version}`).join(", ")}`);
+
+if (dryRun) {
+  for (const { name, json } of order) {
+    const state = isPublished(name, json.version) ? "already on npm, would skip" : "would publish";
+    console.log(`publish (dry run): ${name}@${json.version} ${state}`);
+  }
+  process.exit(0);
+}
 
 const dest = mkdtempSync(join(tmpdir(), "psi-publish-"));
 try {
