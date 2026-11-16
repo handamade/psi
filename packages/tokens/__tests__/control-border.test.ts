@@ -27,10 +27,12 @@ describe("borderControl (D106)", () => {
   });
 
   it("is gated at 3:1 on bgPrimary and bgSecondary", () => {
-    expect(nonTextPairs()).toEqual([
-      { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
-      { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
-    ]);
+    expect(nonTextPairs()).toEqual(
+      expect.arrayContaining([
+        { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
+        { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
+      ]),
+    );
   });
 
   for (const [name, theme, palette, slots] of [
@@ -41,7 +43,7 @@ describe("borderControl (D106)", () => {
     it(`${name}: clears 3:1 with headroom on both surfaces`, () => {
       const resolved = resolve(theme, palette, slots);
       expect(resolved.borderControl, "borderControl resolves").toBeDefined();
-      const results = matrix.checkContrast(resolved, nonTextPairs());
+      const results = matrix.checkContrast(resolved, nonTextPairs().filter((p) => p.fg === "borderControl"));
       expect(results).toHaveLength(2);
       for (const r of results) expect(r.ratio, `${r.fg} on ${r.bg}`).toBeGreaterThanOrEqual(3.1);
     });

@@ -58,6 +58,10 @@ export const lightTheme: ThemeDef = {
    * so WCAG 1.4.11 asks 3:1 for it (`nonTextPairs`). borderNeutral measured
    * 1.32-1.48. Alpha chosen by sweep over every derivable theme. */
   borderControl: token({ from: ref.fgPrimary, alpha: 0.55, scopes: ["border"] }),
+  /** D120: the field border on hover. Fields rest on borderControl, so hover
+   * must be a step darker and still clear 3:1 (`nonTextPairs`); borderStrong
+   * (0.3) would make hover lighter than rest. */
+  borderControlHover: token({ from: ref.fgPrimary, alpha: 0.75, scopes: ["border"] }),
   borderFocus: token({ from: ref.fgAccent, scopes: ["border"] }),
 
   // Scrims (D32): page-canvas surfaces at alpha — never text pairs, so they

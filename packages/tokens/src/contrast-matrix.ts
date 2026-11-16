@@ -182,9 +182,13 @@ export const componentLabelPairs: ContrastPair[] = [
 
 /** WCAG 1.4.11 non-text contrast (D106): 3:1 for the visual information that
  * identifies a control. An unchecked checkbox or radio is identified by its
- * outline alone, against its own fill (bgPrimary) and the surface it sits on
- * (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). */
+ * outline alone, and a text field by its border alone (D120: Input, Select and
+ * Textarea rest on borderControl and hover on borderControlHover). Each is
+ * checked against the control's own fill (bgPrimary) and the surface it sits
+ * on (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). */
 export const nonTextPairs: ContrastPair[] = [
   { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
   { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
+  { fg: "borderControlHover", bg: "bgPrimary", minRatio: 3 },
+  { fg: "borderControlHover", bg: "bgSecondary", minRatio: 3 },
 ];
