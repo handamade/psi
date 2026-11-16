@@ -86,3 +86,25 @@ export const CustomControl: Story = {
     </div>
   ),
 };
+
+/** D115 — the label beside its control, at every control size. */
+export const LabelStart: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 16 }}>
+      {([24, 32, 40, 48] as const).map((size) => (
+        <div key={size} style={{ display: "flex", gap: 24 }}>
+          <Field label={`Name ${size}`} labelPosition="start">
+            <Input size={size} defaultValue="Ada" />
+          </Field>
+          <Field label={`Rows per page ${size}`} labelPosition="start">
+            <Select size={size} defaultValue="50">
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </Select>
+          </Field>
+        </div>
+      ))}
+    </div>
+  ),
+};
