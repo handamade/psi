@@ -109,7 +109,7 @@ D115 is claimed by a spec on another branch. Check again when the PR opens.
   needs no change of its own.
 - **Changeset:** `minor` for `@handamade/psi-tokens`; the packages move in
   lockstep.
-- **A new story**, `Components/Input` `Date`: an `Input` with `type="date"` and
+- **A new story**, `Components/Input` `DateField`: an `Input` with `type="date"` and
   a value, so the VR matrix renders the picker icon in light and ember.
 - **Docs.** The clause goes where the rule is stated: the theming line in
   `packages/react/llms.txt`, its counterpart in `packages/react/README.md`, and
@@ -148,7 +148,7 @@ Tests first, each red on its assertion before the code exists.
   of the root is `light` under the light theme and `dark` under ember; of the
   date input, the same; and inside `AppShell`'s dark sidebar on a light page,
   `dark` while `<main>` stays `light`.
-- **VR**: the `Date` story's two baselines, and the moved ember renders, from
+- **VR**: the `DateField` story's two baselines, and the moved ember renders, from
   CI's render after the user's go-ahead.
 - **All five gates**: `pnpm build && node tools/check-docs-drift.mjs &&
   pnpm test && pnpm lint && pnpm --dir apps/promo build && pnpm test:site`.
