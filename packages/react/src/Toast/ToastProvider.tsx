@@ -27,6 +27,11 @@ export interface ToastProviderProps extends Omit<HTMLAttributes<HTMLDivElement>,
   actionDuration?: number;
   /** Corner the stack occupies. @default "bottom-end" */
   placement?: ToastPlacement;
+  /** The dismiss button's accessible name on every queued toast (D117) — pass
+   * the translated string. A toast's own `dismissLabel` from `show()` wins.
+   * Read at render, so changing it renames toasts already on screen. Unset, the
+   * toast's default applies. @default "Dismiss notification" */
+  dismissLabel?: string;
   /** The subtree that may call `useToast()`. The region is rendered alongside it. */
   children: ReactNode;
   /** Accessible name for the region landmark, forwarded to ToastRegion.
@@ -46,6 +51,8 @@ interface QueuedToast {
   politeness?: ToastPoliteness;
   /** Left undefined when show() did not pass one, so Toast keeps its default. */
   statusLabel?: string | null;
+  /** Left undefined when show() did not pass one, so the provider's applies. */
+  dismissLabel?: string;
   /** Total lifetime for this toast, chosen at show() time. */
   duration: number;
 }
@@ -100,6 +107,7 @@ export function ToastProvider({
   duration = 5000,
   actionDuration = 10000,
   placement = "bottom-end",
+  dismissLabel,
   children,
   ...regionProps
 }: ToastProviderProps) {
@@ -135,14 +143,14 @@ export function ToastProvider({
   );
 
   const show = useCallback(
-    ({ variant = "neutral", message, action, politeness, statusLabel }: ToastOptions): string => {
+    ({ variant = "neutral", message, action, politeness, statusLabel, dismissLabel: own }: ToastOptions): string => {
       const id = `${idPrefix}-${seq.current++}`;
       const lifetime = action != null ? actionDuration : duration;
 
       setToasts((prev) => {
         const next = [
           ...prev,
-          { id, variant, message, action, politeness, statusLabel, duration: lifetime },
+          { id, variant, message, action, politeness, statusLabel, dismissLabel: own, duration: lifetime },
         ];
         // Evict oldest-first past the limit, disposing their timers as we go.
         while (next.length > limit) {
@@ -241,6 +249,7 @@ export function ToastProvider({
               action={t.action}
               politeness={t.politeness}
               statusLabel={t.statusLabel}
+              dismissLabel={t.dismissLabel ?? dismissLabel}
               onDismiss={() => remove(t.id)}
             >
               {t.message}

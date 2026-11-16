@@ -13,6 +13,7 @@ A single transient notification card (D64). Controlled and presentational: it ho
 | `onDismiss` | `(() => void)` | — | no | When provided, renders the dismiss button and calls this. Toast does not remove itself; the owner disposes. |
 | `politeness` | `"polite" \| "assertive"` | — | no | Which live wrapper ToastRegion routes this toast into (D83). Unset, the variant decides: neutral and success are polite, warning and danger assertive. Set it when the kind of event, not its tone, decides — the outcome of the user's own action may interrupt even when it succeeded. |
 | `statusLabel` | `string \| null` | — | no | The visually hidden status word (D83). A string replaces the default ("Success:", "Warning:", "Error:") — pass the translated word; `null` drops it. Unset keeps the default, and `neutral` has none. |
+| `dismissLabel` | `string` | Dismiss notification | no | The dismiss button's accessible name (D117) — pass the translated string. The button stays an icon; only its name changes. Only meaningful with `onDismiss`. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 | `ref` | `Ref<HTMLDivElement>` | — | no | Forwarded ref to the underlying `<div>`. |
 
@@ -23,7 +24,7 @@ A single transient notification card (D64). Controlled and presentational: it ho
 | Tab | Reaches the action and the dismiss button in DOM order. Esc is not a dismissal — a toast is not modal and traps nothing. |
 | Enter / Space | Activates the focused action or dismiss button. |
 
-Presentational and controlled (D64): onDismiss reports and the owner disposes; Toast never removes itself. It carries no role/aria-live of its own — politeness belongs to ToastRegion's two persistent wrappers. The variant's meaning is announced by a visually hidden status word ("Success:", "Warning:", "Error:"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no prefix. statusLabel replaces that word with a translated one, or drops it with null (D83). politeness tells ToastRegion which wrapper speaks the toast; unset, the variant decides. The dismiss button requires no props — it is labelled "Dismiss notification".
+Presentational and controlled (D64): onDismiss reports and the owner disposes; Toast never removes itself. It carries no role/aria-live of its own — politeness belongs to ToastRegion's two persistent wrappers. The variant's meaning is announced by a visually hidden status word ("Success:", "Warning:", "Error:"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no prefix. statusLabel replaces that word with a translated one, or drops it with null (D83). politeness tells ToastRegion which wrapper speaks the toast; unset, the variant decides. The dismiss button requires no props — it is labelled "Dismiss notification", and dismissLabel (also on show() and ToastProvider) renames it, e.g. to a translated string (D117).
 
 ## Theming
 

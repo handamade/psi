@@ -160,7 +160,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Enter / Space", behavior: "Activates the focused action or dismiss button." },
     ],
     notes:
-      "Presentational and controlled (D64): onDismiss reports and the owner disposes; Toast never removes itself. It carries no role/aria-live of its own — politeness belongs to ToastRegion's two persistent wrappers. The variant's meaning is announced by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no prefix. statusLabel replaces that word with a translated one, or drops it with null (D83). politeness tells ToastRegion which wrapper speaks the toast; unset, the variant decides. The dismiss button requires no props — it is labelled \"Dismiss notification\".",
+      "Presentational and controlled (D64): onDismiss reports and the owner disposes; Toast never removes itself. It carries no role/aria-live of its own — politeness belongs to ToastRegion's two persistent wrappers. The variant's meaning is announced by a visually hidden status word (\"Success:\", \"Warning:\", \"Error:\"), never by colour and icon shape alone; the icon is aria-hidden. neutral has no status and gets no prefix. statusLabel replaces that word with a translated one, or drops it with null (D83). politeness tells ToastRegion which wrapper speaks the toast; unset, the variant decides. The dismiss button requires no props — it is labelled \"Dismiss notification\", and dismissLabel (also on show() and ToastProvider) renames it, e.g. to a translated string (D117).",
   },
   ToastRegion: {
     keyboard: [

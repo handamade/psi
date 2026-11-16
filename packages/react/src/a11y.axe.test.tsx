@@ -104,6 +104,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Toast region empty", <ToastRegion>{null}</ToastRegion>],
   ["Toast success routed assertive", <ToastRegion><Toast variant="success" politeness="assertive">Application accepted</Toast></ToastRegion>],
   ["Toast with a translated status word", <ToastRegion><Toast variant="danger" statusLabel="Fehler:">Nicht gespeichert</Toast></ToastRegion>],
+  ["Toast with a translated dismiss label (D117)", <ToastRegion><Toast onDismiss={() => {}} dismissLabel="Benachrichtigung schließen">Gespeichert</Toast></ToastRegion>],
   ["Announcements beside a toast", <ToastRegion data-react-aria-top-layer=""><Toast variant="success">Saved</Toast><Announcement>Row 12 updated</Announcement><Announcement politeness="assertive">2 fields need attention</Announcement></ToastRegion>],
   ["Banner neutral", <Banner>Scheduled maintenance on Saturday.</Banner>],
   ["Banner danger with action and dismiss", <Banner variant="danger" title="Payment failed" action={<Button variant="ghost" size={32}>Retry</Button>} onDismiss={() => {}}>Your card was declined.</Banner>],

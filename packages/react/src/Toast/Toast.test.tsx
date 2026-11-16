@@ -92,6 +92,28 @@ describe("Toast", () => {
     expect(prefix.className).toContain("psi-sr-only");
   });
 
+  describe("dismissLabel (D117)", () => {
+    it("names the dismiss button with the given string", async () => {
+      const user = userEvent.setup();
+      const onDismiss = vi.fn();
+      render(<Toast onDismiss={onDismiss} dismissLabel="Benachrichtigung schließen">msg</Toast>);
+
+      expect(screen.queryByRole("button", { name: "Dismiss notification" })).toBeNull();
+      await user.click(screen.getByRole("button", { name: "Benachrichtigung schließen" }));
+      expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it("keeps the default name when it is not given", () => {
+      render(<Toast onDismiss={() => {}}>msg</Toast>);
+      expect(screen.getByRole("button", { name: "Dismiss notification" })).toBeInTheDocument();
+    });
+
+    it("renders no button without onDismiss, whatever the label", () => {
+      render(<Toast dismissLabel="Schließen">msg</Toast>);
+      expect(screen.queryByRole("button")).toBeNull();
+    });
+  });
+
   describe("statusLabel (D83)", () => {
     it("replaces the status word", () => {
       render(<Toast variant="danger" statusLabel="Fehler:">Nicht gespeichert</Toast>);
