@@ -92,3 +92,40 @@ describe("Header's mode toggle", () => {
     unmount();
   });
 });
+
+describe("Header on any page", () => {
+  it("links to the docs, visible beside the theme switch", () => {
+    const { container, unmount } = mount(
+      createElement(Header, { mode: "light", onMode: () => {} }),
+    );
+    const docs = container.querySelector<HTMLAnchorElement>(".theme-switch a[href='/docs/']");
+    expect(docs?.textContent).toBe("Docs");
+    unmount();
+  });
+
+  it("points section links and the wordmark at the homepage, so they work from /docs/", () => {
+    const { container, unmount } = mount(
+      createElement(Header, { mode: "light", onMode: () => {} }),
+    );
+    const hrefs = [...container.querySelectorAll<HTMLAnchorElement>(".site-nav a")].map((a) =>
+      a.getAttribute("href"),
+    );
+    expect(hrefs.filter((h) => h?.startsWith("#"))).toEqual([]);
+    expect(hrefs).toContain("/#principles");
+    expect(container.querySelector(".wordmark")?.getAttribute("href")).toBe("/#top");
+    unmount();
+  });
+
+  it("renders extras before the Docs link when given", () => {
+    const { container, unmount } = mount(
+      createElement(Header, {
+        mode: "light",
+        onMode: () => {},
+        extras: createElement("span", { "data-testid": "extra" }, "x"),
+      }),
+    );
+    const switchEl = container.querySelector(".theme-switch")!;
+    expect(switchEl.firstElementChild?.getAttribute("data-testid")).toBe("extra");
+    unmount();
+  });
+});
