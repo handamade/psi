@@ -1,6 +1,6 @@
 # Labels beside their controls: `labelPosition` and `FieldStack` (D115)
 
-Date: 2026-11-13. Status: **Approved design**, not built. Branch `d115-field-label-position`.
+Date: 2026-11-13. Status: **Implemented** on branch `d115-field-label-position`.
 
 Provenance: D49 shipped `Field` with the label above the control and put the other layout out of scope: "Horizontal
 (label-left) orientation — revisit on real consumer demand." The demand is here. A consumer's pager puts a
