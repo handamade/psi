@@ -134,8 +134,12 @@ D117 is the highest on `main`. Check again when the PR opens.
     `<PageHeading>Sales</PageHeading>`, and `AppShell.stories.css` drops its
     `main h1` rule.
   - The VR baselines for the AppShell stories and the `app-shell` preset
-    move: the heading loses its browser margin and, under `ember`, takes the
-    display face.
+    move: the heading loses its browser margin. No shipped theme sets a display
+    face different from its sans face, so the face itself does not move a
+    pixel.
+  - `tokens-and-assets-typography--specimens` moves in every theme: the type
+    specimen gains the `text-display-24-32-medium` row. New
+    `components-pageheading--default` and `--in-a-page` baselines.
 - **Docs.** The generated `docs/PageHeading.md`; a `PageHeading` line in
   `packages/react/llms.txt` beside `Text`'s, and `Text`'s line naming
   `PageHeading` for the `h1`; the tokens' `llms.txt` where it
@@ -189,8 +193,9 @@ Tests first, each red on its assertion before the code exists.
   one `<PageHeading>`, and it comes before the page's content.
 - **In a browser** (`app-shell.interaction.spec.ts`), where the stylesheet is
   real:
-  - the heading's computed `margin-top` is `0px` and its `font-family` is the
-    resolved `--psi-font-display`;
+  - the heading's computed `margin-top` is `0px`, and the test sets a sentinel
+    `--psi-font-display` that differs from sans and checks the heading takes
+    it, since no shipped theme tells the two faces apart;
   - with no banner, it starts exactly one block padding (24px) below
     `<main>`'s top. The old `> 24` becomes `toBe(24)`;
   - under a banner, it starts the same distance below the banner.

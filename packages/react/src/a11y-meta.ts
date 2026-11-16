@@ -103,7 +103,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   Text: {
     keyboard: [{ keys: "Tab", behavior: "Not focusable." }],
     notes:
-      "Renders the element `as` names (p by default). Use h2–h4 for a heading at its outline level, whatever its `size`.",
+      "Renders the element `as` names (p by default). Use h2–h4 for a heading at its outline level, whatever its `size`. The page's h1 is PageHeading (D118).",
   },
   PageHeading: {
     keyboard: [{ keys: "Tab", behavior: "Not focusable." }],
