@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { componentPages } from "../content/component-pages";
-import { allExportNames, docSection, getExport, readGeneratedDoc } from "../lib/components";
+import { allExportNames, docSection, getExport, readGeneratedDoc, summary } from "../lib/components";
 
 const require = createRequire(import.meta.url);
 const srcDir = join(dirname(require.resolve("@handamade/psi-react/manifest.json")), "..", "src");
@@ -41,5 +41,33 @@ describe("lib/components", () => {
     expect(md.startsWith("<!--")).toBe(false);
     expect(docSection(md, "Keyboard & assistive tech")).toContain("| Keys |");
     expect(docSection(md, "No such section")).toBeNull();
+  });
+});
+
+describe("summary", () => {
+  const of = (n: string) => summary(getExport(n).description);
+
+  it("never doubles the period", () => {
+    expect(of("Card")).not.toContain("..");
+    expect(of("Card").endsWith(".")).toBe(true);
+  });
+
+  it("widens a 'Not ...' opening to two sentences", () => {
+    for (const n of ["CopyButton", "InlineAlert"]) {
+      expect(of(n).split(/(?<=\.)\s/).length, n).toBeGreaterThan(1);
+    }
+  });
+
+  it("does not cut Dialog's description to a fragment", () => {
+    expect(of("Dialog").length).toBeGreaterThanOrEqual(40);
+  });
+
+  it("reads as a description on every page", () => {
+    for (const p of componentPages) {
+      const s = summary(getExport(p.members[0]).description);
+      expect(s, p.slug).not.toContain("`");
+      expect(s, p.slug).toMatch(/[^.]\.$/);
+      expect(s.length, p.slug).toBeGreaterThanOrEqual(40);
+    }
   });
 });

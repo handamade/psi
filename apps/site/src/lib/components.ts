@@ -46,3 +46,17 @@ export function docSection(md: string, heading: string): string | null {
   const end = rest.findIndex((l) => l.startsWith("## "));
   return (end === -1 ? rest : rest.slice(0, end)).join("\n").trim();
 }
+
+/** Plain-text summary of an export's description, for meta descriptions and
+ * llms.txt: markdown marks stripped, the first complete sentence, or the first
+ * two when that one is too short or only says what the component is not. A
+ * sentence ends at ". " followed by a letter, never at "e.g." or "i.e.". */
+export function summary(description: string): string {
+  const plain = description.replace(/[`*_]{1,2}/g, "").replace(/\s+/g, " ").trim();
+  const sentences = plain.split(/(?<!\be\.g|\bi\.e|\bvs|\betc)(?<=[.!?])\s+(?=[A-Za-z])/);
+  let out = sentences[0];
+  if ((out.length < 40 || out.startsWith("Not ")) && sentences.length > 1) {
+    out = `${out} ${sentences[1]}`;
+  }
+  return out.replace(/[.!?]+$/, "") + ".";
+}

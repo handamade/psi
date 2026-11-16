@@ -5,7 +5,7 @@ import PropsTable from "../../../components/PropsTable.astro";
 import { CodeView } from "../../../components/CodeView";
 import { ExampleTabs } from "../../../components/ExampleTabs";
 import { componentPages, type ComponentPage } from "../../../content/component-pages";
-import { docSection, getExport, readGeneratedDoc } from "../../../lib/components";
+import { docSection, getExport, readGeneratedDoc, summary } from "../../../lib/components";
 import { examplesFor } from "../../../examples/registry";
 import { highlight } from "../../../lib/highlight";
 import { mdToHtml } from "../../../lib/render-md";
@@ -40,11 +40,11 @@ const headings = [
 
 <DocsLayout
   title={page.title}
-  description={main.description.split(". ")[0] + "."}
+  description={summary(main.description)}
   headings={headings}
   mdHref={`/docs/components/${page.slug}.md`}
 >
-  <p>{main.description}</p>
+  <Fragment set:html={mdToHtml(main.description)} />
   <CodeView client:visible html={importHtml} code={importLine} label="Copy import" />
 
   <HeadingAnchor level={2} id="examples">Examples</HeadingAnchor>
