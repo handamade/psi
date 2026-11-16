@@ -189,3 +189,29 @@ to today's layout, three tokens and a layout constant. Additive; nothing that re
 - **A consumer's own pager.** The presets change; a consumer that composed the row itself moves on its own.
 - **Figma.** The assessment file is regenerated from code after the release, as usual.
 - **An `end` or `bottom` label position,** and a label column on the inline end. No one has asked.
+
+## Engine results (Task 1 of the plan, 2026-11-16)
+
+| Check | Chromium 149.0.7827.55 | WebKit 26.5 | Firefox 151.0 |
+| --- | --- | --- | --- |
+| labels share one column (incl. the legend) | PASS | PASS | not measured |
+| controls share one column (incl. the fieldset) | **FAIL** | PASS | not measured |
+| the label column is capped at 240px | PASS | PASS | not measured |
+| one-line controls: label centre within 4px of control centre | PASS | PASS | not measured |
+| legend on the first option's line (within 2px) | PASS | **FAIL** | not measured |
+| textarea: label top within 8px of the textarea's top | PASS | PASS | not measured |
+| narrow: label above control | PASS | PASS | not measured |
+| narrow: legend above its options | PASS | PASS | not measured |
+
+Firefox 151.0 (Playwright build 1532) downloaded but would not launch on the machine that ran the spike: headless and
+headed launches both timed out, with and without the content sandbox disabled. It was not measured, and Task 1 should
+be rerun for Firefox where the build starts (CI's Linux image). Neither verdict below depends on it, because one
+failure in any engine already decides each rule.
+
+Chromium: the fieldset's control column starts at 317px while the `div` fields' starts at 268px, so a `fieldset`
+subgrid does not share the control column there. WebKit: the legend's centre sits 20px above the first option's
+centre (111 against 131), so the legend does not land on the first option's line.
+
+Verdicts: **GROUP = div-group**, **ALIGN = center**, because Chromium puts the `fieldset`'s controls in a different
+column from the other fields' (317px against 268px); and because WebKit puts the legend 20px above the first option's
+line, a baseline row is not safe in all three engines.
