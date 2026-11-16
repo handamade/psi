@@ -1,0 +1,30 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import HeadingAnchor from "../../components/HeadingAnchor.astro";
+import { componentCount, version } from "virtual:psi-facts";
+
+const headings = [
+  { depth: 2, slug: "start-here", text: "Start here" },
+  { depth: 2, slug: "whats-here", text: "What’s here" },
+];
+---
+
+<DocsLayout
+  title="Docs"
+  description="Install Psi, theme it, and look up every component and token."
+  headings={headings}
+>
+  <p>
+    Psi {version}: {componentCount} React 19 components on OKLCH tokens, where every semantic
+    colour is a formula rather than a swatch.
+  </p>
+  <HeadingAnchor level={2} id="start-here">Start here</HeadingAnchor>
+  <p><a href="/docs/get-started/installation/">Installation</a> — two packages and five stylesheets.</p>
+  <HeadingAnchor level={2} id="whats-here">What’s here</HeadingAnchor>
+  <ul>
+    <li><a href="/docs/get-started/installation/">Get started</a>: installation, theming, dark mode, AI and MCP, sizes and variants.</li>
+    <li><a href="/docs/components/button/">Components</a>: live examples, props and keyboard behaviour for each one.</li>
+    <li><a href="/docs/tokens/color/">Tokens</a>: every value in all four themes.</li>
+    <li><a href="/storybook/">Storybook</a>: the workbench every component is tested in.</li>
+  </ul>
+</DocsLayout>

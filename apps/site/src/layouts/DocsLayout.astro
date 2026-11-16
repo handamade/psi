@@ -1,0 +1,32 @@
+---
+import Base from "./Base.astro";
+import { DocsShell } from "../components/DocsShell";
+import OnThisPage from "../components/OnThisPage.astro";
+import { PageHeading } from "@handamade/psi-react";
+import { docsNav } from "../content/docs-nav";
+import "../styles/docs.css";
+
+interface Props {
+  title: string;
+  description: string;
+  headings: { depth: number; slug: string; text: string }[];
+  /** URL of this page's markdown twin (Task 10). */
+  mdHref?: string;
+}
+const { title, description, headings, mdHref } = Astro.props;
+const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
+---
+
+<Base title={`${title} — Psi`} description={description}>
+  {mdHref && <link slot="head" rel="alternate" type="text/markdown" href={mdHref} />}
+  <DocsShell client:load nav={docsNav} currentPath={currentPath}>
+    <div class="docs-page">
+      <div class="docs-content" data-pagefind-body>
+        <PageHeading>{title}</PageHeading>
+        <slot name="actions" />
+        <slot />
+      </div>
+      <OnThisPage headings={headings} />
+    </div>
+  </DocsShell>
+</Base>

@@ -1,0 +1,23 @@
+---
+import { NavItem, NavTree } from "@handamade/psi-react";
+
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length > 0 && (
+    <aside class="docs-toc">
+      <p class="annot">On this page</p>
+      <NavTree aria-label="On this page">
+        {items.map((h) => (
+          <NavItem href={`#${h.slug}`} className={h.depth === 3 ? "docs-toc-sub" : undefined}>
+            {h.text}
+          </NavItem>
+        ))}
+      </NavTree>
+    </aside>
+  )
+}

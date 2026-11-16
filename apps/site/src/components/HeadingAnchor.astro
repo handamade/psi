@@ -1,0 +1,13 @@
+---
+interface Props {
+  level: 2 | 3;
+  id: string;
+}
+const { level, id } = Astro.props;
+const Tag = `h${level}` as "h2" | "h3";
+---
+
+<Tag id={id} class="docs-heading">
+  <slot />
+  <a class="docs-heading-anchor" href={`#${id}`} aria-label="Link to this section">#</a>
+</Tag>
