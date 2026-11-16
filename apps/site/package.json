@@ -12,6 +12,7 @@
     "@handamade/psi-react": "workspace:*",
     "@handamade/psi-tokens": "workspace:*",
     "astro": "7.4.12",
+    "marked": "18.2.0",
     "oxc-transform-react": "0.156.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

@@ -1,0 +1,80 @@
+---
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import HeadingAnchor from "../../../components/HeadingAnchor.astro";
+import PropsTable from "../../../components/PropsTable.astro";
+import { CodeView } from "../../../components/CodeView";
+import { ExampleTabs } from "../../../components/ExampleTabs";
+import { componentPages, type ComponentPage } from "../../../content/component-pages";
+import { docSection, getExport, readGeneratedDoc } from "../../../lib/components";
+import { examplesFor } from "../../../examples/registry";
+import { highlight } from "../../../lib/highlight";
+import { mdToHtml } from "../../../lib/render-md";
+import { storybookDocs } from "../../../lib/storybook";
+import { storyTitles } from "virtual:psi-facts";
+
+export function getStaticPaths() {
+  return componentPages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: ComponentPage };
+const main = getExport(page.members[0]);
+const infos = page.members.map(getExport);
+const importLine = `import { ${page.members.join(", ")} } from "@handamade/psi-react";`;
+const importHtml = await highlight(importLine, "ts");
+const exampleHtml = await Promise.all(
+  examplesFor(page.slug).map(async (e) => ({ name: e.name, html: await highlight(e.source, "tsx") })),
+);
+const keyboard = page.members
+  .map((m) => ({ name: m, md: docSection(readGeneratedDoc(m), "Keyboard & assistive tech") }))
+  .filter((k): k is { name: string; md: string } => k.md !== null && k.md.length > 0);
+const theming = docSection(readGeneratedDoc(page.members[0]), "Theming");
+const storyTitle = storyTitles[page.members[0]];
+
+const headings = [
+  { depth: 2, slug: "examples", text: "Examples" },
+  { depth: 2, slug: "props", text: "Props" },
+  ...(keyboard.length ? [{ depth: 2, slug: "keyboard", text: "Keyboard and assistive tech" }] : []),
+  ...(theming ? [{ depth: 2, slug: "theming", text: "Theming" }] : []),
+];
+---
+
+<DocsLayout
+  title={page.title}
+  description={main.description.split(". ")[0] + "."}
+  headings={headings}
+  mdHref={`/docs/components/${page.slug}.md`}
+>
+  <p>{main.description}</p>
+  <CodeView client:visible html={importHtml} code={importLine} label="Copy import" />
+
+  <HeadingAnchor level={2} id="examples">Examples</HeadingAnchor>
+  {exampleHtml.map((e) => <ExampleTabs client:visible slug={page.slug} name={e.name} html={e.html} />)}
+
+  <HeadingAnchor level={2} id="props">Props</HeadingAnchor>
+  {infos.map((info) => <PropsTable info={info} />)}
+
+  {
+    keyboard.length > 0 && (
+      <>
+        <HeadingAnchor level={2} id="keyboard">Keyboard and assistive tech</HeadingAnchor>
+        {keyboard.map((k) => (
+          <>
+            {keyboard.length > 1 && <p class="annot">{k.name}</p>}
+            <Fragment set:html={mdToHtml(k.md)} />
+          </>
+        ))}
+      </>
+    )
+  }
+
+  {
+    theming && (
+      <>
+        <HeadingAnchor level={2} id="theming">Theming</HeadingAnchor>
+        <Fragment set:html={mdToHtml(theming)} />
+      </>
+    )
+  }
+
+  {storyTitle && <p><a href={storybookDocs(storyTitle)}>Open {page.title} in Storybook</a></p>}
+</DocsLayout>

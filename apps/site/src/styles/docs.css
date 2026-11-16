@@ -145,3 +145,20 @@ h3.docs-heading {
   border-radius: var(--psi-radius-12);
   background: var(--psi-bg-primary);
 }
+
+.props-table {
+  overflow-x: auto;
+}
+
+.props-required {
+  font: var(--psi-text-12-16-regular);
+  color: var(--psi-fg-secondary);
+}
+
+.example-frame {
+  display: block;
+  inline-size: 100%;
+  block-size: 320px;
+  border: 1px solid var(--psi-border-faint);
+  border-radius: var(--psi-radius-8);
+}

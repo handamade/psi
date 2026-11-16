@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "@handamade/psi-react";
 
-import { examples } from "../examples/registry";
+import { examples, isFramed } from "../examples/registry";
 import { CodeView } from "./CodeView";
 
 export function ExampleTabs({ slug, name, html }: { slug: string; name: string; html: string }) {
@@ -17,7 +17,16 @@ export function ExampleTabs({ slug, name, html }: { slug: string; name: string; 
       </TabList>
       <TabPanel value="preview">
         <div className="example-preview">
-          <Component />
+          {isFramed(slug, name) ? (
+            <iframe
+              className="example-frame"
+              src={`/docs/examples/${slug}/${name}/`}
+              title={`${slug.replace(/-/g, " ")} ${name} example`}
+              loading="lazy"
+            />
+          ) : (
+            <Component />
+          )}
         </div>
       </TabPanel>
       <TabPanel value="code">

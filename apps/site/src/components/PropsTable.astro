@@ -1,0 +1,38 @@
+---
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@handamade/psi-react";
+import type { ExportInfo } from "../lib/components";
+
+interface Props {
+  info: ExportInfo;
+}
+const { info } = Astro.props;
+---
+
+<div class="props-table">
+  <p class="annot">{info.name}</p>
+  <Table size={40}>
+    <TableHead>
+      <TableRow>
+        <TableHeaderCell>Prop</TableHeaderCell>
+        <TableHeaderCell>Type</TableHeaderCell>
+        <TableHeaderCell>Default</TableHeaderCell>
+        <TableHeaderCell>Description</TableHeaderCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {
+        info.props.map((p) => (
+          <TableRow>
+            <TableCell>
+              <code>{p.name}</code>
+              {p.required && <span class="props-required"> required</span>}
+            </TableCell>
+            <TableCell><code>{p.type}</code></TableCell>
+            <TableCell>{p.default === null ? "—" : <code>{String(p.default)}</code>}</TableCell>
+            <TableCell>{p.description}</TableCell>
+          </TableRow>
+        ))
+      }
+    </TableBody>
+  </Table>
+</div>

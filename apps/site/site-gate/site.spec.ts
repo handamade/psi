@@ -1,19 +1,8 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
-const BASE = "http://localhost:6210/";
+import { BASE as ORIGIN, runAxe } from "./helpers";
 
-/** axe-core ships in the repo root's node_modules; addScriptTag resolves from cwd. */
-async function runAxe(page: Page) {
-  await page.addScriptTag({ path: "node_modules/axe-core/axe.min.js" });
-  return page.evaluate(async () => {
-    // @ts-expect-error injected global
-    const results = await axe.run(document, { resultTypes: ["violations"] });
-    return results.violations.map((v: { id: string; nodes: unknown[] }) => ({
-      id: v.id,
-      count: v.nodes.length,
-    }));
-  });
-}
+const BASE = `${ORIGIN}/`;
 
 for (const theme of ["light", "dark"] as const) {
   test(`no axe violations (${theme})`, async ({ page }) => {

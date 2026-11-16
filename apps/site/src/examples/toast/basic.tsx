@@ -11,7 +11,7 @@ function SaveButton() {
 
 export default function ToastBasic() {
   return (
-    <ToastProvider>
+    <ToastProvider aria-label="Example notifications">
       <SaveButton />
     </ToastProvider>
   );

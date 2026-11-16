@@ -1,18 +1,8 @@
-import { test, expect, type Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { test, expect } from "@playwright/test";
 
-export const BASE = "http://localhost:6210";
+import { BASE, runAxe } from "./helpers";
 
-export async function runAxe(page: Page) {
-  await page.addScriptTag({ path: "node_modules/axe-core/axe.min.js" });
-  return page.evaluate(async () => {
-    // @ts-expect-error injected global
-    const results = await axe.run(document, { resultTypes: ["violations"] });
-    return results.violations.map((v: { id: string; nodes: unknown[] }) => ({
-      id: v.id,
-      count: v.nodes.length,
-    }));
-  });
-}
 
 test.describe("docs without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
@@ -52,4 +42,67 @@ test("the sidebar is open at desktop width and behind a toggle below it", async 
   await page.setViewportSize({ width: 1300, height: 800 });
   await expect(sidebar).toBeVisible();
   await expect(page.getByRole("button", { name: /navigation/ })).toBeHidden();
+});
+
+function componentSlugs(): string[] {
+  const src = readFileSync("apps/site/src/content/component-pages.ts", "utf8");
+  return [...src.matchAll(/slug: "([a-z0-9-]+)"/g)].map((m) => m[1]);
+}
+
+test.describe("component pages without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("Button's page has its heading, an example's code and the props in the HTML", async ({ page }) => {
+    await page.goto(`${BASE}/docs/components/button/`);
+    await expect(page.locator("h1")).toHaveText("Button");
+    await expect(page.locator(".docs-content")).toContainText('variant="accent"');
+    await expect(page.locator("table").first()).toContainText("24 | 32 | 40 | 48");
+  });
+});
+
+test("every component page exists and has no axe violations, light and dark", async ({ page }) => {
+  test.setTimeout(600_000);
+  for (const slug of componentSlugs()) {
+    for (const theme of ["light", "dark"] as const) {
+      await page.addInitScript((t) => localStorage.setItem("psi-theme", t), theme);
+      const res = await page.goto(`${BASE}/docs/components/${slug}/`, { waitUntil: "networkidle" });
+      expect(res?.status(), slug).toBe(200);
+      expect(await runAxe(page), `${slug} (${theme})`).toEqual([]);
+    }
+  }
+});
+
+test("no internal link on a docs page points at a missing page", async ({ page, request }) => {
+  test.setTimeout(300_000);
+  const pages = ["/docs/", ...componentSlugs().map((s) => `/docs/components/${s}/`)];
+  const seen = new Set<string>();
+  const broken: string[] = [];
+  for (const path of pages) {
+    await page.goto(`${BASE}${path}`);
+    const hrefs = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLAnchorElement>("a[href]")]
+        .map((a) => new URL(a.href, location.href))
+        .filter((u) => u.origin === location.origin && !u.pathname.startsWith("/storybook/"))
+        .map((u) => u.pathname),
+    );
+    for (const href of hrefs) {
+      // Tasks 8 and 9 build the token and get-started pages; they remove this exclusion.
+      if (href.startsWith("/docs/tokens/") || href.startsWith("/docs/get-started/")) continue;
+      if (seen.has(href)) continue;
+      seen.add(href);
+      const r = await request.get(`${BASE}${href}`);
+      if (r.status() !== 200) broken.push(`${path} → ${href} (${r.status()})`);
+    }
+  }
+  expect(broken).toEqual([]);
+});
+
+test("a component page fits 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto(`${BASE}/docs/components/table/`, { waitUntil: "networkidle" });
+  const { scrollW, clientW } = await page.evaluate(() => ({
+    scrollW: document.documentElement.scrollWidth,
+    clientW: document.documentElement.clientWidth,
+  }));
+  expect(scrollW).toBe(clientW);
 });

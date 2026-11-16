@@ -20,3 +20,11 @@ export const examples: ExampleEntry[] = Object.entries(modules)
 export function examplesFor(slug: string): ExampleEntry[] {
   return examples.filter((e) => e.slug === slug);
 }
+
+/** Examples that bring their own landmarks (`<main>`, `<header>`). Inline in a docs
+ * page they would nest inside the page's `<main>`, so the Preview frames them. */
+export const FRAMED = new Set(["app-shell/basic"]);
+
+export function isFramed(slug: string, name: string): boolean {
+  return FRAMED.has(`${slug}/${name}`);
+}

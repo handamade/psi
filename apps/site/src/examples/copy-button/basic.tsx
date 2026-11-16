@@ -19,7 +19,7 @@ function Copy() {
 
 export default function CopyButtonBasic() {
   return (
-    <ToastProvider>
+    <ToastProvider aria-label="Example notifications">
       <Copy />
     </ToastProvider>
   );
