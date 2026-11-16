@@ -83,9 +83,14 @@ test("Enter in the filter-form's text field submits the form once @interaction",
   await expect(page.getByRole("form", { name: /filter/i })).toBeVisible();
 });
 
-test("the cursor-pagination preset's page size and pager share their bottom edge @interaction", async ({ page }) => {
+test("the cursor-pagination preset's page size, its label and the pager share one line @interaction", async ({ page }) => {
   await page.goto(story("patterns-presets--cursor-pagination"), { waitUntil: "networkidle" });
   const select = await box(page, "#storybook-root select");
   const pager = await box(page, "#storybook-root nav button");
+  const label = await box(page, "#storybook-root label");
+  // D115: one line — the label beside the select, both centred on the pager.
+  expect(pager.top).toBeCloseTo(select.top, 0);
   expect(pager.bottom).toBeCloseTo(select.bottom, 0);
+  expect(label.top).toBeGreaterThanOrEqual(select.top);
+  expect(label.bottom).toBeLessThanOrEqual(select.bottom);
 });

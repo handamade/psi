@@ -36,3 +36,73 @@
 .invalid .message {
   color: var(--psi-field-error-fg);
 }
+
+/* ── Label beside the control (D115) ─────────────────────────────
+   Column 1 holds the label; the control and the message line sit in column 2,
+   so a message hangs under its control. Rows align on the first baseline, so
+   the label's text sits on the line of the control's text at every size. In
+   group mode the label is a <div> and the group a <div role="group">, because
+   a fieldset cannot share a FieldStack's columns (D115). Standalone, the field
+   is as wide as its label and its control. */
+
+.field[data-label-position="start"] {
+  grid-template-columns: auto auto;
+  column-gap: var(--psi-field-column-gap);
+  align-items: baseline;
+  justify-content: start;
+}
+
+.field[data-label-position="start"] > * {
+  grid-column: 2;
+}
+
+.field[data-label-position="start"] > .label {
+  grid-column: 1;
+  text-align: var(--psi-field-label-align);
+}
+
+/* A label that wraps spans the message row too, so the message stays under
+   its control instead of under the label's last line (D115). The second row
+   is flexible: a label spanning two auto rows would share its extra height
+   between them and push the message down by half of it, so the fr row takes
+   all of it and the control's row stays the control's height. */
+.field[data-label-position="start"]:has(> .message) {
+  grid-template-rows: auto 1fr;
+}
+
+.field[data-label-position="start"]:has(> .message) > .label {
+  grid-row: span 2;
+}
+
+/* In a FieldStack (D115): every Field spans the stack's columns. Only a start
+   stack's Fields share them (subgrid), so all its labels line up in one
+   column; a start Field in a top stack keeps its own two columns. */
+
+.field[data-in-stack] {
+  grid-column: 1 / -1;
+}
+
+.field[data-in-stack="start"][data-label-position="start"] {
+  grid-template-columns: subgrid;
+}
+
+/* Below 480px of the stack's width (containerQueries.fieldStackColumns), the
+   label returns above its control. The label aligns to start here whatever
+   --psi-field-label-align says: an end-aligned label above a control reads
+   as a mistake. */
+@container psi-field-stack (width < 480px) {
+  .field[data-in-stack="start"][data-label-position="start"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .field[data-in-stack="start"][data-label-position="start"] > *,
+  .field[data-in-stack="start"][data-label-position="start"] > .label {
+    grid-column: 1;
+  }
+
+  .field[data-in-stack="start"][data-label-position="start"] > .label {
+    grid-row: auto;
+    text-align: start;
+  }
+}

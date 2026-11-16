@@ -1,5 +1,7 @@
-import { createContext, useId } from "react";
+import { createContext, useContext, useId } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
+import { FieldStackContext } from "../FieldStack/FieldStackContext.js";
+import type { FieldLabelPosition } from "../FieldStack/FieldStackContext.js";
 import styles from "./field.module.css";
 
 /** Wiring a Field provides to its control (Input/Select consume it; D49). */
@@ -42,7 +44,12 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
    * would say it twice. Without `required` it renders nothing. */
   requiredText?: string;
   /** Group mode: fieldset/legend wrapping several self-labeled controls
-   * (Checkbox/Switch); the message describes the whole group. @default false */
+   * (Checkbox/Switch); the message describes the whole group. In the `start`
+   * position it renders `<div role="group" aria-labelledby>`, because a
+   * fieldset cannot take part in a FieldStack's columns (D115). Changing
+   * `labelPosition` on a group Field swaps the fieldset for a div, which
+   * remounts the group's controls; set it once rather than toggling it.
+   * @default false */
   group?: boolean;
   /** Override the generated control id (pair it with the same id on the control). */
   htmlFor?: string;
@@ -51,11 +58,17 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
    * announces field errors itself. The message still describes the control
    * (aria-describedby). @default true (D81) */
   announce?: boolean;
+  /** Where the label sits (D115): `"top"`, above the control, or `"start"`,
+   * beside it on the inline-start side with the message line under the
+   * control. Without it, a Field takes its FieldStack's position, or `"top"`.
+   * In a toolbar row, use the default `align="center"`: `align="start"`
+   * offsets buttons for labels above. */
+  labelPosition?: FieldLabelPosition;
   /** Forwarded ref to the root element. */
   ref?: Ref<HTMLDivElement | HTMLFieldSetElement>;
 }
 
-/** Labeled form-row wrapper: label above, control, one message line below —
+/** Labeled form-row wrapper: label above, or beside with `labelPosition` (D115), control, one message line below —
  * description normally, error when set (aria-live unless `announce={false}`).
  * Auto-wires id/aria-describedby/aria-invalid into Input and Select (D49).
  * Overriding `--psi-field-gap` or `--psi-field-label-height` on a narrower
@@ -71,6 +84,7 @@ export function Field({
   group = false,
   htmlFor,
   announce = true,
+  labelPosition,
   className,
   children,
   ref,
@@ -78,6 +92,14 @@ export function Field({
 }: FieldProps) {
   const autoId = useId();
   const id = htmlFor ?? autoId;
+  const stack = useContext(FieldStackContext);
+  const position: FieldLabelPosition = labelPosition ?? stack?.labelPosition ?? "top";
+  const layout = {
+    "data-label-position": position === "start" ? "start" : undefined,
+    "data-in-stack": stack ? stack.labelPosition : undefined,
+  };
+  const groupAsDiv = group && position === "start";
+  const groupLabelId = groupAsDiv && label != null ? `${id}-label` : undefined;
   const invalid = Boolean(error);
   const message = invalid ? error : description;
   const messageId = message != null && message !== false ? `${id}-message` : undefined;
@@ -107,7 +129,13 @@ export function Field({
     <>
       {labelContent != null &&
         (group ? (
-          <legend className={styles.label}>{labelContent}</legend>
+          groupAsDiv ? (
+            <div id={groupLabelId} className={styles.label}>
+              {labelContent}
+            </div>
+          ) : (
+            <legend className={styles.label}>{labelContent}</legend>
+          )
         ) : (
           <label id={labelId} className={styles.label} htmlFor={id}>
             {labelContent}
@@ -124,17 +152,34 @@ export function Field({
     </>
   );
 
+  if (groupAsDiv) {
+    return (
+      <div
+        ref={ref as Ref<HTMLDivElement>}
+        role="group"
+        aria-labelledby={groupLabelId}
+        aria-describedby={messageId}
+        className={cls}
+        {...rest}
+        {...layout}
+      >
+        {body}
+      </div>
+    );
+  }
+
   return group ? (
     <fieldset
       ref={ref as Ref<HTMLFieldSetElement>}
       className={cls}
       aria-describedby={messageId}
       {...rest}
+      {...layout}
     >
       {body}
     </fieldset>
   ) : (
-    <div ref={ref as Ref<HTMLDivElement>} className={cls} {...rest}>
+    <div ref={ref as Ref<HTMLDivElement>} className={cls} {...rest} {...layout}>
       {body}
     </div>
   );

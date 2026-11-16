@@ -41,7 +41,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Tab", behavior: "Focus moves to the wrapped control; the label is announced with it." },
     ],
     notes:
-      "Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend. required marks the label with an aria-hidden asterisk and flows required to the control; requiredText replaces the asterisk with a visible word such as \"(Required)\", also aria-hidden, because the control's required/aria-required is what assistive tech reads (D84). A control Psi did not write joins the same wiring through useFieldControl(): spread its result — id, aria-labelledby (a label-for names only a labelable element, and a custom control is usually not one), aria-describedby, aria-invalid, aria-required, required, each present only when the Field sets it — onto the element that takes focus (D84).",
+      "Wires label association, aria-describedby and aria-invalid into a wrapped Input/Select automatically; the message line is aria-live=polite. Group mode renders fieldset/legend; with labelPosition=\"start\" it renders `<div role=\"group\">` named by its label through aria-labelledby, because a fieldset cannot share a FieldStack's columns (D115). required marks the label with an aria-hidden asterisk and flows required to the control; requiredText replaces the asterisk with a visible word such as \"(Required)\", also aria-hidden, because the control's required/aria-required is what assistive tech reads (D84). A control Psi did not write joins the same wiring through useFieldControl(): spread its result — id, aria-labelledby (a label-for names only a labelable element, and a custom control is usually not one), aria-describedby, aria-invalid, aria-required, required, each present only when the Field sets it — onto the element that takes focus (D84). labelPosition=\"start\" puts the label beside the control, with the message under the control (D115); only the visual position changes.",
+  },
+  FieldStack: {
+    keyboard: [
+      { keys: "Tab", behavior: "Skipped — FieldStack itself is not focusable; focus moves through its Fields in source order." },
+    ],
+    notes:
+      "Plain `<div>` with no role (D115): a form's column of Fields. labelPosition=\"start\" moves the labels beside their controls visually; the document order stays label, control, message, so reading and focus order are unchanged.",
   },
   Dialog: {
     keyboard: [
