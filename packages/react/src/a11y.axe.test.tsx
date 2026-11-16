@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
-  Button, IconButton, Card, Panel, Stack, Text, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
+  Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator, MenuText, Textarea, RadioGroup, Radio,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
   Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, NavTree, NavGroup, NavItem, AppShell,
@@ -24,6 +24,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Card", <Card variant="stacked" media={<img alt="" src="x.png" />}>Body</Card>],
   ["Panel", <Panel><h3>Usage</h3><p>Elevated surface body.</p></Panel>],
   ["Stack of Text", <Panel><Stack gap={8} align="start"><Text as="h3" size={16} weight="medium">Nothing here</Text><Text tone="secondary">Clear a filter.</Text><Button>Clear filters</Button></Stack></Panel>],
+  ["PageHeading over Text (D118)", <Stack gap={8}><PageHeading>Sales</PageHeading><Text tone="secondary">Invoices from the last 30 days.</Text><Text as="h2" size={18} weight="medium">Overdue</Text></Stack>],
   ["NavBar", <NavBar brand={<a href="/">DK</a>} actions={<Button size={32}>CTA</Button>}><a href="/a">A</a></NavBar>],
   ["NavBar with no links", <NavBar brand={<a href="/">DK</a>} actions={<Button size={32}>CTA</Button>} />],
   ["NavBar labelled and fluid", <NavBar fluid navLabel="Primary" brand={<a href="/">DK</a>}><a href="/a">A</a></NavBar>],

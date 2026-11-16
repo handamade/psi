@@ -22,6 +22,7 @@ import { controlVars } from "./control.js";
 import { dialogVars } from "./dialog.js";
 import { navbarVars } from "./navbar.js";
 import { panelVars } from "./panel.js";
+import { pageHeadingVars } from "./page-heading.js";
 import { mediaVars } from "./media.js";
 import { menuVars } from "./menu.js";
 import { toastVars } from "./toast.js";
@@ -45,6 +46,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   media: mediaVars,
   menu: menuVars,
   navbar: navbarVars,
+  "page-heading": pageHeadingVars,
   panel: panelVars,
   "radio-group": radioGroupVars,
   select: selectVars,

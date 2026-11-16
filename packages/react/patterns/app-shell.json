@@ -1,6 +1,6 @@
 {
   "id": "app-shell",
-  "intent": "An application frame: a skip link, a full-width header with a Menu toggle that names the sidebar (aria-expanded and aria-controls — wire both and sidebarOpen to one piece of state), a dark sub-themed sidebar holding a NavTree, and a main region that scrolls on its own so nothing hides under the header. A closed sidebar is hidden, not narrowed. A desktop frame, not a responsive drawer. Put a link of your own router in each NavItem instead of href, and aria-current=\"page\" on the current one",
+  "intent": "An application frame: a skip link, a full-width header with a Menu toggle that names the sidebar (aria-expanded and aria-controls — wire both and sidebarOpen to one piece of state), a dark sub-themed sidebar holding a NavTree, and a main region that scrolls on its own so nothing hides under the header. A closed sidebar is hidden, not narrowed. A desktop frame, not a responsive drawer. Put a link of your own router in each NavItem instead of href, and aria-current=\"page\" on the current one. The page opens with its one PageHeading, the screen's h1",
   "match": ["app shell", "application shell", "sidebar layout", "admin layout", "side navigation"],
   "compose": {
     "component": "AppShell",
@@ -59,7 +59,10 @@
           }
         }
       ],
-      "body": ["{content:page}"]
+      "body": [
+        { "component": "PageHeading", "content": "title" },
+        "{content:page}"
+      ]
     }
   },
   "parameters": [],
@@ -76,6 +79,7 @@
     "group-2-label": "[group name]",
     "group-2-first-label": "[page name]",
     "group-2-second-label": "[page name]",
+    "title": "[page title]",
     "page": "[the page; it scrolls on its own]"
   },
   "gaps": []

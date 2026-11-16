@@ -1,0 +1,9 @@
+/* D118: the page's one heading, in the brand's display face. Margin 0, so
+   AppShell's main padding (D113) is the only space above it, under the header
+   or under a banner. */
+
+.pageHeading {
+  margin: 0;
+  font: var(--psi-page-heading-font);
+  color: var(--psi-page-heading-fg);
+}

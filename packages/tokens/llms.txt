@@ -33,9 +33,10 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - --psi-focus-ring-width (2px). --psi-focus-ring-offset (2px) draws the ring outside the control. --psi-focus-ring-offset-inset (-2px) draws it inside, for a control whose outside ring would be clipped or would land on a neighbour: a text field, a tab, a menu item, a row in a list, a panel against the viewport edge.
 - The colour is the component's own --psi-{component}-focus-ring in component CSS, and --psi-border-focus in app CSS. The three geometry tokens are independent px values, so an override on any sub-tree takes effect there; the inset offset is not derived from the width, so override both together.
 
-## Typography: display, serif, mono
+## Typography: display, serif, mono, page heading
 - Fluid display tier: --psi-display-{min}-{max}-{weight} (e.g. --psi-display-56-128-black), clamp-based and pixel-true at both endpoints; pair with the matching .psi-display-* utility class for tracking/uppercase.
 - Serif and mono are first-class combo roles alongside sans: --psi-text-serif-{size}-{lh}-{weight} and --psi-text-mono-{size}-{lh}-{weight}, same naming shape as the sans scale.
+- The display face also has a fixed text style: --psi-text-display-24-32-medium (D118), 24/32 medium in --psi-font-display. It is PageHeading's style. Unlike the fluid --psi-display-* tier, it has fixed px, no tracking and no uppercase. Its utility is .psi-text-display-24-32-medium; on a hand-written h1, also set margin 0.
 
 ## Scrims and borders
 - --psi-scrim-soft/medium/heavy: bgPrimary-derived translucent overlays (0.25/0.35/0.82 alpha) for text-over-media legibility.

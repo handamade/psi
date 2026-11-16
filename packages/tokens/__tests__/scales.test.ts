@@ -129,6 +129,12 @@ describe("scales", () => {
       expect(emitUtilitiesCSS()).toContain(".psi-text-mono-15-24-medium { font: var(--psi-text-mono-15-24-medium); }");
     });
 
+    it("emits the display text style against the display face (D118)", () => {
+      expect(comboName({ fontSize: 24, lineHeight: 32, weight: "medium", role: "display" })).toBe("display-24-32-medium");
+      expect(emitScaleVarsCSS()).toContain("--psi-text-display-24-32-medium: 500 1.5rem/2rem var(--psi-font-display);");
+      expect(emitUtilitiesCSS()).toContain(".psi-text-display-24-32-medium { font: var(--psi-text-display-24-32-medium); }");
+    });
+
     it("emits display combos pixel-true at both clamp endpoints (D28)", () => {
       const css = emitScaleVarsCSS();
       expect(css).toContain("--psi-display-56-128-black: 900 clamp(3.5rem, 9vw, 8rem)/0.95 var(--psi-font-display);");

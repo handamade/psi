@@ -21,7 +21,7 @@ A line or paragraph of text at one of Psi's text styles (D109). It gives a patte
 |---|---|
 | Tab | Not focusable. |
 
-Renders the element `as` names (p by default). Use h2–h4 for a heading at its outline level, whatever its `size`.
+Renders the element `as` names (p by default). Use h2–h4 for a heading at its outline level, whatever its `size`. The page's h1 is PageHeading (D118).
 
 ## Theming
 
