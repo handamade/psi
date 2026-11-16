@@ -262,6 +262,16 @@ describe("labelPosition (D115)", () => {
     expect(label).toMatch(/text-align:\s*var\(--psi-field-label-align\);/);
   });
 
+  it("a start label spans the message row, and the narrow layout releases it", () => {
+    expect(css()).toMatch(
+      /\.field\[data-label-position="start"\]:has\(>\s*\.message\)\s*>\s*\.label\s*\{[^}]*grid-row:\s*span 2;/,
+    );
+    const narrow = /@container psi-field-stack[^{]*\{([\s\S]*)\}\s*$/.exec(css())![1];
+    expect(narrow).toMatch(
+      /\.field\[data-in-stack="start"\]\[data-label-position="start"\]\s*>\s*\.label\s*\{[^}]*grid-row:\s*auto;/,
+    );
+  });
+
   it("the top layout's rules are unchanged", () => {
     expect(/\.field\s*\{([^}]*)\}/.exec(css())![1]).not.toMatch(/grid-template-columns/);
   });

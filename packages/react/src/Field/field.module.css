@@ -61,6 +61,12 @@
   text-align: var(--psi-field-label-align);
 }
 
+/* A label that wraps spans the message row too, so the message stays under
+   its control instead of under the label's last line (D115). */
+.field[data-label-position="start"]:has(> .message) > .label {
+  grid-row: span 2;
+}
+
 /* In a FieldStack (D115): every Field spans the stack's columns. Only a start
    stack's Fields share them (subgrid), so all its labels line up in one
    column; a start Field in a top stack keeps its own two columns. */
@@ -88,6 +94,7 @@
   }
 
   .field[data-in-stack="start"][data-label-position="start"] > .label {
+    grid-row: auto;
     text-align: start;
   }
 }

@@ -59,6 +59,25 @@ test("the label column stops at 240px and a longer label wraps @interaction", as
   const widest = Math.max(...labels.map((l) => l.width));
   expect(widest).toBeLessThanOrEqual(240);
   expect(labels.some((l) => l.bottom - l.top > 20)).toBe(true);
+  // A wrapped label must not push the message away from its control: the Card group message sits under its select.
+  const gap = await page.locator("#storybook-root [data-in-stack][data-label-position=start]:has(> p)").evaluateAll((fs) =>
+    fs.map((f) => {
+      const control = f.querySelector(":scope > :not(p):not([id$='-label'])")!.getBoundingClientRect();
+      const message = f.querySelector(":scope > p")!.getBoundingClientRect();
+      return message.top - control.bottom;
+    }),
+  );
+  expect(gap.length).toBeGreaterThanOrEqual(1);
+  for (const g of gap) expect(g).toBeLessThanOrEqual(8);
+});
+
+test("a label that spans the message row keeps its text on its control's line @interaction", async ({ page }) => {
+  await page.goto(story("components-fieldstack--side-labels"), { waitUntil: "networkidle" });
+  const field = page.locator("#storybook-root [data-in-stack][data-label-position=start]:has(> p):has(> select)").first();
+  const label = (await boxes(page, "#storybook-root [data-in-stack][data-label-position=start]:has(> p):has(> select) > label"))[0];
+  const select = (await boxes(page, "#storybook-root [data-in-stack][data-label-position=start]:has(> p) > select"))[0];
+  await expect(field).toBeVisible();
+  expect(Math.abs(label.cy - select.cy)).toBeLessThanOrEqual(4);
 });
 
 test("under 480px every label returns above its control @interaction", async ({ page }) => {
