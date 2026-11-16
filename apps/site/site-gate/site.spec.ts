@@ -196,7 +196,7 @@ test("the rendered page states the package's real counts", async ({ page }) => {
 // the right shape but a wrong story id is exactly the 404 class I1 was about,
 // and it would still pass a shape-only check. So this reads Storybook's own
 // build index — a JSON manifest of every real story/docs id — and asserts
-// every id the promo page generates is actually present in it.
+// every id the site generates is actually present in it.
 test("no Storybook link points at a missing docs page", async ({ page }) => {
   const { readFileSync, existsSync } = await import("node:fs");
   const indexPath = "apps/storybook/storybook-static/index.json";

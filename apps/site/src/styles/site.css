@@ -1,6 +1,6 @@
 /*
- * Promo site styles. Everything colored derives from --psi-* tokens so all
- * three themes restyle the whole page. Site-scale primitives the token
+ * Site styles (homepage). Everything colored derives from --psi-* tokens so
+ * every built-in theme restyles the whole page. Site-scale primitives the token
  * package deliberately doesn't ship (containers, display type, shadows,
  * breakpoints, motion) are defined here as --promo-* on top of the system.
  */
