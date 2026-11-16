@@ -1,0 +1,54 @@
+---
+title: Sizes and variants
+description: Psi sizes are pixel numbers and variants are a flat list. Here is what each is for.
+order: 5
+---
+
+import guidance from "@handamade/psi-tokens/guidance.json";
+
+Two props shape most components: `size` and `variant`. Both use plain, fixed values.
+
+## Sizes are pixels
+
+A size is a number: one of `24`, `32`, `40` or `48`. It is never `"sm"`, `"md"` or `"lg"`.
+
+```tsx
+<Button size={24}>Compact</Button>
+<Button size={32}>Default</Button>
+<Button size={48}>Large</Button>
+```
+
+`Button` takes its height from the number, and `IconButton` is a square of that size. Both default to `32`.
+
+Scale names follow the same rule: they are pixel-true. `psi-gap-8` is 8px, and `--psi-space-8` is `0.5rem`.
+
+## Variants are a flat list
+
+Variants name how a control looks. There is no `primary` or `secondary`.
+
+<table>
+  <thead>
+    <tr><th>Variant</th><th>Intent</th><th>Typical use</th></tr>
+  </thead>
+  <tbody>
+    {guidance.variants.map((v) => (
+      <tr>
+        <td><code>{v.variant}</code></td>
+        <td>{v.intent}</td>
+        <td>{v.typicalUse}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+Not every component takes every variant. `Button` takes the first eight. `IconButton` takes `accent`, `neutral`, `ghost` and `danger`. Each [component page](/docs/components/button/) lists the variants that component accepts.
+
+## Two rules
+
+- One accent per visual group. Everything else in the group is neutral or ghost.
+- `danger` is only for actions with real consequences, such as deleting or disconnecting.
+
+```tsx
+<Button variant="accent">Save</Button>
+<Button variant="neutral">Cancel</Button>
+```

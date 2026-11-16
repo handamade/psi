@@ -1,0 +1,86 @@
+---
+title: Installation
+description: Install Psi and import its five stylesheets, then render your first component.
+order: 1
+---
+
+Psi is two packages: `@handamade/psi-tokens` (the CSS) and `@handamade/psi-react` (the components). The components need React 19.
+
+## Install
+
+```bash
+pnpm add @handamade/psi-react @handamade/psi-tokens react react-dom
+```
+
+With npm:
+
+```bash
+npm install @handamade/psi-react @handamade/psi-tokens react react-dom
+```
+
+## Import the stylesheets
+
+Import five stylesheets once, in your app root, in this order:
+
+```tsx
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css"; // add dark.css to support both modes
+import "@handamade/psi-tokens/components.css";
+import "@handamade/psi-tokens/utilities.css";
+import "@handamade/psi-react/styles";
+```
+
+The first four come from `@handamade/psi-tokens`. The fifth, `@handamade/psi-react/styles`, comes from the component package and carries the component class rules.
+
+Do not skip the last one. Without `@handamade/psi-react/styles` every component renders unstyled, and your build stays green.
+
+`utilities.css` is required too. The `.psi-container` class and the reduced-motion handling live there, so leaving it out gives a build that works and looks subtly wrong.
+
+## Pick a theme
+
+`light.css` applies at the document root, so a light page needs no attribute. To use another theme, import its stylesheet and set `data-psi-theme` on `<html>`, or on any element to theme only that subtree:
+
+```html
+<html data-psi-theme="dark">
+```
+
+The built-in themes are `light`, `dark`, `acme` and `ember`. See [Theming](/docs/get-started/theming/) and [Dark mode](/docs/get-started/dark-mode/).
+
+## Set up the app root
+
+A theme never paints the page or sets its font, so your app root does. Put these rules in `@layer psi.base`:
+
+```css
+@layer psi.base {
+  html, body {
+    background: var(--psi-bg-primary);
+    color: var(--psi-fg-primary);
+  }
+  body { font: var(--psi-text-14-20-regular); }
+  button, input, select, textarea { font: inherit; }
+}
+```
+
+Set the font on `body`, never on `html`. Psi's scales are in `rem`, so a font size on the root element resizes every control, gap and radius.
+
+## Render a component
+
+```tsx
+import { Button } from "@handamade/psi-react";
+
+export function Save() {
+  return <Button variant="accent">Save</Button>;
+}
+```
+
+See [Button](/docs/components/button/) for its props and examples. Every other component has its own page under Components.
+
+## Your own CSS and the cascade
+
+Component styles ship in `@layer psi.components`, so unlayered CSS in your app beats them, whatever its specificity. An unlayered reset such as `button { padding: 0 }` strips a `Button`. Put resets and element rules in a layer below Psi's:
+
+```css
+@layer psi.base {
+  button { padding: 0; font: inherit; }
+}
+```

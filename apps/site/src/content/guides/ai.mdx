@@ -1,0 +1,52 @@
+---
+title: Using Psi with AI
+description: Connect an AI assistant to Psi's component, token and pattern data through MCP and llms.txt.
+order: 4
+---
+
+Psi publishes its documentation in forms an AI assistant can read. The data comes from the same generated files the build checks, so an assistant reads real props, token formulas and theme values, and not a guess.
+
+## Connect through MCP
+
+The Psi MCP server has two read-only tools. It does not write code.
+
+- **Hosted**: Streamable HTTP at `https://psi.kurkin.de/mcp`. Point an MCP client at it. There is nothing to install.
+- **Local**: `npx @handamade/psi-mcp` runs a stdio server.
+
+Check your client's documentation for how it takes a server URL or command.
+
+## The two tools
+
+`search(query)` returns short briefs with ids. An empty query returns an overview.
+
+`get(id)` returns the full detail for one id:
+
+| Id | What `get` returns |
+| --- | --- |
+| `component:Button` | Props, defaults and the accessibility doc |
+| `token:bgPrimary` | The formula, with OKLCH and hex values per theme |
+| `topic:variants` | Usage guidance |
+| `pattern:<id>` | The compose tree, clarifying parameters, content, gaps, and preset JSX |
+
+A bare name such as `Button` also resolves, without regard to case.
+
+## Give your project agent context
+
+```bash
+npx @handamade/psi-mcp init --claude
+```
+
+This writes a block into `AGENTS.md`, and into `CLAUDE.md` with `--claude`. The block sits between `<!-- psi:agents:start/end -->` markers, so run the command again after you upgrade Psi and your own edits outside the markers stay.
+
+## llms.txt files
+
+Psi also publishes plain-text indexes for tools that read files, not servers:
+
+- `/llms.txt` is the index.
+- `/packages/tokens/llms.txt` has the token rules and artifacts.
+- `/packages/react/llms.txt` has the component rules and artifacts.
+- `/docs/llms.txt` lists every page in these docs as markdown.
+
+## Rules an assistant should follow
+
+The same rules apply to people. They are on [Sizes and variants](/docs/get-started/sizes-and-variants/): sizes are pixel numbers, variants come from a flat list, and `danger` is only for destructive actions.

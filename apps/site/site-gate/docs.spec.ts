@@ -4,6 +4,7 @@ import { test, expect } from "@playwright/test";
 import { BASE, runAxe } from "./helpers";
 
 const TOKEN_SLUGS = ["color", "typography", "display", "spacing", "motion", "layout"];
+const GUIDE_IDS = ["installation", "theming", "dark-mode", "ai", "sizes-and-variants"];
 
 
 test.describe("docs without JavaScript", () => {
@@ -60,6 +61,12 @@ test.describe("component pages without JavaScript", () => {
     await expect(page.locator(".docs-content")).toContainText("--psi-bg-primary");
   });
 
+  test("the installation guide is in the HTML", async ({ page }) => {
+    await page.goto(`${BASE}/docs/get-started/installation/`);
+    await expect(page.locator("h1")).toHaveText("Installation");
+    await expect(page.locator(".docs-content")).toContainText("utilities.css");
+  });
+
   test("Button's page has its heading, an example's code and the props in the HTML", async ({ page }) => {
     await page.goto(`${BASE}/docs/components/button/`);
     await expect(page.locator("h1")).toHaveText("Button");
@@ -92,12 +99,25 @@ test("every token page exists and has no axe violations, light and dark", async 
   }
 });
 
+test("every guide exists and has no axe violations, light and dark", async ({ page }) => {
+  test.setTimeout(300_000);
+  for (const id of GUIDE_IDS) {
+    for (const theme of ["light", "dark"] as const) {
+      await page.addInitScript((t) => localStorage.setItem("psi-theme", t), theme);
+      const res = await page.goto(`${BASE}/docs/get-started/${id}/`, { waitUntil: "networkidle" });
+      expect(res?.status(), id).toBe(200);
+      expect(await runAxe(page), `${id} (${theme})`).toEqual([]);
+    }
+  }
+});
+
 test("no internal link on a docs page points at a missing page", async ({ page, request }) => {
   test.setTimeout(300_000);
   const pages = [
     "/docs/",
     ...componentSlugs().map((s) => `/docs/components/${s}/`),
     ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}/`),
+    ...GUIDE_IDS.map((id) => `/docs/get-started/${id}/`),
   ];
   const seen = new Set<string>();
   const broken: string[] = [];
@@ -110,8 +130,6 @@ test("no internal link on a docs page points at a missing page", async ({ page, 
         .map((u) => u.pathname),
     );
     for (const href of hrefs) {
-      // Task 9 builds the get-started pages; it removes this exclusion.
-      if (href.startsWith("/docs/get-started/")) continue;
       if (seen.has(href)) continue;
       seen.add(href);
       const r = await request.get(`${BASE}${href}`);
@@ -121,12 +139,27 @@ test("no internal link on a docs page points at a missing page", async ({ page, 
   expect(broken).toEqual([]);
 });
 
-test("a component page fits 320px", async ({ page }) => {
+test("one page of each type fits 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto(`${BASE}/docs/components/table/`, { waitUntil: "networkidle" });
-  const { scrollW, clientW } = await page.evaluate(() => ({
-    scrollW: document.documentElement.scrollWidth,
-    clientW: document.documentElement.clientWidth,
-  }));
-  expect(scrollW).toBe(clientW);
+  for (const path of [
+    "/docs/",
+    "/docs/components/table/",
+    "/docs/tokens/color/",
+    "/docs/get-started/installation/",
+  ]) {
+    await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+    const { scrollW, clientW } = await page.evaluate(() => ({
+      scrollW: document.documentElement.scrollWidth,
+      clientW: document.documentElement.clientWidth,
+    }));
+    expect(scrollW, path).toBe(clientW);
+  }
+});
+
+test("code on docs pages is coloured only through variables", async ({ page }) => {
+  for (const path of ["/docs/get-started/installation/", "/docs/components/button/"]) {
+    await page.goto(`${BASE}${path}`);
+    const styles = await page.$$eval("pre [style], pre[style]", (els) => els.map((e) => e.getAttribute("style") ?? ""));
+    expect(styles.filter((s) => /#[0-9a-f]{3,8}\b|rgb\(|hsl\(|oklch\(/i.test(s)), path).toEqual([]);
+  }
 });

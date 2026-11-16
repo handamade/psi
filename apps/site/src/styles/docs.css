@@ -3,6 +3,7 @@
   --site-docs-toc-width: 224px;
   --site-docs-anchor-offset: 24px;
   --site-code-copy-inset: 8px;
+  --site-pre-pad: 16px;
   --site-swatch-pad: 4px;
   --site-chip-gap: 8px;
 }
@@ -117,7 +118,8 @@ h3.docs-heading {
   position: relative;
 }
 
-.code-view pre {
+.code-view pre,
+.docs-content pre {
   margin: 0;
   overflow-x: auto;
   font: var(--psi-text-mono-14-20-regular);
@@ -133,6 +135,15 @@ h3.docs-heading {
   --shiki-token-function: var(--psi-fg-primary);
   --shiki-token-punctuation: var(--psi-fg-secondary);
   --shiki-token-link: var(--psi-fg-accent);
+}
+
+/* Fenced code in a guide is a bare <pre>, outside a .code-view: give it the
+ * same box. */
+.docs-content pre {
+  padding: var(--site-pre-pad);
+  border: 1px solid var(--psi-border-faint);
+  border-radius: var(--psi-radius-8);
+  background: var(--psi-bg-secondary);
 }
 
 .code-view-copy {

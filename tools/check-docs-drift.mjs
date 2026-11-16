@@ -2,7 +2,7 @@
 // inventories: README counts must match manifest.json / patterns.json
 // (Station 6 of the 2026-07-15 inspection — the "8 components" drift
 // survived two full cycles).
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 
 const manifest = JSON.parse(
   await readFile("packages/react/dist/manifest.json", "utf8"),
@@ -103,6 +103,25 @@ for (const [file, re, expected, mode] of claims) {
   } else if (Number(m[1]) !== expected) {
     console.error(`DRIFT: ${file} claims ${m[1]}, expected ${expected} (${re})`);
     failed = true;
+  }
+}
+
+// D121: every guide is prose a reader trusts, and new guides appear without
+// anyone remembering to list them here. Walk the folder instead of naming
+// files: a count typed into any guide fails, whatever the guide is called.
+const guidesDir = "apps/site/src/content/guides";
+for (const file of (await readdir(guidesDir)).filter((f) => f.endsWith(".mdx"))) {
+  const text = await readFile(`${guidesDir}/${file}`, "utf8");
+  for (const [re, expected] of [
+    [/(\d+) (?:React 19 )?components/, nc],
+    [/(\d+) icons/, ni],
+    [/(\d+) composition patterns/, np],
+  ]) {
+    const m = text.match(re);
+    if (m && Number(m[1]) !== expected) {
+      console.error(`DRIFT: ${guidesDir}/${file} claims ${m[1]}, expected ${expected} (${re})`);
+      failed = true;
+    }
   }
 }
 
