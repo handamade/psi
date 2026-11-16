@@ -356,6 +356,11 @@ test("a banner keeps main's three edges, and the page starts below it as it star
 
 test("the page's heading is a PageHeading: margin 0, 24/32, in the display face (D118) @interaction", async ({ page }) => {
   await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  // No shipped theme sets a display face that differs from its sans face, so
+  // the shipped values cannot tell the two apart. Set a sentinel display face
+  // on :root, where --psi-text-display-24-32-medium is declared and its
+  // var(--psi-font-display) substitutes, and check the heading takes it.
+  await page.evaluate(() => document.documentElement.style.setProperty("--psi-font-display", "serif"));
   const h = await page.locator("#main h1").evaluate((h1: HTMLElement) => {
     const cs = getComputedStyle(h1);
     const norm = (s: string) => s.replace(/["'\s]/g, "");
@@ -364,14 +369,15 @@ test("the page's heading is a PageHeading: margin 0, 24/32, in the display face 
       size: cs.fontSize,
       lineHeight: cs.lineHeight,
       font: norm(cs.fontFamily),
-      display: norm(cs.getPropertyValue("--psi-font-display")),
+      sans: norm(getComputedStyle(document.documentElement).getPropertyValue("--psi-font-sans")),
     };
   });
   expect(h.marginTop).toBe("0px");
   expect(h.size).toBe("24px");
   expect(h.lineHeight).toBe("32px");
-  expect(h.display).not.toBe("");
-  expect(h.font).toBe(h.display);
+  expect(h.sans).not.toBe("");
+  expect(h.font).toBe("serif");
+  expect(h.font).not.toBe(h.sans);
 });
 
 test("with both padding tokens at 0, the banner and the page keep main's edges @interaction", async ({ page }) => {
