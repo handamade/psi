@@ -186,7 +186,7 @@ export const componentLabelPairs: ContrastPair[] = [
  * Textarea rest on borderControl and hover on borderControlHover). Each is
  * checked against the control's own fill (bgPrimary) and the surface it sits
  * on (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). An
- * unchecked Switch is identified by its track (DNNN: fillControl, and
+ * unchecked Switch is identified by its track (D122: fillControl, and
  * fillControlHover on hover) against the surface, and its state by the white
  * thumb against the track; the thumb pairs composite the track onto bgPrimary. */
 export const nonTextPairs: ContrastPair[] = [

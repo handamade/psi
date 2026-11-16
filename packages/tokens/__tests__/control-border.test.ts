@@ -59,7 +59,7 @@ describe("borderControl (D106)", () => {
     }
     expect(caught).toBeInstanceOf(ThemeGateError);
     const failing = (caught as ThemeGateError).contrastFailures.map((f) => `${f.fg}/${f.bg}`);
-    // DNNN: fillControl is a ref to borderControl, so a weak borderControl
+    // D122: fillControl is a ref to borderControl, so a weak borderControl
     // takes the Switch track down with it, and the gate names both.
     expect(failing).toEqual([
       "borderControl/bgPrimary",

@@ -10,7 +10,7 @@ import * as matrix from "../src/contrast-matrix.js";
 import { gateTheme, ThemeGateError } from "../src/theme/gate.js";
 import type { ContrastPair } from "../src/contrast-matrix.js";
 
-/** DNNN — an unchecked Switch is identified by its track alone and its state
+/** D122 — an unchecked Switch is identified by its track alone and its state
  * by where the white thumb sits on it, so WCAG 1.4.11 asks 3:1 for the track
  * against its surface and for the thumb against the track, at rest and on
  * hover. fillNeutral4 measured 1.10-1.27. */
@@ -29,7 +29,7 @@ const SWITCH_PAIRS: ContrastPair[] = [
 
 const ember = customerThemes.ember!;
 
-describe("fillControl and fillControlHover (DNNN)", () => {
+describe("fillControl and fillControlHover (D122)", () => {
   it("fillControl is a ref to borderControl and fillControlHover is fgPrimary at 0.75 / 0.55, both surfaces", () => {
     expect(lightTheme.fillControl).toEqual({ from: ref.borderControl, scopes: ["surface"] });
     expect(darkTheme.fillControl).toEqual({ from: ref.borderControl, scopes: ["surface"] });

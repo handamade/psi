@@ -1,6 +1,6 @@
-# A switch you can find (DNNN)
+# A switch you can find (D122)
 
-Date: 2026-11-16. Status: **Approved**, branch `dNNN-switch-track`.
+Date: 2026-11-16. Status: **Approved**, branch `d122-switch-track`.
 
 Provenance: the other follow-up D106 left open ("the Switch track"), and the
 one D120 deliberately kept out of its PR so each PR's vr baselines stay
@@ -47,7 +47,7 @@ composited onto the surface:
 
 ## Decisions
 
-- **DNNN — the unchecked Switch track is a new gated surface, `fillControl`,
+- **D122 — the unchecked Switch track is a new gated surface, `fillControl`,
   with a gated hover step, `fillControlHover`.**
   - **Rest: `fillControl` is a `ref` to `borderControl`, scoped to
     surfaces.** It carries `borderControl`'s alpha (0.55 light, 0.40 dark),

@@ -47,13 +47,13 @@ export const darkTheme: ThemeDef = {
   /** D46: the static-white SURFACE (switch thumb) — pure ref, byte-identical
    * with fgStaticWhite; scoped for what it is. */
   fillStaticWhite: token({ from: ref.fgStaticWhite, scopes: ["surface"] }),
-  /** DNNN: the fill that alone identifies an unchecked control (the Switch
+  /** D122: the fill that alone identifies an unchecked control (the Switch
    * track), the surface twin of borderControl. A ref, so the unchecked track
    * and the unchecked checkbox outline are always the same ink, and WCAG
    * 1.4.11 asks 3:1 for it against its surface and for the white thumb on it
    * (`nonTextPairs`). fillNeutral4 measured 1.10-1.27. */
   fillControl: token({ from: ref.borderControl, scopes: ["surface"] }),
-  /** DNNN: the unchecked Switch track on hover, a step beyond fillControl,
+  /** D122: the unchecked Switch track on hover, a step beyond fillControl,
    * gated the same way. 0.55, not borderControlHover's 0.60: at 0.60 the white
    * thumb on it measures 3.04-3.22, too thin for a derived theme. */
   fillControlHover: token({ from: ref.fgPrimary, alpha: 0.55, scopes: ["surface"] }),

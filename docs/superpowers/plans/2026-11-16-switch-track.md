@@ -1,4 +1,4 @@
-# Switch track at 3:1 (DNNN) Implementation Plan
+# Switch track at 3:1 (D122) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -23,7 +23,7 @@ Spec: `docs/superpowers/specs/2026-11-16-switch-track-design.md`.
 - Checked track (`fillAccent`), thumb (`fillStaticWhite`), focus and disabled are unchanged.
 - Never run `pnpm vr` (its baselines are Linux-only; macOS writes junk).
 - Never name the private request register, its ids or consumers in repo files.
-- `DNNN` is replaced with the decision number from the coordinating session before the first commit that carries it (Task 0).
+- `D122` is replaced with the decision number from the coordinating session before the first commit that carries it (Task 0).
 - Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
 ---
@@ -31,15 +31,15 @@ Spec: `docs/superpowers/specs/2026-11-16-switch-track-design.md`.
 ### Task 0: Base the branch on D120 and fill in the decision number (controller, not a subagent)
 
 **Files:**
-- Modify: `docs/superpowers/specs/2026-11-16-switch-track-design.md`, this plan (replace `DNNN`/`dNNN`)
+- Modify: `docs/superpowers/specs/2026-11-16-switch-track-design.md`, this plan (replace `D122`/`d122`)
 
 - [ ] **Step 1:** Wait for PR #163 (D120) to be merged. Then `git fetch origin && git merge origin/main`, and confirm `grep -n borderControlHover packages/tokens/src/contrast-matrix.ts` shows two pairs.
-- [ ] **Step 2:** Replace `DNNN` and `dNNN` in the spec and in this plan with the number the coordinating session gave. Rename the branch: `git branch -m dNNN-switch-track` (use the real number).
+- [ ] **Step 2:** Replace `D122` and `d122` in the spec and in this plan with the number the coordinating session gave. Rename the branch: `git branch -m d122-switch-track` (use the real number).
 - [ ] **Step 3:** Commit the spec and plan:
 
 ```bash
 git add docs/superpowers/specs/2026-11-16-switch-track-design.md docs/superpowers/plans/2026-11-16-switch-track.md
-git commit -m "docs: spec and plan for the switch track at 3:1 (DNNN)"
+git commit -m "docs: spec and plan for the switch track at 3:1 (D122)"
 ```
 
 ---
@@ -74,7 +74,7 @@ import * as matrix from "../src/contrast-matrix.js";
 import { gateTheme, ThemeGateError } from "../src/theme/gate.js";
 import type { ContrastPair } from "../src/contrast-matrix.js";
 
-/** DNNN — an unchecked Switch is identified by its track alone and its state
+/** D122 — an unchecked Switch is identified by its track alone and its state
  * by where the white thumb sits on it, so WCAG 1.4.11 asks 3:1 for the track
  * against its surface and for the thumb against the track, at rest and on
  * hover. fillNeutral4 measured 1.10-1.27. */
@@ -93,7 +93,7 @@ const SWITCH_PAIRS: ContrastPair[] = [
 
 const ember = customerThemes.ember!;
 
-describe("fillControl and fillControlHover (DNNN)", () => {
+describe("fillControl and fillControlHover (D122)", () => {
   it("fillControl is a ref to borderControl and fillControlHover is fgPrimary at 0.75 / 0.55, both surfaces", () => {
     expect(lightTheme.fillControl).toEqual({ from: ref.borderControl, scopes: ["surface"] });
     expect(darkTheme.fillControl).toEqual({ from: ref.borderControl, scopes: ["surface"] });
@@ -153,13 +153,13 @@ Expected: FAIL. The first test fails on `toEqual` (received `undefined`), the ga
 - [ ] **Step 3: Add the tokens.** In `packages/tokens/src/themes/light.ts`, directly after `fillStaticWhite`:
 
 ```ts
-  /** DNNN: the fill that alone identifies an unchecked control (the Switch
+  /** D122: the fill that alone identifies an unchecked control (the Switch
    * track), the surface twin of borderControl. A ref, so the unchecked track
    * and the unchecked checkbox outline are always the same ink, and WCAG
    * 1.4.11 asks 3:1 for it against its surface and for the white thumb on it
    * (`nonTextPairs`). fillNeutral4 measured 1.10-1.27. */
   fillControl: token({ from: ref.borderControl, scopes: ["surface"] }),
-  /** DNNN: the unchecked Switch track on hover, a step beyond fillControl,
+  /** D122: the unchecked Switch track on hover, a step beyond fillControl,
    * gated the same way. */
   fillControlHover: token({ from: ref.fgPrimary, alpha: 0.75, scopes: ["surface"] }),
 ```
@@ -168,7 +168,7 @@ In `packages/tokens/src/themes/dark.ts`, the same place, the same comments, with
 
 ```ts
   fillControl: token({ from: ref.borderControl, scopes: ["surface"] }),
-  /** DNNN: ... gated the same way. 0.55, not borderControlHover's 0.60: at
+  /** D122: ... gated the same way. 0.55, not borderControlHover's 0.60: at
    * 0.60 the white thumb on it measures 3.04-3.22, too thin for a derived
    * theme. */
   fillControlHover: token({ from: ref.fgPrimary, alpha: 0.55, scopes: ["surface"] }),
@@ -176,7 +176,7 @@ In `packages/tokens/src/themes/dark.ts`, the same place, the same comments, with
 
 The resolver resolves refs recursively (`resolveToken(def.from.name)`), so a forward ref to `borderControl`, declared further down, is fine.
 
-- [ ] **Step 4: Add the pairs.** In `packages/tokens/src/contrast-matrix.ts`, append to `nonTextPairs` (after the D120 lines) and extend its doc comment with one sentence: "An unchecked Switch is identified by its track (DNNN: fillControl, and fillControlHover on hover) against the surface, and its state by the white thumb against the track; the thumb pairs composite the track onto bgPrimary."
+- [ ] **Step 4: Add the pairs.** In `packages/tokens/src/contrast-matrix.ts`, append to `nonTextPairs` (after the D120 lines) and extend its doc comment with one sentence: "An unchecked Switch is identified by its track (D122: fillControl, and fillControlHover on hover) against the surface, and its state by the white thumb against the track; the thumb pairs composite the track onto bgPrimary."
 
 ```ts
   { fg: "fillControl", bg: "bgPrimary", minRatio: 3 },
@@ -190,13 +190,13 @@ The resolver resolves refs recursively (`resolveToken(def.from.name)`), so a for
 - [ ] **Step 5: Run the new test.** Same command as Step 2. Expected: PASS.
 
 - [ ] **Step 6: Update the counts and the two D106/D120 tests.**
-  - `packages/tokens/src/generate/derive.ts`: the `AA_MATRIX` comment says "40 pairs (33 until D106, 38 until D120 …)". Make it "46 pairs (33 until D106, 38 until D120, 40 until DNNN …)", and "The four non-text pairs (D106, D120)" → "The ten non-text pairs (D106, D120, DNNN)", and name `fillControl`/`fillControlHover` alongside `borderControl`/`borderControlHover` as fixed alphas of `fgPrimary` the sweep proves.
-  - `packages/tokens/__tests__/generate-derive.test.ts`: every "40" that counts the matrix becomes 46 (the doc comment, `toHaveLength(40)`, and the two test titles). Add DNNN next to "(D106, D120)" in the title that names them.
+  - `packages/tokens/src/generate/derive.ts`: the `AA_MATRIX` comment says "40 pairs (33 until D106, 38 until D120 …)". Make it "46 pairs (33 until D106, 38 until D120, 40 until D122 …)", and "The four non-text pairs (D106, D120)" → "The ten non-text pairs (D106, D120, D122)", and name `fillControl`/`fillControlHover` alongside `borderControl`/`borderControlHover` as fixed alphas of `fgPrimary` the sweep proves.
+  - `packages/tokens/__tests__/generate-derive.test.ts`: every "40" that counts the matrix becomes 46 (the doc comment, `toHaveLength(40)`, and the two test titles). Add D122 next to "(D106, D120)" in the title that names them.
   - `packages/tokens/__tests__/field-border.test.ts`: the test "nonTextPairs gates borderControl and borderControlHover…" uses `toEqual([...])` on the whole list. Change it to `toEqual(expect.arrayContaining([...the same four]))`.
   - `packages/tokens/__tests__/control-border.test.ts`: "the theme gate refuses a borderControl under 3:1" now also fails `fillControl`, because it is a ref to `borderControl`. That coupling is intended. Change the expectation to:
 
 ```ts
-    // DNNN: fillControl is a ref to borderControl, so a weak borderControl
+    // D122: fillControl is a ref to borderControl, so a weak borderControl
     // takes the Switch track down with it, and the gate names both.
     expect(failing).toEqual([
       "borderControl/bgPrimary",
@@ -216,7 +216,7 @@ Expected: all PASS, including the 360×5×2 sweep in `generate-derive.test.ts`, 
 
 ```bash
 git add packages/tokens/src packages/tokens/__tests__
-git commit -m "feat(tokens): fillControl and fillControlHover, gated at 3:1 (DNNN)"
+git commit -m "feat(tokens): fillControl and fillControlHover, gated at 3:1 (D122)"
 ```
 
 ---
@@ -235,11 +235,11 @@ git commit -m "feat(tokens): fillControl and fillControlHover, gated at 3:1 (DNN
 - [ ] **Step 1: Write the failing test.** Append to `packages/tokens/__tests__/switch-track.test.ts` (add the import at the top: `import { switchVars } from "../src/components/switch.js";`):
 
 ```ts
-describe("the Switch binds the control fill (DNNN)", () => {
+describe("the Switch binds the control fill (D122)", () => {
   it("rests on fill-control and hovers on fill-control-hover", () => {
     expect(switchVars["track-bg"]).toBe("var(--psi-fill-control)");
     expect(switchVars["track-bg-hover"]).toBe("var(--psi-fill-control-hover)");
-    // Unchanged by DNNN: the checked track, the thumb, the focus ring.
+    // Unchanged by D122: the checked track, the thumb, the focus ring.
     expect(switchVars["track-bg-checked"]).toBe("var(--psi-fill-accent)");
     expect(switchVars["thumb-bg"]).toBe("var(--psi-fill-static-white)");
     expect(switchVars["focus-ring"]).toBe("var(--psi-border-focus)");
@@ -255,7 +255,7 @@ describe("the Switch binds the control fill (DNNN)", () => {
 /** Switch component tokens (--psi-switch-*). */
 export const switchVars: Record<string, string> = {
   fg: "var(--psi-fg-primary)",
-  /** DNNN: the unchecked track is the gated control fill (3:1 on its surface,
+  /** D122: the unchecked track is the gated control fill (3:1 on its surface,
    * and the white thumb 3:1 on it), not fillNeutral4 (1.10-1.27). */
   "track-bg": "var(--psi-fill-control)",
   "track-bg-hover": "var(--psi-fill-control-hover)",
@@ -268,7 +268,7 @@ export const switchVars: Record<string, string> = {
 - [ ] **Step 4: The hover rule.** In `packages/react/src/Switch/switch.module.css`, directly after the `.input:checked + .track` rule:
 
 ```css
-/* Hover (DNNN): only an enabled, unchecked track; the checked track and the
+/* Hover (D122): only an enabled, unchecked track; the checked track and the
    thumb do not change under the pointer. */
 .label:hover .input:not(:checked):not(:disabled) + .track {
   background: var(--psi-switch-track-bg-hover);
@@ -286,7 +286,7 @@ Expected: PASS. `psi/token-scopes` accepts `background` bound to `--psi-switch-t
 
 ```bash
 git add packages/tokens/src/components/switch.ts packages/tokens/__tests__/switch-track.test.ts packages/react/src/Switch/switch.module.css
-git commit -m "feat(switch): unchecked track on fillControl, with a hover (DNNN)"
+git commit -m "feat(switch): unchecked track on fillControl, with a hover (D122)"
 ```
 
 ---
@@ -301,7 +301,7 @@ git commit -m "feat(switch): unchecked track on fillControl, with a hover (DNNN)
 - [ ] **Step 1: llms.txt.** After the `--psi-border-control-hover` line in `packages/tokens/llms.txt`, add:
 
 ```
-- --psi-fill-control: the fill that alone identifies an unchecked control: the Switch track (DNNN), bound by --psi-switch-track-bg. A ref to --psi-border-control (fgPrimary at 0.55 alpha in light-based themes, 0.40 in dark-based), so the unchecked track and the unchecked checkbox outline are one ink. Gated at 3:1 on bgPrimary and bgSecondary, and the white thumb (--psi-fill-static-white) at 3:1 on it, by `nonTextPairs` (WCAG 1.4.11). Bind it, not --psi-fill-neutral4 (1.10-1.27:1), for a control identified by its fill alone; --psi-fill-neutral4 is an active or loading surface.
+- --psi-fill-control: the fill that alone identifies an unchecked control: the Switch track (D122), bound by --psi-switch-track-bg. A ref to --psi-border-control (fgPrimary at 0.55 alpha in light-based themes, 0.40 in dark-based), so the unchecked track and the unchecked checkbox outline are one ink. Gated at 3:1 on bgPrimary and bgSecondary, and the white thumb (--psi-fill-static-white) at 3:1 on it, by `nonTextPairs` (WCAG 1.4.11). Bind it, not --psi-fill-neutral4 (1.10-1.27:1), for a control identified by its fill alone; --psi-fill-neutral4 is an active or loading surface.
 - --psi-fill-control-hover: the unchecked Switch track on hover, a step beyond --psi-fill-control: fgPrimary at 0.75 alpha in light-based themes, 0.55 in dark-based, gated the same way. A theme that overrides it should keep it a step beyond --psi-fill-control: the gate checks each at 3:1, not their order.
 ```
 
@@ -313,7 +313,7 @@ git commit -m "feat(switch): unchecked track on fillControl, with a hover (DNNN)
 "@handamade/psi-react": patch
 ---
 
-An unchecked Switch's track reaches 3:1 or better against its surface in every theme (DNNN).
+An unchecked Switch's track reaches 3:1 or better against its surface in every theme (D122).
 
 - **The track is now a control fill.** `--psi-switch-track-bg` binds the new `--psi-fill-control`, the surface twin of `--psi-border-control` (a ref to it, so the two are one ink). It was on `--psi-fill-neutral4`, which measured 1.10–1.27:1. WCAG 1.4.11 asks 3:1 for what identifies a control. **What changes for you:** every unchecked Switch draws a mid-grey track (3.24:1 or better), and the white thumb shows clearly on it (3.47:1 or better). If you set `--psi-switch-track-bg` yourself, your value still wins.
 - **A hover, `--psi-fill-control-hover`.** `fgPrimary` at 0.75 alpha in light-based themes and 0.55 in dark-based, bound by the new `--psi-switch-track-bg-hover` on an enabled, unchecked Switch. The checked track and the thumb don't change on hover.
@@ -333,14 +333,14 @@ Expected: all green. If `check-docs-drift` names a stale count (pairs, tokens), 
 
 ```bash
 git add packages/tokens/llms.txt .changeset/switch-track.md
-git commit -m "docs: fill-control in llms.txt, and a changeset (DNNN)"
+git commit -m "docs: fill-control in llms.txt, and a changeset (D122)"
 ```
 
 ---
 
 ### Task 4: PR, auto-merge, baselines (controller)
 
-- [ ] **Step 1:** `git fetch origin && git merge origin/main`. Re-check that the decision number is still free on `origin/main` (`grep -rn "DNNN" docs/superpowers/specs` should show only this spec). Rerun the five gates if `main` moved.
+- [ ] **Step 1:** `git fetch origin && git merge origin/main`. Re-check that the decision number is still free on `origin/main` (`grep -rn "D122" docs/superpowers/specs` should show only this spec). Rerun the five gates if `main` moved.
 - [ ] **Step 2:** Push and open the PR. Arm auto-merge with `gh pr merge <n> --auto --squash`, then `gh pr view <n> --json autoMergeRequest`. If it reads null, use the `enablePullRequestAutoMerge` GraphQL mutation.
 - [ ] **Step 3:** `vr` fails on every Switch story, Color Tokens (four themes), and stories that compose a Switch (Field, Menu). Download the `vr-baselines` artifact into `.superpowers/` (`gh run download <run> -n vr-baselines -D .superpowers/vr-<run>`). Send the user before/after pairs (`*-expected.png` / `*-actual.png` under `test-results/`).
-- [ ] **Step 4:** Only after the user's OK, copy each `*-actual.png` over its `apps/storybook/vr/stories.spec.ts-snapshots/*-linux.png`, commit (`test(vr): switch track baselines (DNNN)`), push, and confirm `ci` goes green.
+- [ ] **Step 4:** Only after the user's OK, copy each `*-actual.png` over its `apps/storybook/vr/stories.spec.ts-snapshots/*-linux.png`, commit (`test(vr): switch track baselines (D122)`), push, and confirm `ci` goes green.

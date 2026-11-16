@@ -42,7 +42,7 @@ const PROMPTS = [
 ];
 
 describe("deriveTheme", () => {
-  it("gates 46 pairs: the text matrix and the non-text pairs (D106, D120, DNNN)", () => {
+  it("gates 46 pairs: the text matrix and the non-text pairs (D106, D120, D122)", () => {
     expect(AA_MATRIX).toHaveLength(46);
   });
 
