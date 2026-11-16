@@ -30,6 +30,10 @@ export interface ToastProps {
    * ("Success:", "Warning:", "Error:") — pass the translated word; `null`
    * drops it. Unset keeps the default, and `neutral` has none. */
   statusLabel?: string | null;
+  /** The dismiss button's accessible name (D117) — pass the translated string.
+   * The button stays an icon; only its name changes. Only meaningful with
+   * `onDismiss`. @default "Dismiss notification" */
+  dismissLabel?: string;
   className?: string;
   /** Forwarded ref to the underlying `<div>`. */
   ref?: Ref<HTMLDivElement>;
@@ -60,6 +64,7 @@ export function Toast({
   action,
   onDismiss,
   statusLabel,
+  dismissLabel = "Dismiss notification",
   className,
   ref,
 }: ToastProps) {
@@ -83,7 +88,7 @@ export function Toast({
         <IconButton
           variant="ghost"
           size={32}
-          aria-label="Dismiss notification"
+          aria-label={dismissLabel}
           onClick={onDismiss}
         >
           <IconClose aria-hidden="true" />

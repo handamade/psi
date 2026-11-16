@@ -15,6 +15,9 @@ export interface ToastOptions {
   /** The visually hidden status word (D83): a string replaces the default,
    * `null` drops it, unset keeps it. */
   statusLabel?: string | null;
+  /** The dismiss button's accessible name for this toast (D117). Unset, the
+   * provider's `dismissLabel` applies, then "Dismiss notification". */
+  dismissLabel?: string;
 }
 
 export interface AnnounceOptions {

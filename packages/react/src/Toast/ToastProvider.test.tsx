@@ -310,6 +310,82 @@ describe("ToastProvider", () => {
     });
   });
 
+  describe("dismissLabel (D117)", () => {
+    function Raise({ options }: { options: ToastOptions }) {
+      const toast = useToast();
+      return (
+        <button type="button" onClick={() => toast.show(options)}>
+          raise
+        </button>
+      );
+    }
+    const dismissButton = (name: string) => screen.getByRole("button", { name, hidden: true });
+
+    it("names the dismiss button from show()", () => {
+      render(
+        <ToastProvider>
+          <Raise options={{ message: "Gespeichert", dismissLabel: "Schließen" }} />
+        </ToastProvider>,
+      );
+      click("raise");
+      expect(dismissButton("Schließen")).toBeInTheDocument();
+    });
+
+    it("names it from the provider when show() gives none", () => {
+      render(
+        <ToastProvider dismissLabel="Schließen">
+          <Raise options={{ message: "Gespeichert" }} />
+        </ToastProvider>,
+      );
+      click("raise");
+      expect(dismissButton("Schließen")).toBeInTheDocument();
+    });
+
+    it("lets a toast's own label beat the provider's", () => {
+      render(
+        <ToastProvider dismissLabel="Schließen">
+          <Raise options={{ message: "Gespeichert", dismissLabel: "Diese schließen" }} />
+        </ToastProvider>,
+      );
+      click("raise");
+      expect(dismissButton("Diese schließen")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Schließen", hidden: true })).toBeNull();
+    });
+
+    it("keeps the default name when neither is set", () => {
+      render(
+        <ToastProvider>
+          <Raise options={{ message: "Saved" }} />
+        </ToastProvider>,
+      );
+      click("raise");
+      expect(dismissButton("Dismiss notification")).toBeInTheDocument();
+    });
+
+    it("renames a toast already on screen when the provider's label changes", () => {
+      const ui = (label: string) => (
+        <ToastProvider dismissLabel={label}>
+          <Raise options={{ message: "Gespeichert" }} />
+        </ToastProvider>
+      );
+      const { rerender } = render(ui("Schließen"));
+      click("raise");
+      rerender(ui("Fermer"));
+      expect(dismissButton("Fermer")).toBeInTheDocument();
+    });
+
+    it("does not forward the prop to the region element", () => {
+      render(
+        <ToastProvider dismissLabel="Schließen">
+          <span />
+        </ToastProvider>,
+      );
+      const region = document.querySelector("[data-psi-toast-region]")!;
+      expect(region).not.toHaveAttribute("dismisslabel");
+      expect(region).not.toHaveAttribute("dismissLabel");
+    });
+  });
+
   describe("announce() (D91)", () => {
     const status = () => screen.getByRole("status", { hidden: true });
     const alert = () => screen.getByRole("alert", { hidden: true });
