@@ -61,14 +61,15 @@
   text-align: var(--psi-field-label-align);
 }
 
-/* In a FieldStack (D115): every Field spans the stack's two columns; a start
-   Field shares them, so all labels in the stack line up in one column. */
+/* In a FieldStack (D115): every Field spans the stack's columns. Only a start
+   stack's Fields share them (subgrid), so all its labels line up in one
+   column; a start Field in a top stack keeps its own two columns. */
 
 .field[data-in-stack] {
   grid-column: 1 / -1;
 }
 
-.field[data-in-stack][data-label-position="start"] {
+.field[data-in-stack="start"][data-label-position="start"] {
   grid-template-columns: subgrid;
 }
 
@@ -77,16 +78,16 @@
    --psi-field-label-align says: an end-aligned label above a control reads
    as a mistake. */
 @container psi-field-stack (width < 480px) {
-  .field[data-in-stack][data-label-position="start"] {
+  .field[data-in-stack="start"][data-label-position="start"] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .field[data-in-stack][data-label-position="start"] > *,
-  .field[data-in-stack][data-label-position="start"] > .label {
+  .field[data-in-stack="start"][data-label-position="start"] > *,
+  .field[data-in-stack="start"][data-label-position="start"] > .label {
     grid-column: 1;
   }
 
-  .field[data-in-stack][data-label-position="start"] > .label {
+  .field[data-in-stack="start"][data-label-position="start"] > .label {
     text-align: start;
   }
 }

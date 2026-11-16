@@ -1,3 +1,4 @@
+/* global URL, document */
 // D115 engine spike. Opens fixture.html in Chromium, WebKit and Firefox and
 // checks the five things the plan's CSS depends on. Run from the repo root:
 //   node docs/superpowers/plans/assets/d115-spike/spike.mjs [fixture-file]   (default fixture.html)

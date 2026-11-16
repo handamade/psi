@@ -67,6 +67,7 @@ spec on another branch.
   - Content in the stack that is not a `Field` spans both columns.
   - A `Field` whose own `labelPosition` is `"top"` spans both columns with its label above, for a long `Textarea`
     say.
+  - A `Field` with its own `labelPosition="start"` inside a `"top"` stack lays out as a standalone field, in two columns of its own.
   - A `Field` with no label puts its control in column 2, so a lone `Checkbox` lines up with the controls above it.
   - Controls in column 2 stretch to its width, as they stretch under a label above today. How wide a control should
     be is a separate question that this decision does not settle.
@@ -138,7 +139,7 @@ packages/react/src/Field/Field.tsx            — labelPosition prop; reads Fiel
 packages/react/src/Field/field.module.css     — the start layout, standalone and under a FieldStack
 packages/react/src/FieldStack/FieldStack.tsx        — new: the grid and the container
 packages/react/src/FieldStack/FieldStackContext.ts  — new: the context and the FieldLabelPosition type
-packages/react/src/FieldStack/fieldStack.module.css — new
+packages/react/src/FieldStack/field-stack.module.css — new
 packages/react/src/FieldStack/slots.json            — new: one body slot, like Stack
 packages/react/src/Field/Field.stories.tsx, FieldStack/FieldStack.stories.tsx — new stories below
 packages/react/src/index.ts                   — export FieldStack and its types
@@ -149,7 +150,7 @@ packages/tokens/src/guidance.ts               — one steering line
 ```
 
 Each component has its own folder, as the slot and manifest scripts expect. `Field` renders
-`data-label-position="start"` when the resolved position is `start`, and `data-in-stack` inside a `FieldStack`; the
+`data-label-position="start"` when the resolved position is `start`, and `data-in-stack` holding the stack's position; the
 CSS keys off those two attributes, so a `Field` needs no knowledge of its column beyond the context's value.
 
 ## Testing

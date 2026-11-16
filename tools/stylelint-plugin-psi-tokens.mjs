@@ -6,15 +6,14 @@ import { dirname, join } from "node:path";
 const ruleName = "psi/component-tokens-only";
 const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|z|focus-ring)-/;
 // componentName derived from filename: button.module.css → button; icon-button → button (declared alias)
-const ALIASES = { "icon-button": "button", fieldstack: "field" };
+const ALIASES = { "icon-button": "button", "field-stack": "field" };
 
 const rule = (enabled) => (root, result) => {
   if (!enabled) return;
   const file = root.source?.input.file ?? "";
-  const m = file.match(/([A-Za-z-]+)\.module\.css$/);
+  const m = file.match(/([a-z-]+)\.module\.css$/);
   if (!m) return;
-  const stem = m[1].toLowerCase();
-  const component = ALIASES[stem] ?? stem;
+  const component = ALIASES[m[1]] ?? m[1];
   const own = new RegExp(`^--psi-${component}-`);
   root.walkDecls((decl) => {
     for (const varName of decl.value.matchAll(/var\((--psi-[a-z0-9-]+)/g)) {

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
-import styles from "./fieldStack.module.css";
+import styles from "./field-stack.module.css";
 import { FieldStackContext } from "./FieldStackContext.js";
 import type { FieldLabelPosition } from "./FieldStackContext.js";
 

@@ -9,7 +9,7 @@ import { Input } from "../Input/Input.js";
 import { Textarea } from "../Textarea/Textarea.js";
 import { containerQueries } from "../../../tokens/src/scales/layout.js";
 
-const stackCss = () => readFileSync(join(import.meta.dirname, "fieldStack.module.css"), "utf8");
+const stackCss = () => readFileSync(join(import.meta.dirname, "field-stack.module.css"), "utf8");
 const fieldCss = () => readFileSync(join(import.meta.dirname, "../Field/field.module.css"), "utf8");
 
 describe("FieldStack (D115)", () => {
@@ -45,9 +45,9 @@ describe("FieldStack (D115)", () => {
     const name = screen.getByLabelText("Name").parentElement!;
     const notes = screen.getByLabelText("Notes").parentElement!;
     expect(name).toHaveAttribute("data-label-position", "start");
-    expect(name).toHaveAttribute("data-in-stack", "");
+    expect(name).toHaveAttribute("data-in-stack", "start");
     expect(notes).not.toHaveAttribute("data-label-position");
-    expect(notes).toHaveAttribute("data-in-stack", "");
+    expect(notes).toHaveAttribute("data-in-stack", "start");
   });
 
   it("a Field rendered by the consumer's own component still reads the stack", () => {
@@ -74,11 +74,21 @@ describe("FieldStack (D115)", () => {
   });
 
   it("a Field in a start stack shares the stack's columns", () => {
-    expect(fieldCss()).toMatch(/\.field\[data-in-stack\]\[data-label-position="start"\]\s*\{\s*grid-template-columns:\s*subgrid;/);
+    expect(fieldCss()).toMatch(/\.field\[data-in-stack="start"\]\[data-label-position="start"\]\s*\{\s*grid-template-columns:\s*subgrid;/);
   });
 
   it("the container query's literal equals containerQueries.fieldStackColumns", () => {
     const m = /@container psi-field-stack \(width < (\d+)px\)/.exec(fieldCss());
     expect(Number(m?.[1])).toBe(containerQueries.fieldStackColumns);
+  });
+
+  it("a start Field in a top stack lays out alone: it is marked top and never shares columns", () => {
+    render(<FieldStack><Field label="Name" labelPosition="start"><Input /></Field></FieldStack>);
+    const field = screen.getByLabelText("Name").parentElement!;
+    expect(field).toHaveAttribute("data-label-position", "start");
+    expect(field).toHaveAttribute("data-in-stack", "top");
+    const rules = [...fieldCss().matchAll(/([^{}]*)\{[^}]*subgrid[^}]*\}/g)].map((m) => m[1]);
+    expect(rules.length).toBeGreaterThan(0);
+    for (const sel of rules) expect(sel).toContain('[data-in-stack="start"]');
   });
 });

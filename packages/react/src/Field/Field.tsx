@@ -93,7 +93,7 @@ export function Field({
   const position: FieldLabelPosition = labelPosition ?? stack?.labelPosition ?? "top";
   const layout = {
     "data-label-position": position === "start" ? "start" : undefined,
-    "data-in-stack": stack ? "" : undefined,
+    "data-in-stack": stack ? stack.labelPosition : undefined,
   };
   const groupAsDiv = group && position === "start";
   const groupLabelId = groupAsDiv && label != null ? `${id}-label` : undefined;
