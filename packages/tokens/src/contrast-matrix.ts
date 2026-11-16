@@ -167,6 +167,12 @@ export const wcagAAPairs: ContrastPair[] = [
   { fg: "fgSuccess", bg: "bgSecondary", minRatio: 4.5 },
   { fg: "fgWarning", bg: "bgSecondary", minRatio: 4.5 },
   { fg: "fgDanger", bg: "bgSecondary", minRatio: 4.5 },
+
+  // A text link on the elevated surface (D119). --psi-surface-bg — what
+  // Panel, Card, Dialog and Menu alias — resolves to bgSecondary, and the
+  // accent was gated only on bgPrimary and its own tint. .psi-link puts it
+  // there as running text.
+  { fg: "fgAccent", bg: "bgSecondary", minRatio: 4.5 },
 ];
 
 /** Solid component-variant labels on their variant backgrounds (spec: "every
@@ -182,9 +188,22 @@ export const componentLabelPairs: ContrastPair[] = [
 
 /** WCAG 1.4.11 non-text contrast (D106): 3:1 for the visual information that
  * identifies a control. An unchecked checkbox or radio is identified by its
- * outline alone, against its own fill (bgPrimary) and the surface it sits on
- * (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). */
+ * outline alone, and a text field by its border alone (D120: Input, Select and
+ * Textarea rest on borderControl and hover on borderControlHover). Each is
+ * checked against the control's own fill (bgPrimary) and the surface it sits
+ * on (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). An
+ * unchecked Switch is identified by its track (D122: fillControl, and
+ * fillControlHover on hover) against the surface, and its state by the white
+ * thumb against the track; the thumb pairs composite the track onto bgPrimary. */
 export const nonTextPairs: ContrastPair[] = [
   { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
   { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
+  { fg: "borderControlHover", bg: "bgPrimary", minRatio: 3 },
+  { fg: "borderControlHover", bg: "bgSecondary", minRatio: 3 },
+  { fg: "fillControl", bg: "bgPrimary", minRatio: 3 },
+  { fg: "fillControl", bg: "bgSecondary", minRatio: 3 },
+  { fg: "fillControlHover", bg: "bgPrimary", minRatio: 3 },
+  { fg: "fillControlHover", bg: "bgSecondary", minRatio: 3 },
+  { fg: "fillStaticWhite", bg: "fillControl", minRatio: 3 },
+  { fg: "fillStaticWhite", bg: "fillControlHover", minRatio: 3 },
 ];

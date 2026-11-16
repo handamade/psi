@@ -47,9 +47,11 @@ function withAlpha(hex: string, alpha: number): string {
 /**
  * The gate, and it must be the SAME set `scripts/build.ts` runs over every
  * committed theme: `[...wcagAAPairs, ...componentLabelPairs, ...nonTextPairs]`,
- * 38 pairs (this said 33 until D106; D62 and D86 had grown it). The two
- * non-text pairs (D106) are not solved here: `borderControl` is a fixed alpha
- * of `fgPrimary`, and the sweep test proves it holds.
+ * 47 pairs (33 until D106, 38 until D120, 40 until D122, 46 until D119's
+ * fgAccent on bgSecondary; D62 and D86 had grown it). The ten non-text
+ * pairs (D106, D120, D122) are not solved here:
+ * `borderControl`, `borderControlHover`, `fillControl` and `fillControlHover`
+ * are fixed alphas of `fgPrimary`, and the sweep test proves they hold.
  *
  * Checking only `wcagAAPairs` (28) is what let "a theme derived from any
  * prompt clears the AA matrix by construction" ship false a third time. The

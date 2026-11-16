@@ -6,7 +6,7 @@ import {
   Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator, MenuText, Textarea, RadioGroup, Radio,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
-  Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, NavTree, NavGroup, NavItem, AppShell,
+  Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell,
   Tabs, TabList, Tab, TabPanel,
   useFieldControl, useToast,
 } from "./index.js";
@@ -32,6 +32,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["NavTree open", <NavTree aria-label="Main"><NavItem><a href="#o">Overview</a></NavItem><NavGroup label="Reports" open onOpenChange={() => {}}><NavItem><a href="#s" aria-current="page">Sales</a></NavItem><NavItem><a href="#t">Traffic</a></NavItem></NavGroup></NavTree>],
   ["NavTree closed", <NavTree aria-label="Main"><NavItem><a href="#o">Overview</a></NavItem><NavGroup label="Reports" open={false} onOpenChange={() => {}}><NavItem><a href="#s">Sales</a></NavItem></NavGroup></NavTree>],
   ["NavTree in a dark sub-theme", <div data-psi-theme="dark"><NavTree aria-label="Main"><NavGroup label="Reports" open onOpenChange={() => {}}><NavItem><a href="#s" aria-current="page">Sales</a></NavItem><NavItem><a href="#t">Traffic</a></NavItem></NavGroup></NavTree></div>],
+  ["Link inline and current (D119)", <Text>Read the <Link href="/terms">terms</Link> or go <Link href="/" current>home</Link>.</Text>],
   ["AppShell open", <AppShell skipLink={<SkipLink href="#main">Skip to content</SkipLink>} header={<NavBar fluid brand={<Button size={32} aria-expanded aria-controls="sidebar">Menu</Button>} />} sidebar={<NavTree aria-label="Main"><NavItem href="#o" current>Overview</NavItem></NavTree>}><h1>Page</h1></AppShell>],
   ["AppShell closed", <AppShell skipLink={<SkipLink href="#main">Skip to content</SkipLink>} header={<NavBar fluid brand={<Button size={32} aria-expanded={false} aria-controls="sidebar">Menu</Button>} />} sidebarOpen={false} sidebar={<NavTree aria-label="Main"><NavItem href="#o">Overview</NavItem></NavTree>}><h1>Page</h1></AppShell>],
   ["AppShell with a dark sidebar", <AppShell sidebarTheme="dark" skipLink={<SkipLink href="#main">Skip to content</SkipLink>} header={<NavBar fluid brand={<Button size={32} aria-expanded aria-controls="sidebar">Menu</Button>} />} sidebar={<NavTree aria-label="Main"><NavItem href="#o" current>Overview</NavItem><NavGroup label="Reports" open onOpenChange={() => {}}><NavItem href="#s">Sales</NavItem></NavGroup></NavTree>}><h1>Page</h1></AppShell>],

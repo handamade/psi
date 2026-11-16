@@ -304,3 +304,40 @@ describe("foreground-colour utilities (D94)", () => {
     expect(family?.classes).toHaveLength(13);
   });
 });
+
+describe("text link utility (D119)", () => {
+  const css = emitUtilitiesCSS();
+
+  it("emits the rest rule: accent colour, an underline that cannot be turned off, inherited font", () => {
+    expect(css).toContain(
+      ".psi-link { color: var(--psi-link-fg); text-decoration-line: underline; text-decoration-thickness: var(--psi-link-underline-thickness); text-decoration-color: currentColor; text-underline-offset: var(--psi-link-underline-offset); transition: color var(--psi-duration-150) var(--psi-ease-standard), text-decoration-thickness var(--psi-duration-150) var(--psi-ease-standard); }",
+    );
+  });
+
+  it("emits hover, focus-visible and current-page rules, current last so it wins on hover", () => {
+    const hover = ".psi-link:hover { color: var(--psi-link-fg-hover); text-decoration-thickness: var(--psi-link-underline-thickness-hover); }";
+    const focus = ".psi-link:focus-visible { outline: var(--psi-focus-ring-width) solid var(--psi-link-focus-ring); outline-offset: var(--psi-focus-ring-offset); border-radius: var(--psi-link-radius); }";
+    const current = '.psi-link[aria-current="page"] { color: var(--psi-link-fg-current); font-weight: var(--psi-link-font-weight-current); text-decoration-line: none; }';
+    expect(css).toContain(hover);
+    expect(css).toContain(focus);
+    expect(css).toContain(current);
+    expect(css.indexOf(current)).toBeGreaterThan(css.indexOf(hover));
+  });
+
+  it("sits inside @layer psi.utilities", () => {
+    const layerStart = css.indexOf("@layer psi.utilities {");
+    expect(layerStart).toBeGreaterThanOrEqual(0);
+    expect(css.indexOf(".psi-link {")).toBeGreaterThan(layerStart);
+  });
+
+  it("registers in the roster with no scale", () => {
+    const family = emitUtilitiesRoster().families.find((f) => f.prefix === "psi-link");
+    expect(family).toEqual({
+      prefix: "psi-link",
+      property: "color, text-decoration, text-underline-offset, transition, outline, font-weight",
+      scale: null,
+      classes: ["psi-link"],
+    });
+    expect(emitUtilitiesRoster().classes).toContain("psi-link");
+  });
+});

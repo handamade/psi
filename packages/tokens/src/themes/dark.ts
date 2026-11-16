@@ -47,6 +47,16 @@ export const darkTheme: ThemeDef = {
   /** D46: the static-white SURFACE (switch thumb) — pure ref, byte-identical
    * with fgStaticWhite; scoped for what it is. */
   fillStaticWhite: token({ from: ref.fgStaticWhite, scopes: ["surface"] }),
+  /** D122: the fill that alone identifies an unchecked control (the Switch
+   * track), the surface twin of borderControl. A ref, so the unchecked track
+   * and the unchecked checkbox outline are always the same ink, and WCAG
+   * 1.4.11 asks 3:1 for it against its surface and for the white thumb on it
+   * (`nonTextPairs`). fillNeutral4 measured 1.10-1.27. */
+  fillControl: token({ from: ref.borderControl, scopes: ["surface"] }),
+  /** D122: the unchecked Switch track on hover, a step beyond fillControl,
+   * gated the same way. 0.55, not borderControlHover's 0.60: at 0.60 the white
+   * thumb on it measures 3.04-3.22, too thin for a derived theme. */
+  fillControlHover: token({ from: ref.fgPrimary, alpha: 0.55, scopes: ["surface"] }),
 
   borderFaint: token({ from: ref.fgPrimary, alpha: 0.08, scopes: ["border"] }),
   borderNeutral: token({ from: ref.fgPrimary, alpha: 0.15, scopes: ["border"] }),
@@ -55,6 +65,10 @@ export const darkTheme: ThemeDef = {
    * so WCAG 1.4.11 asks 3:1 for it (`nonTextPairs`). borderNeutral measured
    * 1.32-1.48. Alpha chosen by sweep over every derivable theme. */
   borderControl: token({ from: ref.fgPrimary, alpha: 0.4, scopes: ["border"] }),
+  /** D120: the field border on hover. Fields rest on borderControl, so hover
+   * must be a step darker and still clear 3:1 (`nonTextPairs`); borderStrong
+   * (0.3) would make hover lighter than rest. */
+  borderControlHover: token({ from: ref.fgPrimary, alpha: 0.6, scopes: ["border"] }),
   borderFocus: token({ from: ref.fgAccent, scopes: ["border"] }),
 
   // Scrims (D32): page-canvas surfaces at alpha — never text pairs, so they

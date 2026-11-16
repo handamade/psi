@@ -27,10 +27,12 @@ describe("borderControl (D106)", () => {
   });
 
   it("is gated at 3:1 on bgPrimary and bgSecondary", () => {
-    expect(nonTextPairs()).toEqual([
-      { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
-      { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
-    ]);
+    expect(nonTextPairs()).toEqual(
+      expect.arrayContaining([
+        { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
+        { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
+      ]),
+    );
   });
 
   for (const [name, theme, palette, slots] of [
@@ -41,7 +43,7 @@ describe("borderControl (D106)", () => {
     it(`${name}: clears 3:1 with headroom on both surfaces`, () => {
       const resolved = resolve(theme, palette, slots);
       expect(resolved.borderControl, "borderControl resolves").toBeDefined();
-      const results = matrix.checkContrast(resolved, nonTextPairs());
+      const results = matrix.checkContrast(resolved, nonTextPairs().filter((p) => p.fg === "borderControl"));
       expect(results).toHaveLength(2);
       for (const r of results) expect(r.ratio, `${r.fg} on ${r.bg}`).toBeGreaterThanOrEqual(3.1);
     });
@@ -57,14 +59,22 @@ describe("borderControl (D106)", () => {
     }
     expect(caught).toBeInstanceOf(ThemeGateError);
     const failing = (caught as ThemeGateError).contrastFailures.map((f) => `${f.fg}/${f.bg}`);
-    expect(failing).toEqual(["borderControl/bgPrimary", "borderControl/bgSecondary"]);
+    // D122: fillControl is a ref to borderControl, so a weak borderControl
+    // takes the Switch track down with it, and the gate names both.
+    expect(failing).toEqual([
+      "borderControl/bgPrimary",
+      "borderControl/bgSecondary",
+      "fillControl/bgPrimary",
+      "fillControl/bgSecondary",
+      "fillStaticWhite/fillControl",
+    ]);
   });
 
-  it("is bound by the checkbox box and the radio circle, and by no field", () => {
+  it("is bound by the checkbox box, the radio circle and, since D120, every field", () => {
     expect(checkboxVars["box-border"]).toBe("var(--psi-border-control)");
     expect(radioGroupVars["circle-border"]).toBe("var(--psi-border-control)");
-    expect(inputVars.border).toBe("var(--psi-border-neutral)");
-    expect(selectVars.border).toBe("var(--psi-border-neutral)");
-    expect(textareaVars.border).toBe("var(--psi-border-neutral)");
+    expect(inputVars.border).toBe("var(--psi-border-control)");
+    expect(selectVars.border).toBe("var(--psi-border-control)");
+    expect(textareaVars.border).toBe("var(--psi-border-control)");
   });
 });

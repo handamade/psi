@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-11-16",
     tag: "release",
+    title: "0.31.0 — controls you can find, and a text link",
+    body: "Input, Select and Textarea now draw their border at 3:1 or better in every theme. It was 1.32:1, below what WCAG 1.4.11 asks of the edge that identifies a control. A field's border now binds --psi-border-control, the same edge as an unchecked checkbox, with a new, darker --psi-border-control-hover. An unchecked Switch's track moves to a new --psi-fill-control and clears 3:1 too, with a hover of its own. The contrast gate now checks all of them in every theme, consumer themes included, so a palette change cannot quietly undo it. Every field and switch looks a step darker. A value you set yourself still wins. Link is the new text link: accent-coloured and underlined, a heavier line on hover, and current for aria-current=\"page\". A router app passes its own link as the child, as with NavItem. The rules also live in utilities.css as .psi-link, so any anchor, rendered markdown included, can take them. Link's colour as text on Panel, Card, Dialog and Menu surfaces is gated at 4.5:1. 55 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-16",
+    tag: "release",
     title: "0.30.0 — labels beside their controls, and a page heading",
     body: "A Field can put its label beside its control: labelPosition=\"start\" sets the label before the control, with the message line under the control. FieldStack lines up a whole form's labels in one column, as wide as the longest label up to 240px, and returns them above their controls when the stack is narrower than 480px. The pagination presets use it, so a pager is one line high. PageHeading is the page's one h1, at 24/32 medium in the brand's display face with margin 0, so a page sits the same distance below the header and below a banner. Its text style is also a token and a utility, --psi-text-display-24-32-medium. Every theme now declares its color-scheme, so on a dark theme the browser draws its own parts dark: a date field's picker icon, a native select's list, scrollbars. A data-psi-theme=\"dark\" region takes the dark scheme with its tokens, and resolved theme JSON gains colorScheme. A theme still paints no background. Toast, show() and ToastProvider take dismissLabel, the dismiss button's accessible name, for a translated app. 54 components, 24 patterns.",
   },
