@@ -2,7 +2,8 @@ import { cloneElement, Fragment, isValidElement, useEffect } from "react";
 import type { AnchorHTMLAttributes, ReactElement, ReactNode, Ref } from "react";
 
 export interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  /** Render the anchor yourself: `<a href>` with `children` as its text.
+  /** Render the anchor yourself: `<a href>` with `children` as its text. Do
+   * not also pass a link element as the child: that nests `<a>` in `<a>`.
    * Router apps leave it out and pass their own link as the only child. */
   href?: string;
   /** Mark the link as the current page (`aria-current="page"`): on the anchor
@@ -26,13 +27,13 @@ const join = (...names: (string | undefined)[]) => names.filter(Boolean).join(" 
  * and, with `current`, `aria-current="page"`, as `NavItem` does (D93). In that
  * form, `Link`'s other anchor props and `ref` are not applied: put them on
  * your link. The font is inherited, so a standalone link sits in a `Text`.
- * Inside a `NavItem`, pass your router link itself, not `Link`: the utility
- * layer would draw a text link in the nav. For an action that should look
+ * Inside a `NavItem` or among `NavBar`'s links, pass your router link itself,
+ * not `Link`: the utility layer would win over the nav's link styles. For an action that should look
  * like a button, use `Button href`. */
 export function Link({ href, current, className, children, ref, ...rest }: LinkProps) {
   const child =
     href === undefined && isValidElement(children) && children.type !== Fragment
-      ? (children as ReactElement<{ className?: string; "aria-current"?: AnchorHTMLAttributes<HTMLAnchorElement>["aria-current"] }>)
+      ? (children as ReactElement<{ className?: string | ((state: never) => string | undefined); "aria-current"?: AnchorHTMLAttributes<HTMLAnchorElement>["aria-current"] }>)
       : null;
   const unstyled = href === undefined && child === null;
 
@@ -55,8 +56,13 @@ export function Link({ href, current, className, children, ref, ...rest }: LinkP
     );
   }
   if (child) {
+    const own = child.props.className;
     return cloneElement(child, {
-      className: join(LINK_CLASS, child.props.className, className),
+      // A router's className may be a function of its state (NavLink).
+      className:
+        typeof own === "function"
+          ? (state: never) => join(LINK_CLASS, own(state), className)
+          : join(LINK_CLASS, own, className),
       ...(current ? { "aria-current": "page" as const } : {}),
     });
   }

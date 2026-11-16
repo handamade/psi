@@ -83,6 +83,21 @@ describe("Link with a child link (D119, the D93 pattern)", () => {
     expect(screen.getByRole("link")).toHaveAttribute("aria-current", "page");
   });
 
+  it("composes a function className, as React Router's NavLink takes", () => {
+    function FnLink({ className, ...rest }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className"> & { className?: string | ((s: { isActive: boolean }) => string) }) {
+      const cls = typeof className === "function" ? className({ isActive: true }) : className;
+      return <a href="/a" className={cls} {...rest} />;
+    }
+    render(
+      <Link className="mine">
+        <FnLink className={({ isActive }) => (isActive ? "is-on" : "is-off")}>A</FnLink>
+      </Link>,
+    );
+    const a = screen.getByRole("link");
+    expect(a).toHaveClass("psi-link", "is-on", "mine");
+    expect(a.getAttribute("class")).not.toMatch(/=>|isActive/);
+  });
+
   it("does not warn", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     render(
