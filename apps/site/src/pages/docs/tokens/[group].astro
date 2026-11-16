@@ -192,18 +192,17 @@ const layoutSections = [
   {
     page.slug === "motion" && (
       <>
-        <p>{g.motion.reducedMotion}</p>
+        <p>
+          Under <code>prefers-reduced-motion: reduce</code>, every <code>--psi-duration-*</code> token resolves to{" "}
+          <code>0.01ms</code>, so anything driven by a duration token effectively stops animating. Drive transitions
+          and animations with duration tokens rather than hardcoded times.
+        </p>
         <HeadingAnchor level={2} id="durations">Durations</HeadingAnchor>
         <p>{r.scales.motion.durations.map((d) => <code class="token-chip">--psi-duration-{d}</code>)}</p>
         <HeadingAnchor level={2} id="easings">Easings</HeadingAnchor>
         <ul>
           {Object.entries(r.scales.motion.easings).map(([k, v]) => (
             <li><code>--psi-ease-{k}</code>: <code>{v}</code></li>
-          ))}
-        </ul>
-        <ul>
-          {Object.entries(g.motion.recipes).map(([k, v]) => (
-            <li><code>{k}</code>: {v}</li>
           ))}
         </ul>
       </>
