@@ -47,8 +47,9 @@ function withAlpha(hex: string, alpha: number): string {
 /**
  * The gate, and it must be the SAME set `scripts/build.ts` runs over every
  * committed theme: `[...wcagAAPairs, ...componentLabelPairs, ...nonTextPairs]`,
- * 41 pairs (33 until D106, 38 until D120, then D119's fgAccent on
- * bgSecondary; D62 and D86 had grown it). The four
+ * 41 pairs: 33 until D106, 38 after it (D62 and D86 had grown the text
+ * matrix), 40 with D120's non-text pairs, 41 with D119's fgAccent on
+ * bgSecondary. The four
  * non-text pairs (D106, D120) are not solved here: `borderControl` and
  * `borderControlHover` are fixed alphas of `fgPrimary`, and the sweep test
  * proves they hold.

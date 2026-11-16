@@ -1,6 +1,6 @@
 # A text link — `Link` and `.psi-link` (D119)
 
-Date: 2026-11-16. Status: **Approved**, not implemented. Branch
+Date: 2026-11-16. Status: **Implemented**. Branch
 `d119-text-link`.
 
 Provenance: a consumer's request. Psi draws no text link, so the consumer's
@@ -96,8 +96,8 @@ flight on another branch. Check again when the PR opens.
     Measured, rest → hover: light 5.91 → 7.31, dark 8.76 → 10.61, acme
     6.39 → 7.86, ember 8.40 → 10.54 on `bgPrimary`, and higher on
     `bgSecondary` and `fillTintAccent` in every theme. Because both ends of
-    the mix pass, and the mix lies between them, a consumer theme that
-    passes the gate passes on hover too.
+    the mix pass, and the mix lies between them, hover stays at or above the
+    lower of fgAccent and fgPrimary, both gated.
   - **One new contrast pair: `{ fg: "fgAccent", bg: "bgSecondary",
     minRatio: 4.5 }`** in `wcagAAPairs`, beside the status foregrounds'
     `bgSecondary` pairs. It measures 6.45 light, 8.05 dark, 6.98 acme, 8.24

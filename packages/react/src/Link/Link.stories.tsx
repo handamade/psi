@@ -68,14 +68,15 @@ export const RouterChild: Story = {
   ),
 };
 
-/** On the elevated surface (bgSecondary, gated by D119) and on a status
- * tint. */
+/** On the elevated surface (bgSecondary, gated by D119). The InlineAlert
+ * shows the link on a status tint, which is measured (4.72 or more on every
+ * shipped theme) but not yet gated. */
 export const OnSurfaces: Story = {
   render: () => (
     <Stack gap={16}>
       <Panel>
         <Text>
-          This panel sits on the elevated surface. <Link href="#panel">A link here</Link> is gated at 4.5.
+          This panel sits on the elevated surface. <Link href="#panel">A link</Link> sits in its text.
         </Text>
       </Panel>
       <InlineAlert variant="danger" title="Payment failed">
