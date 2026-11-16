@@ -266,7 +266,15 @@ describe("labelPosition (D115)", () => {
     expect(css()).toMatch(
       /\.field\[data-label-position="start"\]:has\(>\s*\.message\)\s*>\s*\.label\s*\{[^}]*grid-row:\s*span 2;/,
     );
+    // The message row is flexible, so a tall label's extra height goes to it
+    // and not to the control's row (measured 12px instead of 6px on Linux).
+    expect(css()).toMatch(
+      /\.field\[data-label-position="start"\]:has\(>\s*\.message\)\s*\{[^}]*grid-template-rows:\s*auto 1fr;/,
+    );
     const narrow = /@container psi-field-stack[^{]*\{([\s\S]*)\}\s*$/.exec(css())![1];
+    expect(narrow).toMatch(
+      /\.field\[data-in-stack="start"\]\[data-label-position="start"\]\s*\{[^}]*grid-template-rows:\s*none;/,
+    );
     expect(narrow).toMatch(
       /\.field\[data-in-stack="start"\]\[data-label-position="start"\]\s*>\s*\.label\s*\{[^}]*grid-row:\s*auto;/,
     );

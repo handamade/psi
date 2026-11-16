@@ -62,7 +62,14 @@
 }
 
 /* A label that wraps spans the message row too, so the message stays under
-   its control instead of under the label's last line (D115). */
+   its control instead of under the label's last line (D115). The second row
+   is flexible: a label spanning two auto rows would share its extra height
+   between them and push the message down by half of it, so the fr row takes
+   all of it and the control's row stays the control's height. */
+.field[data-label-position="start"]:has(> .message) {
+  grid-template-rows: auto 1fr;
+}
+
 .field[data-label-position="start"]:has(> .message) > .label {
   grid-row: span 2;
 }
@@ -86,6 +93,7 @@
 @container psi-field-stack (width < 480px) {
   .field[data-in-stack="start"][data-label-position="start"] {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
   }
 
   .field[data-in-stack="start"][data-label-position="start"] > *,
