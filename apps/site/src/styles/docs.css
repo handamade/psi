@@ -2,6 +2,7 @@
   --site-docs-measure: 72ch;
   --site-docs-toc-width: 224px;
   --site-docs-anchor-offset: 24px;
+  --site-code-copy-inset: 8px;
 }
 
 .docs-page {
@@ -108,4 +109,39 @@ h3.docs-heading {
   .docs-menu-toggle {
     display: none;
   }
+}
+
+.code-view {
+  position: relative;
+}
+
+.code-view pre {
+  margin: 0;
+  overflow-x: auto;
+  font: var(--psi-text-mono-14-20-regular);
+  background: transparent;
+  --shiki-foreground: var(--psi-fg-primary);
+  --shiki-background: transparent;
+  --shiki-token-constant: var(--psi-fg-accent);
+  --shiki-token-string: var(--psi-fg-success);
+  --shiki-token-string-expression: var(--psi-fg-success);
+  --shiki-token-comment: var(--psi-fg-secondary);
+  --shiki-token-keyword: var(--psi-fg-accent);
+  --shiki-token-parameter: var(--psi-fg-primary);
+  --shiki-token-function: var(--psi-fg-primary);
+  --shiki-token-punctuation: var(--psi-fg-secondary);
+  --shiki-token-link: var(--psi-fg-accent);
+}
+
+.code-view-copy {
+  position: absolute;
+  top: var(--psi-space-8);
+  inset-inline-end: var(--site-code-copy-inset);
+}
+
+.example-preview {
+  padding: var(--psi-space-24);
+  border: 1px solid var(--psi-border-faint);
+  border-radius: var(--psi-radius-12);
+  background: var(--psi-bg-primary);
 }

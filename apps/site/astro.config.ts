@@ -1,6 +1,7 @@
 import react from "@astrojs/react";
 import { defineConfig } from "astro/config";
 
+import { psiShikiTheme } from "./src/lib/highlight";
 import { psiFacts } from "./vite-plugin-psi-facts";
 
 export default defineConfig({
@@ -11,5 +12,6 @@ export default defineConfig({
   compressHTML: true,
   integrations: [react()],
   vite: { plugins: [psiFacts()] },
+  markdown: { shikiConfig: { theme: psiShikiTheme } },
   server: { port: 5199 },
 });
