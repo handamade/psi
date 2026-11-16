@@ -138,8 +138,8 @@ D117 is the highest on `main`. Check again when the PR opens.
     display face.
 - **Docs.** The generated `docs/PageHeading.md`; a `PageHeading` line in
   `packages/react/llms.txt` beside `Text`'s, and `Text`'s line naming
-  `PageHeading` for the `h1`; the tokens' `llms.txt` and README where they
-  list the text tiers; the count in every prose claim `check-docs-drift`
+  `PageHeading` for the `h1`; the tokens' `llms.txt` where it
+  lists the text tiers; the count in every prose claim `check-docs-drift`
   checks.
 
 ## File map
@@ -152,7 +152,7 @@ D117 is the highest on `main`. Check again when the PR opens.
 | `packages/tokens/src/guidance.ts` | `typographyDefaults.pageHeading` |
 | `packages/tokens/__tests__/page-heading-tokens.test.ts` | new |
 | `packages/tokens/__tests__/scales.test.ts` | the display combo's name, CSS and utility |
-| `packages/tokens/llms.txt`, `packages/tokens/README.md` | the display text style |
+| `packages/tokens/llms.txt` | the display text style |
 | `packages/react/src/PageHeading/PageHeading.tsx` | new |
 | `packages/react/src/PageHeading/page-heading.module.css` | new |
 | `packages/react/src/PageHeading/slots.json` | new: `body` |
@@ -164,7 +164,7 @@ D117 is the highest on `main`. Check again when the PR opens.
 | `packages/react/src/a11y.axe.test.tsx` | a case |
 | `packages/react/scripts/slots.test.ts` | pin `PageHeading`'s `body` |
 | `packages/react/patterns/app-shell.json` | `PageHeading` in `body`; `title` content |
-| `packages/react/scripts/render-preset.test.ts` | the preset renders one `h1` |
+| `packages/react/scripts/emit-patterns.test.ts` | the `app-shell` preset puts `PageHeading` first in `body` |
 | `packages/react/src/AppShell/AppShell.stories.tsx`, `.stories.css` | use `PageHeading`; drop `main h1` |
 | `apps/storybook/vr/app-shell.interaction.spec.ts` | the heading sits exactly one block padding down |
 | `packages/react/llms.txt`, `packages/react/docs/PageHeading.md` | docs (`.md` generated) |
@@ -180,13 +180,13 @@ Tests first, each red on its assertion before the code exists.
   `--psi-text-display-24-32-medium: 500 1.5rem/2rem var(--psi-font-display);`;
   `utilities.css` has `.psi-text-display-24-32-medium`; the DTCG entry's
   `fontFamily` is `{fontFamily.display}`; `--psi-page-heading-font` and
-  `--psi-page-heading-fg` alias as above; a theme may override each; under
-  `ember` the resolved `--psi-font-display` is Archivo's stack.
+  `--psi-page-heading-fg` alias as above; a theme may override each, and the
+  scope gate refuses a surface token on `page-heading-fg`.
 - **Component** (`PageHeading.test.tsx`): it renders one `h1` with the text;
   it forwards `ref`, `id` and `className`; it carries the module class.
 - **Axe:** a page of a `PageHeading` over `Text`s passes.
-- **Pattern:** the `app-shell` preset renders exactly one `h1`, inside
-  `<main>`, and it is the page's first element.
+- **Pattern** (`emit-patterns.test.ts`): the `app-shell` preset has exactly
+  one `<PageHeading>`, and it comes before the page's content.
 - **In a browser** (`app-shell.interaction.spec.ts`), where the stylesheet is
   real:
   - the heading's computed `margin-top` is `0px` and its `font-family` is the
@@ -194,5 +194,6 @@ Tests first, each red on its assertion before the code exists.
   - with no banner, it starts exactly one block padding (24px) below
     `<main>`'s top. The old `> 24` becomes `toBe(24)`;
   - under a banner, it starts the same distance below the banner.
-- **Gates:** `pnpm build && node tools/check-docs-drift.mjs && pnpm test &&
+- **Gates:** `pnpm test:e2e` (the interaction specs, against a built
+  Storybook), and `pnpm build && node tools/check-docs-drift.mjs && pnpm test &&
   pnpm lint && pnpm --dir apps/promo build && pnpm test:site`, then CI's `vr`.
