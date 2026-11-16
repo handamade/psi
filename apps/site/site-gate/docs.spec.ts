@@ -209,3 +209,12 @@ test("Copy page copies the page as markdown", async ({ page, context }) => {
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied.startsWith("# Button\n")).toBe(true);
 });
+
+test("⌘K finds the Button page", async ({ page }) => {
+  await page.goto(`${BASE}/docs/`, { waitUntil: "networkidle" });
+  await page.keyboard.press("ControlOrMeta+k");
+  const input = page.getByRole("searchbox", { name: "Search the docs" });
+  await expect(input).toBeFocused();
+  await input.fill("button");
+  await expect(page.getByRole("link", { name: /^Button/ }).first()).toBeVisible();
+});

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import {
   AppShell,
+  Button,
   IconButton,
   IconMenu,
   SkipLink,
@@ -13,6 +14,7 @@ import { ANNOUNCE_EVENT } from "../lib/announce";
 import { Header } from "../sections/Header";
 import { useMode } from "../theme";
 import { DocsNav } from "./DocsNav";
+import { SearchDialog } from "./SearchDialog";
 
 /** `md` from guidance.json layout.breakpoints; docs.css bakes the same 960px. */
 const WIDE = "(min-width: 960px)";
@@ -49,8 +51,29 @@ export function DocsShell({
     return () => query.removeEventListener("change", sync);
   }, []);
 
+  const [searchOpen, setSearchOpen] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const extras = (
-    <span className="docs-menu-toggle">
+    <>
+      <Button
+        size={24}
+        variant="neutral-subtle"
+        onClick={() => setSearchOpen(true)}
+        aria-keyshortcuts="Control+K Meta+K"
+      >
+        Search
+      </Button>
+      <span className="docs-menu-toggle">
       <IconButton
         size={24}
         variant="ghost"
@@ -62,11 +85,13 @@ export function DocsShell({
         <IconMenu aria-hidden="true" />
       </IconButton>
     </span>
+    </>
   );
 
   return (
     <ToastProvider placement="bottom-end">
       <AnnounceBridge />
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
       <AppShell
         skipLink={<SkipLink href="#main">Skip to content</SkipLink>}
         header={<Header mode={mode} onMode={setMode} extras={extras} />}
