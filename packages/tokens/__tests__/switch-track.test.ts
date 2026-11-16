@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { switchVars } from "../src/components/switch.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { ref, token } from "../src/dsl/builders.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
@@ -75,5 +76,16 @@ describe("fillControl and fillControlHover (D122)", () => {
     const failing = (caught as ThemeGateError).contrastFailures.map((f) => `${f.fg}/${f.bg}`);
     // Measured: 1.32 / 1.32 track, 1.52 thumb.
     expect(failing).toEqual(["fillControl/bgPrimary", "fillControl/bgSecondary", "fillStaticWhite/fillControl"]);
+  });
+});
+
+describe("the Switch binds the control fill (D122)", () => {
+  it("rests on fill-control and hovers on fill-control-hover", () => {
+    expect(switchVars["track-bg"]).toBe("var(--psi-fill-control)");
+    expect(switchVars["track-bg-hover"]).toBe("var(--psi-fill-control-hover)");
+    // Unchanged by D122: the checked track, the thumb, the focus ring.
+    expect(switchVars["track-bg-checked"]).toBe("var(--psi-fill-accent)");
+    expect(switchVars["thumb-bg"]).toBe("var(--psi-fill-static-white)");
+    expect(switchVars["focus-ring"]).toBe("var(--psi-border-focus)");
   });
 });
