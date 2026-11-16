@@ -5,7 +5,7 @@ import { defineConfig } from "@playwright/test";
  * no screenshot assertions, so it is platform-independent and runs locally.
  * `vr` stays CI-only because its baselines are ubuntu renders.
  *
- * Requires `pnpm --dir apps/promo build` first — the webServer serves dist/.
+ * Requires `pnpm --dir apps/site build` first — the webServer serves dist/.
  */
 export default defineConfig({
   testDir: ".",

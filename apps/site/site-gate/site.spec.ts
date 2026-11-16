@@ -225,7 +225,7 @@ test("no Storybook link points at a missing docs page", async ({ page }) => {
 
   await page.goto(BASE, { waitUntil: "networkidle" });
   const ids = await page.evaluate(() =>
-    [...document.querySelectorAll<HTMLAnchorElement>("a[href*='/docs/']")].map(
+    [...document.querySelectorAll<HTMLAnchorElement>("a[href*='?path=/docs/']")].map(
       (a) => new URL(a.href, location.href).searchParams.get("path") ?? "",
     ),
   );
@@ -265,3 +265,28 @@ for (const width of [320, 760, 1440]) {
     expect(scrollW).toBe(clientW);
   });
 }
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("the homepage's content is in the HTML", async ({ page }) => {
+    await page.goto(BASE);
+    await expect(page.locator("h1")).toHaveCount(1);
+    const text = await page.locator("main").innerText();
+    expect(text.length).toBeGreaterThan(2000);
+    expect(text).toContain("OKLCH");
+  });
+});
+
+test("hydrating the homepage logs no errors, with a stored dark mode and brand", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (m) => {
+    if (m.type() === "error") errors.push(m.text());
+  });
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.addInitScript(() => localStorage.setItem("psi-theme", "dark"));
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  await expect(page.locator("html")).toHaveAttribute("data-psi-theme", "dark");
+  await expect(page.getByRole("button", { name: "Switch to light mode" })).toBeVisible();
+  expect(errors).toEqual([]);
+});

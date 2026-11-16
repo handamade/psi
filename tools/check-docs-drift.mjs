@@ -28,7 +28,7 @@ const claims = [
   ["packages/mcp/README.md", /(\d+) composition patterns/, np],
   ["packages/mcp/llms.txt", /(\d+) composition patterns/, np],
   // D76: the public site is a prose artifact too. It stated "18 components"
-  // across six releases precisely because nothing here looked at apps/promo.
+  // across six releases precisely because nothing here looked at apps/site.
   // These entries are belt-and-braces over virtual:psi-facts — the plugin makes
   // a wrong number inexpressible, and this makes a reintroduced literal fail CI.
   // Mode "must-not-hardcode": the healthy source has no typed digit for the
@@ -37,14 +37,14 @@ const claims = [
   // disagrees with the manifest still fails below: that is what catches a
   // reintroduced literal. Rows without this mode keep the original behavior,
   // where a missing match is itself DRIFT.
-  ["apps/promo/src/sections/Hero.tsx", /(\d+) components/, nc, "must-not-hardcode"],
-  ["apps/promo/src/sections/Hero.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
-  ["apps/promo/src/sections/Roadmap.tsx", /(\d+) components/, nc, "must-not-hardcode"],
-  ["apps/promo/src/sections/Roadmap.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
+  ["apps/site/src/sections/Hero.tsx", /(\d+) components/, nc, "must-not-hardcode"],
+  ["apps/site/src/sections/Hero.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
+  ["apps/site/src/sections/Roadmap.tsx", /(\d+) components/, nc, "must-not-hardcode"],
+  ["apps/site/src/sections/Roadmap.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
   // Playground.tsx carried the original defect ("Eighteen production
   // components" — a spelled-out word no /(\d+)/ regex would have caught) and
   // was not watched at all. It is now.
-  ["apps/promo/src/sections/Playground.tsx", /(\d+) production components/, nc, "must-not-hardcode"],
+  ["apps/site/src/sections/Playground.tsx", /(\d+) production components/, nc, "must-not-hardcode"],
   // D76 spec: "What stays hand-written (release notes) joins the
   // check-docs-drift claims list." UPDATES is entirely hand-written and is
   // the exact artifact that rotted for six releases (it said 0.8.0 while
@@ -56,7 +56,7 @@ const claims = [
   // coerce "0.14.10" and "0.14.1" to the same NaN-safe falsy mismatch in
   // stranger ways than a plain string diff.
   [
-    "apps/promo/src/content/updates.ts",
+    "apps/site/src/content/updates.ts",
     /title:\s*"([^"]*)"/,
     pkgVersion,
     "version-string",

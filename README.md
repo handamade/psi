@@ -20,7 +20,7 @@ OKLCH-based design system for web applications, built on four core principles:
 - **packages/react** — 54 React 19 components (Button, IconButton, Card, Panel, Stack, Text, PageHeading, Toolbar, NavBar, SkipLink, NavTree, NavGroup, NavItem, AppShell, AspectRatio, Input, Select, Field, FieldStack, Dialog, Checkbox, Switch, Textarea, RadioGroup, Radio, Tag, Tooltip, Menu, MenuItem, MenuSeparator, MenuText, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination, Toast, ToastRegion, ToastProvider, Announcement, Tabs, TabList, Tab, TabPanel, DescriptionList, DescriptionItem, Banner, InlineAlert, Skeleton, CopyButton) + 30 icons
 - **packages/figma-plugin** — In-repo Figma plugin syncing resolved tokens
 - **apps/storybook** — Workbench and generated component documentation
-- **apps/promo** — Public website (promo one-pager + update feed), built with Psi itself
+- **apps/site** — Public website (promo one-pager + update feed), built with Psi itself
 
 ## Quick start
 
@@ -43,7 +43,7 @@ Vercel from this repo:
 
 - `pnpm build:web` — build all packages, then assemble `site-dist/` (promo + storybook)
 - `pnpm dev:web` — tokens watcher + promo (5199) + storybook (6006) dev servers
-- **Publish an update:** add an entry to `apps/promo/src/content/updates.ts`,
+- **Publish an update:** add an entry to `apps/site/src/content/updates.ts`,
   merge to `main` — the Vercel Git integration rebuilds and deploys the site.
 - Vercel config lives in `vercel.json` (build command, output `site-dist/`).
 

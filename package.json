@@ -6,14 +6,14 @@
     "build": "pnpm -r run build",
     "build:web": "pnpm -r run build && node tools/assemble-site.mjs",
     "dev": "pnpm run --filter @handamade/psi-tokens --filter ds-storybook dev --parallel",
-    "dev:web": "pnpm run --filter @handamade/psi-tokens --filter promo --filter ds-storybook dev --parallel",
+    "dev:web": "pnpm run --filter @handamade/psi-tokens --filter site --filter ds-storybook dev --parallel",
     "test": "vitest run",
     "lint": "tsc -p api/tsconfig.build.json && eslint . && pnpm lint:css",
     "lint:css": "stylelint 'packages/react/src/**/*.module.css' 'apps/**/*.css' 'apps/storybook/.storybook/*.css'",
     "vr": "playwright test -c apps/storybook/vr",
     "verify:published": "node tools/verify-published.mjs",
     "test:e2e": "playwright test -c apps/storybook/vr --grep @interaction",
-    "test:site": "playwright test -c apps/promo/site-gate",
+    "test:site": "playwright test -c apps/site/site-gate",
     "release": "git checkout main && git pull --ff-only && node tools/release-guard.mjs && pnpm build && node tools/publish.mjs && changeset tag && git push --tags"
   },
   "devDependencies": {

@@ -63,7 +63,7 @@ afterEach(() => {
 });
 
 /** Same hand-rolled renderHook/mount pattern as theme.test.ts and
- * Header.test.ts — apps/promo does not depend on @testing-library/react and
+ * Header.test.ts — apps/site does not depend on @testing-library/react and
  * this task must not add one. */
 function mount(node: ReturnType<typeof createElement>) {
   const container = document.createElement("div");

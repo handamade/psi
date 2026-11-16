@@ -27,12 +27,12 @@ OKLCH-based themeable design system. Code-first: Figma receives generated values
 - **Verify with all five gates, not four:**
 
   ```bash
-  pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint && pnpm --dir apps/promo build && pnpm test:site
+  pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint && pnpm --dir apps/site build && pnpm test:site
   ```
 
   The token build is the WCAG AA contrast gate — it throws on failures. **`check-docs-drift` is the one that gets forgotten**: it is its own CI step, *not* part of `build`/`test`/`lint`, so a green local trio says nothing about it. It fails whenever a component or pattern count changes and `llms.txt`, a README or any other prose still states the old number — which is every coverage cycle. It has now bitten twice (D53, and again on #69 where three files still claimed 4 composition patterns after the catalog went to 13). **Put it in the gate list of every plan.**
 
-  **`test:site` is the fifth, added by D76**, and it is one omission away from the same fate as `check-docs-drift`: it is its own step, not folded into `test`, so a plan that lists only the historical four gates will look complete and gate nothing on `apps/promo`. It needs `apps/promo/dist` to exist — run a full `pnpm build` (or `pnpm --dir apps/promo build`) first, or it fails on a missing build output rather than testing anything — and it must run from the repo root, since it reads `packages/react/dist/manifest.json` and `apps/storybook/storybook-static/index.json` by relative path.
+  **`test:site` is the fifth, added by D76**, and it is one omission away from the same fate as `check-docs-drift`: it is its own step, not folded into `test`, so a plan that lists only the historical four gates will look complete and gate nothing on `apps/site`. It needs `apps/site/dist` to exist — run a full `pnpm build` (or `pnpm --dir apps/site build`) first, or it fails on a missing build output rather than testing anything — and it must run from the repo root, since it reads `packages/react/dist/manifest.json` and `apps/storybook/storybook-static/index.json` by relative path.
 
   CI's full order is `build → check-docs-drift → test → vr → test:site → lint`. Of those, only `vr` cannot be run locally (see below).
 - **`pnpm vr` only passes in CI.** Baselines are `ubuntu-24.04` renders, the image `ci` is pinned to (D112); a macOS run fails all 188 stories on the `-darwin` snapshot suffix and its default update mode silently writes junk baselines. Let CI's `vr` job be the gate and hold the merge with auto-merge. Details in `apps/storybook/vr/README.md`.

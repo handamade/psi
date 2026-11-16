@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { isBrandVector, type BrandVector } from "@handamade/psi-tokens/generate";
 
 export const MODE_KEY = "psi-theme";
@@ -101,7 +101,13 @@ function applyMode(next: Mode): void {
  * following forever.
  */
 export function useMode(): [Mode, (next: Mode) => void, (next: Mode) => void] {
-  const [mode, setModeState] = useState<Mode>(() => readStoredMode() ?? systemMode());
+  // The server has no storage and no OS, so the first render is always
+  // light. The boot script has already set <html data-psi-theme>; this only
+  // brings React's copy in line, before paint, without a hydration mismatch.
+  const [mode, setModeState] = useState<Mode>("light");
+  useLayoutEffect(() => {
+    setModeState(readStoredMode() ?? systemMode());
+  }, []);
 
   /** An explicit choice. This is the only path that persists. */
   const setMode = useCallback((next: Mode) => {
@@ -143,9 +149,12 @@ export function useBrand(): {
   setBrand: (v: BrandVector, cache: Record<string, string>) => void;
   reset: () => void;
 } {
-  const [brand, setBrandState] = useState<BrandVector | null>(
-    () => readStoredBrand()?.vector ?? null,
-  );
+  // Same reason as useMode: null on the server and on the first client
+  // render, the stored vector before paint.
+  const [brand, setBrandState] = useState<BrandVector | null>(null);
+  useLayoutEffect(() => {
+    setBrandState(readStoredBrand()?.vector ?? null);
+  }, []);
 
   const setBrand = useCallback((v: BrandVector, cache: Record<string, string>) => {
     setBrandState(v);

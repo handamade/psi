@@ -1,0 +1,12 @@
+---
+import Base from "../layouts/Base.astro";
+import { App } from "../App";
+import "../styles/home.css";
+---
+
+<Base
+  title="Psi — Color isn’t picked. It’s computed."
+  description="Psi — a themeable design system where every semantic color is an OKLCH formula. Brand anchors in, a contrast-validated multi-theme token set out."
+>
+  <App client:load />
+</Base>

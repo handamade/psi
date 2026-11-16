@@ -44,7 +44,7 @@ export function Footer() {
             Psi · @handamade — docs in packages/*/README.md and the design spec
           </span>
           <span className="annot">
-            Built with Psi itself (apps/promo) — flip the theme and watch every
+            Built with Psi itself (apps/site) — flip the theme and watch every
             color re-derive.
           </span>
         </div>

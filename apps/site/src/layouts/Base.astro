@@ -1,15 +1,34 @@
+---
+// The five stylesheets every Psi consumer imports — four from the token
+// package, then the component rules (CLAUDE.md house rule) — and the
+// site's own shared layer.
+import "@handamade/psi-tokens/base.css";
+import "@handamade/psi-tokens/light.css";
+import "@handamade/psi-tokens/dark.css";
+import "@handamade/psi-tokens/acme.css";
+import "@handamade/psi-tokens/ember.css";
+import "@handamade/psi-tokens/components.css";
+import "@handamade/psi-tokens/utilities.css";
+import "@handamade/psi-react/styles";
+import "../styles/site.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+
 <!doctype html>
 <html lang="en" data-psi-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta
-      name="description"
-      content="Psi — a themeable design system where every semantic color is an OKLCH formula. Brand anchors in, a contrast-validated multi-theme token set out."
-    />
-    <title>Psi — Color isn’t picked. It’s computed.</title>
-    <script>
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <slot name="head" />
+    <script is:inline>
       (function () {
         var doc = document.documentElement;
         var mode = null;
@@ -21,15 +40,8 @@
         } catch (_) {
           /* storage unavailable */
         }
-        // No system OPTION in the switcher, but the first visit still follows
-        // the OS — omitting the option is a UI decision, not a reason to flash
-        // a dark-mode visitor a light page.
         doc.dataset.psiTheme =
           mode || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-
-        // Paint the cached brand before first paint. The app then validates the
-        // vector, re-derives, and rewrites the cache if it disagrees, so a stale
-        // cache costs one frame rather than pinning a visitor to old output.
         if (brand && brand.cache && typeof brand.cache === "object") {
           for (var name in brand.cache) {
             if (name.indexOf("--psi-") === 0) {
@@ -42,7 +54,6 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <slot />
   </body>
 </html>

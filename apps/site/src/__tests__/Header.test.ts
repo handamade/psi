@@ -32,7 +32,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-/** No JSX here on purpose: apps/promo's vitest include is scoped to
+/** No JSX here on purpose: apps/site's vitest include is scoped to
  * `src/**\/*.test.ts` (see vitest.config.ts), not `.tsx` — `createElement`
  * keeps this file a plain `.ts` test while still exercising the components. */
 function mount(node: ReturnType<typeof createElement>) {

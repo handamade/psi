@@ -1,7 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import type { Plugin } from "vite";
 
 const require = createRequire(import.meta.url);
 
@@ -36,6 +35,14 @@ function readStoryTitles(
   return titles;
 }
 
+/** Structural so this file needs no `vite` import: Astro (Vite 8) and Vitest
+ * (its own Vite) both accept it. */
+interface PsiFactsPlugin {
+  name: string;
+  resolveId: (id: string) => string | null;
+  load: (id: string) => string | null;
+}
+
 /**
  * Exposes the package's own generated artifacts to the site as `virtual:psi-facts`.
  *
@@ -44,7 +51,7 @@ function readStoryTitles(
  * no longer expressible. Only the resolved values reach the bundle; the 57KB
  * manifest does not.
  */
-export function psiFacts(): Plugin {
+export function psiFacts(): PsiFactsPlugin {
   const VIRTUAL = "virtual:psi-facts";
   const RESOLVED = "\0" + VIRTUAL;
 

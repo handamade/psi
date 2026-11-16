@@ -1,5 +1,6 @@
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, it, expect, beforeEach, vi } from "vitest";
 
 // Tells React this is a test environment, so `act()` batches synchronously
@@ -15,6 +16,7 @@ import {
   MODE_KEY,
   readStoredBrand,
   readStoredMode,
+  useBrand,
   useMode,
   type Mode,
 } from "../theme";
@@ -34,7 +36,7 @@ afterEach(() => {
 });
 
 /**
- * A hand-rolled renderHook. apps/promo does not depend on
+ * A hand-rolled renderHook. apps/site does not depend on
  * @testing-library/react (only packages/react does, as a devDependency
  * that isn't hoisted here) and this task must not add a dependency, so a
  * tiny host component plus react-dom/client stands in for it.
@@ -203,6 +205,28 @@ describe("useMode", () => {
     media.setMatches(false);
     expect(result.current[0]).toBe("dark"); // never reverted by the OS once explicit
 
+    unmount();
+  });
+});
+
+describe("server rendering", () => {
+  it("renders useMode and useBrand without localStorage or matchMedia", () => {
+    vi.stubGlobal("localStorage", undefined);
+    vi.stubGlobal("matchMedia", undefined);
+    function Probe() {
+      const [mode] = useMode();
+      const { brand } = useBrand();
+      return createElement("p", null, `${mode}:${brand === null ? "none" : "brand"}`);
+    }
+    expect(renderToString(createElement(Probe))).toBe("<p>light:none</p>");
+  });
+
+  it("corrects to the stored mode before the first paint on the client", () => {
+    vi.unstubAllGlobals();
+    localStorage.setItem(MODE_KEY, "dark");
+    stubMatchMedia(false);
+    const { result, unmount } = renderHook(() => useMode());
+    expect(result.current[0]).toBe("dark");
     unmount();
   });
 });
