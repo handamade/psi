@@ -51,3 +51,10 @@ export const States: Story = {
     </div>
   ),
 };
+
+/** D116 — the browser draws a date field's picker icon itself, in the scheme
+ * the theme declares. VR renders this in light and ember (a dark theme), so a
+ * dark icon on a dark field would show. */
+export const DateField: Story = {
+  args: { type: "date", defaultValue: "2026-11-16", "aria-label": "Date" },
+};
