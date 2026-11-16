@@ -12,6 +12,9 @@ export interface ToolbarProps extends HTMLAttributes<HTMLElement> {
    * them, for a row of controls without visible labels such as
    * filter-toolbar. `end` and `start` are for a row of Fields with visible
    * labels beside an unlabelled button.
+   * A Field with `labelPosition="start"` is as tall as its control, so it
+   * takes the default `center`; never put one in a `start` row, whose button
+   * offset assumes labels above (D115).
    * `end` (D87) lines items up on their bottom edge. It lines up each item's
    * *last* line, so a Field in an end-aligned row must end on its control —
    * no description or error line under it; use `start` for one.
