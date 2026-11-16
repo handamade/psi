@@ -2,7 +2,7 @@ export type Weight = "regular" | "medium" | "semibold" | "bold" | "extrabold" | 
 export const WEIGHT_VALUES: Record<Weight, number> = {
   regular: 400, medium: 500, semibold: 600, bold: 700, extrabold: 800, black: 900,
 };
-export type ComboRole = "sans" | "serif" | "mono";
+export type ComboRole = "sans" | "serif" | "mono" | "display";
 export interface TypographyCombo { fontSize: number; lineHeight: number; weight: Weight; role?: ComboRole; }
 export const comboName = (c: TypographyCombo) =>
   `${c.role && c.role !== "sans" ? `${c.role}-` : ""}${c.fontSize}-${c.lineHeight}-${c.weight}`;
@@ -44,4 +44,8 @@ export const typographyCombos: TypographyCombo[] = [
   { fontSize: 14, lineHeight: 20, weight: "regular", role: "mono" },
   { fontSize: 15, lineHeight: 24, weight: "regular", role: "mono" },
   { fontSize: 15, lineHeight: 24, weight: "medium", role: "mono" },
+  // Display text style (D118): the page heading's, in the brand's display face.
+  // Fixed px and a px line height like every --psi-text-* style; the fluid
+  // --psi-display-* tier above is a separate thing with its own utilities.
+  { fontSize: 24, lineHeight: 32, weight: "medium", role: "display" },
 ];

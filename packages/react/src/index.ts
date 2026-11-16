@@ -45,6 +45,8 @@ export { Stack } from "./Stack/Stack.js";
 export type { StackProps } from "./Stack/Stack.js";
 export { Text } from "./Text/Text.js";
 export type { TextProps } from "./Text/Text.js";
+export { PageHeading } from "./PageHeading/PageHeading.js";
+export type { PageHeadingProps } from "./PageHeading/PageHeading.js";
 export { Textarea } from "./Textarea/Textarea.js";
 export type { TextareaProps } from "./Textarea/Textarea.js";
 export { RadioGroup, RadioGroupContext } from "./RadioGroup/RadioGroup.js";
