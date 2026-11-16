@@ -46,7 +46,7 @@ const headings = [
   mdHref={`/docs/components/${page.slug}.md`}
   mdSource={componentPageMd(page, examplesFor(page.slug))}
 >
-  <Fragment set:html={mdToHtml(main.description)} />
+  <Fragment set:html={mdToHtml(main.description, `${page.title} description table`)} />
   <CodeView client:visible html={importHtml} code={importLine} label="Copy import" />
 
   <HeadingAnchor level={2} id="examples">Examples</HeadingAnchor>
@@ -62,7 +62,7 @@ const headings = [
         {keyboard.map((k) => (
           <>
             {keyboard.length > 1 && <p class="annot">{k.name}</p>}
-            <Fragment set:html={mdToHtml(k.md)} />
+            <Fragment set:html={mdToHtml(k.md, `${k.name} keyboard`)} />
           </>
         ))}
       </>
@@ -73,7 +73,7 @@ const headings = [
     theming && (
       <>
         <HeadingAnchor level={2} id="theming">Theming</HeadingAnchor>
-        <Fragment set:html={mdToHtml(theming)} />
+        <Fragment set:html={mdToHtml(theming, `${page.title} theming table`)} />
       </>
     )
   }

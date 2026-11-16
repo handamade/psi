@@ -139,21 +139,94 @@ test("no internal link on a docs page points at a missing page", async ({ page, 
   expect(broken).toEqual([]);
 });
 
-test("one page of each type fits 320px", async ({ page }) => {
+test("every docs page fits 320px, in the document and in the main scroller", async ({ page }) => {
+  test.setTimeout(300_000);
   await page.setViewportSize({ width: 320, height: 800 });
-  for (const path of [
+  const paths = [
     "/docs/",
-    "/docs/components/table/",
-    "/docs/tokens/color/",
-    "/docs/get-started/installation/",
-  ]) {
+    ...componentSlugs().map((s) => `/docs/components/${s}/`),
+    ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}/`),
+    ...GUIDE_IDS.map((id) => `/docs/get-started/${id}/`),
+  ];
+  const over: string[] = [];
+  for (const path of paths) {
     await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
-    const { scrollW, clientW } = await page.evaluate(() => ({
-      scrollW: document.documentElement.scrollWidth,
-      clientW: document.documentElement.clientWidth,
-    }));
-    expect(scrollW, path).toBe(clientW);
+    // AppShell's <main> is its own overflow:auto scroller, so the document
+    // never sees what overflows inside it.
+    const m = await page.evaluate(() => {
+      const main = document.querySelector<HTMLElement>("main#main")!;
+      return {
+        docS: document.documentElement.scrollWidth,
+        docC: document.documentElement.clientWidth,
+        mainS: main.scrollWidth,
+        mainC: main.clientWidth,
+      };
+    });
+    if (m.docS > m.docC || m.mainS > m.mainC) over.push(`${path} doc ${m.docS}/${m.docC} main ${m.mainS}/${m.mainC}`);
   }
+  expect(over).toEqual([]);
+});
+
+test.describe("at 375px", () => {
+  test.use({ viewport: { width: 375, height: 800 } });
+
+  test.describe("without JavaScript", () => {
+    test.use({ javaScriptEnabled: false });
+
+    test("main takes the width and the dead sidebar column is not drawn", async ({ page }) => {
+      await page.goto(`${BASE}/docs/`);
+      const width = await page.locator("main#main").evaluate((el) => el.getBoundingClientRect().width);
+      expect(width).toBeGreaterThanOrEqual(300);
+      await expect(page.locator("#docs-sidebar")).toBeHidden();
+      await expect(page.locator(".docs-menu-toggle")).toBeHidden();
+    });
+  });
+
+  test("one page of each type has no axe violations", async ({ page }) => {
+    test.setTimeout(120_000);
+    for (const path of [
+      "/docs/",
+      "/docs/components/tabs/",
+      "/docs/tokens/color/",
+      "/docs/tokens/typography/",
+      "/docs/get-started/installation/",
+    ]) {
+      await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+      expect(await runAxe(page), path).toEqual([]);
+    }
+  });
+});
+
+test("a code view's copy button does not sit on its code", async ({ page }) => {
+  await page.goto(`${BASE}/docs/components/table/`, { waitUntil: "networkidle" });
+  const view = page.locator(".code-view").first();
+  const copy = await view.getByRole("button", { name: /^Copy/ }).first().boundingBox();
+  const pre = await view.locator("pre").first().boundingBox();
+  expect(copy).not.toBeNull();
+  expect(pre).not.toBeNull();
+  const apart = copy!.y + copy!.height <= pre!.y || pre!.y + pre!.height <= copy!.y;
+  expect(apart, `copy ${JSON.stringify(copy)} pre ${JSON.stringify(pre)}`).toBe(true);
+});
+
+test("a heading's accessible name is its text, and its anchor is named for it", async ({ page }) => {
+  await page.goto(`${BASE}/docs/components/button/`, { waitUntil: "networkidle" });
+  await expect(page.getByRole("heading", { name: "Examples", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Link to Examples" })).toBeAttached();
+});
+
+test("the search index leaves out example previews, Copy page and anchors", async ({ page }) => {
+  await page.goto(`${BASE}/docs/`, { waitUntil: "networkidle" });
+  const content = await page.evaluate(async () => {
+    // @ts-expect-error served by pagefind at runtime
+    const pf = await import("/pagefind/pagefind.js");
+    await pf.init();
+    const found = await pf.search("button");
+    const data = await Promise.all(found.results.slice(0, 5).map((r: { data(): Promise<{ content: string }> }) => r.data()));
+    return data.map((d) => d.content).join("\n");
+  });
+  expect(content.length).toBeGreaterThan(100);
+  expect(content).not.toContain("Copy page");
+  expect(content).not.toContain("Link to");
 });
 
 test("code on docs pages is coloured only through variables", async ({ page }) => {

@@ -2,7 +2,6 @@
   --site-docs-measure: 72ch;
   --site-docs-toc-width: 224px;
   --site-docs-anchor-offset: 24px;
-  --site-code-copy-inset: 8px;
   --site-pre-pad: 16px;
   --site-swatch-pad: 4px;
   --site-chip-gap: 8px;
@@ -48,6 +47,7 @@
 }
 
 .docs-content :where(code):not(pre code) {
+  overflow-wrap: anywhere;
   font-family: var(--psi-font-mono);
   font-size: 0.9em;
   padding: 0 var(--psi-space-4);
@@ -67,11 +67,18 @@
   border-bottom: 1px solid var(--psi-border-faint);
 }
 
-.docs-heading {
+/* The anchor sits beside the heading, not in it, so the heading's accessible
+ * name stays its text. The row keeps them on one line. */
+.docs-heading-row {
   display: flex;
   align-items: baseline;
   gap: var(--psi-space-8);
   margin-block-start: var(--psi-space-24);
+  scroll-margin-top: var(--site-docs-anchor-offset);
+}
+
+.docs-heading {
+  margin: 0;
   scroll-margin-top: var(--site-docs-anchor-offset);
 }
 
@@ -89,7 +96,7 @@ h3.docs-heading {
   opacity: 0;
 }
 
-.docs-heading:hover .docs-heading-anchor,
+.docs-heading-row:hover .docs-heading-anchor,
 .docs-heading-anchor:focus-visible {
   opacity: 1;
 }
@@ -119,8 +126,18 @@ h3.docs-heading {
   }
 }
 
-.code-view {
-  position: relative;
+/* Server HTML and no-JS, narrow: the shell has not measured the viewport yet
+ * (DocsShell sets data-hydrated). Without this the 16rem sidebar column is
+ * drawn and the toggle is dead. Single column; override AppShell's grid. */
+@media (max-width: 959px) {
+  .docs-shell:not([data-hydrated]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-shell:not([data-hydrated]) #docs-sidebar,
+  .docs-shell:not([data-hydrated]) .docs-menu-toggle {
+    display: none;
+  }
 }
 
 .code-view pre,
@@ -152,21 +169,29 @@ h3.docs-heading {
   --shiki-background: var(--psi-bg-secondary);
 }
 
+/* In flow above the code, never over it: the label is visible text. */
 .code-view-copy {
-  position: absolute;
-  top: var(--psi-space-8);
-  inset-inline-end: var(--site-code-copy-inset);
+  display: flex;
+  justify-content: flex-end;
+  margin-block-end: var(--psi-space-8);
 }
 
 .example-preview {
+  overflow-x: auto;
   padding: var(--psi-space-24);
   border: 1px solid var(--psi-border-faint);
   border-radius: var(--psi-radius-12);
   background: var(--psi-bg-primary);
 }
 
-.props-table {
+/* A horizontally scrolling region is a tab stop (ScrollRegion.astro gives it
+ * role, name and tabindex), so a keyboard user can scroll it. */
+.docs-scroll {
   overflow-x: auto;
+}
+
+.docs-scroll :where(td:first-child code) {
+  white-space: nowrap;
 }
 
 .props-required {

@@ -26,7 +26,7 @@ const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${A
     <div class="docs-page">
       <div class="docs-content" data-pagefind-body>
         <PageHeading>{title}</PageHeading>
-        <div class="docs-actions"><CopyPage client:idle markdown={mdSource} /></div>
+        <div class="docs-actions" data-pagefind-ignore><CopyPage client:idle markdown={mdSource} /></div>
         <slot />
       </div>
       <OnThisPage headings={headings} />

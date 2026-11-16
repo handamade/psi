@@ -16,7 +16,7 @@ export function ExampleTabs({ slug, name, html }: { slug: string; name: string; 
         <Tab value="code">Code</Tab>
       </TabList>
       <TabPanel value="preview">
-        <div className="example-preview">
+        <div className="example-preview" data-pagefind-ignore role="region" aria-label={`${name} example preview`} tabIndex={0}>
           {isFramed(slug, name) ? (
             <iframe
               className="example-frame"

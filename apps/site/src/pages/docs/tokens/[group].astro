@@ -1,6 +1,7 @@
 ---
 import DocsLayout from "../../../layouts/DocsLayout.astro";
 import HeadingAnchor from "../../../components/HeadingAnchor.astro";
+import ScrollRegion from "../../../components/ScrollRegion.astro";
 import TokenSwatch from "../../../components/TokenSwatch.astro";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@handamade/psi-react";
 import { tokenPages, type TokenPage } from "../../../content/token-pages";
@@ -62,7 +63,7 @@ const layoutSections = [
           palette. Values below are each formula resolved in the four built-in themes.
         </p>
         <HeadingAnchor level={2} id="semantic-colours">Semantic colours</HeadingAnchor>
-        <div class="props-table" role="region" aria-label="Semantic colours by theme" tabindex="0">
+        <ScrollRegion label="Semantic colours by theme">
           <Table size={48}>
             <TableHead>
               <TableRow>
@@ -87,7 +88,7 @@ const layoutSections = [
               ))}
             </TableBody>
           </Table>
-        </div>
+        </ScrollRegion>
       </>
     )
   }
@@ -105,7 +106,7 @@ const layoutSections = [
           ))}
         </ul>
         <HeadingAnchor level={2} id="text-styles">Text styles</HeadingAnchor>
-        <div class="props-table">
+        <ScrollRegion label="Text styles">
           <Table size={48}>
             <TableHead>
               <TableRow>
@@ -126,7 +127,7 @@ const layoutSections = [
               ))}
             </TableBody>
           </Table>
-        </div>
+        </ScrollRegion>
       </>
     )
   }
@@ -135,7 +136,7 @@ const layoutSections = [
     page.slug === "display" && (
       <>
         <HeadingAnchor level={2} id="display-styles">Display styles</HeadingAnchor>
-        <div class="props-table">
+        <ScrollRegion label="Display styles">
           <Table size={48}>
             <TableHead>
               <TableRow>
@@ -160,7 +161,7 @@ const layoutSections = [
               ))}
             </TableBody>
           </Table>
-        </div>
+        </ScrollRegion>
       </>
     )
   }

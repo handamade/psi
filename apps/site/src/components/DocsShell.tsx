@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import {
   AppShell,
   Button,
@@ -43,7 +43,13 @@ export function DocsShell({
   // is `hidden`. So the sidebar starts open (server HTML, no-JS, desktop) and
   // collapses before paint on a narrow viewport; the toggle only shows there.
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  // The server HTML cannot know the viewport. docs.css hides the sidebar and
+  // its toggle below 960px until this marker exists, so a narrow no-JS page
+  // (and the frame before hydration) is one column, not 16rem of dead sidebar.
+  // An attribute, not a class: AppShell rewrites its className on every toggle.
+  const shellRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
+    shellRef.current?.setAttribute("data-hydrated", "");
     const query = window.matchMedia(WIDE);
     const sync = () => setSidebarOpen(query.matches);
     sync();
@@ -52,16 +58,23 @@ export function DocsShell({
   }, []);
 
   const [searchOpen, setSearchOpen] = useState(false);
+  // Ctrl+K is kill-line in a macOS text field, so Apple platforms get only
+  // Meta+K. Unknown until mounted, so the server and first client render agree.
+  const [apple, setApple] = useState(false);
+  useLayoutEffect(() => {
+    const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
+    setApple(/Mac|iPhone|iPad|iPod/i.test(nav.userAgentData?.platform || nav.userAgent));
+  }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      if ((apple ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setSearchOpen(true);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [apple]);
 
   const extras = (
     <>
@@ -69,7 +82,7 @@ export function DocsShell({
         size={24}
         variant="neutral-subtle"
         onClick={() => setSearchOpen(true)}
-        aria-keyshortcuts="Control+K Meta+K"
+        aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
       >
         Search
       </Button>
@@ -93,6 +106,8 @@ export function DocsShell({
       <AnnounceBridge />
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
       <AppShell
+        ref={shellRef}
+        className="docs-shell"
         skipLink={<SkipLink href="#main">Skip to content</SkipLink>}
         header={<Header mode={mode} onMode={setMode} extras={extras} />}
         sidebar={<DocsNav nav={nav} currentPath={currentPath} />}

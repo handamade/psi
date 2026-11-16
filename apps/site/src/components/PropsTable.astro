@@ -1,6 +1,7 @@
 ---
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@handamade/psi-react";
 import type { ExportInfo } from "../lib/components";
+import ScrollRegion from "./ScrollRegion.astro";
 
 interface Props {
   info: ExportInfo;
@@ -8,8 +9,8 @@ interface Props {
 const { info } = Astro.props;
 ---
 
-<div class="props-table">
-  <p class="annot">{info.name}</p>
+<p class="annot">{info.name}</p>
+<ScrollRegion label={`${info.name} props`}>
   <Table size={40}>
     <TableHead>
       <TableRow>
@@ -35,4 +36,4 @@ const { info } = Astro.props;
       }
     </TableBody>
   </Table>
-</div>
+</ScrollRegion>
