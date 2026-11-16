@@ -50,6 +50,15 @@ export const lightTheme: ThemeDef = {
   /** D46: the static-white SURFACE (switch thumb) — pure ref, byte-identical
    * with fgStaticWhite; scoped for what it is. */
   fillStaticWhite: token({ from: ref.fgStaticWhite, scopes: ["surface"] }),
+  /** DNNN: the fill that alone identifies an unchecked control (the Switch
+   * track), the surface twin of borderControl. A ref, so the unchecked track
+   * and the unchecked checkbox outline are always the same ink, and WCAG
+   * 1.4.11 asks 3:1 for it against its surface and for the white thumb on it
+   * (`nonTextPairs`). fillNeutral4 measured 1.10-1.27. */
+  fillControl: token({ from: ref.borderControl, scopes: ["surface"] }),
+  /** DNNN: the unchecked Switch track on hover, a step beyond fillControl,
+   * gated the same way. */
+  fillControlHover: token({ from: ref.fgPrimary, alpha: 0.75, scopes: ["surface"] }),
 
   borderFaint: token({ from: ref.fgPrimary, alpha: 0.08, scopes: ["border"] }),
   borderNeutral: token({ from: ref.fgPrimary, alpha: 0.15, scopes: ["border"] }),

@@ -185,10 +185,19 @@ export const componentLabelPairs: ContrastPair[] = [
  * outline alone, and a text field by its border alone (D120: Input, Select and
  * Textarea rest on borderControl and hover on borderControlHover). Each is
  * checked against the control's own fill (bgPrimary) and the surface it sits
- * on (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). */
+ * on (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). An
+ * unchecked Switch is identified by its track (DNNN: fillControl, and
+ * fillControlHover on hover) against the surface, and its state by the white
+ * thumb against the track; the thumb pairs composite the track onto bgPrimary. */
 export const nonTextPairs: ContrastPair[] = [
   { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
   { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
   { fg: "borderControlHover", bg: "bgPrimary", minRatio: 3 },
   { fg: "borderControlHover", bg: "bgSecondary", minRatio: 3 },
+  { fg: "fillControl", bg: "bgPrimary", minRatio: 3 },
+  { fg: "fillControl", bg: "bgSecondary", minRatio: 3 },
+  { fg: "fillControlHover", bg: "bgPrimary", minRatio: 3 },
+  { fg: "fillControlHover", bg: "bgSecondary", minRatio: 3 },
+  { fg: "fillStaticWhite", bg: "fillControl", minRatio: 3 },
+  { fg: "fillStaticWhite", bg: "fillControlHover", minRatio: 3 },
 ];

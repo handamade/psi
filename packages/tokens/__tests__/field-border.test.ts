@@ -26,12 +26,12 @@ describe("borderControlHover (D120)", () => {
   });
 
   it("nonTextPairs gates borderControl and borderControlHover on bgPrimary and bgSecondary at 3:1", () => {
-    expect(nonTextPairs()).toEqual([
+    expect(nonTextPairs()).toEqual(expect.arrayContaining([
       { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
       { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
       { fg: "borderControlHover", bg: "bgPrimary", minRatio: 3 },
       { fg: "borderControlHover", bg: "bgSecondary", minRatio: 3 },
-    ]);
+    ]));
   });
 
   for (const [name, theme, palette, slots] of [

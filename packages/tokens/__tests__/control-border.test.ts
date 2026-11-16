@@ -59,7 +59,15 @@ describe("borderControl (D106)", () => {
     }
     expect(caught).toBeInstanceOf(ThemeGateError);
     const failing = (caught as ThemeGateError).contrastFailures.map((f) => `${f.fg}/${f.bg}`);
-    expect(failing).toEqual(["borderControl/bgPrimary", "borderControl/bgSecondary"]);
+    // DNNN: fillControl is a ref to borderControl, so a weak borderControl
+    // takes the Switch track down with it, and the gate names both.
+    expect(failing).toEqual([
+      "borderControl/bgPrimary",
+      "borderControl/bgSecondary",
+      "fillControl/bgPrimary",
+      "fillControl/bgSecondary",
+      "fillStaticWhite/fillControl",
+    ]);
   });
 
   it("is bound by the checkbox box, the radio circle and, since D120, every field", () => {
