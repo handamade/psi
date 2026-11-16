@@ -38,7 +38,8 @@ const preview: Preview = {
       const theme = context.globals.theme ?? "light";
       // The preview iframe is the app root: per the house rule, the theme
       // lives on <html> and the canvas paints bg/fg itself (preview.css) —
-      // theme CSS never paints backgrounds (HAN-38).
+      // theme CSS never paints backgrounds (HAN-38). It does declare
+      // color-scheme, so the browser's own parts follow the theme (D116).
       document.documentElement.dataset.psiTheme = theme;
       return createElement("div", { style: { padding: "1rem" } }, createElement(Story));
     },

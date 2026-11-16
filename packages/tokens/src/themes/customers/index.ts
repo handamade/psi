@@ -1,4 +1,4 @@
-import type { Palette, SlotMap, ThemeDef, TokenDef } from "../../dsl/types.js";
+import type { ColorScheme, Palette, SlotMap, ThemeDef, TokenDef } from "../../dsl/types.js";
 import { lightTheme } from "../light.js";
 import { darkTheme } from "../dark.js";
 import { acmePalette, acmeSlots, acmeOverrides } from "./acme.js";
@@ -11,8 +11,9 @@ export interface BrandFonts { sans?: string; serif?: string; mono?: string; disp
 export interface CustomerTheme {
   palette: Palette;
   slots: SlotMap;
-  /** Which default theme the brand's formulas build on (D27). Default: "light". */
-  base?: "light" | "dark";
+  /** Which default theme the brand's formulas build on (D27), and so the
+   * `color-scheme` its CSS declares (D116). Default: "light". */
+  base?: ColorScheme;
   /** Optional semantic-token formula overrides, merged over the base theme. */
   overrides?: ThemeDef;
   /** Optional brand-level font role assignment (D29). */
@@ -23,11 +24,18 @@ export interface CustomerTheme {
   componentOverrides?: Record<string, string>;
 }
 
+/** D116 — a customer theme's color scheme is its base, light when it names
+ * none. The one place that default lives, so Psi's build and buildThemeCss
+ * cannot disagree. */
+export function customerColorScheme(c: CustomerTheme): ColorScheme {
+  return c.base === "dark" ? "dark" : "light";
+}
+
 /** Assemble the full semantic ThemeDef for a customer brand (D27). D46: an
  * override inherits the base token's scopes unless it declares its own — a
  * brand retuning fgOnAccent's formula must not silently unscope it. */
 export function assembleCustomerTheme(c: CustomerTheme): ThemeDef {
-  const base = c.base === "dark" ? darkTheme : lightTheme;
+  const base = customerColorScheme(c) === "dark" ? darkTheme : lightTheme;
   const merged: Record<string, TokenDef> = { ...base };
   for (const [name, def] of Object.entries(c.overrides ?? {})) {
     const baseScopes = base[name]?.scopes;

@@ -1,5 +1,6 @@
 import type {
   ChannelOp,
+  ColorScheme,
   Palette,
   SlotMap,
   ThemeDef,
@@ -113,6 +114,7 @@ export function emitThemeCSS(
   theme: ThemeDef,
   palette: Palette,
   slots: SlotMap,
+  scheme: ColorScheme,
   opts?: { fonts?: BrandFonts; componentOverrides?: Record<string, string> },
 ): string {
   const lines: string[] = [];
@@ -125,6 +127,13 @@ export function emitThemeCSS(
 
   lines.push("@layer psi.theme {");
   lines.push(`  ${selector} {`);
+
+  // D116 — the one declaration a theme makes that is not a custom property.
+  // It fills no element: it tells the browser which scheme to draw its own
+  // parts in (date pickers, select lists, scrollbars, a root canvas nobody
+  // paints). Inherited, so a sub-tree theme carries it; layered, so any
+  // unlayered consumer rule overrides it.
+  lines.push(`    color-scheme: ${scheme};`);
 
   // Scope this theme's own palette vars inside its selector block so a
   // customer brand's colors ship only with that theme, and two customers
