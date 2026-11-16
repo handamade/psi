@@ -12,7 +12,13 @@
  * resolves from this token and `gap` at the theme root: overriding either on
  * a narrower scope inside a Toolbar align="start" row also needs
  * --psi-toolbar-action-offset set on that same scope, or the row's button
- * keeps the theme-root offset. */
+ *
+ * D115: label-align, label-max-width and column-gap lay out a label beside
+ * its control (Field labelPosition="start", and FieldStack). label-align is
+ * the label's text-align (a theme sets `end` to put each label against its
+ * control); label-max-width caps a FieldStack's label column, a standalone
+ * literal like label-height; column-gap separates the label from its
+ * control. None is a colour, so none enters the contrast gates. */
 export const fieldVars: Record<string, string> = {
   "label-fg": "var(--psi-fg-secondary)",
   "message-fg": "var(--psi-fg-tertiary)",
@@ -25,4 +31,7 @@ export const fieldVars: Record<string, string> = {
   "required-text-fg": "var(--psi-fg-secondary)",
   gap: "var(--psi-space-6)",
   "label-height": "20px",
+  "label-align": "start",
+  "label-max-width": "240px",
+  "column-gap": "var(--psi-space-12)",
 };
