@@ -15,7 +15,7 @@ export interface FieldStackProps extends HTMLAttributes<HTMLDivElement> {
    * to `--psi-field-label-max-width`, and returns them above their controls
    * when the stack is narrower than 480px. @default "top" */
   labelPosition?: FieldLabelPosition;
-  /** Space between Fields in px, from the space scale. @default 16 */
+  /** Space between Fields in px, from the space scale. @default 24 */
   gap?: Gap;
   /** Forwarded ref to the root element. */
   ref?: Ref<HTMLDivElement>;
@@ -30,8 +30,10 @@ const gapClass: Record<Gap, string> = {
  * width, so it must fill its container: it is for a form, not a toolbar,
  * where a single `Field labelPosition="start"` goes. A Field shares the
  * columns only as a direct child; one inside a wrapper element keeps its
- * label beside its control in columns of its own. */
-export function FieldStack({ labelPosition = "top", gap = 16, className, children, ref, ...rest }: FieldStackProps) {
+ * label beside its control in columns of its own. Every Field inside a
+ * FieldStack takes its position, including one inside a nested container;
+ * give a nested Field its own `labelPosition` to opt out. */
+export function FieldStack({ labelPosition = "top", gap = 24, className, children, ref, ...rest }: FieldStackProps) {
   const value = useMemo(() => ({ labelPosition }), [labelPosition]);
   const cls = [styles.stack, gapClass[gap], labelPosition === "start" && styles.start, className]
     .filter(Boolean)

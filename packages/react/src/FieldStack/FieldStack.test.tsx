@@ -23,15 +23,15 @@ describe("FieldStack (D115)", () => {
     expect(ref.current).toBe(root);
   });
 
-  it("defaults to top and gap 16, and takes start and the other gaps", () => {
+  it("defaults to top and gap 24, and takes start and the other gaps", () => {
     const { container, rerender } = render(<FieldStack><Field label="A"><Input /></Field></FieldStack>);
     const root = () => container.firstElementChild as HTMLElement;
     expect(root()).toHaveAttribute("data-label-position", "top");
-    expect(root().className).toMatch(/gap16/);
-    expect(root().className).not.toMatch(/start/);
-    rerender(<FieldStack labelPosition="start" gap={24}><Field label="A"><Input /></Field></FieldStack>);
-    expect(root()).toHaveAttribute("data-label-position", "start");
     expect(root().className).toMatch(/gap24/);
+    expect(root().className).not.toMatch(/start/);
+    rerender(<FieldStack labelPosition="start" gap={16}><Field label="A"><Input /></Field></FieldStack>);
+    expect(root()).toHaveAttribute("data-label-position", "start");
+    expect(root().className).toMatch(/gap16/);
     expect(root().className).toMatch(/start/);
   });
 

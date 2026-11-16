@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test";
 
 /** D115 — labels beside their controls. jsdom does no layout, so the shared
  * column, the cap, the stacking and the alignment are measured here, in
- * Chromium. WebKit and Firefox were measured once by the plan's spike. */
+ * Chromium. WebKit was measured once by the plan's spike; Firefox is a Follow-up in the spec. */
 
 const story = (id: string) => `/iframe.html?id=${id}&globals=theme:light`;
 
@@ -35,8 +35,14 @@ test("a single start field puts its label on its control's line at every size @i
 test("a start FieldStack lines its labels up in one column, and its controls in another @interaction", async ({ page }) => {
   await page.goto(story("components-fieldstack--side-labels"), { waitUntil: "networkidle" });
   const labels = await boxes(page, LABELS);
-  const controls = await boxes(page, "#storybook-root [data-in-stack][data-label-position=start] > :is(input, select)");
+  // Every direct child of a start Field that is neither its label nor its message <p>: the Input and the Select,
+  // the group's radiogroup <div>, and the label-less Checkbox Field's own <label>. All must share column 2.
+  const controls = await boxes(
+    page,
+    "#storybook-root [data-in-stack][data-label-position=start] > :not([id$='-label']):not(p)",
+  );
   expect(labels.length).toBeGreaterThanOrEqual(3);
+  expect(controls.length).toBeGreaterThanOrEqual(4);
   for (const l of labels) expect(l.left).toBeCloseTo(labels[0].left, 0);
   for (const c of controls) expect(c.left).toBeCloseTo(controls[0].left, 0);
   expect(controls[0].left).toBeGreaterThan(Math.max(...labels.map((l) => l.right)));
@@ -59,6 +65,7 @@ test("under 480px every label returns above its control @interaction", async ({ 
   await page.goto(story("components-fieldstack--narrow"), { waitUntil: "networkidle" });
   const fields = page.locator("#storybook-root [data-in-stack][data-label-position=start]");
   const count = await fields.count();
+  expect(count).toBeGreaterThanOrEqual(3);
   for (let i = 0; i < count; i++) {
     const parts = await fields.nth(i).evaluate((f) =>
       [...f.children].map((c) => { const r = c.getBoundingClientRect(); return { top: r.top, bottom: r.bottom }; }),
@@ -71,6 +78,8 @@ test("right-to-left puts the label column on the right @interaction", async ({ p
   await page.goto(story("components-fieldstack--right-to-left"), { waitUntil: "networkidle" });
   const labels = await boxes(page, LABELS);
   const controls = await boxes(page, "#storybook-root [data-in-stack][data-label-position=start] > :is(input, select)");
+  expect(labels.length).toBeGreaterThanOrEqual(3);
+  expect(controls.length).toBeGreaterThanOrEqual(2);
   for (const l of labels) expect(l.right).toBeCloseTo(labels[0].right, 0);
   expect(controls[0].right).toBeLessThan(Math.min(...labels.map((l) => l.left)));
 });

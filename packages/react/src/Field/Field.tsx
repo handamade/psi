@@ -46,7 +46,10 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
   /** Group mode: fieldset/legend wrapping several self-labeled controls
    * (Checkbox/Switch); the message describes the whole group. In the `start`
    * position it renders `<div role="group" aria-labelledby>`, because a
-   * fieldset cannot take part in a FieldStack's columns (D115). @default false */
+   * fieldset cannot take part in a FieldStack's columns (D115). Changing
+   * `labelPosition` on a group Field swaps the fieldset for a div, which
+   * remounts the group's controls; set it once rather than toggling it.
+   * @default false */
   group?: boolean;
   /** Override the generated control id (pair it with the same id on the control). */
   htmlFor?: string;
@@ -65,7 +68,7 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
   ref?: Ref<HTMLDivElement | HTMLFieldSetElement>;
 }
 
-/** Labeled form-row wrapper: label above, control, one message line below —
+/** Labeled form-row wrapper: label above, or beside with `labelPosition` (D115), control, one message line below —
  * description normally, error when set (aria-live unless `announce={false}`).
  * Auto-wires id/aria-describedby/aria-invalid into Input and Select (D49).
  * Overriding `--psi-field-gap` or `--psi-field-label-height` on a narrower

@@ -71,6 +71,7 @@ for (const c of components) {
   // name doesn't kebab-case to its actual --psi-{component}-* token prefix)
   const TOKEN_NAME_OVERRIDES: Record<string, string> = {
     IconButton: "button",
+    FieldStack: "field",
     NavBar: "navbar",
     NavGroup: "nav-tree",
     NavItem: "nav-tree",

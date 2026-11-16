@@ -1,6 +1,6 @@
 {
   "id": "table-pagination",
-  "intent": "Page-size selector and page range control beneath a data table The page-size label sits beside its select (D115).",
+  "intent": "Page-size selector and page range control beneath a data table. The page-size label sits beside its select (D115).",
   "match": ["pagination", "table pagination", "page controls", "rows per page", "paging"],
   "compose": {
     "component": "Toolbar",

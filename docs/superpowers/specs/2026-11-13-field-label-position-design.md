@@ -41,7 +41,7 @@ spec on another branch.
   - **`Field` gains `labelPosition?: "top" | "start"`.** Without it, a `Field` takes its `FieldStack`'s position, or
     `"top"` outside one. `"top"` is today's layout, unchanged.
   - **New `FieldStack`**, the 53rd component: `labelPosition?: "top" | "start"` (default `"top"`),
-    `gap?: 8 | 12 | 16 | 24` (default 16, from the space scale like `Stack`), `children`, and rest props on its
+    `gap?: 8 | 12 | 16 | 24` (default 24, the house spacing between form fields), `children`, and rest props on its
     `<div>`. It holds `Field`s, and may hold other content between them.
   - **With `"top"`, a `FieldStack` is a column of fields** with its gap, like `Stack`: a form that keeps its labels
     above gets the same container as one that moves them.
@@ -75,25 +75,19 @@ spec on another branch.
   **Alignment inside a row**
   - Each row aligns its label and its control on their **first baseline** (`align-items: baseline`), so the label's
     text sits on the same line as the text in the control at every size (24, 32, 40, 48) with no per-size offset.
-    In group mode the legend's text lines up with the first option's label.
+    In group mode the group's label lines up with the first option's label.
   - The plan verifies this for `Input`, `Select` (a `<select>`'s baseline is its value's text), `Textarea`,
-    `RadioGroup`, a `Checkbox` group, and a `useFieldControl` combobox built on a `div`, in Chromium, WebKit and
-    Firefox. If one of them has no usable baseline, the fallback is to centre the label on a one-line control's
-    height, and the plan records which controls take it.
+    `RadioGroup`, a `Checkbox` group, and a `useFieldControl` combobox built on a `div`. The centring fallback was
+    not taken: baseline held in the engines measured (see Engine results).
   - The label's text aligns to `--psi-field-label-align` (`text-align`), `start` by default. A theme sets `end` in its
     `componentOverrides` to put each label against its control.
 
   **Groups**
-  - Group mode keeps its `<fieldset>` and `<legend>`, and the legend takes column 1. A browser draws a fieldset's
-    first legend on the fieldset's border (the *rendered legend*) and leaves it out of the fieldset's own layout.
-    A floated legend is not a rendered legend, and `float` has no effect on a grid item, so a legend with
-    `float: inline-start` becomes an ordinary item of the fieldset's grid.
-  - In a `FieldStack`, the fieldset must also take `grid-template-columns: subgrid`. A fieldset lays its content out
-    through an anonymous box, so whether that box can be a subgrid is the less certain half.
-  - The plan proves both in the three engines before the CSS is final. If either fails, the fallback is a group
-    `Field` in the `start` position rendered as `<div role="group" aria-labelledby>` with its label in a `<div>`:
-    the group keeps its name and its description, and `RadioGroup`, which adds no role inside a group `Field`
-    (D104), is unchanged.
+  - In the `start` position a group `Field` renders `<div role="group" aria-labelledby aria-describedby>` with its
+    label in a `<div>`; a `<fieldset>` and `<legend>` are used only in the `top` position. A fieldset cannot take a
+    parent grid's columns through subgrid in Chromium, and in WebKit a floated legend sits 20px off the first option
+    (see Engine results). The group keeps its name and its description, and `RadioGroup`, which adds no role inside a
+    group `Field` (D104), is unchanged.
 
   **Narrow containers**
   - A `FieldStack` with `labelPosition="start"` is a size container named `psi-field-stack`. Below 480px of its own
@@ -117,7 +111,8 @@ spec on another branch.
   - None is a colour, so none enters the contrast gates.
 
   **What does not change**
-  - **Accessibility.** The label is still a `<label for>` or a `<legend>`, and the document order is still label,
+  - **Accessibility.** The label is a `<label for>`, or in group mode a `<legend>` (top) or a `<div>` that names a
+    `<div role="group">` through `aria-labelledby` (start). The document order is still label,
     control, message, so a screen reader and the Tab order meet the same field. Only the visual position moves.
     Right-to-left needs nothing extra: the grid's columns and `text-align: start` are logical.
   - **`labelPosition="top"`**, the default, renders today's markup and CSS. No current story changes.
@@ -144,7 +139,7 @@ packages/react/src/FieldStack/slots.json            — new: one body slot, like
 packages/react/src/Field/Field.stories.tsx, FieldStack/FieldStack.stories.tsx — new stories below
 packages/react/src/index.ts                   — export FieldStack and its types
 packages/tokens/src/components/field.ts       — three tokens
-packages/tokens/src/scales/layout.ts          — containers.fieldStackColumns
+packages/tokens/src/scales/layout.ts          — containerQueries.fieldStackColumns
 packages/react/patterns/table-pagination.json, cursor-pagination.json — the presets
 packages/tokens/src/guidance.ts               — one steering line
 ```
@@ -160,10 +155,10 @@ CSS keys off those two attributes, so a `Field` needs no knowledge of its column
   - `aria-describedby` and `aria-invalid` are unchanged; the message renders after the control.
   - A `Field`'s own `labelPosition` beats its stack's; a `Field` wrapped in a consumer component still reads the
     stack's position.
-  - Group mode keeps its `fieldset` and `legend` in the `start` position.
-  - A `Field` without a label renders no label element and takes column 2 (its control carries the column class).
+  - Group mode renders a `<div role="group">` named by its label in the `start` position, and a fieldset/legend in the `top` position.
+  - A `Field` without a label renders no label element and takes column 2 (its control sits in column 2).
   - `labelPosition="top"` renders the same markup as today (a snapshot of a top `Field` before and after).
-  - `containers.fieldStackColumns` equals the literal in `fieldStack.module.css`.
+  - `containerQueries.fieldStackColumns` equals the literal in `field.module.css`.
 - **Axe.** Every new story joins `a11y.axe.test.tsx`.
 - **Visual (CI only, `maxDiffPixels: 0`).** New stories:
   - a single `start` field at 24, 32, 40 and 48, with an `Input` and with a `Select`;
@@ -174,8 +169,7 @@ CSS keys off those two attributes, so a `Field` needs no knowledge of its column
   - the form under a theme override of `--psi-field-label-align: end`;
   - the form under `dir="rtl"`, Psi's first story that sets a direction;
   - the two presets, re-rendered.
-- **Engines.** The floated legend and the baseline row are checked by hand in Chromium, WebKit and Firefox before
-  their CSS is final, and the plan records what each engine did.
+- **Engines.** The group and the baseline row were measured by the spike in Chromium and WebKit; Firefox is a Follow-up.
 - **Gates.** All five, with `check-docs-drift` expected to fail on the component count (52 to 53) until every
   document that states it is updated.
 
@@ -211,6 +205,11 @@ disabled, for the Firefox attempt only; Chromium and WebKit need no such thing.
 Chromium: the fieldset's control column starts at 317px while the `div` fields' starts at 268px. WebKit: the legend's
 centre sits 20px above the first option's centre (111 against 131).
 
+What the spike did and did not measure: the fixture is plain HTML in `system-ui`, not Psi's components or fonts; it has
+no Checkbox group; it did not measure the standalone `auto auto` layout, RTL or `--psi-field-label-align: end` outside
+Chromium (the interaction spec and VR cover those in Chromium); and the shipped CSS differs from the fixture in the
+`data-in-stack` gating, `justify-content: start` and the absence of the float.
+
 ### Div-group variant
 
 The same spike on `fixture-div-group.html`, where the two group fields are `<div class="field start" role="group"
@@ -234,4 +233,5 @@ Verdicts: **GROUP = div-group**, **ALIGN = baseline**.
 
 ## Follow-ups
 
-- Re-run `node docs/superpowers/plans/assets/d115-spike/spike.mjs fixture-div-group.html` in Firefox on a machine where Playwright's Firefox launches (CI's Linux image, say) and fill in the Firefox column of the engine results; if any check fails there, the group or alignment verdict is reopened.
+- Re-run `node docs/superpowers/plans/assets/d115-spike/spike.mjs fixture-div-group.html` in Firefox on a machine where Playwright's Firefox launches (CI's Linux image, say) and fill in the Firefox column of the engine results; if any check fails there, the group or alignment verdict is reopened. When re-run, add a Checkbox group and a standalone `auto auto` field to the fixture so it covers what this spec claims.
+- `Field`'s `error` (a ReactNode) is not listed in `Field/slots.json`, so a pattern cannot fill it. Pre-existing, not D115.
