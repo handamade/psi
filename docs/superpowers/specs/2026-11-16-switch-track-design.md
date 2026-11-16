@@ -70,9 +70,9 @@ composited onto the surface:
 
     | Theme | track vs surface, rest / hover (worst of bgPrimary, bgSecondary) | white thumb on track, rest / hover (on bgPrimary) |
     | --- | --- | --- |
-    | light | 3.24 / 5.65 | 3.74 / 6.53 |
+    | light | 3.24 / 5.63 | 3.74 / 6.50 |
     | acme | 3.29 / 5.81 | 3.71 / 6.54 |
-    | dark | 3.29 / 5.17 | 5.97 / 3.72 |
+    | dark | 3.29 / 5.18 | 5.97 / 3.72 |
     | ember | 3.41 / 5.52 | 5.80 / 3.56 |
 
   - **`nonTextPairs` gains six pairs at 3:1:**
