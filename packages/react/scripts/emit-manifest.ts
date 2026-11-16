@@ -12,6 +12,7 @@ const COMPONENTS = [
   "Panel",
   "Stack",
   "Text",
+  "PageHeading",
   "DescriptionList",
   "DescriptionItem",
   "Input",

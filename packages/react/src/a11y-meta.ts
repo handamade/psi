@@ -105,6 +105,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Renders the element `as` names (p by default). Use h2–h4 for a heading at its outline level, whatever its `size`.",
   },
+  PageHeading: {
+    keyboard: [{ keys: "Tab", behavior: "Not focusable." }],
+    notes:
+      "Renders the page's one h1 (D118). Use one per screen, as the first thing in the page: inside an AppShell, the page's first child, after any banner. Sub-headings are Text as=\"h2\" or \"h3\". It has no as or size prop, because a page heading is always the h1.",
+  },
   Toolbar: {
     keyboard: [
       { keys: "Tab", behavior: "Moves through the controls in DOM order — no roving tabindex (deliberately not role=toolbar, D52)." },
