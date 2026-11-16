@@ -30,6 +30,7 @@ const COMPONENTS = [
   "Tooltip",
   "NavBar",
   "SkipLink",
+  "Link",
   "NavTree",
   "NavGroup",
   "NavItem",

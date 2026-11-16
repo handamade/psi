@@ -229,6 +229,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "A native anchor, visually hidden until it is focused (:focus-visible) and with no script (D88). Fragment navigation moves focus only to a focusable target, so the element named by href must be focusable: tabIndex={-1} is enough, and AppShell's main has it. A modal Dialog makes the link inert, so it never needs to beat one. A ToastRegion is on the native top layer and paints over the focused link whatever its z-index: do not place one at top-start in an app with a skip link.",
   },
+  Link: {
+    keyboard: [
+      { keys: "Tab", behavior: "Takes focus like any link and draws the shared focus ring (:focus-visible)." },
+      { keys: "Enter", behavior: "Follows the link. Your router's own link handles it when you pass one as the child." },
+    ],
+    notes:
+      "A native anchor (D119), either the one Link renders from href or your router's link passed as the only child. Underlined at rest, so it is never told from the text around it by colour alone (WCAG 1.4.1): the accent scores about 2:1 against body text. current sets aria-current=\"page\", drawn as medium-weight text with no underline. Psi adds no target or rel and no new-tab marker; if a link opens a new tab, say so in its text.",
+  },
   NavTree: {
     keyboard: [
       { keys: "Tab / Shift+Tab", behavior: "Moves through the group buttons and the links of open groups in document order. There is no roving focus and no arrow-key model: it is a list of links, not a menu or a tree widget." },

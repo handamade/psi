@@ -14,6 +14,8 @@ export { NavBar } from "./NavBar/NavBar.js";
 export type { NavBarProps } from "./NavBar/NavBar.js";
 export { SkipLink } from "./SkipLink/SkipLink.js";
 export type { SkipLinkProps } from "./SkipLink/SkipLink.js";
+export { Link } from "./Link/Link.js";
+export type { LinkProps } from "./Link/Link.js";
 export { NavTree } from "./NavTree/NavTree.js";
 export type { NavTreeProps } from "./NavTree/NavTree.js";
 export { NavGroup } from "./NavTree/NavGroup.js";
