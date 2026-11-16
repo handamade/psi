@@ -204,7 +204,7 @@ to today's layout, three tokens and a layout constant. Additive; nothing that re
 | narrow: legend above its options | PASS | PASS | not measured |
 
 Firefox 151.0 (Playwright build 1532) downloaded but would not launch on the dev machine, headless or headed, so it is
-"not measured" and is to be re-measured where it starts (CI's Linux image). The spike ran once with the Bash sandbox
+"not measured"; the re-run is the follow-up at the end of this spec. The spike ran once with the Bash sandbox
 disabled, for the Firefox attempt only; Chromium and WebKit need no such thing.
 
 Chromium: the fieldset's control column starts at 317px while the `div` fields' starts at 268px. WebKit: the legend's
@@ -230,3 +230,7 @@ Verdicts: **GROUP = div-group**, **ALIGN = baseline**.
 - GROUP = div-group, because a `fieldset` cannot take the stack's columns in Chromium (317px against 268px).
 - ALIGN = baseline, because the only baseline failure was WebKit's `<legend>`, which the div-group variant does not
   have; this overrides the plan's literal ALIGN rule by the user's decision of 2026-11-16.
+
+## Follow-ups
+
+- Re-run `node docs/superpowers/plans/assets/d115-spike/spike.mjs fixture-div-group.html` in Firefox on a machine where Playwright's Firefox launches (CI's Linux image, say) and fill in the Firefox column of the engine results; if any check fails there, the group or alignment verdict is reopened.

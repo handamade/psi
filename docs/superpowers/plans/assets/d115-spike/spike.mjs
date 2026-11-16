@@ -25,6 +25,7 @@ function judge(m) {
   return checks;
 }
 
+let measured = 0;
 for (const [name, type] of [["chromium", chromium], ["webkit", webkit], ["firefox", firefox]]) {
   let browser;
   try {
@@ -51,5 +52,10 @@ for (const [name, type] of [["chromium", chromium], ["webkit", webkit], ["firefo
   console.log(`\n== ${name} (${browser.version()})`);
   for (const [check, ok] of Object.entries(judge(m))) console.log(`${ok ? "PASS" : "FAIL"}  ${check}`);
   console.log(JSON.stringify(m));
+  measured++;
   await browser.close();
+}
+if (measured === 0) {
+  console.log("\nNo engine was measured.");
+  process.exitCode = 1;
 }
