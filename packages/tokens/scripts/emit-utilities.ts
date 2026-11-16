@@ -190,6 +190,15 @@ export function emitUtilitiesCSS(): string {
   lines.push("");
   lines.push(`  .psi-media-tint { filter: var(--psi-media-tint); transition: filter var(--psi-duration-450) var(--psi-ease-soft); }`);
   lines.push(`  .psi-media-tint:hover, .psi-media-tint:focus-visible { filter: none; }`);
+  lines.push("");
+  lines.push("  /* Text link (D119): the one copy of the rules; the React Link applies");
+  lines.push("     this class. Underlined at rest, always: the accent is ~2:1 against");
+  lines.push("     body text, so colour alone cannot mark a link (WCAG 1.4.1). The");
+  lines.push("     current-page rule comes last so it also wins on hover. */");
+  lines.push(`  .psi-link { color: var(--psi-link-fg); text-decoration-line: underline; text-decoration-thickness: var(--psi-link-underline-thickness); text-decoration-color: currentColor; text-underline-offset: var(--psi-link-underline-offset); transition: color var(--psi-duration-150) var(--psi-ease-standard), text-decoration-thickness var(--psi-duration-150) var(--psi-ease-standard); }`);
+  lines.push(`  .psi-link:hover { color: var(--psi-link-fg-hover); text-decoration-thickness: var(--psi-link-underline-thickness-hover); }`);
+  lines.push(`  .psi-link:focus-visible { outline: var(--psi-focus-ring-width) solid var(--psi-link-focus-ring); outline-offset: var(--psi-focus-ring-offset); border-radius: var(--psi-link-radius); }`);
+  lines.push(`  .psi-link[aria-current="page"] { color: var(--psi-link-fg-current); font-weight: var(--psi-link-font-weight-current); text-decoration-line: none; }`);
 
   lines.push("");
   lines.push(`  .psi-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }`);
@@ -288,6 +297,13 @@ export function emitUtilitiesRoster(): {
   });
 
   families.push({
+    prefix: "psi-link",
+    property: "color, text-decoration, text-underline-offset, transition, outline, font-weight",
+    scale: null,
+    classes: ["psi-link"],
+  });
+
+  families.push({
     prefix: "psi-sr-only",
     property: "position, width, height, padding, margin, overflow, clip, clip-path, white-space, border",
     scale: null,
@@ -296,7 +312,7 @@ export function emitUtilitiesRoster(): {
 
   return {
     note:
-      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Scaled utility families set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. The bare/fixed utilities (.psi-container, .psi-media-tint, .psi-sr-only) set several. Every utility sits in @layer psi.utilities, above @layer psi.components, so on a component root it beats the component's own value (D94). Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
+      "Every utility class shipped in utilities.css, generated from the same source as the CSS (D79). Scaled utility families set one property each and create no layout context: .psi-gap-* sets gap only, so pair it with display:flex or grid yourself. The bare/fixed utilities (.psi-container, .psi-media-tint, .psi-link, .psi-sr-only) set several. Every utility sits in @layer psi.utilities, above @layer psi.components, so on a component root it beats the component's own value (D94). Import @handamade/psi-tokens/utilities.css — it is required, not optional; .psi-container and the reduced-motion duration zeroing live there.",
     families,
     classes: [...new Set(families.flatMap((f) => f.classes))].sort(),
   };
