@@ -1,5 +1,40 @@
 # @handamade/psi-react
 
+## 0.30.0
+
+### Minor Changes
+
+- 1981411: Labels beside their controls: `Field labelPosition` and `FieldStack` (D115).
+
+  - **`<Field labelPosition="start">`** puts the label before the control, with the message line under the control. The label still names the control, and the order is still label, control, message. The default, `"top"`, is unchanged.
+  - **`<FieldStack labelPosition="start" gap={8|12|16|24}>`** (gap defaults to 24) is a form whose Fields share one label column, as wide as the longest label up to `--psi-field-label-max-width` (240px). Under 480px of its own width, its labels return above their controls. A Field's own `labelPosition` wins, and a `start` Field inside a `"top"` stack keeps two columns of its own.
+  - **A group Field in the start position** renders `<div role="group">` named by its label, since a fieldset can't share a stack's columns.
+  - **New tokens:** `--psi-field-label-align` (`start`; a theme sets `end` to put labels against their controls), `--psi-field-label-max-width` and `--psi-field-column-gap`.
+  - **The `table-pagination` and `cursor-pagination` presets** put _Rows per page_ beside its select, so the pager is one line high.
+
+- 20979dd: A page heading in the brand's display face: `PageHeading` (D118).
+
+  - **`PageHeading`**: the page's one `h1`, at 24/32 medium in `--psi-font-display`, with margin 0. Use one per screen, as the first thing in the page. Inside an `AppShell`, it goes after any `banner`, and margin 0 keeps the page one block padding below the header and below a banner alike. It has no `as`, `size` or face prop. Restyle it through `--psi-page-heading-font` and `--psi-page-heading-fg`.
+  - **A new text style, `--psi-text-display-24-32-medium`**, with its utility `.psi-text-display-24-32-medium`: 24/32 medium in the display face. Unlike the fluid `--psi-display-*` tier, it has fixed px, no tracking and no uppercase.
+  - **The `app-shell` preset** now opens its page with a `PageHeading`.
+  - `guidance.json`'s `typographyDefaults` gains `pageHeading`. `heading` is unchanged.
+  - `Text` is unchanged. It still stops at `h4`.
+
+- 1a01b14: A `Toast` dismiss button with a name you can set (D117).
+
+  - **New `dismissLabel` prop** on `Toast`, on `show()` and on `ToastProvider`: the dismiss button's accessible name, for a translated app. It stays an icon button; only its name changes. A toast's own value wins, then the provider's, then the default `"Dismiss notification"`, so nothing changes for you unless you set it. The provider reads its value at render, so changing it renames toasts already on screen.
+  - It is not `Dialog`'s `closeLabel`, which gives the close button visible text. `Dialog`'s "Close dialog" and `Banner`'s "Dismiss" are still fixed names.
+
+### Patch Changes
+
+- e79533e: Every theme declares its `color-scheme` (D116).
+
+  - **Dark themes now draw the browser's own parts dark.** A theme's CSS declares `color-scheme: light` or `color-scheme: dark` from its base, so a date field's picker icon, a native select's list, spin buttons and scrollbars match the theme. Before, they were drawn for a light page on every theme, which put a near-black calendar icon on a dark date field. **What can change for you:** on a dark theme those parts render dark, and the browser's system colours flip too (for example `LinkText` on unstyled links, `Field` and `ButtonFace` on unstyled native controls), not only pickers and scrollbars. On a light theme nothing changes, unless your page lets the OS choose (`<meta name="color-scheme" content="light dark">`, or your own `color-scheme: light dark` in a layer): the light theme's `:root` now pins `light`. To restore the choice, set `color-scheme` in an unlayered rule. An unlayered `color-scheme` rule of your own, one in a layer declared after `psi.theme`, or an inline style overrides it; one in `@layer psi.base` does not.
+  - **Sub-trees follow.** A `data-psi-theme="dark"` element inside a light page, such as `AppShell`'s `sidebarTheme="dark"`, takes the dark scheme with its tokens.
+  - **Your own themes too.** `buildThemeCss` and `psi-theme` declare the scheme from the definition's `base`, `light` when none is named; rebuild to pick it up.
+  - **`resolved/<theme>.json` gains `colorScheme`**, `"light"` or `"dark"`.
+  - The rule stands: a theme still paints no background.
+
 ## 0.29.0
 
 ### Minor Changes
