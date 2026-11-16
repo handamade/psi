@@ -39,6 +39,12 @@
   background: var(--psi-switch-track-bg-checked);
 }
 
+/* Hover (D122): only an enabled, unchecked track; the checked track and the
+   thumb do not change under the pointer. */
+.label:hover .input:not(:checked):not(:disabled) + .track {
+  background: var(--psi-switch-track-bg-hover);
+}
+
 /* Focus visible */
 .input:focus-visible + .track {
   outline: var(--psi-focus-ring-width) solid var(--psi-switch-focus-ring);
