@@ -176,3 +176,36 @@ test("a guide's code block has a box and a component page's code view has none",
   const inner = await page.locator(".code-view pre").first().evaluate((el) => getComputedStyle(el).borderTopWidth);
   expect(inner).toBe("0px");
 });
+
+test("every docs page has a markdown twin, and /docs/llms.txt lists exactly them", async ({ request }) => {
+  const llms = await (await request.get(`${BASE}/docs/llms.txt`)).text();
+  const listed = [...llms.matchAll(/\]\(https:\/\/psi\.kurkin\.de(\/docs\/[^)]+\.md)\)/g)].map((m) => m[1]);
+  const expected = [
+    "/docs/index.md",
+    ...GUIDE_IDS.map((g) => `/docs/get-started/${g}.md`),
+    ...componentSlugs().map((s) => `/docs/components/${s}.md`),
+    ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}.md`),
+  ];
+  expect([...listed].sort()).toEqual([...expected].sort());
+  for (const url of expected) {
+    const r = await request.get(`${BASE}${url}`);
+    expect(r.status(), url).toBe(200);
+    expect((await r.text()).length, url).toBeGreaterThan(100);
+  }
+});
+
+test("each docs page links its twin", async ({ page }) => {
+  await page.goto(`${BASE}/docs/components/button/`);
+  await expect(page.locator('link[rel="alternate"][type="text/markdown"]')).toHaveAttribute(
+    "href",
+    "/docs/components/button.md",
+  );
+});
+
+test("Copy page copies the page as markdown", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto(`${BASE}/docs/components/button/`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Copy page" }).click();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied.startsWith("# Button\n")).toBe(true);
+});

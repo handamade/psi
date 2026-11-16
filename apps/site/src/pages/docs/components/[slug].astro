@@ -7,6 +7,7 @@ import { ExampleTabs } from "../../../components/ExampleTabs";
 import { componentPages, type ComponentPage } from "../../../content/component-pages";
 import { docSection, getExport, readGeneratedDoc, summary } from "../../../lib/components";
 import { examplesFor } from "../../../examples/registry";
+import { componentPageMd } from "../../../lib/markdown";
 import { highlight } from "../../../lib/highlight";
 import { mdToHtml } from "../../../lib/render-md";
 import { storybookDocs } from "../../../lib/storybook";
@@ -43,6 +44,7 @@ const headings = [
   description={summary(main.description)}
   headings={headings}
   mdHref={`/docs/components/${page.slug}.md`}
+  mdSource={componentPageMd(page, examplesFor(page.slug))}
 >
   <Fragment set:html={mdToHtml(main.description)} />
   <CodeView client:visible html={importHtml} code={importLine} label="Copy import" />

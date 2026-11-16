@@ -1,5 +1,6 @@
 ---
 import Base from "./Base.astro";
+import { CopyPage } from "../components/CopyPage";
 import { DocsShell } from "../components/DocsShell";
 import OnThisPage from "../components/OnThisPage.astro";
 import { PageHeading } from "@handamade/psi-react";
@@ -10,20 +11,22 @@ interface Props {
   title: string;
   description: string;
   headings: { depth: number; slug: string; text: string }[];
-  /** URL of this page's markdown twin (Task 10). */
-  mdHref?: string;
+  /** URL of this page's markdown twin. */
+  mdHref: string;
+  /** The twin's text, embedded so Copy page needs no fetch. */
+  mdSource: string;
 }
-const { title, description, headings, mdHref } = Astro.props;
+const { title, description, headings, mdHref, mdSource } = Astro.props;
 const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
 ---
 
 <Base title={`${title} — Psi`} description={description}>
-  {mdHref && <link slot="head" rel="alternate" type="text/markdown" href={mdHref} />}
+  <link slot="head" rel="alternate" type="text/markdown" href={mdHref} />
   <DocsShell client:load nav={docsNav} currentPath={currentPath}>
     <div class="docs-page">
       <div class="docs-content" data-pagefind-body>
         <PageHeading>{title}</PageHeading>
-        <slot name="actions" />
+        <div class="docs-actions"><CopyPage client:idle markdown={mdSource} /></div>
         <slot />
       </div>
       <OnThisPage headings={headings} />

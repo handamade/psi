@@ -4,6 +4,7 @@ import HeadingAnchor from "../../../components/HeadingAnchor.astro";
 import TokenSwatch from "../../../components/TokenSwatch.astro";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@handamade/psi-react";
 import { tokenPages, type TokenPage } from "../../../content/token-pages";
+import { tokenPageMd } from "../../../lib/markdown";
 import { THEMES, colorTokens, guidance, kebab, resolved } from "../../../lib/tokens";
 
 export function getStaticPaths() {
@@ -51,6 +52,7 @@ const layoutSections = [
   description={`Psi's ${page.title.toLowerCase()} tokens, with their values in every theme.`}
   headings={headings}
   mdHref={`/docs/tokens/${page.slug}.md`}
+  mdSource={tokenPageMd(page)}
 >
   {
     page.slug === "color" && (

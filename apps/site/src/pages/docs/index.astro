@@ -1,6 +1,7 @@
 ---
 import DocsLayout from "../../layouts/DocsLayout.astro";
 import HeadingAnchor from "../../components/HeadingAnchor.astro";
+import { overviewMd } from "../../lib/markdown";
 import { componentCount, version } from "virtual:psi-facts";
 
 const headings = [
@@ -13,6 +14,8 @@ const headings = [
   title="Docs"
   description="Install Psi, theme it, and look up every component and token."
   headings={headings}
+  mdHref="/docs/index.md"
+  mdSource={overviewMd()}
 >
   <p>
     Psi {version}: {componentCount} React 19 components on OKLCH tokens, where every semantic

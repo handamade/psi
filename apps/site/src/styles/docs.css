@@ -20,6 +20,11 @@
   }
 }
 
+.docs-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .docs-content {
   min-width: 0;
   max-width: var(--site-docs-measure);

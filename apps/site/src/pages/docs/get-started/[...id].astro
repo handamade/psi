@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import DocsLayout from "../../../layouts/DocsLayout.astro";
+import { guideMd } from "../../../lib/markdown";
 import H2 from "../../../components/H2.astro";
 import H3 from "../../../components/H3.astro";
 
@@ -18,6 +19,7 @@ const { Content, headings } = await render(entry);
   description={entry.data.description}
   headings={headings}
   mdHref={`/docs/get-started/${entry.id}.md`}
+  mdSource={guideMd(entry)}
 >
   <Content components={{ h2: H2, h3: H3 }} />
 </DocsLayout>

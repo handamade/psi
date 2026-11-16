@@ -52,6 +52,7 @@ export function resolved(theme: ThemeName = "light"): Resolved {
 }
 
 export interface Guidance {
+  variants: { variant: string; intent: string; typicalUse: string }[];
   typographyDefaults: Record<string, string>;
   motion: { reducedMotion: string; recipes: Record<string, string> };
   layout: { note: string; container: string };
