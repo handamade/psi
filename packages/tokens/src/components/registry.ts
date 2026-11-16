@@ -2,6 +2,7 @@
 // gate reads it, in Psi's own build and in a consumer's theme build alike.
 import { bannerVars } from "./banner.js";
 import { inlineAlertVars } from "./inline-alert.js";
+import { linkVars } from "./link.js";
 import { buttonVars } from "./button.js";
 import { skeletonVars } from "./skeleton.js";
 import { skipLinkVars } from "./skip-link.js";
@@ -43,6 +44,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   field: fieldVars,
   input: inputVars,
   "inline-alert": inlineAlertVars,
+  link: linkVars,
   media: mediaVars,
   menu: menuVars,
   navbar: navbarVars,
