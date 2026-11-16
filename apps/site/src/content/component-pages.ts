@@ -21,6 +21,7 @@ export const componentPages: ComponentPage[] = [
   { slug: "icon-button", title: "IconButton", members: ["IconButton"] },
   { slug: "inline-alert", title: "InlineAlert", members: ["InlineAlert"] },
   { slug: "input", title: "Input", members: ["Input"] },
+  { slug: "link", title: "Link", members: ["Link"] },
   { slug: "menu", title: "Menu", members: ["Menu", "MenuItem", "MenuSeparator", "MenuText"] },
   { slug: "nav-bar", title: "NavBar", members: ["NavBar"] },
   { slug: "nav-tree", title: "NavTree", members: ["NavTree", "NavGroup", "NavItem"] },
