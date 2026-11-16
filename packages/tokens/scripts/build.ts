@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
-import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
+import { customerThemes, assembleCustomerTheme, customerColorScheme } from "../src/themes/customers/index.js";
 import type { BrandFonts } from "../src/themes/customers/index.js";
 import { validateScopeConsistency, validateNoScalePrefixShadow } from "../src/dsl/validator.js";
 import { SCALE_SCOPES, PROPERTY_GROUPS, keyGroup } from "../src/scopes.js";
@@ -23,7 +23,7 @@ import { sizeScale } from "../src/scales/sizes.js";
 import { breakpoints } from "../src/scales/layout.js";
 import { guidance } from "../src/guidance.js";
 
-import type { Palette, SlotMap } from "../src/dsl/types.js";
+import type { ColorScheme, Palette, SlotMap } from "../src/dsl/types.js";
 
 // ── Config ────────────────────────────────────────────────────────
 
@@ -31,15 +31,17 @@ interface ThemeConfig {
   theme: typeof lightTheme;
   palette: Palette;
   slots: SlotMap;
+  /** D116 — the color-scheme the theme's CSS declares. */
+  scheme: ColorScheme;
   fonts?: BrandFonts;
   componentOverrides?: Record<string, string>;
 }
 
 const themes: Record<string, ThemeConfig> = {
-  light: { theme: lightTheme, palette: defaultPalette, slots: defaultSlots },
-  dark: { theme: darkTheme, palette: defaultPalette, slots: defaultSlots },
+  light: { theme: lightTheme, palette: defaultPalette, slots: defaultSlots, scheme: "light" },
+  dark: { theme: darkTheme, palette: defaultPalette, slots: defaultSlots, scheme: "dark" },
   ...Object.fromEntries(Object.entries(customerThemes).map(([name, c]) => [
-    name, { theme: assembleCustomerTheme(c), palette: c.palette, slots: c.slots, fonts: c.fonts, componentOverrides: c.componentOverrides },
+    name, { theme: assembleCustomerTheme(c), palette: c.palette, slots: c.slots, scheme: customerColorScheme(c), fonts: c.fonts, componentOverrides: c.componentOverrides },
   ])),
 };
 
@@ -111,7 +113,7 @@ function build(): void {
     console.log(`  validated ${themeName} theme; contrast and scope gates passed`);
 
     // Emit theme CSS (live oklch formulas)
-    const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots, {
+    const themeCSS = emitThemeCSS(themeName, themeDef, palette, slots, config.scheme, {
       fonts: config.fonts,
       componentOverrides: config.componentOverrides,
     });
@@ -119,7 +121,7 @@ function build(): void {
     console.log(`  wrote dist/${themeName}.css`);
 
     // Emit resolved JSON
-    const json = emitResolvedJSON(themeName, resolved);
+    const json = emitResolvedJSON(themeName, resolved, config.scheme);
     writeFileSync(join(resolvedDir, `${themeName}.json`), json);
     console.log(`  wrote dist/resolved/${themeName}.json`);
 
