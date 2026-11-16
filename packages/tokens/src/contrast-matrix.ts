@@ -167,6 +167,12 @@ export const wcagAAPairs: ContrastPair[] = [
   { fg: "fgSuccess", bg: "bgSecondary", minRatio: 4.5 },
   { fg: "fgWarning", bg: "bgSecondary", minRatio: 4.5 },
   { fg: "fgDanger", bg: "bgSecondary", minRatio: 4.5 },
+
+  // A text link on the elevated surface (D119). --psi-surface-bg — what
+  // Panel, Card, Dialog and Menu alias — resolves to bgSecondary, and the
+  // accent was gated only on bgPrimary and its own tint. .psi-link puts it
+  // there as running text.
+  { fg: "fgAccent", bg: "bgSecondary", minRatio: 4.5 },
 ];
 
 /** Solid component-variant labels on their variant backgrounds (spec: "every
