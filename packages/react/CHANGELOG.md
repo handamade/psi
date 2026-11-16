@@ -1,5 +1,32 @@
 # @handamade/psi-react
 
+## 0.31.0
+
+### Minor Changes
+
+- d037ad3: A text link: `Link` and the `.psi-link` class (D119).
+
+  - **`Link`**: the accent colour, underlined at rest, mixing toward ink and thickening its line on hover; `current` sets `aria-current="page"`, drawn as medium-weight text with no underline. With `href` it renders the anchor. A router app passes its own link as the only child instead, and `Link` adds the class and `aria-current` to it, as `NavItem` does. The font is inherited.
+  - **`.psi-link`** in `utilities.css` holds the rules, so any `<a>` — rendered markdown, a page without React — can take the class.
+  - **`--psi-link-*` tokens**: `fg`, `fg-hover`, `fg-current`, `font-weight-current`, `underline-thickness`, `underline-thickness-hover`, `underline-offset`, `focus-ring`, `radius`.
+  - **A new contrast pair**: the accent as text on `bgSecondary` (the Panel, Card, Dialog and Menu surface) is gated at 4.5. Every shipped theme already passes; a theme built with `psi-theme` is solved to pass.
+
+### Patch Changes
+
+- 1f76199: Input, Select and Textarea draw their border at 3:1 or better in every theme (D120).
+
+  - **A field's border is now its control edge.** `--psi-input-border`, `--psi-select-border` and `--psi-textarea-border` bind `--psi-border-control`, the border an unchecked checkbox or radio already uses. They were on `--psi-border-neutral`, which measured 1.32–1.48:1 against the surfaces a field sits on. WCAG 1.4.11 asks 3:1 for the edge that identifies a control, and a field's fill is the canvas itself. **What changes for you:** every field in every theme draws a visibly darker edge. If you set one of these variables yourself, your value still wins.
+  - **A new token for hover, `--psi-border-control-hover`.** `fgPrimary` at 0.75 alpha in light-based themes and 0.60 in dark-based. The three fields' `-border-hover` bind it. It's a step darker than rest. The old hover, `--psi-border-strong`, would have been lighter than the new rest border.
+  - **The contrast gate checks it.** `nonTextPairs` gains `borderControlHover` on `bgPrimary` and `bgSecondary` at 3:1, so the build, `buildThemeCss` and `psi-theme` refuse a theme that breaks it. A theme that changes only its palette clears it whenever it clears `--psi-border-control`. If you override `--psi-border-control`, override `--psi-border-control-hover` with it, so hover stays the darker of the two.
+  - `--psi-border-neutral` and `--psi-border-strong` are unchanged. They keep their decorative uses, InlineAlert's neutral border and the outline Button.
+
+- d190c51: An unchecked Switch's track reaches 3:1 or better against its surface in every theme (D122).
+
+  - **The track is now a control fill.** `--psi-switch-track-bg` binds the new `--psi-fill-control`, the surface twin of `--psi-border-control` (a ref to it, so the two are one ink). It was on `--psi-fill-neutral4`, which measured 1.10–1.27:1. WCAG 1.4.11 asks 3:1 for what identifies a control. **What changes for you:** every unchecked Switch draws a mid-grey track (3.24:1 or better), and the white thumb shows clearly on it (3.47:1 or better). Those floors are measured on Psi's shipped themes; a derived theme is held to 3:1 by the gate. If you set `--psi-switch-track-bg` yourself, your value still wins.
+  - **A hover, `--psi-fill-control-hover`.** `fgPrimary` at 0.75 alpha in light-based themes and 0.55 in dark-based, bound by the new `--psi-switch-track-bg-hover` on an enabled, unchecked Switch. The checked track and the thumb don't change on hover.
+  - **The contrast gate checks it.** `nonTextPairs` gains six pairs: both tracks on `bgPrimary` and `bgSecondary`, and the white thumb on each track. The build, `buildThemeCss` and `psi-theme` refuse a theme that breaks them. If you override `--psi-border-control` at theme scope, the Switch track moves with it (a nested-element override doesn't reach `--psi-fill-control`); override `--psi-fill-control-hover` alongside so hover stays a step beyond rest.
+  - `--psi-fill-neutral4` is unchanged and keeps its other uses.
+
 ## 0.30.0
 
 ### Minor Changes
