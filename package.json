@@ -14,7 +14,7 @@
     "verify:published": "node tools/verify-published.mjs",
     "test:e2e": "playwright test -c apps/storybook/vr --grep @interaction",
     "test:site": "playwright test -c apps/promo/site-gate",
-    "release": "git checkout main && git pull --ff-only && node tools/release-guard.mjs && pnpm build && pnpm -r publish --access public && changeset tag && git push --tags"
+    "release": "git checkout main && git pull --ff-only && node tools/release-guard.mjs && pnpm build && node tools/publish.mjs && changeset tag && git push --tags"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
