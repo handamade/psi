@@ -3,8 +3,10 @@ export const inputVars: Record<string, string> = {
   bg: "var(--psi-bg-primary)",
   fg: "var(--psi-fg-primary)",
   placeholder: "var(--psi-fg-tertiary)",
-  border: "var(--psi-border-neutral)",
-  "border-hover": "var(--psi-border-strong)",
+  // D120: the field's border is its only edge (its fill is the canvas), so
+  // WCAG 1.4.11 asks 3:1 at rest and on hover. Both are gated (nonTextPairs).
+  border: "var(--psi-border-control)",
+  "border-hover": "var(--psi-border-control-hover)",
   "border-error": "var(--psi-fg-danger)",
   "focus-ring": "var(--psi-border-focus)",
 

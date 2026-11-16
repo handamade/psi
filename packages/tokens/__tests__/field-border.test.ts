@@ -5,6 +5,9 @@ import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
 import { darkTheme } from "../src/themes/dark.js";
 import { acmePalette, acmeSlots } from "../src/themes/customers/acme.js";
+import { inputVars } from "../src/components/input.js";
+import { selectVars } from "../src/components/select.js";
+import { textareaVars } from "../src/components/textarea.js";
 import * as matrix from "../src/contrast-matrix.js";
 import { gateTheme, ThemeGateError } from "../src/theme/gate.js";
 import type { ContrastPair } from "../src/contrast-matrix.js";
@@ -62,4 +65,20 @@ describe("borderControlHover (D120)", () => {
     const failing = (caught as ThemeGateError).contrastFailures.map((f) => `${f.fg}/${f.bg}`);
     expect(failing).toEqual(["borderControlHover/bgPrimary", "borderControlHover/bgSecondary"]);
   });
+});
+
+describe("fields bind the control border (D120)", () => {
+  for (const [name, vars] of [
+    ["input", inputVars],
+    ["select", selectVars],
+    ["textarea", textareaVars],
+  ] as const) {
+    it(`${name}: rests on border-control and hovers on border-control-hover`, () => {
+      expect(vars.border).toBe("var(--psi-border-control)");
+      expect(vars["border-hover"]).toBe("var(--psi-border-control-hover)");
+      // Unchanged by D120: error and focus.
+      expect(vars["border-error"]).toBe("var(--psi-fg-danger)");
+      expect(vars["focus-ring"]).toBe("var(--psi-border-focus)");
+    });
+  }
 });

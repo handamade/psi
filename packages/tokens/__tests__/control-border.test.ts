@@ -62,11 +62,11 @@ describe("borderControl (D106)", () => {
     expect(failing).toEqual(["borderControl/bgPrimary", "borderControl/bgSecondary"]);
   });
 
-  it("is bound by the checkbox box and the radio circle, and by no field", () => {
+  it("is bound by the checkbox box, the radio circle and, since D120, every field", () => {
     expect(checkboxVars["box-border"]).toBe("var(--psi-border-control)");
     expect(radioGroupVars["circle-border"]).toBe("var(--psi-border-control)");
-    expect(inputVars.border).toBe("var(--psi-border-neutral)");
-    expect(selectVars.border).toBe("var(--psi-border-neutral)");
-    expect(textareaVars.border).toBe("var(--psi-border-neutral)");
+    expect(inputVars.border).toBe("var(--psi-border-control)");
+    expect(selectVars.border).toBe("var(--psi-border-control)");
+    expect(textareaVars.border).toBe("var(--psi-border-control)");
   });
 });
