@@ -1,0 +1,231 @@
+---
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import HeadingAnchor from "../../../components/HeadingAnchor.astro";
+import TokenSwatch from "../../../components/TokenSwatch.astro";
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@handamade/psi-react";
+import { tokenPages, type TokenPage } from "../../../content/token-pages";
+import { THEMES, colorTokens, guidance, kebab, resolved } from "../../../lib/tokens";
+
+export function getStaticPaths() {
+  return tokenPages.map((page) => ({ params: { group: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: TokenPage };
+const r = resolved("light");
+const g = guidance();
+const sections: Record<TokenPage["slug"], { slug: string; text: string }[]> = {
+  color: [{ slug: "semantic-colours", text: "Semantic colours" }],
+  typography: [{ slug: "text-styles", text: "Text styles" }],
+  display: [{ slug: "display-styles", text: "Display styles" }],
+  spacing: [
+    { slug: "space", text: "Space" },
+    { slug: "size", text: "Size" },
+    { slug: "radius", text: "Radius" },
+    { slug: "focus-ring", text: "Focus ring" },
+  ],
+  motion: [
+    { slug: "durations", text: "Durations" },
+    { slug: "easings", text: "Easings" },
+  ],
+  layout: [
+    { slug: "breakpoints", text: "Breakpoints" },
+    { slug: "container", text: "Container" },
+    { slug: "z-index", text: "Z-index" },
+  ],
+};
+const headings = sections[page.slug].map((s) => ({ depth: 2, ...s }));
+const scaleSections = [
+  ["space", "Space", r.scales.space, "--psi-space-"],
+  ["size", "Size", r.scales.size, "--psi-size-"],
+  ["radius", "Radius", r.scales.radius, "--psi-radius-"],
+] as const;
+const layoutSections = [
+  ["breakpoints", "Breakpoints", r.scales.layout.breakpoints],
+  ["container", "Container", r.scales.layout.container],
+  ["z-index", "Z-index", r.scales.layout.zIndex],
+] as const;
+---
+
+<DocsLayout
+  title={`${page.title} tokens`}
+  description={`Psi's ${page.title.toLowerCase()} tokens, with their values in every theme.`}
+  headings={headings}
+  mdHref={`/docs/tokens/${page.slug}.md`}
+>
+  {
+    page.slug === "color" && (
+      <>
+        <p>
+          Every semantic colour is an OKLCH formula over the theme's anchors, so a theme is a few inputs, not a
+          palette. Values below are each formula resolved in the four built-in themes.
+        </p>
+        <HeadingAnchor level={2} id="semantic-colours">Semantic colours</HeadingAnchor>
+        <div class="props-table" role="region" aria-label="Semantic colours by theme" tabindex="0">
+          <Table size={48}>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Token</TableHeaderCell>
+                <TableHeaderCell>Formula</TableHeaderCell>
+                {THEMES.map((t) => <TableHeaderCell>{t}</TableHeaderCell>)}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {colorTokens().map((tok) => (
+                <TableRow>
+                  <TableCell><code>{tok.cssVar}</code></TableCell>
+                  <TableCell><code>{tok.formula}</code></TableCell>
+                  {THEMES.map((t) => (
+                    <TableCell>
+                      <TokenSwatch cssVar={tok.cssVar} theme={t} />
+                      <code class="token-value">{tok.byTheme[t].hex}</code>
+                      <code class="token-value">{tok.byTheme[t].oklch}</code>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </>
+    )
+  }
+
+  {
+    page.slug === "typography" && (
+      <>
+        <p>
+          Text styles are <code>--psi-text-&#123;size&#125;-&#123;lineHeight&#125;-&#123;weight&#125;</code>,
+          shorthand <code>font</code> values. Defaults by role:
+        </p>
+        <ul>
+          {Object.entries(g.typographyDefaults).map(([role, combo]) => (
+            <li><code>{role}</code>: <code>--psi-text-{combo}</code></li>
+          ))}
+        </ul>
+        <HeadingAnchor level={2} id="text-styles">Text styles</HeadingAnchor>
+        <div class="props-table">
+          <Table size={48}>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Token</TableHeaderCell>
+                <TableHeaderCell>Size / line</TableHeaderCell>
+                <TableHeaderCell>Weight</TableHeaderCell>
+                <TableHeaderCell>Sample</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {r.typography.map((t) => (
+                <TableRow>
+                  <TableCell><code>--psi-text-{t.name}</code></TableCell>
+                  <TableCell>{t.fontSize}/{t.lineHeight}</TableCell>
+                  <TableCell>{t.weight} ({t.cssWeight})</TableCell>
+                  <TableCell><span style={`font: var(--psi-text-${t.name})`}>Sphinx of black quartz</span></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </>
+    )
+  }
+
+  {
+    page.slug === "display" && (
+      <>
+        <HeadingAnchor level={2} id="display-styles">Display styles</HeadingAnchor>
+        <div class="props-table">
+          <Table size={48}>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Name</TableHeaderCell>
+                <TableHeaderCell>Min–max px</TableHeaderCell>
+                <TableHeaderCell>vw</TableHeaderCell>
+                <TableHeaderCell>Line height</TableHeaderCell>
+                <TableHeaderCell>Weight</TableHeaderCell>
+                <TableHeaderCell>Tracking</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {r.display.map((d) => (
+                <TableRow>
+                  <TableCell><code>{d.name}</code></TableCell>
+                  <TableCell>{d.min}–{d.max}</TableCell>
+                  <TableCell>{d.vw}</TableCell>
+                  <TableCell>{d.lineHeight}</TableCell>
+                  <TableCell>{d.weight} ({d.cssWeight})</TableCell>
+                  <TableCell>{d.tracking}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </>
+    )
+  }
+
+  {
+    page.slug === "spacing" && (
+      <>
+        <p>{g.geometry.note}</p>
+        <p>Control sizes: {g.geometry.sizes.map((s) => <code class="token-chip">{s}</code>)}</p>
+        <p>
+          Scale names are pixel-true: <code>--psi-space-8</code> is 8px. The space scale also feeds the{" "}
+          {Object.entries(r.scales.scopes).map(([scale, fams]) => `${scale} → ${fams.join(", ")}`).join("; ")} utility
+          families, for example <code>.psi-gap-8</code>.
+        </p>
+        {scaleSections.map(([id, label, values, prefix]) => (
+          <>
+            <HeadingAnchor level={2} id={id}>{label}</HeadingAnchor>
+            <p>{values.map((v) => <code class="token-chip">{prefix}{v}</code>)}</p>
+          </>
+        ))}
+        <HeadingAnchor level={2} id="focus-ring">Focus ring</HeadingAnchor>
+        <ul>
+          {Object.entries(r.scales.focusRing).map(([k, v]) => (
+            <li><code>--psi-focus-ring-{kebab(k)}</code>: {v}px</li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    page.slug === "motion" && (
+      <>
+        <p>{g.motion.reducedMotion}</p>
+        <HeadingAnchor level={2} id="durations">Durations</HeadingAnchor>
+        <p>{r.scales.motion.durations.map((d) => <code class="token-chip">--psi-duration-{d}</code>)}</p>
+        <HeadingAnchor level={2} id="easings">Easings</HeadingAnchor>
+        <ul>
+          {Object.entries(r.scales.motion.easings).map(([k, v]) => (
+            <li><code>--psi-ease-{k}</code>: <code>{v}</code></li>
+          ))}
+        </ul>
+        <ul>
+          {Object.entries(g.motion.recipes).map(([k, v]) => (
+            <li><code>{k}</code>: {v}</li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    page.slug === "layout" && (
+      <>
+        <p>{g.layout.note}</p>
+        {layoutSections.map(([id, label, values]) => (
+          <>
+            <HeadingAnchor level={2} id={id}>{label}</HeadingAnchor>
+            {id === "container" && <p>{g.layout.container}</p>}
+            <ul>
+              {Object.entries(values).map(([k, v]) => (
+                <li><code>{k}</code>: {v}</li>
+              ))}
+            </ul>
+          </>
+        ))}
+      </>
+    )
+  }
+</DocsLayout>

@@ -3,6 +3,8 @@ import { test, expect } from "@playwright/test";
 
 import { BASE, runAxe } from "./helpers";
 
+const TOKEN_SLUGS = ["color", "typography", "display", "spacing", "motion", "layout"];
+
 
 test.describe("docs without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
@@ -52,6 +54,12 @@ function componentSlugs(): string[] {
 test.describe("component pages without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
+  test("the Color tokens page has every semantic colour in the HTML", async ({ page }) => {
+    await page.goto(`${BASE}/docs/tokens/color/`);
+    await expect(page.locator("h1")).toHaveText("Color tokens");
+    await expect(page.locator(".docs-content")).toContainText("--psi-bg-primary");
+  });
+
   test("Button's page has its heading, an example's code and the props in the HTML", async ({ page }) => {
     await page.goto(`${BASE}/docs/components/button/`);
     await expect(page.locator("h1")).toHaveText("Button");
@@ -72,9 +80,25 @@ test("every component page exists and has no axe violations, light and dark", as
   }
 });
 
+test("every token page exists and has no axe violations, light and dark", async ({ page }) => {
+  test.setTimeout(300_000);
+  for (const slug of TOKEN_SLUGS) {
+    for (const theme of ["light", "dark"] as const) {
+      await page.addInitScript((t) => localStorage.setItem("psi-theme", t), theme);
+      const res = await page.goto(`${BASE}/docs/tokens/${slug}/`, { waitUntil: "networkidle" });
+      expect(res?.status(), slug).toBe(200);
+      expect(await runAxe(page), `${slug} (${theme})`).toEqual([]);
+    }
+  }
+});
+
 test("no internal link on a docs page points at a missing page", async ({ page, request }) => {
   test.setTimeout(300_000);
-  const pages = ["/docs/", ...componentSlugs().map((s) => `/docs/components/${s}/`)];
+  const pages = [
+    "/docs/",
+    ...componentSlugs().map((s) => `/docs/components/${s}/`),
+    ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}/`),
+  ];
   const seen = new Set<string>();
   const broken: string[] = [];
   for (const path of pages) {
@@ -86,8 +110,8 @@ test("no internal link on a docs page points at a missing page", async ({ page, 
         .map((u) => u.pathname),
     );
     for (const href of hrefs) {
-      // Tasks 8 and 9 build the token and get-started pages; they remove this exclusion.
-      if (href.startsWith("/docs/tokens/") || href.startsWith("/docs/get-started/")) continue;
+      // Task 9 builds the get-started pages; it removes this exclusion.
+      if (href.startsWith("/docs/get-started/")) continue;
       if (seen.has(href)) continue;
       seen.add(href);
       const r = await request.get(`${BASE}${href}`);

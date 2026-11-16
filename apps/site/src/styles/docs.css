@@ -3,6 +3,8 @@
   --site-docs-toc-width: 224px;
   --site-docs-anchor-offset: 24px;
   --site-code-copy-inset: 8px;
+  --site-swatch-pad: 4px;
+  --site-chip-gap: 8px;
 }
 
 .docs-page {
@@ -161,4 +163,28 @@ h3.docs-heading {
   block-size: 320px;
   border: 1px solid var(--psi-border-faint);
   border-radius: var(--psi-radius-8);
+}
+
+.token-swatch {
+  display: inline-flex;
+  padding: var(--site-swatch-pad);
+  border-radius: var(--psi-radius-6);
+  background: var(--psi-bg-primary);
+  border: 1px solid var(--psi-border-faint);
+}
+
+.token-swatch-chip {
+  width: var(--psi-size-24);
+  height: var(--psi-size-24);
+  border-radius: var(--psi-radius-4);
+}
+
+.token-value {
+  display: block;
+  font: var(--psi-text-mono-13-20-regular);
+}
+
+.token-chip {
+  display: inline-block;
+  margin: 0 var(--site-chip-gap) var(--site-chip-gap) 0;
 }

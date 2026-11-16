@@ -1,0 +1,12 @@
+---
+interface Props {
+  cssVar: string;
+  theme: "light" | "dark" | "acme" | "ember";
+}
+const { cssVar, theme } = Astro.props;
+---
+
+<!-- Decorative: the hex beside it carries the value. -->
+<span class="token-swatch" data-psi-theme={theme} aria-hidden="true">
+  <span class="token-swatch-chip" style={`background: var(${cssVar})`}></span>
+</span>

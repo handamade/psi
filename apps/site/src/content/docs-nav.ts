@@ -1,4 +1,5 @@
 import { componentPages } from "./component-pages";
+import { tokenPages } from "./token-pages";
 
 export interface NavLink {
   label: string;
@@ -15,5 +16,8 @@ export const docsNav: NavSection[] = [
     label: "Components",
     links: componentPages.map((p) => ({ label: p.title, href: `/docs/components/${p.slug}/` })),
   },
-  { label: "Tokens", links: [] },
+  {
+    label: "Tokens",
+    links: tokenPages.map((p) => ({ label: p.title, href: `/docs/tokens/${p.slug}/` })),
+  },
 ];
