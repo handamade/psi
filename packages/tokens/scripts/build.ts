@@ -121,7 +121,7 @@ function build(): void {
     console.log(`  wrote dist/${themeName}.css`);
 
     // Emit resolved JSON
-    const json = emitResolvedJSON(themeName, resolved);
+    const json = emitResolvedJSON(themeName, resolved, config.scheme);
     writeFileSync(join(resolvedDir, `${themeName}.json`), json);
     console.log(`  wrote dist/resolved/${themeName}.json`);
 
