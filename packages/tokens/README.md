@@ -27,7 +27,7 @@ Then set the theme on your root element:
 </html>
 ```
 
-All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, `--psi-space-12`, etc.
+All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, `--psi-space-12`, etc. Each theme also declares `color-scheme` (`light` or `dark`, from its base), so date pickers, select lists and scrollbars match it; a `color-scheme` rule of your own overrides it (D116).
 
 **utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*`, `.psi-fg-*` (D94) utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
 
@@ -65,14 +65,14 @@ const { css, warnings } = buildThemeCss("acme-portal", {
 });
 ```
 
-The definition has the same shape as a `customers/<name>.ts` theme. It passes the same gates as Psi's shipped themes, which run the same code (`src/theme/gate.ts`): a WCAG AA contrast failure or a D46 scope violation throws `ThemeGateError`, naming every failure. The CSS is scoped to `[data-psi-theme="<name>"]`; load it after `base.css` and set the attribute on any element.
+The definition has the same shape as a `customers/<name>.ts` theme. It passes the same gates as Psi's shipped themes, which run the same code (`src/theme/gate.ts`): a WCAG AA contrast failure or a D46 scope violation throws `ThemeGateError`, naming every failure. The CSS is scoped to `[data-psi-theme="<name>"]`; load it after `base.css` and set the attribute on any element. It declares `color-scheme` from `base`, `light` when none is named (D116).
 
 From a build script: `psi-theme <definition.mjs|.ts> --name <name> [--out <file.css>]`, where the definition module default-exports the theme. Exit codes: 0 built, 1 refused by a gate, 2 usage error.
 
 ## Machine-readable artifacts
 
 For AI and tooling, see [llms.txt](./llms.txt):
-- `dist/resolved/{light,dark,acme}.json` — Every token with OKLCH, hex, and formula
+- `dist/resolved/{light,dark,acme,ember}.json` — Every token with OKLCH, hex, and formula, and the theme's `colorScheme` (D116)
 - `dist/guidance.json` — Variant intent, usage rules, state derivation
 - `dist/dtcg/{theme}.json` — W3C DTCG format export
 - `dist/components/{name}.vars.css` — Component-specific token declarations

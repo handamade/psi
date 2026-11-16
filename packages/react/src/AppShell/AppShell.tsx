@@ -28,7 +28,8 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
   /** A theme name for the sidebar alone, such as `"dark"`: sets
    * `data-psi-theme` on the sidebar element, so every token inside re-resolves
    * under that theme while the rest of the page keeps its own (D88). The
-   * sidebar paints `--psi-bg-primary` itself; a theme paints no background. */
+   * sidebar paints `--psi-bg-primary` itself; a theme paints no background.
+   * Its `color-scheme` follows the theme, so its scrollbars do too (D116). */
   sidebarTheme?: string;
   /** `id` of the sidebar element, which a toggle names with `aria-controls`
    * (D88). @default "sidebar" */

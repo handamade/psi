@@ -3,7 +3,7 @@
 OKLCH formula-based design tokens. Code is the source of truth; all artifacts generated.
 
 ## Machine-readable artifacts
-- dist/resolved/{light,dark,acme,ember}.json: every token with OKLCH, hex, and derivation formula
+- dist/resolved/{light,dark,acme,ember}.json: every token with OKLCH, hex, and derivation formula, plus the theme's `colorScheme` ("light" | "dark", D116)
 - dist/guidance.json: variant intent, usage rules, state derivation, typography defaults, motion/layout/fonts notes, recipes, and the utility-class roster at `utilities.classes`
 - dist/dtcg/{theme}.json: W3C DTCG format export
 - dist/components/{name}.vars.css: component-token declarations (--psi-{component}-*)
@@ -14,6 +14,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - Override --psi-{component}-* tokens for one-off component theming; never fork semantic tokens.
 - Scales are pixel-true: --psi-space-8 is 8px (0.5rem). Typography: --psi-text-{size}-{lh}-{weight}.
 - Themes: import base.css + {theme}.css + components.css + utilities.css; set data-psi-theme="{name}" ({light,dark,acme,ember}).
+- Each theme's block also declares `color-scheme` from its base (light, acme: `light`; dark, ember: `dark`), so browser-drawn parts — date pickers, select lists, scrollbars — follow the theme, including in a sub-tree. It is the one theme declaration that is not a custom property; it fills no element (a theme still paints no background), and an unlayered consumer rule overrides it (D116).
 - Foreground utilities (D94): `.psi-fg-<role>` sets `color: var(--psi-fg-<role>)` for every fg token (`psi-fg-primary`, `psi-fg-secondary`, `psi-fg-tertiary`, `psi-fg-on-accent`, `psi-fg-danger`, …). Like every utility it sits in `@layer psi.utilities` and beats a component's own colour.
 - Scoped tokens bind only their declared property groups (D46): fg* → text properties, bg*/fill*/scrim* → surfaces, border* → borders, --psi-space-* → gaps/padding/margin. Cross-family bindings that are design decisions carry both scopes (fgDanger: text+border for error borders; fillAccent: surface+border for selected controls). The token build enforces component bindings; the repo's stylelint rule (psi/token-scopes) enforces first-party consumer CSS (component modules + apps/). External consumers aren't gated automatically — dist/scope-map.json carries the machine-readable scopes to lint against.
 
@@ -51,7 +52,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - .psi-sr-only hides content visually while keeping it in the accessibility tree — position/size/clip only, never display:none or visibility:hidden, so screen readers still announce it and it stays in the tab order if focusable. Use it for status-word prefixes, icon-only-control labels not carried by aria-label, or a native input replaced by a custom visual control.
 
 ## Dark-first brands
-- A brand theme can declare `base: "dark"` (see ember) so its formulas derive from the dark palette instead of light — use this for brands whose primary surface is a dark canvas rather than treating dark as an inverted afterthought.
+- A brand theme can declare `base: "dark"` (see ember) so its formulas derive from the dark palette instead of light — use this for brands whose primary surface is a dark canvas rather than treating dark as an inverted afterthought. `base` also sets the theme's `color-scheme` (D116).
 
 ## Brand fonts (D29)
 - Font roles (sans/serif/mono/display) are brand-level. The DS ships no font files — consumers load each brand's webfonts themselves (e.g. ember: Archivo for display/sans, IBM Plex Serif/Mono).
@@ -71,7 +72,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 ## Building a theme outside this repo (`./theme`, D81)
 - `import { buildThemeCss, ThemeGateError } from "@handamade/psi-tokens/theme"` — `buildThemeCss(name, definition)` returns `{ css, warnings }` for a definition shaped like `customers/<name>.ts` (`palette`, `slots`, optional `base: "light" | "dark"`, `overrides`, `fonts`, `componentOverrides`). It runs the same gates as Psi's own build, through the same code (`src/theme/gate.ts`), and throws `ThemeGateError` (`contrastFailures`, `scopeViolations`) instead of returning a failing theme. The names `light` and `dark` are refused.
 - Use it to keep a client brand in the client's repository: nothing client-named has to ship in this public package.
-- The CSS is scoped to `[data-psi-theme="<name>"]`, never `:root`, so a `base: "dark"` theme can style a sub-tree such as a dark sidebar.
+- The CSS is scoped to `[data-psi-theme="<name>"]`, never `:root`, so a `base: "dark"` theme can style a sub-tree such as a dark sidebar. It declares `color-scheme` from `base`, `light` when none is named (D116).
 - `psi-theme <definition-module> --name <name> [--out <file.css>]` is the same build as a bin, for a consumer's build script. The module default-exports the definition. Exit codes: 0 built · 1 refused by a gate · 2 usage error.
 - The token builders (`token`, `set`, `delta`, `cap`, `slot`, `ref`) and the definition types are re-exported from `./theme` for writing `overrides`.
 
