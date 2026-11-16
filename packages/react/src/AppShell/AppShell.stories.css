@@ -23,10 +23,6 @@
   color: var(--psi-fg-primary);
 }
 
-.psi-story-app-root main h1 {
-  font: var(--psi-text-24-32-medium);
-}
-
 .psi-story-app-root main a {
   color: var(--psi-fg-accent);
 }

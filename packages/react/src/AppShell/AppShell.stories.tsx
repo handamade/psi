@@ -9,6 +9,7 @@ import { Banner } from "../Banner/Banner.js";
 import { NavTree } from "../NavTree/NavTree.js";
 import { NavGroup } from "../NavTree/NavGroup.js";
 import { NavItem } from "../NavTree/NavItem.js";
+import { PageHeading } from "../PageHeading/PageHeading.js";
 import "./AppShell.stories.css";
 
 /** D88 — the frame of an application: a header row over a sidebar and a
@@ -112,7 +113,7 @@ function Demo({
         </NavTree>
       }
     >
-      <h1>Sales</h1>
+      <PageHeading>Sales</PageHeading>
       {Array.from({ length: 40 }, (_, i) => (
         <p key={i}>
           Row {i + 1} of a long page, with <a href={`#row-${i + 1}`}>a link to row {i + 1}</a>. Only main scrolls.

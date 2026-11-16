@@ -115,6 +115,13 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(summaryTiles.blocked).toBe(false);
     expect(summaryTiles.gaps).toEqual([]);
     expect(summaryTiles.preset).toContain("<Card");
+
+    // D118: the frame's page opens with its one PageHeading, before the page's content.
+    const appShell = output.patterns.find((p: { id: string }) => p.id === "app-shell");
+    expect(appShell.preset.match(/<PageHeading\b/g)).toHaveLength(1);
+    expect(appShell.preset.indexOf("<PageHeading")).toBeLessThan(
+      appShell.preset.indexOf("[the page; it scrolls on its own]"),
+    );
   });
 
   it("double-emit is byte-identical", () => {
