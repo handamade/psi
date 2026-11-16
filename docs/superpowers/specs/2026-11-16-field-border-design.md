@@ -90,8 +90,11 @@ composited onto the surface:
   **What this changes.** Every Input, Select and Textarea, in every theme,
   draws a visibly darker edge at rest and a darker one again on hover. A
   consumer theme built with `buildThemeCss` is now also held to
-  `borderControlHover` at 3:1. Any theme that clears `borderControl` clears
-  it, because it is a higher alpha of the same ink. A consumer that set
+  `borderControlHover` at 3:1. A theme that changes only its palette clears
+  it whenever it clears `borderControl`, because it is a higher alpha of the
+  same ink. A theme that overrides `borderControl` should override
+  `borderControlHover` with it: the gate checks each at 3:1, not that hover
+  is the darker of the two. A consumer that set
   `--psi-input-border` (or the select or textarea one) by override keeps
   its override.
 
