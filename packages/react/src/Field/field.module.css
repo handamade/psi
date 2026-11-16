@@ -36,3 +36,27 @@
 .invalid .message {
   color: var(--psi-field-error-fg);
 }
+
+/* ── Label beside the control (D115) ─────────────────────────────
+   Column 1 holds the label; the control and the message line sit in column 2,
+   so a message hangs under its control. Rows align on the first baseline, so
+   the label's text sits on the line of the control's text at every size. In
+   group mode the label is a <div> and the group a <div role="group">, because
+   a fieldset cannot share a FieldStack's columns (D115). Standalone, the field
+   is as wide as its label and its control. */
+
+.field[data-label-position="start"] {
+  grid-template-columns: auto auto;
+  column-gap: var(--psi-field-column-gap);
+  align-items: baseline;
+  justify-content: start;
+}
+
+.field[data-label-position="start"] > * {
+  grid-column: 2;
+}
+
+.field[data-label-position="start"] > .label {
+  grid-column: 1;
+  text-align: var(--psi-field-label-align);
+}

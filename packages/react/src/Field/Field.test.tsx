@@ -211,3 +211,58 @@ describe("label line box (D92)", () => {
     expect(label).toMatch(/min-block-size:\s*var\(--psi-field-label-height\);/);
   });
 });
+
+describe("labelPosition (D115)", () => {
+  const css = () => readFileSync(join(import.meta.dirname, "field.module.css"), "utf8");
+
+  it("defaults to top: no position attribute, today's markup", () => {
+    const { container } = render(<Field label="Email"><Input /></Field>);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).not.toHaveAttribute("data-label-position");
+    expect(root).not.toHaveAttribute("data-in-stack");
+    expect(root.firstElementChild?.tagName).toBe("LABEL");
+  });
+
+  it("start keeps the label naming the control, and the order label, control, message", () => {
+    const { container } = render(
+      <Field label="Rows per page" labelPosition="start" description="Applies to every list.">
+        <Select size={32}><option>50</option></Select>
+      </Field>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveAttribute("data-label-position", "start");
+    expect(screen.getByLabelText("Rows per page").tagName).toBe("SELECT");
+    expect([...root.children].map((el) => el.tagName)).toEqual(["LABEL", "SELECT", "P"]);
+    expect(screen.getByLabelText("Rows per page")).toHaveAttribute(
+      "aria-describedby",
+      screen.getByText("Applies to every list.").id,
+    );
+  });
+
+  it("start in group mode keeps the group named and described", () => {
+    render(
+      <Field group label="Notify me" labelPosition="start" error="Pick one.">
+        <Checkbox>Email</Checkbox>
+      </Field>,
+    );
+    const group = screen.getByRole("group", { name: "Notify me" });
+    expect(group.tagName).toBe("DIV");
+    expect(group).toHaveAttribute("aria-describedby", screen.getByText("Pick one.").id);
+    expect(group).toHaveAttribute("aria-labelledby", screen.getByText("Notify me").id);
+    expect(group).toHaveAttribute("data-label-position", "start");
+  });
+
+  it("the start layout puts the label in column 1 and everything else in column 2", () => {
+    const start = /\.field\[data-label-position="start"\]\s*\{([^}]*)\}/.exec(css())![1];
+    expect(start).toMatch(/grid-template-columns:\s*auto auto;/);
+    expect(start).toMatch(/column-gap:\s*var\(--psi-field-column-gap\);/);
+    expect(css()).toMatch(/\.field\[data-label-position="start"\]\s*>\s*\*\s*\{\s*grid-column:\s*2;/);
+    const label = /\.field\[data-label-position="start"\]\s*>\s*\.label\s*\{([^}]*)\}/.exec(css())![1];
+    expect(label).toMatch(/grid-column:\s*1;/);
+    expect(label).toMatch(/text-align:\s*var\(--psi-field-label-align\);/);
+  });
+
+  it("the top layout's rules are unchanged", () => {
+    expect(/\.field\s*\{([^}]*)\}/.exec(css())![1]).not.toMatch(/grid-template-columns/);
+  });
+});
