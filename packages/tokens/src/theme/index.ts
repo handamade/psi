@@ -1,13 +1,13 @@
 // D81 — @handamade/psi-tokens/theme: build a gated theme outside the Psi repo.
 // A consumer keeps its brand's definition in its own repository; nothing
 // client-named has to ship in this package.
-import { assembleCustomerTheme, type CustomerTheme } from "../themes/customers/index.js";
+import { assembleCustomerTheme, customerColorScheme, type CustomerTheme } from "../themes/customers/index.js";
 import { emitThemeCSS } from "../emit/css.js";
 import { gateTheme } from "./gate.js";
 
 export { ThemeGateError } from "./gate.js";
 export type { CustomerTheme, BrandFonts } from "../themes/customers/index.js";
-export type { Palette, PaletteEntry, SlotMap, ThemeDef, TokenDef } from "../dsl/types.js";
+export type { ColorScheme, Palette, PaletteEntry, SlotMap, ThemeDef, TokenDef } from "../dsl/types.js";
 export { token, set, delta, cap, slot, ref } from "../dsl/builders.js";
 
 export interface ThemeBuild {
@@ -27,7 +27,7 @@ export function buildThemeCss(name: string, theme: CustomerTheme): ThemeBuild {
   }
   const def = assembleCustomerTheme(theme);
   const { warnings } = gateTheme(name, def, theme.palette, theme.slots, theme.componentOverrides);
-  const css = emitThemeCSS(name, def, theme.palette, theme.slots, {
+  const css = emitThemeCSS(name, def, theme.palette, theme.slots, customerColorScheme(theme), {
     fonts: theme.fonts,
     componentOverrides: theme.componentOverrides,
   });

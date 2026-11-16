@@ -83,3 +83,7 @@ export interface ResolvedToken {
   readonly formula: string;
   readonly scopes?: readonly string[];
 }
+
+/** D116 — the scheme a theme declares, so the browser draws its own parts
+ * (form controls, scrollbars, a root canvas nobody paints) to match. */
+export type ColorScheme = "light" | "dark";

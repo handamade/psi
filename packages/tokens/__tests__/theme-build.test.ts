@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildThemeCss, ThemeGateError, type CustomerTheme } from "../src/theme/index.js";
 import { run } from "../src/cli/psi-theme.js";
-import { customerThemes, assembleCustomerTheme } from "../src/themes/customers/index.js";
+import { customerThemes, assembleCustomerTheme, customerColorScheme } from "../src/themes/customers/index.js";
 import { emitThemeCSS } from "../src/emit/css.js";
 
 const forest: CustomerTheme = {
@@ -24,7 +24,7 @@ const forest: CustomerTheme = {
 describe("buildThemeCss (D81)", () => {
   it("emits exactly what Psi's own build emits for a shipped customer theme", () => {
     const acme = customerThemes.acme;
-    const expected = emitThemeCSS("acme", assembleCustomerTheme(acme), acme.palette, acme.slots, {
+    const expected = emitThemeCSS("acme", assembleCustomerTheme(acme), acme.palette, acme.slots, customerColorScheme(acme), {
       fonts: acme.fonts,
       componentOverrides: acme.componentOverrides,
     });
@@ -59,7 +59,17 @@ describe("buildThemeCss (D81)", () => {
       base: "dark",
       palette: { ...forest.palette, pine: { l: 0.97, c: 0.01, h: 150 }, paper: { l: 0.18, c: 0.03, h: 150 }, leaf: { l: 0.5, c: 0.12, h: 150 } },
     };
-    expect(buildThemeCss("forest-sidebar", sidebar).css).toContain('[data-psi-theme="forest-sidebar"] {');
+    const { css } = buildThemeCss("forest-sidebar", sidebar);
+    expect(css).toContain('[data-psi-theme="forest-sidebar"] {');
+    // D116 — a dark base declares a dark scheme, so its pickers and scrollbars draw dark.
+    expect(css).toContain("\n    color-scheme: dark;\n");
+  });
+
+  it("declares a light scheme for a theme that names no base (D116)", () => {
+    expect(forest.base).toBeUndefined();
+    const { css } = buildThemeCss("forest", forest);
+    expect(css).toContain("\n    color-scheme: light;\n");
+    expect(css).not.toContain("color-scheme: dark");
   });
 });
 

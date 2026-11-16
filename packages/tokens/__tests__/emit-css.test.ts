@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { emitBaseCSS, emitThemeCSS } from "../scripts/emit-css.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { lightTheme } from "../src/themes/light.js";
+import { darkTheme } from "../src/themes/dark.js";
 import { acmePalette, acmeSlots } from "../src/themes/customers/acme.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS, emitUtilitiesRoster } from "../scripts/emit-utilities.js";
 import { token, slot } from "../src/dsl/builders.js";
@@ -26,7 +27,7 @@ describe("emitBaseCSS", () => {
 
 describe("emitThemeCSS", () => {
   it("emits semantic tokens inside @layer psi.theme", () => {
-    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots);
+    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots, "light");
     expect(css).toContain("@layer psi.theme");
     expect(css).toContain("--psi-bg-primary");
     expect(css).toContain("--psi-fg-accent");
@@ -34,23 +35,23 @@ describe("emitThemeCSS", () => {
   });
 
   it("light theme targets :root and [data-psi-theme='light']", () => {
-    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots);
+    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots, "light");
     expect(css).toContain(":root");
     expect(css).toContain('[data-psi-theme="light"]');
   });
 
   it("uses live oklch(from var(...) ...) form for slot-sourced tokens", () => {
-    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots);
+    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots, "light");
     expect(css).toMatch(/oklch\(from var\(--psi-palette-/);
   });
 
   it("uses live var() form for ref-sourced tokens", () => {
-    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots);
+    const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots, "light");
     expect(css).toMatch(/oklch\(from var\(--psi-fg-primary\)/);
   });
 
   it("scopes a customer theme's own palette vars inside its theme selector block", () => {
-    const css = emitThemeCSS("acme", lightTheme, acmePalette, acmeSlots);
+    const css = emitThemeCSS("acme", lightTheme, acmePalette, acmeSlots, "light");
 
     // The theme selector for a non-light/dark theme is scoped, not :root.
     const selectorIndex = css.indexOf('[data-psi-theme="acme"]');
@@ -70,6 +71,7 @@ describe("emitThemeCSS", () => {
     const css = emitThemeCSS("ember", { bgPrimary: token({ from: slot.canvas }) },
       { emberCanvas: { l: 0.147, c: 0.004, h: 49 } },
       { ink: "emberCanvas", canvas: "emberCanvas", accent: "emberCanvas", success: "emberCanvas", warning: "emberCanvas", danger: "emberCanvas" },
+      "dark",
       { fonts: { display: '"Archivo", system-ui, sans-serif', mono: '"IBM Plex Mono", "Courier New", monospace' } });
     expect(css).toContain(`--psi-font-display: "Archivo", system-ui, sans-serif;`);
     expect(css).toContain(`--psi-font-mono: "IBM Plex Mono", "Courier New", monospace;`);
@@ -80,10 +82,43 @@ describe("emitThemeCSS", () => {
     const css = emitThemeCSS("ember", { bgPrimary: token({ from: slot.canvas }) },
       { emberCanvas: { l: 0.147, c: 0.004, h: 49 } },
       { ink: "emberCanvas", canvas: "emberCanvas", accent: "emberCanvas", success: "emberCanvas", warning: "emberCanvas", danger: "emberCanvas" },
+      "dark",
       { componentOverrides: { "card-radius": "0", "button-font": "var(--psi-text-mono-15-24-regular)" } });
     expect(css).toContain(`@layer psi.components {\n  [data-psi-theme="ember"] {`);
     expect(css).toContain("--psi-card-radius: 0;");
     expect(css).toContain("--psi-button-font: var(--psi-text-mono-15-24-regular);");
+  });
+
+  describe("color-scheme (D116)", () => {
+    /** The body of the theme's token block: from its selector to its closing brace. */
+    const block = (css: string, selector: string) => {
+      const open = css.indexOf(`  ${selector} {`);
+      expect(open).toBeGreaterThan(-1);
+      return css.slice(open, css.indexOf("\n  }", open));
+    };
+
+    it("declares light inside the light theme's own block", () => {
+      const css = emitThemeCSS("light", lightTheme, defaultPalette, defaultSlots, "light");
+      expect(block(css, ':root, [data-psi-theme="light"]')).toContain("\n    color-scheme: light;\n");
+    });
+
+    it("declares dark inside a dark theme's own block, before its custom properties", () => {
+      const css = emitThemeCSS("dark", darkTheme, defaultPalette, defaultSlots, "dark");
+      const body = block(css, '[data-psi-theme="dark"]');
+      expect(body).toContain("\n    color-scheme: dark;\n");
+      expect(body.indexOf("color-scheme")).toBeLessThan(body.indexOf("--psi-"));
+    });
+
+    it("declares it once, in the theme layer, never in the component-overrides block", () => {
+      const css = emitThemeCSS("ember", { bgPrimary: token({ from: slot.canvas }) },
+        { emberCanvas: { l: 0.147, c: 0.004, h: 49 } },
+        { ink: "emberCanvas", canvas: "emberCanvas", accent: "emberCanvas", success: "emberCanvas", warning: "emberCanvas", danger: "emberCanvas" },
+        "dark",
+        { componentOverrides: { "card-radius": "0" } });
+      expect(css.match(/color-scheme:/g)).toHaveLength(1);
+      expect(css.indexOf("color-scheme")).toBeGreaterThan(css.indexOf("@layer psi.theme"));
+      expect(css.indexOf("color-scheme")).toBeLessThan(css.indexOf("@layer psi.components"));
+    });
   });
 });
 
