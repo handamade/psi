@@ -1,0 +1,25 @@
+/* D115: a form's column of Fields. One column by default; with
+   labelPosition="start", two — the label column, as wide as the longest
+   label up to --psi-field-label-max-width, and the control column. Every
+   child spans both; a start Field lays its parts on them with subgrid
+   (field.module.css). The stack is a named size container: the rule that
+   stacks its Fields below 480px is in field.module.css, because a container
+   query styles only the container's descendants. */
+
+.stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stack > * { grid-column: 1 / -1; }
+
+.gap8 { row-gap: var(--psi-space-8); }
+.gap12 { row-gap: var(--psi-space-12); }
+.gap16 { row-gap: var(--psi-space-16); }
+.gap24 { row-gap: var(--psi-space-24); }
+
+.start {
+  grid-template-columns: fit-content(var(--psi-field-label-max-width)) minmax(0, 1fr);
+  column-gap: var(--psi-field-column-gap);
+  container: psi-field-stack / inline-size;
+}

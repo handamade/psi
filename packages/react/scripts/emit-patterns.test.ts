@@ -48,6 +48,11 @@ describe("emitPatterns (real-dist posture)", () => {
     expect(tablePagination.blocked).toBe(false);
     expect(tablePagination.gaps).toEqual([]);
     expect(tablePagination.preset).toContain("<Pagination");
+    // D115: the page-size label sits beside its select, so the row is one line high.
+    expect(tablePagination.preset).toMatch(/<Field\s+label="Rows per page"\s+labelPosition="start"\s*>/);
+    const cursorPagination = output.patterns.find((p: { id: string }) => p.id === "cursor-pagination");
+    expect(cursorPagination.preset).toMatch(/<Field\s+label="Rows per page"\s+labelPosition="start"\s*>/);
+    expect(cursorPagination.preset).not.toMatch(/align="end"/);
 
     // Unblocked by the Toast family (D64-D65); Drawer and Tabs are the arc's
     // remaining two gaps.

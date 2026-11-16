@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
-import { breakpoints, container, zIndex } from "../src/scales/layout.js";
+import { breakpoints, container, containerQueries, zIndex } from "../src/scales/layout.js";
 import { comboName, WEIGHT_VALUES, typographyCombos } from "../src/scales/typography.js";
 import { durationScale, easings } from "../src/scales/motion.js";
 import { focusRing } from "../src/scales/focus-ring.js";
@@ -65,6 +65,7 @@ describe("scales", () => {
   describe("layout", () => {
     it("layout constants match spec (WS4, D31)", () => {
       expect(breakpoints).toEqual({ sm: 560, md: 960 });
+      expect(containerQueries).toEqual({ fieldStackColumns: 480 });
       expect(container).toEqual({ max: 1312, gutter: 40, gutterNarrow: 24 });
       expect(zIndex).toEqual({ sticky: 1, nav: 100, overlay: 1000, tooltip: 1100 });
     });

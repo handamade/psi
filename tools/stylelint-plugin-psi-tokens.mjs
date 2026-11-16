@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 const ruleName = "psi/component-tokens-only";
 const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|z|focus-ring)-/;
 // componentName derived from filename: button.module.css → button; icon-button → button (declared alias)
-const ALIASES = { "icon-button": "button" };
+const ALIASES = { "icon-button": "button", "field-stack": "field" };
 
 const rule = (enabled) => (root, result) => {
   if (!enabled) return;

@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 import {
-  Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
+  Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator, MenuText, Textarea, RadioGroup, Radio,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
   Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, NavTree, NavGroup, NavItem, AppShell,
@@ -39,6 +39,8 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Input", <label>Name<Input size={32} /></label>],
   ["Input error", <label>Email<Input size={32} error aria-invalid="true" /></label>],
   ["Checkbox group in error", <Field group label="Notify me" error="Pick at least one."><Checkbox>Email</Checkbox><Checkbox>SMS</Checkbox></Field>],
+  ["Field with its label beside its control", <Field label="Rows per page" labelPosition="start"><Select size={32}><option>50</option></Select></Field>],
+  ["FieldStack with side labels", <FieldStack labelPosition="start"><Field label="Name" required><Input /></Field><Field group label="Status" error="Pick one."><RadioGroup value="a" onValueChange={() => {}}><Radio value="a">Active</Radio><Radio value="b">Blocked</Radio></RadioGroup></Field><Field><Checkbox>Notify the owner</Checkbox></Field></FieldStack>],
   ["Select", <label>Plan<Select size={32}><option>Free</option></Select></label>],
   ["Field with Input", <Field label="Email" description="We never share it."><Input size={40} /></Field>],
   ["Field error", <Field label="Email" error="Invalid email." required><Input size={40} /></Field>],

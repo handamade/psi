@@ -1,0 +1,75 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>D115 engine spike</title>
+<!-- D115 spike: the CSS the plan proposes for Field and FieldStack, written as
+     plain classes so it runs in any engine without a build. spike.mjs opens this
+     file in Chromium, WebKit and Firefox and measures it. Not shipped. -->
+<style>
+  body { font: 14px/20px system-ui; margin: 16px; }
+
+  /* FieldStack labelPosition="start" */
+  .stack {
+    display: grid;
+    grid-template-columns: fit-content(240px) minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 16px;
+    container: psi-field-stack / inline-size;
+    width: 600px;
+  }
+  .stack > * { grid-column: 1 / -1; }
+
+  /* Field */
+  .field { display: grid; gap: 6px; border: 0; margin: 0; padding: 0; min-width: 0; }
+  .label { padding: 0; min-block-size: 20px; }
+
+  /* Field labelPosition="start", inside a FieldStack */
+  .start {
+    grid-template-columns: subgrid;
+    column-gap: 12px;
+    align-items: baseline;
+  }
+  .start > * { grid-column: 2; }
+  .start > .label { grid-column: 1; float: inline-start; }
+
+  @container psi-field-stack (width < 480px) {
+    .start { grid-template-columns: minmax(0, 1fr); }
+    .start > *, .start > .label { grid-column: 1; }
+  }
+
+  /* Controls at Psi's sizes and value fonts */
+  input:not([type="radio"]), select, textarea { box-sizing: border-box; font: 14px/20px system-ui; height: 32px; }
+  textarea { height: auto; }
+  .s24 { height: 24px !important; font: 12px/16px system-ui !important; }
+  .s40 { height: 40px !important; font: 16px/24px system-ui !important; }
+  .s48 { height: 48px !important; font: 18px/28px system-ui !important; }
+  .combo { display: flex; align-items: center; height: 40px; border: 1px solid; padding-inline: 12px; font: 16px/24px system-ui; }
+  .radios { display: grid; gap: 8px; }
+
+  .narrow { width: 400px; margin-top: 32px; }
+</style>
+
+<div class="stack" id="wide">
+  <div class="field start" data-k="name"><label class="label" for="a">Name</label><input id="a" value="Ada" /></div>
+  <div class="field start" data-k="group"><label class="label" for="b">Card group</label><select id="b"><option>Retail</option></select></div>
+  <div class="field start" data-k="status" role="group" aria-labelledby="sl">
+    <div class="label" id="sl">Status</div>
+    <div class="radios">
+      <label><input type="radio" name="r" /> Active</label>
+      <label><input type="radio" name="r" /> Blocked</label>
+    </div>
+  </div>
+  <div class="field start" data-k="long"><label class="label" for="c">A label long enough to pass the two hundred and forty pixel cap</label><input id="c" /></div>
+  <div class="field start" data-k="combo"><label class="label" id="dl">Airline</label><div class="combo" role="combobox" aria-labelledby="dl" tabindex="0">Choose</div></div>
+  <div class="field start" data-k="s24"><label class="label" for="e">Size 24</label><input id="e" class="s24" value="x" /></div>
+  <div class="field start" data-k="s40"><label class="label" for="f">Size 40</label><input id="f" class="s40" value="x" /></div>
+  <div class="field start" data-k="s48"><label class="label" for="g">Size 48</label><select id="g" class="s48"><option>x</option></select></div>
+  <div class="field start" data-k="ta"><label class="label" for="h">Notes</label><textarea id="h" rows="3">Line</textarea></div>
+</div>
+
+<div class="stack narrow" id="narrow">
+  <div class="field start" data-k="nname"><label class="label" for="i">Name</label><input id="i" /></div>
+  <div class="field start" data-k="nstatus" role="group" aria-labelledby="nsl">
+    <div class="label" id="nsl">Status</div>
+    <div class="radios"><label><input type="radio" name="n" /> Active</label></div>
+  </div>
+</div>

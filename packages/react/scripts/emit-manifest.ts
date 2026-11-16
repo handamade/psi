@@ -18,6 +18,7 @@ const COMPONENTS = [
   "Input",
   "Select",
   "Field",
+  "FieldStack",
   "Dialog",
   "Checkbox",
   "Switch",
