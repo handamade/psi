@@ -36,7 +36,7 @@ describe("description-list tokens", () => {
     // fgPrimary and fgSecondary on bgPrimary/bgSecondary are in wcagAAPairs
     // already; a key/value list introduces no new foreground. Counts pinned so
     // a later edit that quietly adds an ungated colour shows up in the diff.
-    expect(wcagAAPairs).toHaveLength(31); // 28 + the three D86 tint pairs
+    expect(wcagAAPairs).toHaveLength(32); // 28 + the three D86 tint pairs + the D119 link pair
     expect(componentLabelPairs).toHaveLength(5);
   });
 });

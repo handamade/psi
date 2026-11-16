@@ -6,7 +6,7 @@ import { checkContrast, componentLabelPairs, wcagAAPairs, type ContrastPair } fr
 import { CHROMA_WORDS, RADIUS_RUNGS, type BrandVector } from "../src/generate/types.js";
 
 /**
- * The SAME 38 pairs `scripts/build.ts` gates every committed theme on.
+ * The SAME 39 pairs `scripts/build.ts` gates every committed theme on.
  *
  * This file used to assert against `wcagAAPairs` alone — 28 pairs — which is
  * why the suite could not catch a derived theme failing `fgOnAccent` on
@@ -42,8 +42,8 @@ const PROMPTS = [
 ];
 
 describe("deriveTheme", () => {
-  it("gates 38 pairs: the text matrix and D106's non-text pairs", () => {
-    expect(AA_MATRIX).toHaveLength(38);
+  it("gates 39 pairs: the text matrix and D106's non-text pairs", () => {
+    expect(AA_MATRIX).toHaveLength(39);
   });
 
   it("returns both members from one vector", () => {
@@ -59,7 +59,7 @@ describe("deriveTheme", () => {
     }
   });
 
-  it("clears all 38 pairs for the prompt that used to miss by 0.0021", () => {
+  it("clears all 39 pairs for the prompt that used to miss by 0.0021", () => {
     // "bold calm app" parses to hue 146 / vivid, the worst hue for a white
     // label on a `l: 0.55` accent. Both modes share the accent anchor, so the
     // regression showed up in both at once.
@@ -82,11 +82,11 @@ describe("deriveTheme", () => {
   /**
    * A sample of prompts proves nothing about "any prompt". This walks the
    * whole reachable vector space — every hue × every chroma word × both
-   * modes — and asserts zero failures across all 38 pairs and zero throws.
+   * modes — and asserts zero failures across all 39 pairs and zero throws.
    * `radius` and `fonts` cannot move a colour, so they are not swept.
    */
   it(
-    "clears all 38 pairs across 360 hues x 5 chroma words x both modes",
+    "clears all 39 pairs across 360 hues x 5 chroma words x both modes",
     () => {
       const failures: string[] = [];
       const thrown: string[] = [];

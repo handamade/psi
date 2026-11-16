@@ -7,7 +7,7 @@ import { darkTheme } from "../src/themes/dark.js";
 import { resolve } from "../src/dsl/resolver.js";
 import { defaultPalette, defaultSlots } from "../src/palettes/default.js";
 import { assembleCustomerTheme, customerThemes } from "../src/themes/customers/index.js";
-import { compositeHex } from "../src/contrast-matrix.js";
+import { compositeHex, wcagAAPairs } from "../src/contrast-matrix.js";
 
 const themes = [
   ["light", resolve(lightTheme, defaultPalette, defaultSlots)],
@@ -70,5 +70,11 @@ describe("link tokens (D119)", () => {
       expect(hov).toBeGreaterThanOrEqual(4.5);
       expect(hov).toBeGreaterThanOrEqual(rest);
     });
+  });
+});
+
+describe("link contrast pair (D119)", () => {
+  it("gates the accent on bgSecondary, the Panel/Card/Dialog surface", () => {
+    expect(wcagAAPairs).toContainEqual({ fg: "fgAccent", bg: "bgSecondary", minRatio: 4.5 });
   });
 });
