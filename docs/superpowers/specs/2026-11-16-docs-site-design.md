@@ -1,6 +1,6 @@
 # A docs site built with Psi, and a homepage that is HTML (D121)
 
-Date: 2026-11-16. Status: **Approved design**, not planned, not implemented.
+Date: 2026-11-16. Status: **Implemented** on branch `d121-docs-site`.
 Branch `d121-docs-site`.
 
 Provenance: a review of psi.kurkin.de against three reference sites the owner
