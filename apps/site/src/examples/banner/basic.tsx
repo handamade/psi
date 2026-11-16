@@ -8,7 +8,7 @@ export default function BannerBasic() {
     <Banner
       variant="warning"
       title="Scheduled maintenance"
-      action={<Button size={24}>Details</Button>}
+      action={<Button variant="ghost" size={24}>Details</Button>}
       onDismiss={() => setVisible(false)}
     >
       Billing is read-only on Sunday from 02:00 to 03:00 UTC.

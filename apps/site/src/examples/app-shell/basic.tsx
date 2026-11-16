@@ -6,7 +6,9 @@ export default function AppShellBasic() {
   return (
     <AppShell
       style={{ height: 320 }}
-      header={<NavBar fluid brand={<strong>Acme</strong>} actions={<Button size={32}>Invite</Button>} />}
+      mainId="example-main"
+      sidebarId="example-sidebar"
+      header={<NavBar fluid navLabel="Example" brand={<strong>Acme</strong>} actions={<Button size={32}>Invite</Button>} />}
       sidebar={
         <NavTree aria-label="Workspace">
           <NavItem href="#" current>
