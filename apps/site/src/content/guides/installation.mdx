@@ -24,11 +24,13 @@ Import five stylesheets once, in your app root, in this order:
 
 ```tsx
 import "@handamade/psi-tokens/base.css";
-import "@handamade/psi-tokens/light.css"; // add dark.css to support both modes
+import "@handamade/psi-tokens/light.css"; // add dark.css after it for both modes
 import "@handamade/psi-tokens/components.css";
 import "@handamade/psi-tokens/utilities.css";
 import "@handamade/psi-react/styles";
 ```
+
+If you import more than one theme stylesheet, import `light.css` first. Its rule matches `:root` at the same specificity as `[data-psi-theme="dark"]`, so a theme file imported before it loses the tie and `<html data-psi-theme="dark">` renders light.
 
 The first four come from `@handamade/psi-tokens`. The fifth, `@handamade/psi-react/styles`, comes from the component package and carries the component class rules.
 
@@ -43,6 +45,8 @@ Do not skip the last one. Without `@handamade/psi-react/styles` every component 
 ```html
 <html data-psi-theme="dark">
 ```
+
+A theme never paints a background, so a themed subtree needs its own paint rule (see below). Brand fonts apply only when the attribute is on `<html>`: inside a subtree the text style combos keep the default font stacks.
 
 The built-in themes are `light`, `dark`, `acme` and `ember`. See [Theming](/docs/get-started/theming/) and [Dark mode](/docs/get-started/dark-mode/).
 

@@ -163,3 +163,16 @@ test("code on docs pages is coloured only through variables", async ({ page }) =
     expect(styles.filter((s) => /#[0-9a-f]{3,8}\b|rgb\(|hsl\(|oklch\(/i.test(s)), path).toEqual([]);
   }
 });
+
+test("a guide's code block has a box and a component page's code view has none", async ({ page }) => {
+  await page.goto(`${BASE}/docs/get-started/installation/`);
+  const guide = await page.locator(".docs-content > pre").first().evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { border: s.borderTopWidth, bg: s.backgroundColor };
+  });
+  expect(guide.border).toBe("1px");
+  expect(guide.bg).not.toBe("rgba(0, 0, 0, 0)");
+  await page.goto(`${BASE}/docs/components/button/`);
+  const inner = await page.locator(".code-view pre").first().evaluate((el) => getComputedStyle(el).borderTopWidth);
+  expect(inner).toBe("0px");
+});

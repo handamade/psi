@@ -17,6 +17,8 @@ import "@handamade/psi-tokens/utilities.css";
 import "@handamade/psi-react/styles";
 ```
 
+Import `light.css` before `dark.css`. Both rules have the same specificity, so the later file wins a tie, and `light.css` matches `:root`. With `dark.css` first, `<html data-psi-theme="dark">` renders light.
+
 Then set the theme on `<html>`:
 
 ```html

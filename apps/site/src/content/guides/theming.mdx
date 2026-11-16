@@ -14,7 +14,7 @@ The [Color tokens](/docs/tokens/color/) page lists every semantic color with its
 
 ## Built-in themes
 
-Psi ships four: `light`, `dark`, `acme` and `ember`. Each is a stylesheet in `@handamade/psi-tokens`. Import the ones you use after `base.css`:
+Psi ships four: `light`, `dark`, `acme` and `ember`. Each is a stylesheet in `@handamade/psi-tokens`. Import the ones you use after `base.css`, with `light.css` first among the theme files. Its rule matches `:root` at the same specificity as `[data-psi-theme="ember"]`, so a theme file imported before it loses the tie and the attribute has no effect:
 
 ```tsx
 import "@handamade/psi-tokens/base.css";
@@ -26,15 +26,24 @@ import "@handamade/psi-tokens/ember.css";
 
 ## Scope a theme to part of a page
 
-`data-psi-theme` works on any element. Everything inside it uses that theme:
+`data-psi-theme` works on any element. Everything inside it uses that theme. A theme never paints a background, so paint the wrapper yourself:
 
 ```html
 <html data-psi-theme="light">
-  <aside data-psi-theme="ember">
+  <aside class="sidebar" data-psi-theme="ember">
     <!-- this subtree is ember -->
   </aside>
 </html>
 ```
+
+```css
+.sidebar {
+  background: var(--psi-bg-primary);
+  color: var(--psi-fg-primary);
+}
+```
+
+Without the paint rule the aside keeps the page's background with ember's foreground colors. Brand fonts apply only when the attribute is on `<html>`: in a subtree the text style combos keep the default font stacks.
 
 Tokens you set on the page's theme do not cross into a sub-themed element. Set them on that element or inside its theme.
 
@@ -78,28 +87,30 @@ The module default-exports the definition. It exits 0 when built, 1 when a gate 
 
 ## Derive a brand from a prompt
 
-`@handamade/psi-tokens/generate` derives a light and dark pair from a description. It is deterministic: the same prompt gives the same brand.
+`@handamade/psi-tokens/generate` derives a light and dark pair from a description. It is deterministic: the same prompt gives the same brand. Feed each member to `buildThemeCss` to get stylesheets you can load:
 
 ```ts
-import { parsePrompt, deriveTheme, serializeCustomerTheme } from "@handamade/psi-tokens/generate";
+import { parsePrompt, deriveTheme } from "@handamade/psi-tokens/generate";
+import { buildThemeCss } from "@handamade/psi-tokens/theme";
 
 const vector = parsePrompt("a calm dark fintech brand");
 const pair = deriveTheme(vector);
-const { filename, source, registration } = serializeCustomerTheme(pair);
+
+const light = buildThemeCss(`${vector.name}-light`, pair.light.customerTheme);
+const dark = buildThemeCss(`${vector.name}-dark`, pair.dark.customerTheme);
+// light.css and dark.css are strings of CSS
 ```
 
 Exported signatures:
 
 ```ts
-function deriveTheme(v: BrandVector): DerivedPair;
-function serializeCustomerTheme(pair: DerivedPair): {
-  filename: string;
-  source: string;
-  registration: string;
-};
+export declare function parsePrompt(prompt: string): BrandVector;
+export declare function deriveTheme(v: BrandVector): DerivedPair;
 ```
 
 `deriveTheme` solves each member of the pair to WCAG AA. It never returns a theme below AA: when it cannot reach AA, it throws.
+
+`serializeCustomerTheme(pair)` is for a different job. It writes the TypeScript source of a theme file plus the registry lines that add it, for a theme registry such as Psi's own repository. Use `buildThemeCss` when you only need CSS.
 
 ## One-off changes: override component tokens
 

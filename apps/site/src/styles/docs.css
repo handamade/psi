@@ -119,7 +119,7 @@ h3.docs-heading {
 }
 
 .code-view pre,
-.docs-content pre {
+.docs-content > pre {
   margin: 0;
   overflow-x: auto;
   font: var(--psi-text-mono-14-20-regular);
@@ -137,13 +137,14 @@ h3.docs-heading {
   --shiki-token-link: var(--psi-fg-accent);
 }
 
-/* Fenced code in a guide is a bare <pre>, outside a .code-view: give it the
- * same box. */
-.docs-content pre {
+/* Fenced code in a guide is a <pre> directly under .docs-content. A CodeView's
+ * pre is nested in its own Panel, so it is not matched and draws no second
+ * box. Shiki paints the background from --shiki-background, so set that. */
+.docs-content > pre {
   padding: var(--site-pre-pad);
   border: 1px solid var(--psi-border-faint);
   border-radius: var(--psi-radius-8);
-  background: var(--psi-bg-secondary);
+  --shiki-background: var(--psi-bg-secondary);
 }
 
 .code-view-copy {
