@@ -31,7 +31,7 @@ Measured on `origin/main` at `093eb79` (0.30.0).
   guide (so the five-stylesheet rule lives only in READMEs and llms.txt), no
   theming or dark-mode guide, no AI guide, no cross-site search, no
   per-page markdown.
-- **The machine trail is ahead of the human one.** `manifest.json` (52
+- **The machine trail is ahead of the human one.** `manifest.json` (54
   exports from 35 component folders), `guidance.json`, `resolved/<theme>.json`
   for light, dark, acme and ember, `contracts.json`, `a11y-meta.ts`, and
   `packages/react/docs/<Export>.md` — one markdown file per export, generated
@@ -110,7 +110,9 @@ Measured on `origin/main` at `093eb79` (0.30.0).
 
 - The homepage's theme hook (`apps/promo/src/theme.ts`) reads `localStorage`
   and `matchMedia` inside `useState` initialisers, which throws at build.
-  Those reads get a server-safe guard; the inline theme script in
+  Those reads move into a `useLayoutEffect`: the server renders light with
+  no brand, and the client corrects to the stored values before first
+  paint, so hydration never mismatches. The inline theme script in
   `index.html` moves into the Astro layout's `<head>` unchanged, so first
   paint still has the right theme and cached brand.
 - **A Psi component that cannot render on the server is a package bug.** It
@@ -120,7 +122,7 @@ Measured on `origin/main` at `093eb79` (0.30.0).
 
 ### Content
 
-- **Component pages — one per component folder, 35 pages for 52 exports.**
+- **Component pages — one per component folder, 35 pages for 54 exports.**
   `Table` covers `TableHead`, `TableBody`, `TableRow`, `TableHeaderCell`,
   `TableCell`, `TableCaption`; `Tabs` covers `TabList`, `Tab`, `TabPanel`;
   and so on. A map in `apps/site/src/content/component-pages.ts` assigns
@@ -135,8 +137,9 @@ Measured on `origin/main` at `093eb79` (0.30.0).
      already renders them.
   7. A link to the component's Storybook stories.
 
-  An optional `apps/site/src/content/components/<slug>.mdx` adds usage prose
-  between 2 and 3.
+  Hand-written usage prose per component is not in v1: the description,
+  examples and generated sections carry the page. A per-page prose file can
+  be added when a page needs one.
 - **Examples are their own files**, `apps/site/src/examples/<slug>/<name>.tsx`,
   each default-exporting a small component written as a consumer would
   write it. Storybook stories are not reused: they set props through args,
@@ -146,16 +149,16 @@ Measured on `origin/main` at `093eb79` (0.30.0).
   typecheck covers the example files, so an invented prop, variant or size
   fails `pnpm build`.
 - **Token pages — six, mirroring the existing Storybook token pages:**
-  Color, Typography, Spacing, Motion, Layout, Display. Data comes from
-  `resolved/<theme>.json` — its 39 semantic colour `tokens`, its `scales`
-  (space, size, radius, motion, layout, focusRing) and its 22 `typography`
-  entries — and the six pages together cover every key in those three
-  objects except `scales.scopes`, which is metadata (`{"space":["gap"]}`:
-  which utility families a scale feeds), shown as a note on the Spacing
-  page. A unit test checks the coverage. Each row: token name, CSS variable, a
-  swatch or value for each of the four themes, and for semantic colours the
-  OKLCH formula. Group notes come from `guidance.json` (variants, motion,
-  geometry, layout).
+  Color, Typography, Display, Spacing, Motion, Layout. Data comes from
+  `resolved/<theme>.json`: its 39 semantic colour `tokens`, its 22
+  `typography` combos, its `display` combos, and its `scales` (space, size,
+  radius, focusRing on Spacing; motion on Motion; layout on Layout).
+  `scales.scopes` is metadata (`{"space":["gap"]}`: which utility families a
+  scale feeds) and is shown as a note on the Spacing page. A unit test checks
+  that the six pages cover every key. Each row: token name, CSS variable,
+  a swatch or value for each of the four themes, and for semantic colours
+  the OKLCH formula. Group notes come from `guidance.json` (motion, layout,
+  geometry, typographyDefaults).
 - **Guides — MDX in an Astro content collection**, five in v1:
   1. Installation — both packages, the **five** stylesheets and why the
      fifth matters, first component.
@@ -207,7 +210,7 @@ when the PR merges.
 | Token swatch | Site component over `--psi-*` | Site-only |
 | Heading anchor links | Site component | Site-only |
 | "On this page" list | `NavTree` + `NavItem` | Psi |
-| Copy feedback | `CopyButton` announces nothing by design (D86); the site routes `onCopy` through `ToastProvider` | Psi |
+| Copy feedback | `CopyButton` announces nothing by design (D86). Each island is its own React root, so a copy dispatches a `psi-site:announce` DOM event and the docs shell, which owns the one `ToastProvider`, speaks it with `useToast().announce()` | Psi |
 | Mobile sidebar | `AppShell` `sidebarOpen` + `IconButton` | Psi |
 | Back-button scroll position | `AppShell`'s `<main>` is its own scroller; browsers restore window scroll, not an inner scroller's | **Watch.** If returning to a long docs page lands at the top, record it as an `AppShell` finding rather than patch it in the site |
 
@@ -235,8 +238,8 @@ Tests first, each red on its assertion before the code exists.
 - **Unit tests** (`apps/site`, vitest):
   - every manifest export is on exactly one component page;
   - every component page has at least one example;
-  - every key of `tokens`, `scales` (but `scopes`) and `typography` in the
-    resolved files is on exactly one token page;
+  - every semantic token, typography combo, display combo and scale (but
+    `scopes`) in the resolved files is on exactly one token page;
   - the token markdown renderer against fixed resolved-token data.
 - **Build checks:** `astro check` and a typecheck of `src/examples/**` run in
   `apps/site`'s `build`.
