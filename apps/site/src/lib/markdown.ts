@@ -5,6 +5,16 @@ import type { TokenPage } from "../content/token-pages";
 import { docSection, getExport, readGeneratedDoc } from "./components";
 import { THEMES, colorTokens, guidance, kebab, resolved } from "./tokens";
 
+/** A table cell value: a literal "|" would split the cell. */
+const cell = (v: unknown) => String(v).replace(/\|/g, "\\|");
+/** One GFM table as one string, so blocks joined by blank lines never split it. */
+const table = (header: string[], rows: unknown[][]) =>
+  [
+    `| ${header.join(" | ")} |`,
+    `|${header.map(() => "---").join("|")}|`,
+    ...rows.map((r) => `| ${r.map(cell).join(" | ")} |`),
+  ].join("\n");
+
 const fence = (lang: string, code: string) => `\`\`\`${lang}\n${code.trimEnd()}\n\`\`\``;
 
 /** Drops a member doc's "# Name" title (we add "## Name") and its Rules
@@ -42,11 +52,13 @@ export function tokenPageMd(page: TokenPage): string {
       out.push(
         "Every semantic colour is an OKLCH formula over the theme's anchors, so a theme is a few inputs, not a palette. Values below are each formula resolved in the four built-in themes.",
         "## Semantic colours",
-        `| Token | Formula | ${THEMES.join(" | ")} |`,
-        `|---|---|${THEMES.map(() => "---").join("|")}|`,
-        ...colorTokens().map(
-          (t) =>
-            `| \`${t.cssVar}\` | \`${t.formula}\` | ${THEMES.map((th) => `${t.byTheme[th].oklch} (${t.byTheme[th].hex})`).join(" | ")} |`,
+        table(
+          ["Token", "Formula", ...THEMES],
+          colorTokens().map((t) => [
+            `\`${t.cssVar}\``,
+            `\`${t.formula}\``,
+            ...THEMES.map((th) => `${t.byTheme[th].oklch} (${t.byTheme[th].hex})`),
+          ]),
         ),
       );
       break;
@@ -57,18 +69,18 @@ export function tokenPageMd(page: TokenPage): string {
           .map(([role, combo]) => `- \`${role}\`: \`--psi-text-${combo}\``)
           .join("\n"),
         "## Text styles",
-        "| Token | Size / line | Weight |",
-        "|---|---|---|",
-        ...r.typography.map((t) => `| \`--psi-text-${t.name}\` | ${t.fontSize}/${t.lineHeight} | ${t.weight} (${t.cssWeight}) |`),
+        table(
+          ["Token", "Size / line", "Weight"],
+          r.typography.map((t) => [`\`--psi-text-${t.name}\``, `${t.fontSize}/${t.lineHeight}`, `${t.weight} (${t.cssWeight})`]),
+        ),
       );
       break;
     case "display":
       out.push(
         "## Display styles",
-        "| Name | Min–max px | vw | Line height | Weight | Tracking |",
-        "|---|---|---|---|---|---|",
-        ...r.display.map(
-          (d) => `| \`${d.name}\` | ${d.min}–${d.max} | ${d.vw} | ${d.lineHeight} | ${d.weight} (${d.cssWeight}) | ${d.tracking} |`,
+        table(
+          ["Name", "Min–max px", "vw", "Line height", "Weight", "Tracking"],
+          r.display.map((d) => [`\`${d.name}\``, `${d.min}–${d.max}`, d.vw, d.lineHeight, `${d.weight} (${d.cssWeight})`, d.tracking]),
         ),
       );
       break;
@@ -124,11 +136,10 @@ const facts: Record<string, string> = {
 };
 
 function variantsTable(): string {
-  return [
-    "| Variant | Intent | Typical use |",
-    "|---|---|---|",
-    ...guidance().variants.map((v) => `| \`${v.variant}\` | ${v.intent} | ${v.typicalUse} |`),
-  ].join("\n");
+  return table(
+    ["Variant", "Intent", "Typical use"],
+    guidance().variants.map((v) => [`\`${v.variant}\``, v.intent, v.typicalUse]),
+  );
 }
 
 /** Turns a guide's MDX body into plain markdown. Outside fenced code:

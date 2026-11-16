@@ -88,3 +88,34 @@ describe("overviewMd", () => {
     expect(overviewMd()).toContain("/docs/llms.txt");
   });
 });
+
+/** Table blocks: runs of consecutive lines starting with "|". */
+function tableBlocks(md: string): string[][] {
+  const blocks: string[][] = [];
+  let cur: string[] = [];
+  for (const line of md.split("\n")) {
+    if (line.startsWith("|")) cur.push(line);
+    else if (cur.length) {
+      blocks.push(cur);
+      cur = [];
+    }
+  }
+  if (cur.length) blocks.push(cur);
+  return blocks;
+}
+const cells = (row: string) => row.replace(/\\\|/g, "").split("|").length;
+
+describe("tables in twins are real tables", () => {
+  const twins = [
+    ...tokenPages.map((p) => [`tokens/${p.slug}`, tokenPageMd(p)] as const),
+    ...readdirSync(dir).map((f) => [`guide/${f}`, guideMd(guide(f))] as const),
+  ];
+  for (const [name, md] of twins) {
+    it(`${name}: no blank line between rows, and every row has the header's cell count`, () => {
+      expect(md).not.toMatch(/^\|.*\|\n\n\|/m);
+      for (const block of tableBlocks(md)) {
+        for (const row of block) expect(cells(row), row).toBe(cells(block[0]));
+      }
+    });
+  }
+});
