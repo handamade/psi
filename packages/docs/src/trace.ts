@@ -156,7 +156,7 @@ function tokenTrace(cssVar: string): Trace {
       kind: "text",
       text: readFileSync(join(tokensRoot, "llms.txt"), "utf8")
         .split("\n")
-        .filter((l) => l.includes("--psi-fg-") || /formula/i.test(l))
+        .filter((l) => l.startsWith("- ") && (l.includes("--psi-fg-") || /formula/i.test(l)))
         .slice(0, 6)
         .join("\n"),
       from: "packages/tokens/llms.txt",
