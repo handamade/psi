@@ -107,3 +107,71 @@ describe("check: the API rules", () => {
     expect(() => run("x".repeat(MAX_CODE + 1))).toThrow(CheckInputError);
   });
 });
+
+describe("check: slots (D45 contracts)", () => {
+  const PSI =
+    'import { Banner, Button, DescriptionItem, DescriptionList, Link, Tab, TabList, TabPanel, Tabs } from "@handamade/psi-react";\n';
+
+  it("flags a child the slot does not accept", () => {
+    const md = run(PSI + "<DescriptionList><p>x</p></DescriptionList>");
+    expect(lines(md, "slot")[0]).toMatch(/`DescriptionList`'s children take DescriptionItem; got <p>\./);
+  });
+
+  it("flags too few children", () => {
+    const md = run(PSI + "<DescriptionList></DescriptionList>");
+    expect(lines(md, "slot")[0]).toContain("`DescriptionList`'s children need at least 1 child.");
+  });
+
+  it("checks a slot passed as a prop", () => {
+    const bad = run(PSI + '<Banner action={<Link href="/">Undo</Link>}>Saved.</Banner>');
+    expect(lines(bad, "slot")[0]).toMatch(/`Banner`'s `action` takes .*Button.*; got <Link>\./);
+    const good = run(PSI + "<Banner action={<Button>Undo</Button>}>Saved.</Banner>");
+    expect(lines(good, "slot")).toHaveLength(0);
+  });
+
+  it("accepts a member of a named contract", () => {
+    // Banner's action accepts the inline-content contract, which includes Tag.
+    const md = run('import { Banner, Tag } from "@handamade/psi-react";\n<Banner action={<Tag>New</Tag>}>Saved.</Banner>');
+    expect(lines(md, "slot")).toHaveLength(0);
+  });
+
+  it("does not treat a component imported from elsewhere as Psi's", () => {
+    const md = run(PSI + 'import { Link as RouterLink } from "react-router";\n<Banner action={<RouterLink to="/">Undo</RouterLink>}>Saved.</Banner>');
+    expect(lines(md, "slot")).toHaveLength(1);
+  });
+
+  it("looks through fragments, and skips computed children", () => {
+    expect(lines(run(PSI + "<DescriptionList><><p>x</p></></DescriptionList>"), "slot")).toHaveLength(1);
+    const md = run(PSI + "<DescriptionList>{items.map((i) => <DescriptionItem key={i} term={i}>x</DescriptionItem>)}</DescriptionList>");
+    expect(lines(md, "slot")).toHaveLength(0);
+    expect(md).toContain("computed children of `DescriptionList`");
+  });
+
+  it("passes a correct Tabs tree", () => {
+    const md = run(
+      PSI +
+        '<Tabs value="a" onValueChange={() => {}}><TabList aria-label="Sections"><Tab value="a">A</Tab></TabList><TabPanel value="a">x</TabPanel></Tabs>',
+    );
+    expect(lines(md, "slot")).toHaveLength(0);
+    expect(lines(md, "accessible-name")).toHaveLength(0);
+    expect(md).toContain("No problems found.");
+  });
+});
+
+describe("check: accessible names", () => {
+  it("flags a TabList with no name", () => {
+    const md = run('import { TabList, Tab } from "@handamade/psi-react";\n<TabList><Tab value="a">A</Tab></TabList>');
+    expect(lines(md, "accessible-name")[0]).toContain("`TabList` needs an accessible name: pass `aria-label`.");
+  });
+
+  it("does not repeat what missing-required already says", () => {
+    // IconButton's aria-label is a required prop, so missing-required reports it.
+    const md = run(IMPORT + "<IconButton><IconPlus /></IconButton>");
+    expect(lines(md, "missing-required")).toHaveLength(1);
+    expect(lines(md, "accessible-name")).toHaveLength(0);
+  });
+
+  it("skips an element with a spread", () => {
+    expect(lines(run('import { TabList } from "@handamade/psi-react";\n<TabList {...p} />'), "accessible-name")).toHaveLength(0);
+  });
+});

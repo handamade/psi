@@ -87,6 +87,113 @@ function valueOf(value: AnyNode | null): AttrValue {
   return { kind: "computed" };
 }
 
+export interface RuleContext {
+  find(n: AnyNode, rule: Rule, message: string): void;
+  where(n: AnyNode): string;
+  report: Report;
+  /** The Psi export a tag names, or null. */
+  exportOf(tag: string): string | null;
+}
+
+type Item = { kind: "element"; tag: string } | { kind: "text" } | { kind: "computed" };
+
+function itemsOf(nodes: AnyNode[]): Item[] {
+  const out: Item[] = [];
+  for (const n of nodes) {
+    if (n.type === "JSXText") {
+      if ((n.value as string).trim()) out.push({ kind: "text" });
+    } else if (n.type === "JSXElement") {
+      const tag = tagOf((n.openingElement as AnyNode).name as AnyNode);
+      out.push(tag ? { kind: "element", tag } : { kind: "computed" });
+    } else if (n.type === "JSXFragment") {
+      out.push(...itemsOf(n.children as AnyNode[]));
+    } else if (n.type === "JSXExpressionContainer") {
+      const e = n.expression as AnyNode;
+      if (e.type === "JSXEmptyExpression") continue;
+      if (e.type === "StringLiteral" || e.type === "NumericLiteral" || e.type === "TemplateLiteral") out.push({ kind: "text" });
+      else if (e.type === "JSXElement" || e.type === "JSXFragment") out.push(...itemsOf([e]));
+      else out.push({ kind: "computed" });
+    } else {
+      out.push({ kind: "computed" });
+    }
+  }
+  return out;
+}
+
+const CARDINALITY: Record<string, [number, number | null]> = {
+  "0..1": [0, 1],
+  "1..1": [1, 1],
+  "0..*": [0, null],
+  "1..*": [1, null],
+};
+
+export function checkSlots(el: Element, index: CheckIndex, ctx: RuleContext): void {
+  const c = el.component;
+  for (const slot of c.slots) {
+    const label = slot.name === "body" ? `\`${c.name}\`'s children` : `\`${c.name}\`'s \`${slot.name}\``;
+    let items: Item[];
+    if (slot.name === "body") {
+      items = itemsOf(el.children);
+    } else {
+      const attr = el.attrs.find((a) => a.name === slot.name);
+      if (!attr) {
+        items = [];
+      } else if (attr.value.kind === "jsx") {
+        items = itemsOf([attr.value.node]);
+      } else if (attr.value.kind === "literal") {
+        items = [{ kind: "text" }];
+      } else {
+        items = [{ kind: "computed" }];
+      }
+    }
+    if (items.some((i) => i.kind === "computed")) {
+      ctx.report.skipped.push(
+        `computed ${slot.name === "body" ? "children" : `\`${slot.name}\``} of \`${c.name}\` at ${ctx.where(el.node)}`,
+      );
+      continue;
+    }
+
+    const accepts = [
+      ...(slot.accepts.components ?? []),
+      ...(slot.accepts.contracts ?? []).flatMap((k) => index.contracts[k] ?? []),
+    ];
+    if (accepts.length > 0) {
+      const allowed = new Set(accepts);
+      const list = [...allowed].join(", ");
+      for (const item of items) {
+        const name = item.kind === "element" ? ctx.exportOf(item.tag) : null;
+        if (name && allowed.has(name)) continue;
+        const got = item.kind === "element" ? `<${item.tag}>` : "text";
+        ctx.find(el.node, "slot", `${label} take${slot.name === "body" ? "" : "s"} ${list}; got ${got}.`);
+      }
+    }
+
+    if (el.spread) continue; // a spread may supply children or the prop
+    const [min, max] = CARDINALITY[slot.cardinality] ?? [0, null];
+    const requiredProp = c.props.some((p) => p.name === slot.name && p.required);
+    if (items.length < min && !requiredProp) {
+      ctx.find(el.node, "slot", `${label} need${slot.name === "body" ? "" : "s"} at least ${min} ${slot.name === "body" ? "child" : "element"}.`);
+    }
+    if (max !== null && items.length > max) {
+      ctx.find(el.node, "slot", `${label} take${slot.name === "body" ? "" : "s"} at most ${max}; got ${items.length}.`);
+    }
+  }
+}
+
+export function checkAccessibleName(el: Element, ctx: RuleContext): void {
+  const rule = el.component.accessibleName;
+  if (!rule || el.spread) return;
+  const given = new Set(el.attrs.map((a) => a.name));
+  if (rule.oneOf.some((a) => given.has(a))) return;
+  // A required naming prop is already reported by missing-required.
+  if (el.component.props.some((p) => p.required && rule.oneOf.includes(p.name))) return;
+  ctx.find(
+    el.node,
+    "accessible-name",
+    `\`${el.component.name}\` needs an accessible name: pass ${rule.oneOf.map((a) => `\`${a}\``).join(" or ")}.`,
+  );
+}
+
 export function runCheck(code: string, index: CheckIndex): Report {
   const report: Report = { findings: [], checked: new Map(), notChecked: new Map(), skipped: [] };
   const parsed = parseSource(code);
@@ -147,6 +254,18 @@ export function runCheck(code: string, index: CheckIndex): Report {
     if (!component) report.notChecked.set(tag, "a Psi export with no manifest entry");
     return component ?? null;
   }
+
+  const ctx: RuleContext = {
+    find,
+    where,
+    report,
+    // Same lookup as componentFor, without recording not-checked reasons.
+    exportOf: (tag) => {
+      if (tag.includes(".") || /^[a-z]/.test(tag)) return null;
+      if (otherLocals.has(tag) && !psiLocals.has(tag)) return null;
+      return (hasPsiImport ? psiLocals.get(tag) : components.has(tag) ? tag : undefined) ?? null;
+    },
+  };
 
   const elements: Element[] = [];
   walk(ast, (n) => {
@@ -211,6 +330,9 @@ export function runCheck(code: string, index: CheckIndex): Report {
         find(el.node, "missing-required", `\`${c.name}\` needs \`${p.name}\`.`);
       }
     }
+
+    checkSlots(el, index, ctx);
+    checkAccessibleName(el, ctx);
   }
 
   return report;
