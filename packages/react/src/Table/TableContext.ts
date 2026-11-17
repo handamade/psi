@@ -27,3 +27,9 @@ export const TableContext = createContext<TableContextValue>({
 /** Row ids in document order, published by Table so the select-all
  * checkbox can compute all/some without the consumer restating them. */
 export const TableRowIdsContext = createContext<string[]>([]);
+
+/** The id a TableContainer offers its table's caption (D126). A caption with
+ * no id of its own takes it, so the container can name itself with
+ * aria-labelledby. undefined outside a container: a bare table's caption
+ * gets no id. */
+export const TableContainerContext = createContext<string | undefined>(undefined);

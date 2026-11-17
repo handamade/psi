@@ -5,7 +5,7 @@ import axe from "axe-core";
 import {
   Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator, MenuText, Textarea, RadioGroup, Radio,
-  Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
+  Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, TableContainer, Pagination, CursorPagination,
   Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell,
   Tabs, TabList, Tab, TabPanel,
   useFieldControl, useToast,
@@ -96,6 +96,15 @@ const cases: Array<[string, React.ReactElement]> = [
         <TableRow><TableCell colSpan={2}>No more applications match.</TableCell></TableRow>
       </TableBody>
     </Table>
+  )],
+  ["TableContainer named by its caption (D126)", (
+    <TableContainer maxBlockSize={240}>
+      <Table stickyHeader>
+        <TableCaption>Payments</TableCaption>
+        <TableHead><TableRow><TableHeaderCell>Date</TableHeaderCell><TableHeaderCell numeric>Amount</TableHeaderCell></TableRow></TableHead>
+        <TableBody><TableRow rowId="t1"><TableCell>2026-08-05</TableCell><TableCell numeric>1,240.00</TableCell></TableRow></TableBody>
+      </Table>
+    </TableContainer>
   )],
   ["CursorPagination", <CursorPagination hasPrevious hasNext onPrevious={() => {}} onNext={() => {}} />],
   ["CursorPagination at the first page", <CursorPagination hasPrevious={false} hasNext onPrevious={() => {}} onNext={() => {}} />],

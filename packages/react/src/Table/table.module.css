@@ -217,3 +217,27 @@
   z-index: var(--psi-z-sticky);
   background: var(--psi-table-bg);
 }
+
+/* ── TableContainer (D126) ────────────────────────────────────────
+   The scroller in both axes, so a sticky header sticks to its top. It draws
+   the frame and clips the content to the rounded inner edge; the table inside
+   drops its own border and corner radii. A tab stop, so it draws the shared
+   ring, outside the frame. */
+
+.container {
+  overflow: auto;
+  background: var(--psi-table-bg);
+  border: 1px solid var(--psi-table-border);
+  border-radius: var(--psi-table-radius);
+}
+
+.container:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-table-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset);
+}
+
+.container > .table {
+  border: 0;
+  border-radius: 0;
+  --_psi-table-corner: 0px;
+}

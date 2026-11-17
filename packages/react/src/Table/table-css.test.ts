@@ -44,6 +44,16 @@ describe("table.module.css (D126)", () => {
     expect(css).not.toMatch(/box-shadow/);
   });
 
+  it("moves the frame to the container and zeroes the table's own", () => {
+    const container = rule(".container");
+    expect(container).toMatch(/overflow:\s*auto/);
+    expect(container).toMatch(/border:\s*1px solid var\(--psi-table-border\)/);
+    expect(container).toMatch(/border-radius:\s*var\(--psi-table-radius\)/);
+    const inner = rule(".container > .table");
+    expect(inner).toMatch(/border:\s*0/);
+    expect(inner).toMatch(/--_psi-table-corner:\s*0px/);
+  });
+
   it("keeps a numeric body cell on one line", () => {
     expect(rule(".cell[data-numeric]")).toMatch(/white-space:\s*nowrap/);
   });
