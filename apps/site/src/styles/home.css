@@ -780,10 +780,11 @@
    hairlines are a mix of --psi-fg-secondary rather than a border token. */
 .map { --map-line: color-mix(in oklch, var(--psi-fg-secondary) 35%, transparent); }
 .map-node rect { fill: none; stroke: var(--map-line); }
+.map-link rect { stroke: var(--psi-fg-secondary); pointer-events: all; }
 .map-link { cursor: pointer; text-decoration: none; }
 .map-link:focus-visible { outline: none; }
-.map-link:focus-visible rect { stroke: var(--psi-fg-accent); stroke-width: 3; }
-.map-link[data-current] rect { stroke: var(--psi-fg-accent); fill: color-mix(in oklch, var(--psi-fg-accent) 10%, transparent); }
+.map-link:focus-visible rect { stroke: var(--psi-fg-primary); stroke-width: 3; stroke-dasharray: 5 3; }
+.map-link[data-current] rect { stroke: var(--psi-fg-accent); stroke-width: 1.5; fill: color-mix(in oklch, var(--psi-fg-accent) 10%, transparent); }
 .map-h { fill: var(--psi-fg-primary); font: var(--psi-text-12-16-medium); }
 .map-s { fill: var(--psi-fg-secondary); font: 11px var(--psi-font-mono); }
 .map-s-strong { fill: var(--psi-fg-primary); }
@@ -835,3 +836,4 @@
   .surfaces-grid { grid-template-columns: minmax(0, 1fr); }
   .map-hint { display: block; }
 }
+.trace-rows td:first-child { white-space: nowrap; }

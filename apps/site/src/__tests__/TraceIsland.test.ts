@@ -33,7 +33,28 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const lit = (c: HTMLElement) => c.querySelectorAll(".map-wire[data-on]").length;
+
 describe("TraceIsland", () => {
+  it("lights only Source's spine for Code, and the path down to the box otherwise", () => {
+    const { container } = mount(createElement(TraceIsland, props));
+    click(container.querySelector('a[data-surface="code"]')!);
+    expect(lit(container)).toBe(1);
+    click(container.querySelector('a[data-surface="figma"]')!);
+    // spine1, spine2, trunk + 2 segments down the people column
+    expect(lit(container)).toBe(5);
+  });
+  it("box hrefs come from the data and follow the target", () => {
+    const d = { ...data, Button: { ...data.Button, docs: { ...data.Button.docs, href: "/d/b" } } };
+    const { container } = mount(createElement(TraceIsland, { ...props, data: d }));
+    const href = (s: string) => container.querySelector(`a[data-surface="${s}"]`)!.getAttribute("href");
+    expect(href("docs")).toBe("/d/b");
+    expect(href("storybook")).toBe("/sb/b");
+    expect(href("figma")).toBe("https://figma.example");
+    const field = [...container.querySelectorAll('[role="radio"]')].find((r) => r.textContent === "Field") as HTMLElement;
+    act(() => field.click());
+    expect(href("storybook")).toBe("/sb/f");
+  });
   it("opens on Button's Docs tab, with the map's Docs box current", () => {
     const { container } = mount(createElement(TraceIsland, props));
     expect(visible(container)).toContain("variant");
@@ -58,6 +79,10 @@ describe("TraceIsland", () => {
     expect(container.querySelector(".surfaces-grid")).toBeNull();
     expect(visible(container)).toContain("SOURCE");
     expect(container.querySelector(".trace")!.closest("[hidden]")).not.toBeNull();
+    const seg = [...container.querySelectorAll('[role="tablist"] [role="tab"]')].map((t) => t.textContent);
+    expect(seg.slice(0, 2)).toEqual(["Map", "Trace"]);
+    expect(container.querySelectorAll('[role="tabpanel"][aria-labelledby]').length).toBeGreaterThanOrEqual(2);
+    expect(container.querySelector('[role="radiogroup"][aria-label="Surfaces view"]')).toBeNull();
     click(container.querySelector('a[data-surface="mcp"]')!);
     expect(container.querySelector(".trace")!.closest("[hidden]")).toBeNull();
     expect(visible(container)).toContain("B mcp");

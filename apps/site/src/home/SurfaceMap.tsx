@@ -12,16 +12,11 @@ const AGENTS = [
   ["md", "Markdown", "a .md per page", 556],
 ] as const;
 
-/** Where each box links when JavaScript has not run. */
-const DEFAULT_HREFS: Record<Surface, string> = {
-  code: "/docs/get-started/",
-  docs: "/docs/components/",
-  storybook: "/storybook/",
-  figma: "https://www.figma.com/design/MvbVttmGaFBmEqydtLJ0JN",
-  mcp: "/docs/get-started/ai/",
-  llms: "/llms.txt",
-  md: "/docs/get-started/ai/",
-};
+const COLUMNS: { x: number; rows: readonly (readonly [Surface | "paper", number])[] }[] = [
+  { x: 95, rows: [["docs", 432], ["storybook", 494], ["figma", 556], ["paper", 618]] },
+  { x: 285, rows: [["mcp", 432], ["llms", 494], ["md", 556]] },
+];
+const BOX_H = 50;
 
 export function SurfaceMap({
   current,
@@ -32,9 +27,10 @@ export function SurfaceMap({
   current: Surface;
   onSelect: (s: Surface) => void;
   componentCount: number;
-  hrefs?: Partial<Record<Surface, string>>;
+  hrefs: Record<Surface, string>;
 }) {
-  const href = (s: Surface) => hrefs?.[s] ?? DEFAULT_HREFS[s];
+  const href = (s: Surface) => hrefs[s];
+  const lit = (s: Surface | "paper") => (s === current ? "" : undefined);
   const on = (s: Surface) => (s === current ? "" : undefined);
   const click = (s: Surface) => (e: MouseEvent) => {
     e.preventDefault();
@@ -49,27 +45,31 @@ export function SurfaceMap({
       </a>
     </g>
   );
-  const SURFACE_X = (x: number) => (x === 20 ? 95 : 285);
-  const surfaceWire = (s: Surface, x: number, y: number) => (
-    <path key={s} className="map-wire" data-on={on(s)} aria-hidden="true" d={`M190,356 C190,392 ${x},384 ${x},412 L${x},${y - 25}`} />
+  const code = current === "code";
+  // Lit from Source down to the selected box: trunk, then each segment above it.
+  const reach = (x: number, i: number) => {
+    const col = COLUMNS.find((c) => c.x === x)!;
+    const at = col.rows.findIndex(([s]) => s === current);
+    return at >= i;
+  };
+  const wires = COLUMNS.flatMap(({ x, rows }) =>
+    rows.map(([s, y], i) => {
+      const d = i === 0 ? `M190,356 C190,392 ${x},384 ${x},412 L${x},${y}` : `M${x},${rows[i - 1][1] + BOX_H} L${x},${y}`;
+      return <path key={s} className="map-wire" data-on={reach(x, i) ? "" : undefined} aria-hidden="true" d={d} />;
+    }),
   );
+  const ports = COLUMNS.flatMap(({ x, rows }) => rows.map(([s, y], i) => <circle key={s} className="map-port" data-on={reach(x, i) ? "" : undefined} cx={x} cy={y} r="3.5" />));
   return (
     <div className="map">
       <svg viewBox="0 0 380 700" role="group" aria-label="How Psi's surfaces are produced from one source">
         <g aria-hidden="true">
           <path className="map-wire" data-on="" d="M190,84 L190,124" />
-          <path className="map-wire" data-on="" d="M190,242 L190,282" />
-        </g>
-        {PEOPLE.map(([s, , , y]) => surfaceWire(s, SURFACE_X(20), y + 25))}
-        {AGENTS.map(([s, , , y]) => surfaceWire(s, SURFACE_X(210), y + 25))}
-        <path className="map-wire" aria-hidden="true" d="M190,356 C190,392 95,384 95,412 L95,668" />
-        <g aria-hidden="true">
-          {[[190, 84], [190, 124], [190, 242], [190, 282], [190, 356]].map(([cx, cy]) => (
-            <circle key={cy} className="map-port" data-on="" cx={cx} cy={cy} r="3.5" />
+          <path className="map-wire" data-on={code ? undefined : ""} d="M190,242 L190,282" />
+          {wires}
+          {[[190, 84, true], [190, 124, true], [190, 242, !code], [190, 282, !code], [190, 356, !code]].map(([cx, cy, o]) => (
+            <circle key={String(cy)} className="map-port" data-on={o ? "" : undefined} cx={Number(cx)} cy={Number(cy)} r="3.5" />
           ))}
-          {[...PEOPLE.map((p) => [95, p[3] + 25, p[0]] as const), ...AGENTS.map((p) => [285, p[3] + 25, p[0]] as const)].map(([cx, cy, s]) => (
-            <circle key={s} className="map-port" data-on={on(s)} cx={cx} cy={cy - 25} r="3.5" />
-          ))}
+          {ports}
         </g>
 
         <g className="map-node" transform="translate(40,10)">

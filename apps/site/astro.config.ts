@@ -18,7 +18,12 @@ export default defineConfig({
     // The standalone example pages are noindex iframe targets.
     sitemap({ filter: (page) => !page.includes("/docs/examples/") }),
   ],
-  vite: { plugins: [psiFacts()] },
+  vite: {
+    plugins: [psiFacts()],
+    // loadIndex() reads psi-index.json beside its own module; bundled into a
+    // prerender chunk that file does not exist, so keep the package external.
+    environments: { prerender: { resolve: { external: ["@handamade/psi-mcp"] } } },
+  },
   markdown: { shikiConfig: { theme: psiShikiTheme } },
   server: { port: 5199 },
 });

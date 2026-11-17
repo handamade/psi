@@ -53,14 +53,16 @@ export function TraceIsland({ data, storybookHref, figmaHref, componentCount }: 
     if (!wide) setView("trace");
   };
 
-  const map = (
-    <SurfaceMap
-      current={surface}
-      onSelect={select}
-      componentCount={componentCount}
-      hrefs={{ storybook: storybookHref.Button.split("?")[0], figma: figmaHref }}
-    />
-  );
+  const hrefs: Record<Surface, string> = {
+    code: data[target].code.href ?? (target.startsWith("--") ? "/docs/tokens/color/" : `/docs/components/${target.toLowerCase()}/`),
+    docs: data[target].docs.href ?? "/docs/components/",
+    storybook: storybookHref[target],
+    figma: figmaHref,
+    mcp: data[target].mcp.href ?? "/docs/get-started/ai/",
+    llms: data[target].llms.href ?? "/llms.txt",
+    md: data[target].md.href ?? "/docs/get-started/ai/",
+  };
+  const map = <SurfaceMap current={surface} onSelect={select} componentCount={componentCount} hrefs={hrefs} />;
   const trace = (
     <div className="trace">
       <div className="trace-top">
