@@ -1,0 +1,29 @@
+/* packages/react/src/Count/count.module.css — D124. Colours alias the
+   semantic layer in packages/tokens/src/components/count.ts. */
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.neutral {
+  color: var(--psi-count-fg);
+  font: var(--psi-text-12-16-regular);
+  font-variant-numeric: var(--psi-font-variant-numeric);
+}
+
+/* A pill: shape and weight set it apart from a neutral count, so colour is
+   never the only signal. The tint is translucent, so it is painted over a
+   backdrop of its own (bg-primary). The pill is then always the composite
+   the contrast gate measures, whatever surface the entry paints. */
+.attention {
+  padding-inline: var(--psi-count-attention-padding-x);
+  border-radius: var(--psi-radius-full);
+  background:
+    linear-gradient(var(--psi-count-attention-bg), var(--psi-count-attention-bg)),
+    var(--psi-count-attention-backdrop-bg);
+  color: var(--psi-count-attention-fg);
+  font: var(--psi-text-12-16-medium);
+  font-variant-numeric: var(--psi-font-variant-numeric);
+}

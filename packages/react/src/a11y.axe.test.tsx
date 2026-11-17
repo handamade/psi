@@ -6,7 +6,7 @@ import {
   Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator, MenuText, Textarea, RadioGroup, Radio,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
-  Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell,
+  Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, Count, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell,
   Tabs, TabList, Tab, TabPanel,
   useFieldControl, useToast,
 } from "./index.js";
@@ -117,6 +117,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Skeleton text", <div aria-busy="true"><Skeleton lines={3} /></div>],
   ["Skeleton block", <div aria-busy="true"><Skeleton variant="block" size={48} /></div>],
   ["CopyButton", <CopyButton value="ORD-1042" />],
+  ["Count neutral and attention (D124)", <Text>Cards <Count value={238} /> stuck <Count value={4} tone="attention" label="4 stuck" /></Text>],
   ["Tabs horizontal", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs vertical", <Tabs value="all" onValueChange={() => {}} orientation="vertical"><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs with a disabled tab", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="archived" disabled>Archived</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="archived">Archived rows</TabPanel></Tabs>],

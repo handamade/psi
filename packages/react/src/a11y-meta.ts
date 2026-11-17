@@ -221,6 +221,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region: it renders no role and no aria-live, announces nothing, and does not change its label or icon after a copy, so a screen reader hears the same button before and after. The application speaks the result: onCopy reports \"copied\" or \"failed\" (a rejected write, or no clipboard API), and the application routes that through its announcer or a Toast (D86). The label is visible text; the icon is aria-hidden and only reinforces it. Focus stays on the button.",
   },
+  Count: {
+    keyboard: [],
+    notes:
+      "A <span> with no role and no aria-live (D124): a count that changes announces nothing on its own; an app's own announcer speaks a change. Its visible text joins the name of the link or button it sits in (\"Cards 238\", \"Cards 999+\"). label replaces the number for a screen reader (the number becomes aria-hidden, the label psi-sr-only): start it with the number shown. The attention tone is a pill in medium weight, never colour alone, but the tone itself is visual, so an attention count should carry a label.",
+  },
   SkipLink: {
     keyboard: [
       { keys: "Tab", behavior: "Takes focus and becomes visible at the inline-start top corner, drawing the shared focus ring. Put it first in the document so it is the first tab stop." },

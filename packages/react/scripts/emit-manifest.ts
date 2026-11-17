@@ -57,6 +57,7 @@ const COMPONENTS = [
   "InlineAlert",
   "Skeleton",
   "CopyButton",
+  "Count",
   "Tabs",
   "TabList",
   "Tab",
