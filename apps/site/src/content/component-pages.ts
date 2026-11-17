@@ -13,6 +13,7 @@ export const componentPages: ComponentPage[] = [
   { slug: "card", title: "Card", members: ["Card"] },
   { slug: "checkbox", title: "Checkbox", members: ["Checkbox"] },
   { slug: "copy-button", title: "CopyButton", members: ["CopyButton"] },
+  { slug: "count", title: "Count", members: ["Count"] },
   { slug: "cursor-pagination", title: "CursorPagination", members: ["CursorPagination"] },
   { slug: "description-list", title: "DescriptionList", members: ["DescriptionList", "DescriptionItem"] },
   { slug: "dialog", title: "Dialog", members: ["Dialog"] },

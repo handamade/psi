@@ -1,0 +1,5 @@
+{
+  "slots": [
+    { "name": "body", "accepts": { "components": ["Table"] }, "cardinality": "1..1", "order": 1 }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "slots": [
+    { "name": "label", "accepts": {}, "cardinality": "0..1", "order": 1 },
+    { "name": "icon", "accepts": {}, "cardinality": "0..1", "order": 2 },
+    { "name": "body", "accepts": { "components": ["NavItem"] }, "cardinality": "1..*", "order": 3 }
+  ]
+}

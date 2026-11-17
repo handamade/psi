@@ -104,6 +104,8 @@ export { Skeleton } from "./Skeleton/Skeleton.js";
 export type { SkeletonProps } from "./Skeleton/Skeleton.js";
 export { CopyButton } from "./CopyButton/CopyButton.js";
 export type { CopyButtonProps } from "./CopyButton/CopyButton.js";
+export { Count } from "./Count/Count.js";
+export type { CountProps } from "./Count/Count.js";
 export { Tabs, TabsContext } from "./Tabs/Tabs.js";
 export type { TabsProps, TabsOrientation, TabsContextValue } from "./Tabs/Tabs.js";
 export { TabList } from "./Tabs/TabList.js";

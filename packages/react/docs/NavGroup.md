@@ -8,6 +8,7 @@ A collapsible group of `NavItem`s in a `NavTree` (D88). Controlled-only, like `T
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
 | `label` | `ReactNode` | — | yes | The group's visible label, such as "Reports". |
+| `icon` | `ReactNode` | — | no | An icon before the label (D124), passed without a size. Decorative (`aria-hidden`), sized by `--psi-nav-tree-icon-size`, coloured with the label. It stays when the group is closed: only the chevron turns. |
 | `open` | `boolean` | — | yes | Whether the group's items are shown. Controlled. |
 | `onOpenChange` | `(open: boolean) => void` | — | yes | Called with the next state when the button is pressed. The group never changes `open` itself. |
 | `children` | `ReactNode` | — | yes | `NavItem`s of the group. |
@@ -19,7 +20,7 @@ A collapsible group of `NavItem`s in a `NavTree` (D88). Controlled-only, like `T
 |---|---|
 | Enter / Space | Activates the group's native button, which asks the parent to open or close the group through onOpenChange. |
 
-Controlled-only: open and onOpenChange are required and the group never changes its own state. Renders a <button type="button"> with aria-expanded and aria-controls naming its <ul>, which carries `hidden` when closed, so the links leave the layout and the accessibility tree while aria-controls still resolves. The chevron is aria-hidden and turns on a duration token; the label and aria-expanded carry the meaning.
+Controlled-only: open and onOpenChange are required and the group never changes its own state. Renders a <button type="button"> with aria-expanded and aria-controls naming its <ul>, which carries `hidden` when closed, so the links leave the layout and the accessibility tree while aria-controls still resolves. The chevron is aria-hidden and turns on a duration token; the label and aria-expanded carry the meaning. An icon (D124) sits before the label in an aria-hidden span; the label stays the button's name, and the icon stays when the group is closed.
 
 ## Theming
 
@@ -40,3 +41,4 @@ Override `--psi-nav-tree-*` custom properties at any scope; interactive states d
 - Label beside its control: <Field labelPosition="start"> for one field in a toolbar or pager (keep Toolbar align="center"); <FieldStack labelPosition="start"> for a form whose labels share one column, as wide as the longest label up to --psi-field-label-max-width, stacking below 480px of the form's width. A theme sets --psi-field-label-align: end to put labels against their controls (D115).
 - Use Dialog for blocking modal flows — title/footer slots, dismissible gate; danger stays on the footer Buttons, one accent per group.
 - Text links are Link (React) or the .psi-link class on any <a>: accent colour, underlined at rest, never by colour alone (D119). A router app passes its own link as Link's only child. Button href is for an action that should look like a button. Inside a NavItem or among NavBar's links, pass your router link itself, not Link.
+- A count after a label is Count (D124): neutral by default; tone="attention" is a pill and should carry a label ("4 stuck"), since the tone is visual. A Count is never a live region. In a NavTree, pass it as NavItem's count, and an icon as icon on NavItem or NavGroup; the icon is decorative and sized by the tree.
