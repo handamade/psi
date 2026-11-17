@@ -321,4 +321,20 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Renders role=\"tabpanel\" with aria-labelledby pointing back at its tab. Unselected panels stay in the DOM with `hidden`.",
   },
+  SegmentedControl: {
+    keyboard: [
+      { keys: "Tab", behavior: "Enters the control at its selected segment (one stop for the whole control), then leaves it. When value matches no segment, the first enabled segment holds the stop and none is selected; a selected disabled segment keeps the stop (D93)." },
+      { keys: "Arrow Right / Arrow Left", behavior: "Moves to the next/previous enabled segment, wrapping at both ends, and selects it." },
+      { keys: "Arrow Down / Arrow Up", behavior: "On its own (a radio group): the same as Right/Left, as in the APG radio group. Inside Tabs (a tab list): ignored, as in a horizontal TabList." },
+      { keys: "Home / End", behavior: "Jumps to the first or last enabled segment and selects it." },
+    ],
+    notes:
+      "Two roles, chosen by where it renders (D132). On its own it is role=\"radiogroup\" for a setting that applies at once, and value and onValueChange are required. Inside Tabs it is the role=\"tablist\" (aria-orientation=\"horizontal\"), in place of TabList, and Tabs owns the value; passing value or onValueChange there throws. Requires an accessible name: aria-label or aria-labelledby. It is not a form field: it submits nothing and does not join a Field; a form value is a RadioGroup. The selected segment shows by the accent tint, the accent label and a 1px inset ring that clears 3:1, so never by colour alone; in forced colours it paints Highlight.",
+    accessibleName: { oneOf: ["aria-label", "aria-labelledby"] },
+  },
+  Segment: {
+    keyboard: [{ keys: "Enter / Space", behavior: "Selects the segment (native button behavior); the arrow keys already select on focus." }],
+    notes:
+      "A <button type=\"button\">: role=\"radio\" with aria-checked on its own, role=\"tab\" with aria-selected and aria-controls (naming the TabPanel of the same value) inside Tabs (D132). disabled sets aria-disabled, not the disabled attribute, so it stays discoverable while the arrows skip it and a click does nothing. The label is the accessible name; it truncates visually when the control is narrower than its labels but stays whole in the DOM.",
+  },
 };

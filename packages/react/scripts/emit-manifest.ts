@@ -64,6 +64,8 @@ const COMPONENTS = [
   "TabList",
   "Tab",
   "TabPanel",
+  "SegmentedControl",
+  "Segment",
 ];
 
 // Keep a prop when it is declared on the component's own props interface
@@ -112,6 +114,7 @@ const PASSTHROUGH_DESCRIPTIONS: Record<string, string> = {
 // (Menu's item, separator and text live in Menu/, not in folders of their own).
 const COMPONENT_DIR: Record<string, string> = {
   Radio: "RadioGroup",
+  Segment: "SegmentedControl",
   DescriptionItem: "DescriptionList",
   MenuItem: "Menu",
   MenuSeparator: "Menu",

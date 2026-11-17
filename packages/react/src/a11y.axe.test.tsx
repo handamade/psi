@@ -7,7 +7,7 @@ import {
   Menu, MenuItem, MenuSeparator, MenuText, Textarea, RadioGroup, Radio,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, TableContainer, Pagination, CursorPagination,
   Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, Count, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell,
-  Tabs, TabList, Tab, TabPanel,
+  Tabs, TabList, Tab, TabPanel, SegmentedControl, Segment,
   useFieldControl, useToast, IconSimCard,
 } from "./index.js";
 
@@ -137,6 +137,9 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Skeleton block", <div aria-busy="true"><Skeleton variant="block" size={48} /></div>],
   ["CopyButton", <CopyButton value="ORD-1042" />],
   ["Count neutral and attention (D124)", <Text>Cards <Count value={238} /> stuck <Count value={4} tone="attention" label="4 stuck" /></Text>],
+  ["SegmentedControl on its own (D132)", <SegmentedControl aria-label="Color scheme" value="light" onValueChange={() => {}}><Segment value="light">Light</Segment><Segment value="dark">Dark</Segment><Segment value="system">System</Segment></SegmentedControl>],
+  ["SegmentedControl with a disabled segment, size 24, fill (D132)", <SegmentedControl aria-label="Theme" value="light" onValueChange={() => {}} size={24} fill><Segment value="light">light</Segment><Segment value="dark">dark</Segment><Segment value="acme" disabled>acme</Segment><Segment value="ember">ember</Segment></SegmentedControl>],
+  ["SegmentedControl inside Tabs (D132)", <Tabs value="map" onValueChange={() => {}}><SegmentedControl aria-label="Diagram"><Segment value="map">Map</Segment><Segment value="trace">Trace</Segment></SegmentedControl><TabPanel value="map">The map</TabPanel><TabPanel value="trace">The trace</TabPanel></Tabs>],
   ["Tabs horizontal", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs vertical", <Tabs value="all" onValueChange={() => {}} orientation="vertical"><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="flagged">Flagged</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="flagged">Flagged rows</TabPanel></Tabs>],
   ["Tabs with a disabled tab", <Tabs value="all" onValueChange={() => {}}><TabList aria-label="Views"><Tab value="all">All</Tab><Tab value="archived" disabled>Archived</Tab></TabList><TabPanel value="all">All rows</TabPanel><TabPanel value="archived">Archived rows</TabPanel></Tabs>],
