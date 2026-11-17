@@ -1,4 +1,4 @@
-import { cloneElement, Fragment, isValidElement } from "react";
+import { cloneElement, Fragment, isValidElement, useEffect } from "react";
 import type { HTMLAttributes, ReactElement, ReactNode, Ref } from "react";
 import styles from "./nav-tree.module.css";
 
@@ -16,9 +16,43 @@ export interface NavItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "child
    * Without `current`, a child's own `aria-current` is left alone, so a router
    * that marks its active link keeps working. */
   current?: boolean;
+  /** An icon before the text (D124), such as `<IconSettings />`, passed
+   * without a size: the entry sizes it (`--psi-nav-tree-icon-size`) and
+   * colours it with the text. Always decorative: it is wrapped in
+   * `aria-hidden`, and the text is the name. Needs `href`, or one link
+   * element as the child. A router link whose children is a function (a render prop) keeps it: NavItem wraps the function so its result becomes the label. */
+  icon?: ReactNode;
+  /** A `<Count>` after the text (D124), at the row's inline end. Its text
+   * joins the link's name ("Cards 238"). Needs `href`, or one link element as
+   * the child. */
+  count?: ReactNode;
   className?: string;
   /** Forwarded ref to the `<li>`. */
   ref?: Ref<HTMLLIElement>;
+}
+
+const present = (node: ReactNode) => node !== undefined && node !== null && node !== false;
+
+/** Icon, label and count, in that order, as the content of the entry's link
+ * (D124). A space sits before the count's slot, so the name reads "Cards 238"
+ * in any accessibility tree, jsdom's included. */
+function entryContent(label: ReactNode, icon: ReactNode, count: ReactNode) {
+  return (
+    <>
+      {present(icon) ? (
+        <span className={styles.icon} aria-hidden="true">
+          {icon}
+        </span>
+      ) : null}
+      <span className={styles.label}>{label}</span>
+      {present(count) ? (
+        <>
+          {" "}
+          <span className={styles.countSlot}>{count}</span>
+        </>
+      ) : null}
+    </>
+  );
 }
 
 /** One entry of a `NavTree` (D88): an `<li>` that styles the single anchor
@@ -30,28 +64,54 @@ export interface NavItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "child
  * colour alone: medium weight, a raised surface and a bar at the inline
  * start. A child link you mark `aria-current="true"` is the entry the current
  * screen sits under (D96): medium weight and the current colour, with no
- * surface and no bar. `NavItem` itself never sets `true`. */
-export function NavItem({ children, href, current, className, ref, ...rest }: NavItemProps) {
+ * surface and no bar. `NavItem` itself never sets `true`. `icon` and `count` (D124) go inside the
+ * link: with `href` in the anchor `NavItem` renders, with a router link by
+ * cloning it with icon, label and count as its content. Without either, the
+ * markup is unchanged. */
+export function NavItem({ children, href, current, icon, count, className, ref, ...rest }: NavItemProps) {
   const cls = [styles.item, className].filter(Boolean).join(" ");
-  // D93: `current` reaches a link the consumer passes as the child. Only a
-  // single element (not a Fragment) can carry the attribute; a string or
-  // several children are left as they are. Without `current` nothing is
-  // cloned, so the child's own `aria-current` survives.
-  const onlyChild =
-    href === undefined && current && isValidElement(children) && children.type !== Fragment
-      ? (children as ReactElement<{ "aria-current"?: string }>)
+  const decorated = present(icon) || present(count);
+  // D93: only a single element (not a Fragment) can be cloned. It is cloned
+  // for `current` (to add aria-current="page") and, D124, for an icon or a
+  // count (to fill it). Otherwise nothing is cloned, so the child's own
+  // aria-current survives.
+  const child =
+    href === undefined && isValidElement(children) && children.type !== Fragment
+      ? (children as ReactElement<{ "aria-current"?: string; children?: ReactNode | ((...args: unknown[]) => ReactNode) }>)
       : null;
+  const dropped = decorated && href === undefined && child === null;
+
+  useEffect(() => {
+    if (!dropped || process.env.NODE_ENV === "production") return;
+    console.warn("NavItem: icon and count need href, or one link element as the child; they were not rendered.");
+  }, [dropped]);
+
+  let content: ReactNode = children;
+  if (href !== undefined) {
+    content = (
+      <a href={href} aria-current={current ? "page" : undefined}>
+        {decorated ? entryContent(children, icon, count) : children}
+      </a>
+    );
+  } else if (child && (current || decorated)) {
+    const extra = current ? { "aria-current": "page" } : {};
+    if (decorated) {
+      const own = child.props.children;
+      // A render-prop link (`({ isActive }) => ...`) keeps its function: it is
+      // wrapped, so what it returns becomes the label.
+      const filled =
+        typeof own === "function"
+          ? (...args: unknown[]) => entryContent(own(...args), icon, count)
+          : entryContent(own, icon, count);
+      content = cloneElement(child, { ...extra, children: filled });
+    } else {
+      content = cloneElement(child, extra);
+    }
+  }
+
   return (
     <li ref={ref} className={cls} {...rest}>
-      {href !== undefined ? (
-        <a href={href} aria-current={current ? "page" : undefined}>
-          {children}
-        </a>
-      ) : onlyChild ? (
-        cloneElement(onlyChild, { "aria-current": "page" })
-      ) : (
-        children
-      )}
+      {content}
     </li>
   );
 }

@@ -57,6 +57,7 @@ const COMPONENTS = [
   "InlineAlert",
   "Skeleton",
   "CopyButton",
+  "Count",
   "Tabs",
   "TabList",
   "Tab",
@@ -134,7 +135,7 @@ function typeToString(p: { type: { name: string; value?: { value: string }[] } }
   return p.type.name;
 }
 
-const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS);
+const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS, COMPONENT_DIR);
 
 const manifest = COMPONENTS.map((name) => {
   const dir = COMPONENT_DIR[name] ?? name;

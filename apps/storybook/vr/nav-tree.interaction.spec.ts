@@ -26,3 +26,22 @@ test("a link marked aria-current=true reads as the parent of the current screen 
   expect(parent.background).toBe("rgba(0, 0, 0, 0)");
   expect(parent.before).toBe("none");
 });
+
+/** D124 — the browser joins the count to the link's name with a space, sizes
+ * the icon by the token (16) and pushes the count to the inline end. */
+test("an entry's icon is 16px and its count joins the name at the row's end @interaction", async ({ page }) => {
+  await page.goto(story("components-navtree--with-counts"), { waitUntil: "networkidle" });
+  const link = page.getByRole("link", { name: "Cards 238" });
+  await expect(link).toBeVisible();
+  const box = await link.evaluate((el) => {
+    const svg = el.querySelector("svg")!.getBoundingClientRect();
+    const count = el.lastElementChild!.getBoundingClientRect();
+    const a = el.getBoundingClientRect();
+    const pad = parseFloat(getComputedStyle(el).paddingInlineEnd);
+    return { w: svg.width, h: svg.height, countEnd: count.right, linkEnd: a.right - pad };
+  });
+  expect(box.w).toBe(16);
+  expect(box.h).toBe(16);
+  expect(Math.abs(box.countEnd - box.linkEnd)).toBeLessThan(1);
+  await expect(page.getByRole("link", { name: "Stuck 4 stuck" })).toBeVisible();
+});

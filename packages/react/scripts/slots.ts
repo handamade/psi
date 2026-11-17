@@ -10,12 +10,16 @@ export interface SlotContract {
   order?: number;
 }
 
-/** Loads contracts.json + every <Component>/slots.json under srcDir and
+/** Loads contracts.json + every component's slot file under srcDir and
  * validates the whole graph: any reference to an unknown component or
- * contract throws — the build is the conformance gate (D45/D48 posture). */
+ * contract throws — the build is the conformance gate (D45/D48 posture).
+ * A component owns `src/<Name>/slots.json`. A part that lives in another
+ * component's folder (componentDir, e.g. NavItem → NavTree) owns
+ * `src/<Dir>/<Name>.slots.json` (D124). */
 export function loadSlotContracts(
   srcDir: string,
   componentNames: string[],
+  componentDir: Record<string, string> = {},
 ): Record<string, SlotContract[]> {
   const contractsPath = join(srcDir, "contracts.json");
   const contracts: Record<string, string[]> = existsSync(contractsPath)
@@ -34,7 +38,9 @@ export function loadSlotContracts(
 
   const out: Record<string, SlotContract[]> = {};
   for (const name of componentNames) {
-    const slotsPath = join(srcDir, name, "slots.json");
+    const dir = componentDir[name] ?? name;
+    const rel = dir === name ? `${name}/slots.json` : `${dir}/${name}.slots.json`;
+    const slotsPath = join(srcDir, rel);
     if (!existsSync(slotsPath)) {
       out[name] = []; // absence is explicit, not unknown (D45)
       continue;
@@ -44,14 +50,14 @@ export function loadSlotContracts(
       for (const comp of slot.accepts.components ?? []) {
         if (!componentNames.includes(comp)) {
           throw new Error(
-            `${name}/slots.json: slot "${slot.name}" accepts unknown component "${comp}"`,
+            `${rel}: slot "${slot.name}" accepts unknown component "${comp}"`,
           );
         }
       }
       for (const contract of slot.accepts.contracts ?? []) {
         if (!(contract in contracts)) {
           throw new Error(
-            `${name}/slots.json: slot "${slot.name}" accepts unknown contract "${contract}"`,
+            `${rel}: slot "${slot.name}" accepts unknown contract "${contract}"`,
           );
         }
       }
