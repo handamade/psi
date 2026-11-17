@@ -12,6 +12,7 @@ import { inputVars } from "./input.js";
 import { selectVars } from "./select.js";
 import { surfaceVars } from "./surface.js";
 import { checkboxVars } from "./checkbox.js";
+import { comboboxVars } from "./combobox.js";
 import { switchVars } from "./switch.js";
 import { tableVars } from "./table.js";
 import { tagVars } from "./tag.js";
@@ -41,6 +42,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   button: buttonVars,
   card: cardVars,
   checkbox: checkboxVars,
+  combobox: comboboxVars,
   control: controlVars,
   count: countVars,
   dialog: dialogVars,
