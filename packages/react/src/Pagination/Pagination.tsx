@@ -9,23 +9,20 @@ function range(start: number, end: number): number[] {
 /** Pages to render, with "ellipsis" marking an elided run. Pure and exported
  * so the truncation math is testable without rendering.
  *
- * Anchored on the real `leftSibling`/`rightSibling` for the current page —
- * not a page-count-independent fixed span. An earlier version's two
- * single-ellipsis branches used a fixed window (`range(1, windowSize)` /
- * `range(pageCount - windowSize + 1, pageCount)`) that didn't move with
- * `page` at all, so `paginationRange(3, 13, 1)` came out as
- * `[1, 2, 3, "ellipsis", 13]`, silently dropping true sibling page 4.
+ * D127: the count of items is the same on every page, so Previous and Next
+ * hold still under the pointer. When every page fits in
+ * `2 * siblingCount + 5` slots, every page is shown. Otherwise the list is
+ * always that many items — first, an ellipsis, the current page with
+ * `siblingCount` pages either side, an ellipsis, last — and near an end the
+ * window is filled out on the side away from that end, as it is in the
+ * middle (`1 2 3 4 5 … 100` on pages 1–4, not `1 2 3 … 100`). Before D127
+ * the window was padded only to `2 * siblingCount + 1`, so a 100-page pager
+ * showed 5, 6 or 7 slots and Next moved by up to 37px between pages.
  *
- * Each single-ellipsis branch instead widens only as far as `max(sibling,
- * windowSize)` / `min(sibling, pageCount - windowSize + 1)` — enough to
- * always include the real sibling, while still padding out to a full
- * `2 * siblingCount + 1` run when clamping at an edge would otherwise
- * shrink it (e.g. `paginationRange(13, 13, 1)` needs `11, 12, 13`, not
- * just `12, 13`).
- *
- * An ellipsis is only rendered where it elides at least two pages — a
- * single hidden page is rendered directly instead, since an ellipsis
- * standing in for one number is worse than the number. */
+ * An ellipsis always elides at least two pages — a single hidden page is
+ * rendered directly instead, since an ellipsis standing in for one number is
+ * worse than the number. Every true sibling of the current page is present
+ * (an earlier fixed-window version dropped one; the sweep test guards it). */
 export function paginationRange(
   page: number,
   pageCount: number,
@@ -33,37 +30,23 @@ export function paginationRange(
 ): Array<number | "ellipsis"> {
   const siblings = Math.max(0, siblingCount);
   const windowSize = siblings * 2 + 1;
-
   // first + last + current window + 2 ellipses
-  const maxSlots = windowSize + 4;
-  if (pageCount <= maxSlots) {
+  const slots = windowSize + 4;
+  if (pageCount <= slots) {
     return range(1, pageCount);
   }
 
-  const leftSibling = Math.max(page - siblings, 1);
-  const rightSibling = Math.min(page + siblings, pageCount);
-  // leftSibling > 3 / rightSibling < pageCount - 2 means at least two pages
-  // would be hidden on that side — the minimum that justifies an ellipsis.
-  const showLeftEllipsis = leftSibling > 3;
-  const showRightEllipsis = rightSibling < pageCount - 2;
-
-  if (!showLeftEllipsis && showRightEllipsis) {
-    const end = Math.max(rightSibling, windowSize);
-    return [...range(1, end), "ellipsis", pageCount];
+  // Near an end the run that touches it replaces the window and the ellipsis
+  // on that side: the window plus the two slots they took.
+  const edgeRun = windowSize + 2;
+  // A left ellipsis would hide 2…page-siblings-1, fewer than two pages.
+  if (page - siblings <= 3) {
+    return [...range(1, edgeRun), "ellipsis", pageCount];
   }
-
-  if (showLeftEllipsis && !showRightEllipsis) {
-    const start = Math.min(leftSibling, pageCount - windowSize + 1);
-    return [1, "ellipsis", ...range(start, pageCount)];
+  if (page + siblings >= pageCount - 2) {
+    return [1, "ellipsis", ...range(pageCount - edgeRun + 1, pageCount)];
   }
-
-  if (showLeftEllipsis && showRightEllipsis) {
-    return [1, "ellipsis", ...range(leftSibling, rightSibling), "ellipsis", pageCount];
-  }
-
-  // Neither ellipsis needed (shouldn't occur once pageCount > maxSlots, but
-  // fall back to the full list rather than dropping pages).
-  return range(1, pageCount);
+  return [1, "ellipsis", ...range(page - siblings, page + siblings), "ellipsis", pageCount];
 }
 
 export interface PaginationProps {

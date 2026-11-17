@@ -16,16 +16,16 @@ describe("paginationRange", () => {
     expect(paginationRange(2, 2, 1)).toEqual([1, 2]);
   });
 
-  it("truncates on the right near the start", () => {
-    expect(paginationRange(2, 13, 1)).toEqual([1, 2, 3, "ellipsis", 13]);
+  it("fills the window near the start, so the slot count holds (D127)", () => {
+    expect(paginationRange(2, 13, 1)).toEqual([1, 2, 3, 4, 5, "ellipsis", 13]);
   });
 
   it("truncates on both sides in the middle", () => {
     expect(paginationRange(7, 13, 1)).toEqual([1, "ellipsis", 6, 7, 8, "ellipsis", 13]);
   });
 
-  it("truncates on the left near the end", () => {
-    expect(paginationRange(13, 13, 1)).toEqual([1, "ellipsis", 11, 12, 13]);
+  it("fills the window near the end, so the slot count holds (D127)", () => {
+    expect(paginationRange(13, 13, 1)).toEqual([1, "ellipsis", 9, 10, 11, 12, 13]);
   });
 
   it("widens with siblingCount", () => {
@@ -36,11 +36,11 @@ describe("paginationRange", () => {
   // dropped a true sibling of the current page on ordinary inputs — one
   // click past the start was enough to trigger it.
   it("does not drop the right sibling one click past the start (regression)", () => {
-    expect(paginationRange(3, 13, 1)).toEqual([1, 2, 3, 4, "ellipsis", 13]);
+    expect(paginationRange(3, 13, 1)).toEqual([1, 2, 3, 4, 5, "ellipsis", 13]);
   });
 
   it("does not drop the left sibling one click before the end (regression)", () => {
-    expect(paginationRange(11, 13, 1)).toEqual([1, "ellipsis", 10, 11, 12, 13]);
+    expect(paginationRange(11, 13, 1)).toEqual([1, "ellipsis", 9, 10, 11, 12, 13]);
   });
 
   it("clamps a negative siblingCount instead of producing adjacent ellipses", () => {
@@ -54,11 +54,13 @@ describe("paginationRange", () => {
     //   2. page 1 and pageCount always appear
     //   3. an ellipsis elides at least two pages (never stands in for one)
     //   4. output is strictly ascending, no duplicates, no adjacent ellipses
+    //   5. the slot count is the same on every page (D127): every page when
+    //      they fit, else 2 * siblingCount + 5 — so Previous and Next hold still
     // This is the test that would have caught the fixed-window bug: case 4
     // (2, 13, 1) already passed under the old code, but case 3 (3, 13, 1)
     // is what exposed the drop.
     for (let pageCount = 1; pageCount <= 30; pageCount++) {
-      for (let siblingCount = 1; siblingCount <= 3; siblingCount++) {
+      for (let siblingCount = 0; siblingCount <= 3; siblingCount++) {
         for (let page = 1; page <= pageCount; page++) {
           it(`holds for page=${page} pageCount=${pageCount} siblingCount=${siblingCount}`, () => {
             const out = paginationRange(page, pageCount, siblingCount);
@@ -69,6 +71,9 @@ describe("paginationRange", () => {
             for (let p = wantLo; p <= wantHi; p++) {
               expect(out).toContain(p);
             }
+
+            // Invariant 5: a constant slot count.
+            expect(out).toHaveLength(Math.min(pageCount, 2 * siblingCount + 5));
 
             // Invariant 2: first and last page always present.
             expect(out).toContain(1);
