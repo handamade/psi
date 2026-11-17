@@ -290,3 +290,41 @@ describe("useModePref", () => {
     expect(last[1]).toBe("dark");
   });
 });
+
+describe("mode hooks in one document", () => {
+  beforeEach(() => stubMatchMedia(false));
+
+  function Pair({ onRender }: { onRender: (a: ReturnType<typeof useModePref>, b: ReturnType<typeof useMode>) => void }) {
+    const a = useModePref();
+    const b = useMode();
+    onRender(a, b);
+    return null;
+  }
+
+  it("useMode follows a change made through useModePref, and the reverse", () => {
+    let a!: ReturnType<typeof useModePref>;
+    let b!: ReturnType<typeof useMode>;
+    mount(createElement(Pair, { onRender: (x, y) => ((a = x), (b = y)) }));
+    act(() => a[2]("dark"));
+    expect(b[0]).toBe("dark");
+    act(() => b[1]("light"));
+    expect(a[1]).toBe("light");
+    expect(a[0]).toBe("light"); // the preference follows too
+  });
+
+  it("choosing System in one instance clears the other's preference", () => {
+    localStorage.setItem(MODE_KEY, "dark");
+    let a!: ReturnType<typeof useModePref>;
+    let c!: ReturnType<typeof useModePref>;
+    function Two() {
+      a = useModePref();
+      c = useModePref();
+      return null;
+    }
+    mount(createElement(Two));
+    expect(c[0]).toBe("dark");
+    act(() => a[2]("system"));
+    expect(c[0]).toBe("system");
+    expect(c[1]).toBe("light");
+  });
+});

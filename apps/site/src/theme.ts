@@ -77,8 +77,24 @@ function systemMode(): Mode {
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+/** Fired on `window` whenever a mode is painted, so every hook instance in
+ * the document (the chrome's, the homepage's, later the theme console's)
+ * follows a change made by any other. `detail` is the new mode. */
+export const MODE_EVENT = "psi-site:mode";
+
 function applyMode(next: Mode): void {
   document.documentElement.dataset.psiTheme = next;
+  window.dispatchEvent(new CustomEvent<Mode>(MODE_EVENT, { detail: next }));
+}
+
+/** Follow modes painted by other instances. Callers persist BEFORE applying,
+ * so a listener that re-reads storage sees the new preference. */
+function useModeEvents(onMode: (mode: Mode) => void): void {
+  useEffect(() => {
+    const on = (e: Event) => onMode((e as CustomEvent<Mode>).detail);
+    window.addEventListener(MODE_EVENT, on);
+    return () => window.removeEventListener(MODE_EVENT, on);
+  }, [onMode]);
 }
 
 /**
@@ -112,12 +128,12 @@ export function useMode(): [Mode, (next: Mode) => void, (next: Mode) => void] {
   /** An explicit choice. This is the only path that persists. */
   const setMode = useCallback((next: Mode) => {
     setModeState(next);
-    applyMode(next);
     try {
       localStorage.setItem(MODE_KEY, next);
     } catch {
       /* storage unavailable */
     }
+    applyMode(next);
   }, []);
 
   /** A machine choice (a derived brand's own `vector.mode`), not a
@@ -126,6 +142,8 @@ export function useMode(): [Mode, (next: Mode) => void, (next: Mode) => void] {
     setModeState(next);
     applyMode(next);
   }, []);
+
+  useModeEvents(setModeState);
 
   useEffect(() => {
     const mq = matchMedia("(prefers-color-scheme: dark)");
@@ -164,14 +182,22 @@ export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode)
     setPrefState(p);
     const next = p === "system" ? systemMode() : p;
     setModeState(next);
-    applyMode(next);
     try {
       if (p === "system") localStorage.removeItem(MODE_KEY);
       else localStorage.setItem(MODE_KEY, p);
     } catch {
       /* storage unavailable */
     }
+    applyMode(next);
   }, []);
+
+  // Another instance changed the mode: follow it, and re-read the preference
+  // it stored (or cleared).
+  const followOther = useCallback((m: Mode) => {
+    setModeState(m);
+    setPrefState(readStoredMode() ?? "system");
+  }, []);
+  useModeEvents(followOther);
 
   const setModeEphemeral = useCallback((m: Mode) => {
     setModeState(m);

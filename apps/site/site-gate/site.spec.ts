@@ -276,6 +276,6 @@ test("hydrating the homepage logs no errors, with a stored dark mode and brand",
   await page.addInitScript(() => localStorage.setItem("psi-theme", "dark"));
   await page.goto(BASE, { waitUntil: "networkidle" });
   await expect(page.locator("html")).toHaveAttribute("data-psi-theme", "dark");
-  await expect(page.getByRole("button", { name: "Switch to light mode" })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Dark" }).first()).toHaveAttribute("aria-checked", "true");
   expect(errors).toEqual([]);
 });
