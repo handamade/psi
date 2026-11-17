@@ -45,7 +45,7 @@ function Zones() {
   const nav = (
     <NavTree aria-label="Canopy">
       <NavItem href="#overview">Overview</NavItem>
-      <NavItem href="#zones" current count={<Count value={6} />}>Zones</NavItem>
+      <NavItem href="#zones" current count={<Count value={ZONES.length} />}>Zones</NavItem>
       <NavItem href="#alerts" count={<Count value={2} tone="attention" label="2 alerts" />}>Alerts</NavItem>
       <NavItem href="#schedules">Schedules</NavItem>
     </NavTree>
@@ -68,7 +68,7 @@ function Zones() {
       >
         <Stack gap={16}>
           <PageHeading>Zones</PageHeading>
-          <Text tone="secondary">North house · 6 zones · updated 2 min ago</Text>
+          <Text tone="secondary">North house · {ZONES.length} zones · updated 2 min ago</Text>
           <Toolbar>
             <Input type="search" aria-label="Search zones" placeholder="Search zones…" />
             <Select aria-label="House"><option>All houses</option><option>North</option></Select>
