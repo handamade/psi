@@ -73,6 +73,11 @@ describe("FieldStack (D115)", () => {
     expect(stackCss()).toMatch(/\.stack\s*>\s*\*\s*\{\s*grid-column:\s*1\s*\/\s*-1;/);
   });
 
+  it("is capped by --psi-field-stack-max-width at every label position (D125)", () => {
+    const stack = /\.stack\s*\{([^}]*)\}/.exec(stackCss())![1];
+    expect(stack).toMatch(/max-inline-size:\s*var\(--psi-field-stack-max-width\);/);
+  });
+
   it("a Field in a start stack shares the stack's columns", () => {
     expect(fieldCss()).toMatch(/\.field\[data-in-stack="start"\]\[data-label-position="start"\]\s*\{\s*grid-template-columns:\s*subgrid;/);
   });

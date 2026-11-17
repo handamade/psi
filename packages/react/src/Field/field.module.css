@@ -37,6 +37,28 @@
   color: var(--psi-field-error-fg);
 }
 
+/* ── Control width (D125) ────────────────────────────────────────
+   Every direct child but the label and the message line is the control:
+   an Input, a Select, a Textarea (or its counter wrapper), a group, or a
+   useFieldControl element. Pixel-true steps, like Dialog's widths. The
+   attribute selector (0,4,0) beats a control's own width: 100% and
+   Toolbar's `> input` rule. max-inline-size lets the control shrink in a
+   narrower column: a stack below 480px, a dialog, a phone. In a start
+   Field the control sits at the start of column 2. */
+
+.field[data-control-width="80"] > :not(.label):not(.message) { inline-size: 80px; max-inline-size: 100%; }
+.field[data-control-width="120"] > :not(.label):not(.message) { inline-size: 120px; max-inline-size: 100%; }
+.field[data-control-width="160"] > :not(.label):not(.message) { inline-size: 160px; max-inline-size: 100%; }
+.field[data-control-width="240"] > :not(.label):not(.message) { inline-size: 240px; max-inline-size: 100%; }
+.field[data-control-width="320"] > :not(.label):not(.message) { inline-size: 320px; max-inline-size: 100%; }
+.field[data-control-width="480"] > :not(.label):not(.message) { inline-size: 480px; max-inline-size: 100%; }
+
+/* The track must not grow with the control, or max-inline-size: 100% resolves
+   against the control's own width and never clamps (D125). */
+.field[data-control-width] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 /* ── Label beside the control (D115) ─────────────────────────────
    Column 1 holds the label; the control and the message line sit in column 2,
    so a message hangs under its control. Rows align on the first baseline, so
@@ -50,6 +72,12 @@
   column-gap: var(--psi-field-column-gap);
   align-items: baseline;
   justify-content: start;
+}
+
+/* A sized control's column shrinks with the field; the subgrid and the
+   narrow-stack rules below still win. */
+.field[data-control-width][data-label-position="start"] {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .field[data-label-position="start"] > * {
