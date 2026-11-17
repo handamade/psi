@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeAll } from "vitest";
 import { createStore, type Store } from "../src/store.js";
 import type { PsiIndex } from "../src/types.js";
