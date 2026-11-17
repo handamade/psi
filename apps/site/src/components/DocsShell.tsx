@@ -1,21 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { AppShell, SkipLink, ToastProvider, useToast } from "@handamade/psi-react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { AppShell, SkipLink, ToastProvider } from "@handamade/psi-react";
 
 import type { NavSection } from "../content/docs-nav";
-import { ANNOUNCE_EVENT } from "../lib/announce";
 import { SiteChrome } from "../chrome/SiteChrome";
 import { WIDE } from "../chrome/useWide";
+import { AnnounceBridge } from "./AnnounceBridge";
 import { DocsNav } from "./DocsNav";
-
-function AnnounceBridge() {
-  const toast = useToast();
-  useEffect(() => {
-    const onAnnounce = (e: Event) => toast.announce((e as CustomEvent<string>).detail);
-    window.addEventListener(ANNOUNCE_EVENT, onAnnounce);
-    return () => window.removeEventListener(ANNOUNCE_EVENT, onAnnounce);
-  }, [toast]);
-  return null;
-}
 
 export function DocsShell({
   nav,

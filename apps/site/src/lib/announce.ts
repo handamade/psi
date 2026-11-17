@@ -1,6 +1,6 @@
 /** Each Astro island is its own React root, so a CopyButton in one island
  * cannot reach the ToastProvider in another through context. Islands
- * dispatch this event instead; DocsShell owns the one provider and speaks
+ * dispatch this event instead; AnnounceBridge (one per page) speaks
  * it (CopyButton announces nothing by design, D86). */
 export const ANNOUNCE_EVENT = "psi-site:announce";
 

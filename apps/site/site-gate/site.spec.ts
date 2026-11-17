@@ -237,6 +237,17 @@ test("the header links pages, never fragments", async ({ page }) => {
   expect(hrefs.filter((h) => h?.includes("#"))).toEqual([]);
 });
 
+// CodeView's copy button announces through announce(); the homepage has no
+// DocsShell, so CanopyIsland mounts the one bridge. Without it a copy on / is silent.
+test("a copy on the homepage is spoken once", async ({ page }) => {
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.getByRole("heading", { level: 2, name: "Built only from Psi" }).scrollIntoViewIfNeeded();
+  // client:visible: the markup is there before the island hydrates, so wait for Astro to drop `ssr`.
+  await expect(page.locator("astro-island:has(.canopy)")).not.toHaveAttribute("ssr", "");
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent("psi-site:announce", { detail: "Copied" })));
+  await expect(page.getByText("Copied", { exact: true })).toHaveCount(1);
+});
+
 test.describe("at 375px", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
