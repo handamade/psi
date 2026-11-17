@@ -62,4 +62,10 @@ describe("Tag", () => {
     const tag = container.querySelector("span")!;
     expect(tag.className).toContain("neutral");
   });
+  it("names the dismiss button with dismissLabel (D130), defaulting to \"Dismiss\"", () => {
+    const { rerender } = render(<Tag onDismiss={() => {}}>Berlin</Tag>);
+    expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
+    rerender(<Tag onDismiss={() => {}} dismissLabel="Remove Berlin">Berlin</Tag>);
+    expect(screen.getByRole("button", { name: "Remove Berlin" })).toBeInTheDocument();
+  });
 });

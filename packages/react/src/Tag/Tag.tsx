@@ -12,6 +12,10 @@ export interface TagProps extends HTMLAttributes<HTMLSpanElement> {
   subtle?: boolean;
   /** When provided, renders a dismiss button that calls this handler. */
   onDismiss?: () => void;
+  /** The dismiss button's accessible name, so several dismissible tags can
+   * each say what they remove ("Remove Berlin"). Sets the name only (D117's
+   * shape; D130). @default "Dismiss" */
+  dismissLabel?: string;
   /** Forwarded ref to the underlying `<span>` element. */
   ref?: Ref<HTMLSpanElement>;
 }
@@ -38,6 +42,7 @@ export function Tag({
   variant = "neutral",
   subtle = false,
   onDismiss,
+  dismissLabel = "Dismiss",
   className,
   children,
   ref,
@@ -56,7 +61,7 @@ export function Tag({
           type="button"
           className={styles.dismiss}
           onClick={onDismiss}
-          aria-label="Dismiss"
+          aria-label={dismissLabel}
         >
           <svg
             width="12"
