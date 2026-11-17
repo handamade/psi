@@ -333,6 +333,14 @@ test.describe("at 375px", () => {
     expect(m.textBottom).toBeLessThanOrEqual(m.barTop);
   });
 
+  test("Open navigation in the Menu moves focus into the docs sidebar", async ({ page }) => {
+    await page.goto(`${BASE}docs/components/button/`, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("button", { name: "Open navigation" }).click();
+    await expect(page.locator("#docs-sidebar")).toBeVisible();
+    await expect(page.locator("#docs-sidebar [aria-current]")).toBeFocused();
+  });
+
   test("a docs page's last content clears the bottom bar", async ({ page }) => {
     await page.goto(`${BASE}docs/components/button/`, { waitUntil: "networkidle" });
     const toEnd = () => page.evaluate(() => { const m = document.querySelector<HTMLElement>("main#main")!; m.scrollTop = m.scrollHeight; });

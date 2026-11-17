@@ -62,6 +62,20 @@ export function SiteChrome({ sidebar }: { sidebar?: { open: boolean; onToggle: (
     menuButton.current?.focus();
   };
 
+  // "Open navigation" sends focus to what it opened: the sidebar's current link,
+  // else its first. Run after the commit that closes the drawer (its close()
+  // hands focus back to Menu) and draws the sidebar, so this lands last.
+  const focusSidebar = useRef(false);
+  const sidebarId = sidebar?.id;
+  const sidebarOpen = sidebar?.open;
+  useEffect(() => {
+    if (!focusSidebar.current || menuOpen || !sidebarOpen || !sidebarId) return;
+    focusSidebar.current = false;
+    const nav = document.getElementById(sidebarId);
+    const target = nav?.querySelector<HTMLElement>("[aria-current]") ?? nav?.querySelector<HTMLElement>("a[href], button");
+    target?.focus();
+  }, [menuOpen, sidebarOpen, sidebarId]);
+
   return (
     <>
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
@@ -97,7 +111,16 @@ export function SiteChrome({ sidebar }: { sidebar?: { open: boolean; onToggle: (
       <Dialog id="site-menu" open={menuOpen} onClose={closeMenu} placement="inline-end" width={400} title="Menu">
         {sidebar && (
           <Button variant="neutral" size={40} aria-controls={sidebar.id} aria-expanded={sidebar.open}
-            onClick={() => { sidebar.onToggle(); closeMenu(); }}>
+            onClick={() => {
+              if (sidebar.open) {
+                sidebar.onToggle();
+                closeMenu();
+              } else {
+                focusSidebar.current = true;
+                sidebar.onToggle();
+                setMenuOpen(false);
+              }
+            }}>
             {sidebar.open ? "Close navigation" : "Open navigation"}
           </Button>
         )}

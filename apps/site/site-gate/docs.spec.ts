@@ -43,7 +43,8 @@ test("the sidebar is open at desktop width and behind the Menu below it", async 
   await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(sidebar).toBeVisible();
-  await expect(page.getByRole("button", { name: "Menu" })).toBeFocused();
+  // Focus goes to what was opened (the current page's link on /docs/), not back to Menu.
+  await expect(sidebar.locator("[aria-current]")).toBeFocused();
   await page.setViewportSize({ width: 1300, height: 800 });
   await expect(sidebar).toBeVisible();
   await expect(page.getByRole("button", { name: "Menu" })).toBeHidden();
