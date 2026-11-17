@@ -258,6 +258,7 @@ test("every docs page has a markdown twin, and /docs/llms.txt lists exactly them
   const expected = [
     "/docs/index.md",
     ...GUIDE_IDS.map((g) => `/docs/get-started/${g}.md`),
+    "/docs/changelog.md",
     ...componentSlugs().map((s) => `/docs/components/${s}.md`),
     ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}.md`),
   ];
