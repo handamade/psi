@@ -154,6 +154,9 @@ export const ControlWidth: Story = {
         <Field label="Address, in a 360px column" controlWidth={480}>
           <Input size={32} defaultValue="Unter den Linden 1, 10117 Berlin" />
         </Field>
+        <Field label="Address" labelPosition="start" controlWidth={480}>
+          <Input size={32} defaultValue="Unter den Linden 1, 10117 Berlin" />
+        </Field>
       </div>
     </div>
   ),

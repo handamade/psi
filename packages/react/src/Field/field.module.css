@@ -53,6 +53,12 @@
 .field[data-control-width="320"] > :not(.label):not(.message) { inline-size: 320px; max-inline-size: 100%; }
 .field[data-control-width="480"] > :not(.label):not(.message) { inline-size: 480px; max-inline-size: 100%; }
 
+/* The track must not grow with the control, or max-inline-size: 100% resolves
+   against the control's own width and never clamps (D125). */
+.field[data-control-width] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 /* ── Label beside the control (D115) ─────────────────────────────
    Column 1 holds the label; the control and the message line sit in column 2,
    so a message hangs under its control. Rows align on the first baseline, so
@@ -66,6 +72,12 @@
   column-gap: var(--psi-field-column-gap);
   align-items: baseline;
   justify-content: start;
+}
+
+/* A sized control's column shrinks with the field; the subgrid and the
+   narrow-stack rules below still win. */
+.field[data-control-width][data-label-position="start"] {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .field[data-label-position="start"] > * {

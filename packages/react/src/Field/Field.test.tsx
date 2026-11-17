@@ -331,4 +331,16 @@ describe("controlWidth (D125)", () => {
       expect(rule).toMatch(/max-inline-size:\s*100%;/);
     }
   });
+
+  it("a sized Field's track shrinks with the field, in the right source order", () => {
+    const text = css();
+    expect(text).toContain(".field[data-control-width] {\n  grid-template-columns: minmax(0, 1fr);\n}");
+    const start = text.indexOf(
+      '.field[data-control-width][data-label-position="start"] {\n  grid-template-columns: auto minmax(0, 1fr);',
+    );
+    expect(start).toBeGreaterThan(-1);
+    expect(start).toBeGreaterThan(text.indexOf('.field[data-label-position="start"] {'));
+    expect(start).toBeLessThan(text.indexOf("grid-template-columns: subgrid"));
+    expect(start).toBeLessThan(text.indexOf("@container psi-field-stack"));
+  });
 });

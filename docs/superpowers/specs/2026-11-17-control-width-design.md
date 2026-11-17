@@ -68,6 +68,7 @@ other branches in flight at the same time.
       `Toolbar`'s `> input` rule (0,1,1).
     - `max-inline-size: 100%` lets a control shrink where its column is
       narrower than the step: a stack below 480px, a dialog, a phone.
+    - So that it can, a Field with `controlWidth` sets its own track to `minmax(0, 1fr)` (`auto minmax(0, 1fr)` in the `start` position): an `auto` track would grow to the control's width and the clamp would never bite. Found by the Chromium layout check.
   - The label and the message line keep the Field's width. An error under a
     120px control does not wrap at 120px.
   - The props doc and the generated docs carry a table, measured in the browser
