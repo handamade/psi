@@ -69,10 +69,13 @@ for (const s of stories) {
         const again = seen.has(el);
         seen.add(el);
         // Checkbox and Switch keep the native input focusable and draw the
-        // ring on the indicator that follows it.
-        const own = getComputedStyle(el);
+        // ring on the indicator that follows it. Combobox (D130) draws its
+        // input's ring around the whole control, Tags and buttons included,
+        // and makes the input's own outline transparent: read the control.
+        const host = el.matches("input[role=combobox]") ? el.closest("[data-psi-combobox]") : null;
+        const own = getComputedStyle(host ?? el);
         const next = el.nextElementSibling ? getComputedStyle(el.nextElementSibling) : null;
-        const cs = own.outlineStyle !== "solid" && next?.outlineStyle === "solid" ? next : own;
+        const cs = !host && own.outlineStyle !== "solid" && next?.outlineStyle === "solid" ? next : own;
         const cls = typeof el.className === "string" ? el.className.split(" ")[0] : "";
         const role = el.getAttribute("role");
         return {
