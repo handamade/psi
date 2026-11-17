@@ -35,16 +35,18 @@ test("a copy anywhere is spoken once, through the shell's region", async ({ page
   await expect(page.getByText("Copied", { exact: true })).toBeAttached();
 });
 
-test("the sidebar is open at desktop width and behind a toggle below it", async ({ page }) => {
+test("the sidebar is open at desktop width and behind the Menu below it", async ({ page }) => {
   await page.setViewportSize({ width: 600, height: 800 });
   await page.goto(`${BASE}/docs/`, { waitUntil: "networkidle" });
   const sidebar = page.locator("#docs-sidebar");
   await expect(sidebar).toBeHidden();
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(sidebar).toBeVisible();
+  await expect(page.getByRole("button", { name: "Menu" })).toBeFocused();
   await page.setViewportSize({ width: 1300, height: 800 });
   await expect(sidebar).toBeVisible();
-  await expect(page.getByRole("button", { name: /navigation/ })).toBeHidden();
+  await expect(page.getByRole("button", { name: "Menu" })).toBeHidden();
 });
 
 function componentSlugs(): string[] {

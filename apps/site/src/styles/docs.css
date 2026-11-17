@@ -118,24 +118,15 @@ h3.docs-heading {
   padding-inline-start: var(--psi-space-12);
 }
 
-/* AppShell collapses its sidebar by `hidden` only; below the md breakpoint
- * (960, guidance.json layout.breakpoints) the toggle is how it comes back. */
-@media (min-width: 960px) {
-  .docs-menu-toggle {
-    display: none;
-  }
-}
-
 /* Server HTML and no-JS, narrow: the shell has not measured the viewport yet
  * (DocsShell sets data-hydrated). Without this the 16rem sidebar column is
- * drawn and the toggle is dead. Single column; override AppShell's grid. */
+ * drawn and its Menu-drawer toggle is dead. Single column; override AppShell's grid. */
 @media (max-width: 959px) {
   .docs-shell:not([data-hydrated]) {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .docs-shell:not([data-hydrated]) #docs-sidebar,
-  .docs-shell:not([data-hydrated]) .docs-menu-toggle {
+  .docs-shell:not([data-hydrated]) #docs-sidebar {
     display: none;
   }
 }
