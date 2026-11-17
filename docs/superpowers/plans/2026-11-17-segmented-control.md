@@ -29,7 +29,7 @@
 - Modify: `packages/tokens/src/components/registry.ts` (import and `segmented: segmentedVars`)
 - Test: `packages/tokens/__tests__/segmented-tokens.test.ts`
 
-**Interfaces:** Produces CSS vars `--psi-segmented-{bg,border,fg,fg-hover,bg-hover,selected-bg,selected-fg,selected-border,fg-disabled,focus-ring,radius,inset,24-height,32-height,40-height,24-padding-x,32-padding-x,40-padding-x,24-font,32-font,40-font}`.
+**Interfaces:** Produces CSS vars `--psi-segmented-{bg,border,fg,fg-hover,bg-hover,selected-bg,selected-fg,selected-ring,fg-disabled,focus-ring,radius,inset,24-height,32-height,40-height,24-padding-x,32-padding-x,40-padding-x,24-font,32-font,40-font}`.
 
 - [ ] **Step 1: Write the failing test** — declares the token map exactly; the shipped defaults pass `checkOverrideScopes`; `wcagAAPairs` contains `fgSecondary/bgPrimary`, `fgPrimary/fillNeutral3`, `fgAccent/fillTintAccent`, `fgAccent/bgPrimary`; per theme (light, dark, acme, ember) `fgAccent` on the tint composited onto `bgPrimary` ≥ 4.5 and `fgAccent` vs `bgPrimary` ≥ 3.
 
@@ -55,7 +55,7 @@ export const segmentedVars: Record<string, string> = {
   "bg-hover": "var(--psi-fill-neutral3)",
   "selected-bg": "var(--psi-fill-tint-accent)",
   "selected-fg": "var(--psi-fg-accent)",
-  "selected-border": "var(--psi-fg-accent)",
+  "selected-ring": "var(--psi-fg-accent)",
   "fg-disabled": "var(--psi-fg-quaternary)",
   "focus-ring": "var(--psi-border-focus)",
   radius: "var(--psi-radius-full)",
@@ -119,7 +119,7 @@ Implementation: as in the spec's API section. Key points:
 - Call every hook before any `throw` (rules of hooks).
 - Root: `role={inTabs ? "tablist" : "radiogroup"}`, `aria-orientation` only in tabs mode, `onKeyDown` composes the caller's handler with `useTabsKeyboard({ itemSelector: "[data-psi-segment]", orientation: inTabs ? "horizontal" : "both" })`.
 - Segment: `<button type="button" data-psi-segment data-value>`; tabs mode adds `role="tab" id=tabId(...) aria-selected aria-controls=panelId(...)`; radio mode `role="radio" aria-checked`; `aria-disabled` when disabled; `tabIndex = tabStop === value ? 0 : -1`; registers with `register` in a layout effect; label in `<span className={styles.label}>`.
-- CSS per the spec: pill track (`inline-flex`, `max-inline-size: 100%`, 1px border, `inset` padding, `bg`), `.fill` (`flex`, `inline-size: 100%`, segments `flex: 1 1 0`), segments `flex: 0 1 auto; min-inline-size: 0`, label ellipsis, selected = tint + fg + `box-shadow: inset 0 0 0 1px var(--psi-segmented-selected-border)`, hover only on unselected enabled segments, inset focus ring.
+- CSS per the spec: pill track (`inline-flex`, `max-inline-size: 100%`, 1px border, `inset` padding, `bg`), `.fill` (`flex`, `inline-size: 100%`, segments `flex: 1 1 0`), segments `flex: 0 1 auto; min-inline-size: 0`, label ellipsis, selected = tint + fg + `box-shadow: inset 0 0 0 1px var(--psi-segmented-selected-ring)`, hover only on unselected enabled segments, inset focus ring.
 
 - [ ] Commit `feat(react): SegmentedControl, a radio group alone and the tab list inside Tabs (D132)`.
 

@@ -167,7 +167,7 @@ The owner chose one standalone component over a `Tabs` variant and a
   | `bg-hover` | `fill-neutral3` | Unselected segment on hover. |
   | `selected-bg` | `fill-tint-accent` | The soft accent fill. |
   | `selected-fg` | `fg-accent` | Selected label. |
-  | `selected-border` | `fg-accent` | A 1px inset ring on the selected segment (below). |
+  | `selected-ring` | `fg-accent` | A 1px inset ring on the selected segment (below). |
   | `fg-disabled` | `fg-quaternary` | Not gated: disabled text is exempt from 1.4.3, as with `--psi-tabs-fg-disabled`. |
   | `focus-ring` | `border-focus` | With `--psi-focus-ring-width` and `--psi-focus-ring-offset-inset`. |
   | `radius` | `radius-full` | See "Shape". |
@@ -198,6 +198,10 @@ The owner chose one standalone component over a `Tabs` variant and a
   the ring clears 3:1 against the canvas around it in every theme without a new
   pair. The ring is drawn inside the segment so selecting never moves a pixel
   of layout.
+  The key is `selected-ring`, not `selected-border`: a `-border` key is held
+  by the D46 scope gate to border-scoped tokens, and `fg-accent` is scoped to
+  text. An unsuffixed key is not scope-checked, the same posture as
+  `focus-ring`. Found by the gate during D132.
 
   **Contrast.** Every text pair is one the matrix already gates in all four
   themes, so no pair is added and the pinned pair count does not move:
