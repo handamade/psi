@@ -161,9 +161,10 @@ export function checkSlots(el: Element, index: CheckIndex, ctx: RuleContext): vo
       const allowed = new Set(accepts);
       const list = [...allowed].join(", ");
       for (const item of items) {
+        if (item.kind === "text") continue; // text is always accepted (D45, patterns.ts); cardinality still counts it
         const name = item.kind === "element" ? ctx.exportOf(item.tag) : null;
         if (name && allowed.has(name)) continue;
-        const got = item.kind === "element" ? `<${item.tag}>` : "text";
+        const got = item.kind === "element" ? `<${item.tag}>` : "a computed value";
         ctx.find(el.node, "slot", `${label} take${slot.name === "body" ? "" : "s"} ${list}; got ${got}.`);
       }
     }

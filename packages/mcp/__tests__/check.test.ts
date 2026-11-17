@@ -1,3 +1,5 @@
+import { readFileSync, readdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { CheckInputError, MAX_CODE, checkMarkdown } from "../src/check/index.js";
@@ -112,6 +114,12 @@ describe("check: slots (D45 contracts)", () => {
   const PSI =
     'import { Banner, Button, DescriptionItem, DescriptionList, Link, Menu, Tab, TabList, TabPanel, Tabs } from "@handamade/psi-react";\n';
 
+  it("accepts text in a slot with an accepts list, as the D45 validator does", () => {
+    const md = run(PSI + '<Banner action="Undo">Saved.</Banner>');
+    expect(lines(md, "slot")).toHaveLength(0);
+    expect(lines(run(PSI + "<DescriptionList>text</DescriptionList>"), "slot")).toHaveLength(0);
+  });
+
   it("flags a child the slot does not accept", () => {
     const md = run(PSI + "<DescriptionList><p>x</p></DescriptionList>");
     expect(lines(md, "slot")[0]).toMatch(/`DescriptionList`'s children take DescriptionItem; got <p>\./);
@@ -180,5 +188,23 @@ describe("check: accessible names", () => {
 
   it("skips an element with a spread", () => {
     expect(lines(run('import { TabList } from "@handamade/psi-react";\n<TabList {...p} />'), "accessible-name")).toHaveLength(0);
+  });
+});
+
+describe("check: every docs example is clean", () => {
+  const dir = fileURLToPath(new URL("../../docs/examples/", import.meta.url));
+  const files = readdirSync(dir, { recursive: true, encoding: "utf8" })
+    .filter((f) => f.endsWith(".tsx"))
+    .sort();
+
+  it("finds the examples", () => {
+    expect(files.length).toBeGreaterThanOrEqual(40);
+  });
+
+  it.each(files)("%s has no API findings", (file) => {
+    const md = run(readFileSync(dir + file, "utf8"));
+    for (const rule of ["parse", "slot", "unknown-prop", "invalid-value", "unknown-export", "accessible-name"]) {
+      expect(lines(md, rule), `${file}: ${rule}`).toEqual([]);
+    }
   });
 });
