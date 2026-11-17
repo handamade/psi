@@ -55,8 +55,8 @@
 }
 
 .input {
-  flex: 1 1 60px;
-  min-inline-size: 60px;
+  flex: 1 1 40px;
+  min-inline-size: 40px;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -134,7 +134,10 @@
 .size40 .input { block-size: calc(var(--psi-combobox-40-height) - 2px); }
 .size48 .input { block-size: calc(var(--psi-combobox-48-height) - 2px); }
 
+/* A 24px control holds 22px of content inside its border: the buttons
+   shrink to fit it rather than stretch the control. */
 .size24 .actions { padding-inline-end: 0; }
+.size24 .button { inline-size: 20px; block-size: 22px; }
 
 .multiple .values {
   padding-inline-start: var(--psi-space-4);

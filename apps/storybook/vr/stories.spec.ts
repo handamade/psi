@@ -25,6 +25,13 @@ for (const s of stories) {
         // wait for it deterministically instead of racing the fixed settle below.
         await page.waitForSelector('[role="tooltip"]', { state: "visible", timeout: 5000 });
       }
+      if (s.id.startsWith("components-combobox--open-")) {
+        // D130: these stories open their list from a vr-only play fn; wait for
+        // the popup rather than racing the settle below.
+        await page.waitForFunction(() =>
+          document.querySelector("[data-psi-combobox-popup]")?.matches(":popover-open"),
+        );
+      }
       await page.waitForTimeout(250); // fonts/HMR-free settle
       await expect(page).toHaveScreenshot(`${s.id}--${theme}.png`, { fullPage: true });
     });
