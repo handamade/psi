@@ -68,6 +68,11 @@ if (dryRun) {
 
 const dest = mkdtempSync(join(tmpdir(), "psi-publish-"));
 try {
+  // Pack and check every package before publishing any. Packing one package
+  // only after the one before it was on npm let 0.34.0 publish tokens and react
+  // and then stop on mcp: `pnpm pack` could not rewrite the `workspace:*` of a
+  // private devDependency that had no `version`.
+  const ready = [];
   for (const { name, dir, json } of order) {
     const id = `${name}@${json.version}`;
     if (isPublished(name, json.version)) {
@@ -75,19 +80,27 @@ try {
       continue;
     }
 
-    const packed = execFileSync("pnpm", ["pack", "--pack-destination", dest], {
-      cwd: dir,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "inherit"],
-    });
+    let packed;
+    try {
+      packed = execFileSync("pnpm", ["pack", "--pack-destination", dest], {
+        cwd: dir,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+    } catch (error) {
+      fail(`${id} did not pack, so nothing was published.\n${error.stdout ?? ""}${error.stderr ?? ""}`);
+    }
     const tarball = packed.trim().split("\n").at(-1).trim();
 
     const packedJson = JSON.parse(
       execFileSync("tar", ["-xOzf", tarball, "package/package.json"], { encoding: "utf8" }),
     );
     const leaks = workspaceLeaks(packedJson);
-    if (leaks.length) fail(`${id}: the packed package.json still has ${leaks.join(", ")}`);
+    if (leaks.length) fail(`${id}: the packed package.json still has ${leaks.join(", ")}; nothing was published`);
+    ready.push({ id, tarball });
+  }
 
+  for (const { id, tarball } of ready) {
     console.log(`\npublish: ${id} — npm will print an npmjs.com link. Open it, approve, and wait here.`);
     const result = spawnSync("npm", ["publish", tarball, "--access", "public"], { stdio: "inherit" });
     if (result.status !== 0) {
