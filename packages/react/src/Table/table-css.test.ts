@@ -73,3 +73,32 @@ describe("table.module.css (D126)", () => {
     expect(rule(".cell[data-numeric]")).toMatch(/white-space:\s*nowrap/);
   });
 });
+
+describe("table.module.css follow-ups (D128)", () => {
+  const LAST = ".body:not(:has(~ .body .row)) .row:last-child";
+  const FIRST = ".table:not(:has(.head)) .body:not(.body:has(.row) ~ .body) .row:first-child";
+
+  it("drops the bottom border on the last body that has rows, not only the last body", () => {
+    expect(rule(`${LAST} > *`)).toMatch(/border-bottom:\s*0/);
+  });
+
+  it("rounds the bottom corners of the last body that has rows", () => {
+    expect(rule(`${LAST} > :first-child`)).toMatch(/border-end-start-radius:\s*var\(--_psi-table-corner\)/);
+    expect(rule(`${LAST} > :last-child`)).toMatch(/border-end-end-radius:\s*var\(--_psi-table-corner\)/);
+  });
+
+  it("rounds the top corners of the first body that has rows when there is no head", () => {
+    expect(rule(`${FIRST} > :first-child`)).toMatch(/border-start-start-radius:\s*var\(--_psi-table-corner\)/);
+    expect(rule(`${FIRST} > :last-child`)).toMatch(/border-start-end-radius:\s*var\(--_psi-table-corner\)/);
+  });
+
+  it("keeps the D126 rules for an engine without :has()", () => {
+    expect(rule(".body:last-of-type .row:last-child > *")).toMatch(/border-bottom:\s*0/);
+    expect(rule(".body:last-of-type .row:last-child > :first-child")).toMatch(/border-end-start-radius/);
+  });
+
+  it("keeps a sticky header's measured size clear at the container's top", () => {
+    expect(rule(".container")).toMatch(/scroll-padding-block-start:\s*var\(--_psi-table-head-size,\s*0px\)/);
+  });
+});
+

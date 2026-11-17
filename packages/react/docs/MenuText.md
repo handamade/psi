@@ -20,7 +20,7 @@ A line of text that is not an action (D99): inside the role="menu" element with 
 
 ## Theming
 
-This component has no `--psi-menu-text-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-menu-text-*` tokens of its own. Its styling binds the `--psi-menu-*` tokens; override those at any scope.
 
 
 

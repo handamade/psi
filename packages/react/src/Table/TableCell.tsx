@@ -1,5 +1,7 @@
+import { useContext, useLayoutEffect } from "react";
 import type { ReactNode, Ref, TdHTMLAttributes } from "react";
 import styles from "./table.module.css";
+import { TableRowContext } from "./TableContext.js";
 
 export interface TableCellProps extends Omit<TdHTMLAttributes<HTMLTableCellElement>, "children"> {
   /** Right-aligns and renders tabular figures (D62). */
@@ -21,17 +23,28 @@ export interface TableCellProps extends Omit<TdHTMLAttributes<HTMLTableCellEleme
  * right-aligned *and* tabular — a column that aligns but whose digits jitter
  * between rows defeats the purpose. Remaining attributes land on the cell
  * (D85). */
-export function TableCell({ numeric, colSpan, rowHeader, children, className, ref, ...rest }: TableCellProps) {
+export function TableCell({ numeric, colSpan, rowHeader, children, className, id, ref, ...rest }: TableCellProps) {
+  // A row header in a selectable table registers its id with its row, so the
+  // row's checkbox is labelled by it (D128). An empty id names nothing.
+  const row = useContext(TableRowContext);
+  const headerId = rowHeader ? id || row?.offeredHeaderId || undefined : id;
+  const register = rowHeader ? row?.registerHeader : undefined;
+  useLayoutEffect(() => {
+    if (!register) return;
+    register(headerId);
+    return () => register(undefined);
+  }, [register, headerId]);
+
   const cls = [styles.cell, rowHeader && styles.rowHeader, className].filter(Boolean).join(" ");
   if (rowHeader) {
     return (
-      <th {...rest} ref={ref} scope="row" colSpan={colSpan} className={cls} data-numeric={numeric || undefined}>
+      <th {...rest} id={headerId} ref={ref} scope="row" colSpan={colSpan} className={cls} data-numeric={numeric || undefined}>
         {children}
       </th>
     );
   }
   return (
-    <td {...rest} ref={ref} colSpan={colSpan} className={cls} data-numeric={numeric || undefined}>
+    <td {...rest} id={id} ref={ref} colSpan={colSpan} className={cls} data-numeric={numeric || undefined}>
       {children}
     </td>
   );

@@ -15,7 +15,7 @@
 
 ## Theming
 
-This component has no `--psi-table-header-cell-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-table-header-cell-*` tokens of its own. Its styling binds the `--psi-table-*` tokens; override those at any scope.
 
 
 

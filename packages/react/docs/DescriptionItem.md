@@ -14,7 +14,7 @@ One term/value pair. The term is a prop and the value is children, matching Fiel
 
 ## Theming
 
-This component has no `--psi-description-item-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-description-item-*` tokens of its own. Its styling binds the `--psi-description-list-*` tokens; override those at any scope.
 
 
 

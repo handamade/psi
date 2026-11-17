@@ -23,7 +23,7 @@ Native <input type=radio> underneath (visually hidden), drawn like Checkbox on a
 
 ## Theming
 
-This component has no `--psi-radio-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-radio-*` tokens of its own. Its styling binds the `--psi-radio-group-*` tokens; override those at any scope.
 
 
 

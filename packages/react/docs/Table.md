@@ -15,6 +15,8 @@ Data table on native table semantics. Holds no state: sorting, selection and pag
 | `selectable` | `boolean` | false | no | Renders the row-selection checkbox column. |
 | `selected` | `ReadonlySet<string>` | new Set<string>() | no | Controlled selection, keyed by each `TableRow`'s `rowId`. |
 | `onSelectionChange` | `((selected: ReadonlySet<string>) => void)` | — | no | Called with the next selection. See `onSortChange` on why it is optional. |
+| `selectAllLabel` | `string` | Select all rows | no | Accessible name of the select-all checkbox, for a translated app (D128). |
+| `selectRowLabel` | `string` | Select row | no | The start of each row checkbox's accessible name, for a translated app (D128). A row without `selectLabel` is named this followed by its row header — the row's `TableCell rowHeader`, so "Select row Acme" — or, with no row header, by its position among the table's rows: "Select row 3". That position counts body rows only, one less than the row number a screen reader announces with the header row, so prefer a row header. |
 | `children` | `ReactNode` | — | yes | TableHead and TableBody. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 | `ref` | `Ref<HTMLTableElement>` | — | no | Forwarded ref to the underlying `<table>` element. |

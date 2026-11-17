@@ -19,7 +19,7 @@ Non-interactive rule with role="separator" — exposed to assistive tech as a se
 
 ## Theming
 
-This component has no `--psi-menu-separator-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-menu-separator-*` tokens of its own. Its styling binds the `--psi-menu-*` tokens; override those at any scope.
 
 
 

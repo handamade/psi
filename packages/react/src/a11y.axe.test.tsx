@@ -118,6 +118,15 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Toast region empty", <ToastRegion>{null}</ToastRegion>],
   ["Toast success routed assertive", <ToastRegion><Toast variant="success" politeness="assertive">Application accepted</Toast></ToastRegion>],
   ["Toast with a translated status word", <ToastRegion><Toast variant="danger" statusLabel="Fehler:">Nicht gespeichert</Toast></ToastRegion>],
+  ["Table selectable with translated labels and a row header (D128)", (
+    <Table selectable selected={new Set(["t1"])} onSelectionChange={() => {}} selectAllLabel="Alle Zeilen auswählen" selectRowLabel="Zeile auswählen">
+      <TableHead><TableRow><TableHeaderCell>Empfänger</TableHeaderCell><TableHeaderCell numeric>Betrag</TableHeaderCell></TableRow></TableHead>
+      <TableBody>
+        <TableRow rowId="t1"><TableCell rowHeader>Acme</TableCell><TableCell numeric>1.240,00</TableCell></TableRow>
+        <TableRow rowId="t2"><TableCell>Globex</TableCell><TableCell numeric>98,50</TableCell></TableRow>
+      </TableBody>
+    </Table>
+  )],
   ["Toast with a translated dismiss label (D117)", <ToastRegion><Toast onDismiss={() => {}} dismissLabel="Benachrichtigung schließen">Gespeichert</Toast></ToastRegion>],
   ["Announcements beside a toast", <ToastRegion data-react-aria-top-layer=""><Toast variant="success">Saved</Toast><Announcement>Row 12 updated</Announcement><Announcement politeness="assertive">2 fields need attention</Announcement></ToastRegion>],
   ["Banner neutral", <Banner>Scheduled maintenance on Saturday.</Banner>],

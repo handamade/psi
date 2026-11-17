@@ -8,14 +8,14 @@
 | Prop | Type | Default | Required | Description |
 |---|---|---|---|---|
 | `rowId` | `string` | — | no | Stable identity for selection. Required for selectable tables (D62). |
-| `selectLabel` | `string` | — | no | Accessible name for this row's selection checkbox. |
+| `selectLabel` | `string` | — | no | Accessible name for this row's selection checkbox; wins over the default, `Table`'s `selectRowLabel` followed by the row header or the row's position (D128). |
 | `children` | `ReactNode` | — | yes | The row's cells. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 | `ref` | `Ref<HTMLTableRowElement>` | — | no | Forwarded ref to the `<tr>`. |
 
 ## Theming
 
-This component has no `--psi-table-row-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-table-row-*` tokens of its own. Its styling binds the `--psi-table-*` tokens; override those at any scope.
 
 
 
