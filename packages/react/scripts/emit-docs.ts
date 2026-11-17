@@ -1,8 +1,8 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { a11yMeta } from "../src/a11y-meta.js";
-import { themingSection } from "./docs-sections.js";
+import { boundFamilies, themingSection } from "./docs-sections.js";
 
 interface Prop {
   name: string;
@@ -57,6 +57,31 @@ function toKebabCase(str: string): string {
 }
 
 mkdirSync(join(root, "docs"), { recursive: true });
+
+// D128: every component token family's generated declarations, and every
+// component's source file, so a member without a family of its own can say
+// which family its stylesheet binds.
+const familyDir = join(root, "../tokens/dist/components");
+const familyVars: Record<string, string> = Object.fromEntries(
+  readdirSync(familyDir)
+    .filter((f) => f.endsWith(".vars.css"))
+    .map((f) => [f.slice(0, -".vars.css".length), readFileSync(join(familyDir, f), "utf8")]),
+);
+const sourceFiles = new Map<string, string>();
+for (const entry of readdirSync(join(root, "src"), { recursive: true, withFileTypes: true })) {
+  if (!entry.isFile() || !/^[A-Z][A-Za-z0-9]*\.tsx$/.test(entry.name)) continue;
+  sourceFiles.set(basename(entry.name, ".tsx"), join(entry.parentPath, entry.name));
+}
+
+/** The CSS of the modules a component's source file imports. */
+function importedCss(name: string): string {
+  const file = sourceFiles.get(name);
+  if (!file) return "";
+  const source = readFileSync(file, "utf8");
+  return [...source.matchAll(/from\s+"(\.[^"]+\.module\.css)"/g)]
+    .map((m) => readFileSync(join(dirname(file), m[1]), "utf8"))
+    .join("\n");
+}
 
 for (const c of components) {
   // Build props table
@@ -128,7 +153,12 @@ ${props}
 
 ${a11ySection}## Theming
 
-${themingSection(tokenName, varsCss, guidance.states as { hover: string; active: string })}
+${themingSection(
+  tokenName,
+  varsCss,
+  guidance.states as { hover: string; active: string },
+  varsCss === null ? boundFamilies(importedCss(c.name), familyVars) : [],
+)}
 
 ${variantGuidanceSection}
 

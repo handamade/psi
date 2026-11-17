@@ -23,7 +23,7 @@ Is itself a role="region" landmark named by aria-label (default "Notifications";
 
 ## Theming
 
-This component has no `--psi-toast-region-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-toast-region-*` tokens of its own. Its styling binds the `--psi-toast-*` tokens; override those at any scope.
 
 
 

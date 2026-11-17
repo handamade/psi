@@ -22,7 +22,7 @@ Renders a real <button>. disabled sets aria-disabled (not the disabled attribute
 
 ## Theming
 
-This component has no `--psi-menu-item-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-menu-item-*` tokens of its own. Its styling binds the `--psi-menu-*` tokens; override those at any scope.
 
 ## Variant guidance
 

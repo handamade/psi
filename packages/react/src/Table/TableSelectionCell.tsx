@@ -1,11 +1,30 @@
-import { useContext } from "react";
+import { useContext, useId } from "react";
 import styles from "./table.module.css";
 import { Checkbox } from "../Checkbox/Checkbox.js";
 import { TableContext, TableRowIdsContext } from "./TableContext.js";
 
-/** Per-row selection checkbox. Internal — not exported from index.ts. */
-export function TableRowSelectionCell({ rowId, label }: { rowId: string; label: string }) {
-  const { selected, onSelectionChange } = useContext(TableContext);
+/** Per-row selection checkbox. Internal — not exported from index.ts.
+ * Its name, most specific first (D128): the row's `selectLabel`; then
+ * `selectRowLabel` followed by the row header, by `aria-labelledby` naming the
+ * checkbox itself and that cell, so it follows the cell's content; then
+ * `selectRowLabel` followed by the row's 1-based position among the rows
+ * Table reads. Never the raw rowId. */
+export function TableRowSelectionCell({
+  rowId,
+  selectLabel,
+  headerId,
+}: {
+  rowId: string;
+  selectLabel?: string;
+  headerId?: string;
+}) {
+  const { selected, onSelectionChange, selectRowLabel } = useContext(TableContext);
+  const rowIds = useContext(TableRowIdsContext);
+  const ownId = useId();
+  const position = rowIds.indexOf(rowId) + 1;
+  const byHeader = selectLabel === undefined && headerId !== undefined;
+  const label =
+    selectLabel ?? (byHeader || position === 0 ? selectRowLabel : `${selectRowLabel} ${position}`);
   const toggle = () => {
     const next = new Set(selected);
     if (next.has(rowId)) next.delete(rowId);
@@ -14,14 +33,20 @@ export function TableRowSelectionCell({ rowId, label }: { rowId: string; label: 
   };
   return (
     <td className={`${styles.cell} ${styles.selectCell}`}>
-      <Checkbox aria-label={label} checked={selected.has(rowId)} onChange={toggle} />
+      <Checkbox
+        id={ownId}
+        aria-label={label}
+        aria-labelledby={byHeader ? `${ownId} ${headerId}` : undefined}
+        checked={selected.has(rowId)}
+        onChange={toggle}
+      />
     </td>
   );
 }
 
 /** Select-all header checkbox, indeterminate on a partial selection. */
 export function TableSelectAllCell() {
-  const { selected, onSelectionChange } = useContext(TableContext);
+  const { selected, onSelectionChange, selectAllLabel } = useContext(TableContext);
   const rowIds = useContext(TableRowIdsContext);
   const all = rowIds.length > 0 && rowIds.every((id) => selected.has(id));
   const some = rowIds.some((id) => selected.has(id));
@@ -40,7 +65,7 @@ export function TableSelectAllCell() {
 
   return (
     <th scope="col" className={`${styles.headerCell} ${styles.selectCell}`}>
-      <Checkbox aria-label="Select all rows" checked={all} indeterminate={some && !all} onChange={toggle} />
+      <Checkbox aria-label={selectAllLabel} checked={all} indeterminate={some && !all} onChange={toggle} />
     </th>
   );
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { Table } from "./Table.js";
 import { TableHead } from "./TableHead.js";
 import { TableBody } from "./TableBody.js";
@@ -223,5 +224,79 @@ describe("Table selection", () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("no `TableBody` is visible"));
 
     warn.mockRestore();
+  });
+});
+
+describe("Table selection names (D128)", () => {
+  function names(props: { selectAllLabel?: string; selectRowLabel?: string } = {}, rows?: ReactNode) {
+    return render(
+      <Table selectable selected={new Set()} onSelectionChange={vi.fn()} {...props}>
+        <TableHead><TableRow><TableHeaderCell>Payee</TableHeaderCell><TableHeaderCell>Amount</TableHeaderCell></TableRow></TableHead>
+        <TableBody>
+          {rows ?? (
+            <>
+              <TableRow rowId="8f3a2c91"><TableCell>Acme</TableCell><TableCell>10</TableCell></TableRow>
+              <TableRow rowId="b71e04d2"><TableCell>Globex</TableCell><TableCell>20</TableCell></TableRow>
+            </>
+          )}
+        </TableBody>
+      </Table>,
+    );
+  }
+
+  it("names the select-all checkbox from selectAllLabel", () => {
+    names({ selectAllLabel: "Alle Zeilen auswählen" });
+    expect(screen.getByRole("checkbox", { name: "Alle Zeilen auswählen" })).toBeTruthy();
+  });
+
+  it("names a row without a row header by its position, not its rowId", () => {
+    names();
+    expect(screen.getByRole("checkbox", { name: "Select row 1" })).toBeTruthy();
+    expect(screen.getByRole("checkbox", { name: "Select row 2" })).toBeTruthy();
+    expect(screen.queryByRole("checkbox", { name: /8f3a2c91/ })).toBeNull();
+  });
+
+  it("starts each row's name with selectRowLabel", () => {
+    names({ selectRowLabel: "Zeile auswählen" });
+    expect(screen.getByRole("checkbox", { name: "Zeile auswählen 2" })).toBeTruthy();
+  });
+
+  it("names a row by its row header, live", () => {
+    const { rerender } = names(
+      { selectRowLabel: "Zeile auswählen" },
+      <TableRow rowId="8f3a2c91"><TableCell rowHeader>Acme</TableCell><TableCell>10</TableCell></TableRow>,
+    );
+    const box = screen.getByRole("checkbox", { name: "Zeile auswählen Acme" });
+    const header = screen.getByRole("rowheader", { name: "Acme" });
+    expect(box.getAttribute("aria-labelledby")).toBe(`${box.id} ${header.id}`);
+    rerender(
+      <Table selectable selected={new Set()} onSelectionChange={vi.fn()} selectRowLabel="Zeile auswählen">
+        <TableHead><TableRow><TableHeaderCell>Payee</TableHeaderCell><TableHeaderCell>Amount</TableHeaderCell></TableRow></TableHead>
+        <TableBody>
+          <TableRow rowId="8f3a2c91"><TableCell rowHeader>Acme Corp</TableCell><TableCell>10</TableCell></TableRow>
+        </TableBody>
+      </Table>,
+    );
+    expect(screen.getByRole("checkbox", { name: "Zeile auswählen Acme Corp" })).toBe(box);
+  });
+
+  it("keeps a row header's own id", () => {
+    names({}, <TableRow rowId="r1"><TableCell rowHeader id="acme">Acme</TableCell><TableCell>10</TableCell></TableRow>);
+    expect(screen.getByRole("checkbox", { name: "Select row Acme" }).getAttribute("aria-labelledby")).toMatch(/ acme$/);
+  });
+
+  it("lets selectLabel win over both", () => {
+    names({}, <TableRow rowId="r1" selectLabel="Pick Acme"><TableCell rowHeader>Acme</TableCell><TableCell>10</TableCell></TableRow>);
+    const box = screen.getByRole("checkbox", { name: "Pick Acme" });
+    expect(box.hasAttribute("aria-labelledby")).toBe(false);
+  });
+
+  it("gives a row header no generated id outside a selectable table", () => {
+    render(
+      <Table>
+        <TableBody><TableRow rowId="r1"><TableCell rowHeader>Acme</TableCell></TableRow></TableBody>
+      </Table>,
+    );
+    expect(screen.getByRole("rowheader").hasAttribute("id")).toBe(false);
   });
 });

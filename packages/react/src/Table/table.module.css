@@ -101,6 +101,31 @@
   border-end-end-radius: var(--_psi-table-corner);
 }
 
+/* The first and last body that have rows (D128). With several bodies, the
+   :last-of-type and :first-of-type rules above miss when the last (or, with
+   no head, the first) body is empty: the edge then belongs to the body with
+   rows beside it. :has() rules, each its own rule, so an engine without
+   :has() keeps the rules above and drops only these. */
+.body:not(:has(~ .body .row)) .row:last-child > * {
+  border-bottom: 0;
+}
+
+.body:not(:has(~ .body .row)) .row:last-child > :first-child {
+  border-end-start-radius: var(--_psi-table-corner);
+}
+
+.body:not(:has(~ .body .row)) .row:last-child > :last-child {
+  border-end-end-radius: var(--_psi-table-corner);
+}
+
+.table:not(:has(.head)) .body:not(.body:has(.row) ~ .body) .row:first-child > :first-child {
+  border-start-start-radius: var(--_psi-table-corner);
+}
+
+.table:not(:has(.head)) .body:not(.body:has(.row) ~ .body) .row:first-child > :last-child {
+  border-start-end-radius: var(--_psi-table-corner);
+}
+
 /* A row header (D85): the cell that names its row. Weight marks it; the
    colour stays the body's, unlike a column header's. */
 .rowHeader {
@@ -240,8 +265,12 @@
    drops its own border and corner radii. A tab stop, so it draws the shared
    ring, outside the frame. */
 
+/* A sticky header's measured size, which TableHead reports (D128): a row
+   that focus scrolls into view lands below the header, not under it (WCAG
+   2.4.11). 0px when nothing sticks. */
 .container {
   overflow: auto;
+  scroll-padding-block-start: var(--_psi-table-head-size, 0px);
   background: var(--psi-table-bg);
   border: 1px solid var(--psi-table-border);
   border-radius: var(--psi-table-radius);
