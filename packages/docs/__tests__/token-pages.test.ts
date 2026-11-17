@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { tokenPages } from "../content/token-pages";
-import { colorTokens, resolved } from "../lib/tokens";
+import { THEMES, colorTokens } from "../src/data";
+import { resolved } from "../src/node";
+import { tokenPages } from "../src/pages";
 
 describe("tokenPages", () => {
   it("covers every top-level token group and every scale but scopes, each once", () => {
@@ -31,7 +32,7 @@ describe("tokenPages", () => {
 
 describe("colorTokens", () => {
   it("gives every semantic colour its CSS variable, formula and a value in all four themes", () => {
-    const all = colorTokens();
+    const all = colorTokens(Object.fromEntries(THEMES.map((t) => [t, resolved(t)])) as never);
     expect(all.length).toBe(Object.keys(resolved("light").tokens).length);
     const bg = all.find((t) => t.name === "bgPrimary")!;
     expect(bg.cssVar).toBe("--psi-bg-primary");

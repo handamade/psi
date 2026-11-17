@@ -37,7 +37,7 @@ describe("tokenPageMd", () => {
   });
 });
 
-const dir = join(__dirname, "..", "content", "guides");
+const dir = join(__dirname, "..", "..", "..", "..", "packages", "docs", "guides");
 function guide(file: string) {
   const raw = readFileSync(join(dir, file), "utf8");
   const [, fm, body] = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)!;

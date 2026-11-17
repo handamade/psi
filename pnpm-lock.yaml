@@ -88,6 +88,9 @@ importers:
       '@astrojs/sitemap':
         specifier: 3.7.5
         version: 3.7.5
+      '@handamade/psi-docs':
+        specifier: workspace:*
+        version: link:../../packages/docs
       '@handamade/psi-react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -159,6 +162,31 @@ importers:
       vite:
         specifier: ^6.0.0
         version: 6.4.3(@types/node@20.19.43)(lightningcss@1.33.0)(tsx@4.22.4)(yaml@2.9.1)
+
+  packages/docs:
+    dependencies:
+      '@handamade/psi-react':
+        specifier: workspace:*
+        version: link:../react
+      '@handamade/psi-tokens':
+        specifier: workspace:*
+        version: link:../tokens
+      react:
+        specifier: ^19.2.0
+        version: 19.2.7
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.17
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.6(@types/node@20.19.43)(jsdom@29.1.1)(lightningcss@1.33.0)(tsx@4.22.4)(yaml@2.9.1)
 
   packages/figma-plugin:
     devDependencies:

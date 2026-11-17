@@ -3,8 +3,9 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { componentPages } from "../content/component-pages";
-import { allExportNames, docSection, getExport, readGeneratedDoc, summary } from "../lib/components";
+import { docSection, summary } from "../src/data";
+import { allExportNames, getExport, readGeneratedDoc } from "../src/node";
+import { componentPages } from "../src/pages";
 
 const require = createRequire(import.meta.url);
 const srcDir = join(dirname(require.resolve("@handamade/psi-react/manifest.json")), "..", "src");

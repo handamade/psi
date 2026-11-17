@@ -48,7 +48,7 @@ test("the sidebar is open at desktop width and behind a toggle below it", async 
 });
 
 function componentSlugs(): string[] {
-  const src = readFileSync("apps/site/src/content/component-pages.ts", "utf8");
+  const src = readFileSync("packages/docs/src/pages.ts", "utf8").split("export interface TokenPage")[0];
   return [...src.matchAll(/slug: "([a-z0-9-]+)"/g)].map((m) => m[1]);
 }
 

@@ -2,9 +2,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { GUIDE_ORDER } from "../content/docs-nav";
+import { GUIDE_ORDER } from "../src/pages";
 
-const dir = join(__dirname, "..", "content", "guides");
+const dir = join(__dirname, "..", "guides");
 
 describe("guides", () => {
   it("are the five v1 guides, one file each", () => {
