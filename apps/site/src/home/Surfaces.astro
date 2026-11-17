@@ -1,0 +1,20 @@
+---
+import { TraceIsland } from "./TraceIsland";
+import { buildTraceData, TARGETS } from "../lib/trace-data";
+import { storybookDocs } from "../lib/storybook";
+import type { TraceTarget } from "@handamade/psi-docs/trace";
+import { componentCount } from "virtual:psi-facts";
+
+const FIGMA = "https://www.figma.com/design/MvbVttmGaFBmEqydtLJ0JN";
+const data = await buildTraceData();
+// Every target's storybook excerpt starts with its real story title.
+const storybookHref = Object.fromEntries(
+  TARGETS.map((t) => [t, storybookDocs(data[t].storybook.text!.split("\n")[0])]),
+) as Record<TraceTarget, string>;
+---
+<section class="home-section" aria-labelledby="surfaces-h">
+  <h2 id="surfaces-h">One source, every surface</h2>
+  <p class="home-lede">Docs, Storybook, Figma, the MCP server and llms.txt are all generated from the same code and pass the same gates. None of them is edited by hand.</p>
+  <TraceIsland client:visible data={data} storybookHref={storybookHref} figmaHref={FIGMA} componentCount={componentCount} />
+  <p class="home-foot"><span>Counts and excerpts are read from the build, so they can't drift.</span> <a href="/docs/get-started/ai/">Using Psi with AI</a></p>
+</section>

@@ -1,8 +1,24 @@
 // Build-time only. Call buildTraceData() from .astro frontmatter and pass plain
 // data to islands; never import this module from a .tsx island, because it
 // pulls the MCP server, its SDK and node:fs into the client graph.
-import { checkMarkdown, loadIndex, themeMarkdown } from "@handamade/psi-mcp";
+import { readFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { checkMarkdown, loadIndex, themeMarkdown, type PsiIndex } from "@handamade/psi-mcp";
 import { traceFor, type Excerpt, type Surface, type TraceTarget } from "@handamade/psi-docs/trace";
+
+/** `loadIndex()` reads `psi-index.json` beside its own module. Astro bundles the
+ * workspace package into a prerender chunk, where that file does not exist, so
+ * resolve the package's real location and read the index from there. */
+async function loadPsiIndex(): Promise<PsiIndex> {
+  try {
+    return await loadIndex();
+  } catch {
+    const entry = import.meta.resolve("@handamade/psi-mcp");
+    return JSON.parse(await readFile(join(dirname(fileURLToPath(entry)), "psi-index.json"), "utf8"));
+  }
+}
 
 export const TARGETS: TraceTarget[] = ["Button", "Field", "Table", "--psi-fg-accent"];
 
@@ -37,7 +53,7 @@ function themeExcerpt(): string {
 }
 
 export async function buildTraceData(): Promise<Record<TraceTarget, Record<Surface, Excerpt>>> {
-  const index = await loadIndex();
+  const index = await loadPsiIndex();
   const out = {} as Record<TraceTarget, Record<Surface, Excerpt>>;
   for (const t of TARGETS) {
     const text =
