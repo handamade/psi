@@ -15,6 +15,7 @@
     "@fontsource/ibm-plex-mono": "5.3.0",
     "@fontsource/rubik-glitch": "5.3.0",
     "@handamade/psi-docs": "workspace:*",
+    "@handamade/psi-mcp": "workspace:*",
     "@handamade/psi-react": "workspace:*",
     "@handamade/psi-tokens": "workspace:*",
     "astro": "7.4.12",

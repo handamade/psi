@@ -100,6 +100,9 @@ importers:
       '@handamade/psi-docs':
         specifier: workspace:*
         version: link:../../packages/docs
+      '@handamade/psi-mcp':
+        specifier: workspace:*
+        version: link:../../packages/mcp
       '@handamade/psi-react':
         specifier: workspace:*
         version: link:../../packages/react
