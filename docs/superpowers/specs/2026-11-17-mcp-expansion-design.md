@@ -1,6 +1,6 @@
 # An MCP that answers like the docs, checks JSX, and makes a theme (D129)
 
-Date: 2026-11-17. Status: **Approved design**, not built. Branch `d129-mcp-expansion`.
+Date: 2026-11-17. Status: **Implemented** on branch `d129-mcp-expansion`.
 
 Provenance: the second of the three site projects the owner set out in D121 — a
 demo homepage, a real docs section, and "a fully capable MCP". D121 built the

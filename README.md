@@ -61,6 +61,6 @@ For AI: see [llms.txt](llms.txt) and per-package llms.txt files for machine-read
 - **Hosted (no install):** Streamable HTTP at `https://psi.kurkin.de/mcp`
 - **Local (stdio):** `npx @handamade/psi-mcp`
 
-Tools: `search(query)` → compact briefs with ids · `get(id)` → full detail (`component:Button`, `token:bgPrimary`, `topic:variants`, or a bare name).
+Tools: `search(query)` → compact briefs with ids · `get(id)` → the docs page as markdown (`component:Button`, `tokens:color`, `guide:theming`, `token:bgPrimary`, `topic:variants`, or a bare name) · `theme({ color })` → an AA-solved light and dark theme as CSS · `check({ code })` → where JSX uses Psi wrongly.
 
 Generate agent context: `npx @handamade/psi-mcp init` (writes/updates AGENTS.md; add `--claude` for CLAUDE.md too). See [packages/mcp/README.md](packages/mcp/README.md).
