@@ -9,6 +9,9 @@
 .stack {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  /* D125: a stacked form stops at 640px by default; it still fills a
+     narrower container, so the start stack's size container is unchanged. */
+  max-inline-size: var(--psi-field-stack-max-width);
 }
 
 .stack > * { grid-column: 1 / -1; }

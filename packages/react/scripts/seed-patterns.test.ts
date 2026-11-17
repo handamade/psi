@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import ts from "typescript";
 import { loadPatterns } from "./patterns-loader.js";
-import { renderPreset, validatePatterns } from "./patterns.js";
+import { renderPreset, validatePatterns, type Pattern } from "./patterns.js";
 
 const root = join(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8"));
@@ -52,9 +52,31 @@ describe("seed patterns against the real manifest", () => {
     // specifying an icon the library did not contain.
     expect(gaps).toEqual({});
   });
-  it("Field declares its prop-slots in the manifest", () => {
+  it("Field declares its prop-slots in the manifest, error included (D125)", () => {
     const field = manifest.components.find((c: { name: string }) => c.name === "Field");
-    expect(field.slots.map((s: { name: string }) => s.name)).toEqual(["label", "body", "description"]);
+    expect(field.slots.map((s: { name: string }) => s.name)).toEqual(["label", "body", "description", "error"]);
+  });
+
+  it("a pattern can fill a Field's error, which renders as the error prop (D125)", () => {
+    const probe: Pattern = {
+      id: "field-error-probe",
+      intent: "A field showing its error",
+      match: ["field error probe"],
+      compose: {
+        component: "Field",
+        slots: {
+          label: ["{content:label}"],
+          body: [{ component: "Input" }],
+          error: ["{content:error}"],
+        },
+      },
+      parameters: [],
+      content: { label: "Email", error: "Enter an email address." },
+      gaps: [],
+      requires: [],
+    };
+    expect(validatePatterns([probe], manifest.components, contracts, icons).gaps).toEqual({});
+    expect(renderPreset(probe, manifest.components)).toContain('error="Enter an email address."');
   });
   it("Tag lists children like the other content-bearing leaves (eval run 07-21)", () => {
     const tag = manifest.components.find((c: { name: string }) => c.name === "Tag");
@@ -121,7 +143,7 @@ describe("the manifest describes children (D72)", () => {
   // react-docgen-typescript reports `children` only when the declaration
   // carries a JSDoc comment — not because of propFilter, extends, or the type
   // spelling, all of which D70 wrongly blamed and D72 disproved with a probe.
-  const TAKES_NO_CHILDREN = ["Input", "Textarea", "Pagination", "MenuSeparator", "CursorPagination", "Skeleton", "CopyButton"];
+  const TAKES_NO_CHILDREN = ["Input", "Textarea", "Pagination", "MenuSeparator", "CursorPagination", "Skeleton", "CopyButton", "Count"];
 
   it("lists children for every component that accepts it", () => {
     const missing = manifest.components

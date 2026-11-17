@@ -158,6 +158,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Renders <caption>, which names the table for assistive tech and is visible, unlike an aria-label on Table. Put the range in `detail` (\"Rows 51–100 of more than 100,000\") so that moving focus to the caption after a token-paged page change reads the new range (D85). Remaining attributes land on the element.",
   },
+  TableContainer: {
+    keyboard: [
+      { keys: "Tab", behavior: "A tab stop, so the region can be scrolled from the keyboard in every browser; draws the shared focus ring outside its frame." },
+      { keys: "Arrow keys / Page Up / Page Down / Home / End", behavior: "Scroll the region while it has focus (native)." },
+    ],
+    notes:
+      "A <div role=\"region\"> that scrolls its Table both ways and keeps a stickyHeader at its top (D126); maxBlockSize caps its height. It draws the frame, so the table inside drops its own. Named by the table's TableCaption through aria-labelledby (the caption gets an id if it has none); pass aria-label or aria-labelledby instead when there is no caption. Inside it the caption sits within the frame and scrolls with the content; focusing it after a page change scrolls it back into view.",
+  },
   CursorPagination: {
     keyboard: [
       { keys: "Tab", behavior: "Reaches the Previous and Next buttons in order; a disabled direction is skipped." },
@@ -221,6 +229,11 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Not a live region: it renders no role and no aria-live, announces nothing, and does not change its label or icon after a copy, so a screen reader hears the same button before and after. The application speaks the result: onCopy reports \"copied\" or \"failed\" (a rejected write, or no clipboard API), and the application routes that through its announcer or a Toast (D86). The label is visible text; the icon is aria-hidden and only reinforces it. Focus stays on the button.",
   },
+  Count: {
+    keyboard: [],
+    notes:
+      "A <span> with no role and no aria-live (D124): a count that changes announces nothing on its own; an app's own announcer speaks a change. Its visible text joins the name of the link or button it sits in (\"Cards 238\", \"Cards 999+\"). label replaces the number for a screen reader (the number becomes aria-hidden, the label psi-sr-only): start it with the number shown. The attention tone is a pill in medium weight, never colour alone, but the tone itself is visual, so an attention count should carry a label.",
+  },
   SkipLink: {
     keyboard: [
       { keys: "Tab", behavior: "Takes focus and becomes visible at the inline-start top corner, drawing the shared focus ring. Put it first in the document so it is the first tab stop." },
@@ -249,14 +262,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Enter / Space", behavior: "Activates the group's native button, which asks the parent to open or close the group through onOpenChange." },
     ],
     notes:
-      "Controlled-only: open and onOpenChange are required and the group never changes its own state. Renders a <button type=\"button\"> with aria-expanded and aria-controls naming its <ul>, which carries `hidden` when closed, so the links leave the layout and the accessibility tree while aria-controls still resolves. The chevron is aria-hidden and turns on a duration token; the label and aria-expanded carry the meaning.",
+      "Controlled-only: open and onOpenChange are required and the group never changes its own state. Renders a <button type=\"button\"> with aria-expanded and aria-controls naming its <ul>, which carries `hidden` when closed, so the links leave the layout and the accessibility tree while aria-controls still resolves. The chevron is aria-hidden and turns on a duration token; the label and aria-expanded carry the meaning. An icon (D124) sits before the label in an aria-hidden span; the label stays the button's name, and the icon stays when the group is closed.",
   },
   NavItem: {
     keyboard: [
       { keys: "Enter", behavior: "Follows the link inside it (native anchor behavior); the link is the consumer's router link." },
     ],
     notes:
-      "An <li> that styles the one anchor inside it. Router apps pass their own link as the child; current clones it with aria-current=\"page\" (D93), and without current the child keeps its own aria-current; with href the NavItem renders the anchor itself (for plain links and presets) and current sets aria-current=\"page\" on it. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor.",
+      "An <li> that styles the one anchor inside it. Router apps pass their own link as the child; current clones it with aria-current=\"page\" (D93), and without current the child keeps its own aria-current; with href the NavItem renders the anchor itself (for plain links and presets) and current sets aria-current=\"page\" on it. The current page is marked by weight, a raised surface and an inline-start bar, never by colour alone, and the focus ring is drawn inset on the anchor. icon and count (D124) go inside the link: icon (aria-hidden), label, count. The count's text joins the link's name (\"Cards 238\"), or its label does; it is not a live region. A router link is cloned to hold them; a child that is not one link element gets neither, with a development warning. A router link whose children is a function keeps it: NavItem wraps the function so its result becomes the label.",
   },
   AppShell: {
     keyboard: [

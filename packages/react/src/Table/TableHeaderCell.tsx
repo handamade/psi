@@ -15,12 +15,44 @@ export interface TableHeaderCellProps extends Omit<ThHTMLAttributes<HTMLTableCel
   ref?: Ref<HTMLTableCellElement>;
 }
 
+type Mark = "both" | "asc" | "desc";
+
+/** The sort mark (D126): private inline SVGs in currentColor, one size in
+ * every state, so the slot is always filled and a right-aligned label never
+ * shifts when its column becomes sorted. Not exported: the icon set does not
+ * change. Same stroke conventions as src/icons. */
+function SortMark({ mark }: { mark: Mark }) {
+  return (
+    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      {mark === "both" && (
+        <>
+          <polyline points="7 9 12 4 17 9" />
+          <polyline points="7 15 12 20 17 15" />
+        </>
+      )}
+      {mark === "asc" && (
+        <>
+          <line x1="12" y1="19" x2="12" y2="5" />
+          <polyline points="5 12 12 5 19 12" />
+        </>
+      )}
+      {mark === "desc" && (
+        <>
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <polyline points="19 12 12 19 5 12" />
+        </>
+      )}
+    </svg>
+  );
+}
+
 /** `<th scope="col">`. `aria-sort` belongs on the th, never on the inner
  * button — assistive tech reads the sort state from the column header. */
 export function TableHeaderCell({ sortKey, numeric, children, className, ref, ...rest }: TableHeaderCellProps) {
   const { sortable, sort, onSortChange } = useContext(TableContext);
   const isSortable = sortable && sortKey !== undefined;
   const isActive = isSortable && sort?.key === sortKey;
+  const mark: Mark = isActive ? (sort!.direction === "asc" ? "asc" : "desc") : "both";
 
   const ariaSort = !isSortable
     ? undefined
@@ -48,8 +80,13 @@ export function TableHeaderCell({ sortKey, numeric, children, className, ref, ..
       {isSortable ? (
         <button type="button" className={styles.sortButton} onClick={activate}>
           {children}
-          <span className={styles.sortIndicator} aria-hidden="true">
-            {isActive ? (sort!.direction === "asc" ? "↑" : "↓") : ""}
+          <span
+            className={styles.sortIndicator}
+            aria-hidden="true"
+            data-mark={mark}
+            data-active={isActive || undefined}
+          >
+            <SortMark mark={mark} />
           </span>
         </button>
       ) : (

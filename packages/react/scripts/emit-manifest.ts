@@ -47,6 +47,7 @@ const COMPONENTS = [
   "TableHeaderCell",
   "TableCell",
   "TableCaption",
+  "TableContainer",
   "Pagination",
   "CursorPagination",
   "Toast",
@@ -57,6 +58,7 @@ const COMPONENTS = [
   "InlineAlert",
   "Skeleton",
   "CopyButton",
+  "Count",
   "Tabs",
   "TabList",
   "Tab",
@@ -109,6 +111,7 @@ const COMPONENT_DIR: Record<string, string> = {
   TableHeaderCell: "Table",
   TableCell: "Table",
   TableCaption: "Table",
+  TableContainer: "Table",
   ToastRegion: "Toast",
   ToastProvider: "Toast",
   Announcement: "Toast",
@@ -134,7 +137,7 @@ function typeToString(p: { type: { name: string; value?: { value: string }[] } }
   return p.type.name;
 }
 
-const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS);
+const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS, COMPONENT_DIR);
 
 const manifest = COMPONENTS.map((name) => {
   const dir = COMPONENT_DIR[name] ?? name;

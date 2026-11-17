@@ -8,7 +8,8 @@
  * covers the item text on the sidebar, on the hover surface (neutral3) and on
  * the current surface (neutral4). `indicator` and `focus-ring` are non-text
  * accents and `radius` is geometry; none carries a gated pair, so the pinned
- * pair count does not move. */
+ * pair count does not move. `icon-size` and `icon-gap` (D124) are geometry, so
+ * they carry no gated pair. */
 export const navTreeVars: Record<string, string> = {
   "item-fg": "var(--psi-fg-secondary)",
   "item-fg-current": "var(--psi-fg-primary)",
@@ -23,4 +24,8 @@ export const navTreeVars: Record<string, string> = {
   // component prefix, and the radius lives outside it.
   radius: "var(--psi-control-radius)",
   "focus-ring": "var(--psi-border-focus)",
+  // D124: an icon before an entry's or a group's label. Half the entry's
+  // height, as D97 sizes a button's icon, which is 16 like the group chevron.
+  "icon-size": "calc(var(--psi-size-32) / 2)",
+  "icon-gap": "var(--psi-space-8)",
 };

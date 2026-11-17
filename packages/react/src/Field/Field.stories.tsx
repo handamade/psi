@@ -4,6 +4,7 @@ import { Field } from "./Field.js";
 import { Input } from "../Input/Input.js";
 import { Select } from "../Select/Select.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
+import { Toolbar } from "../Toolbar/Toolbar.js";
 import { Switch } from "../Switch/Switch.js";
 import { useFieldControl } from "./useFieldControl.js";
 import "./Field.stories.css";
@@ -105,6 +106,58 @@ export const LabelStart: Story = {
           </Field>
         </div>
       ))}
+    </div>
+  ),
+};
+
+/** D125: each step, from a page size to an address. The message line keeps the Field's width, so the
+ * postcode's error does not wrap at 120px. Below: a start Field, a Toolbar row whose Field is as wide as
+ * its control, and a 480 step in a 360px column, where the control shrinks to the column. */
+export const ControlWidth: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 16, width: 560 }}>
+      <Field label="Rows per page" controlWidth={80}>
+        <Select size={32} defaultValue="50">
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </Select>
+      </Field>
+      <Field label="Postcode" controlWidth={120} error="Enter a postcode of five digits.">
+        <Input size={32} defaultValue="1011" />
+      </Field>
+      <Field label="Amount" controlWidth={160}>
+        <Input size={32} defaultValue="1,250.00" />
+      </Field>
+      <Field label="ICCID" controlWidth={240} description="19 or 20 digits.">
+        <Input size={32} defaultValue="89490200001234567890" />
+      </Field>
+      <Field label="Display name" controlWidth={320}>
+        <Input size={32} defaultValue="Ada Lovelace" />
+      </Field>
+      <Field label="Address" controlWidth={480}>
+        <Input size={32} defaultValue="Unter den Linden 1, 10117 Berlin" />
+      </Field>
+      <Field label="ICCID" labelPosition="start" controlWidth={240}>
+        <Input size={32} defaultValue="89490200001234567890" />
+      </Field>
+      <Toolbar align="center" gap={12}>
+        <Field label="Rows per page" labelPosition="start" controlWidth={80}>
+          <Select size={32} defaultValue="50">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </Select>
+        </Field>
+      </Toolbar>
+      <div data-testid="narrow-column" style={{ display: "grid", gap: 16, width: 360 }}>
+        <Field label="Address, in a 360px column" controlWidth={480}>
+          <Input size={32} defaultValue="Unter den Linden 1, 10117 Berlin" />
+        </Field>
+        <Field label="Address" labelPosition="start" controlWidth={480}>
+          <Input size={32} defaultValue="Unter den Linden 1, 10117 Berlin" />
+        </Field>
+      </div>
     </div>
   ),
 };

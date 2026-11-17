@@ -284,3 +284,63 @@ describe("labelPosition (D115)", () => {
     expect(/\.field\s*\{([^}]*)\}/.exec(css())![1]).not.toMatch(/grid-template-columns/);
   });
 });
+
+describe("controlWidth (D125)", () => {
+  const css = () => readFileSync(join(import.meta.dirname, "field.module.css"), "utf8");
+  const steps = [80, 120, 160, 240, 320, 480] as const;
+
+  it("writes data-control-width on the root for each step, and nothing without the prop", () => {
+    const { container, rerender } = render(<Field label="Name"><Input /></Field>);
+    const root = () => container.firstElementChild as HTMLElement;
+    expect(root()).not.toHaveAttribute("data-control-width");
+    for (const step of steps) {
+      rerender(<Field label="Name" controlWidth={step}><Input /></Field>);
+      expect(root()).toHaveAttribute("data-control-width", String(step));
+    }
+  });
+
+  it("a caller's own data-control-width does not override the prop", () => {
+    const { container } = render(
+      <Field label="Name" controlWidth={240} {...{ "data-control-width": "999" }}><Input /></Field>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-control-width", "240");
+  });
+
+  it("a start Field and a group Field carry it too", () => {
+    const { container } = render(
+      <>
+        <Field label="ICCID" labelPosition="start" controlWidth={240}><Input /></Field>
+        <Field group label="Notify me" controlWidth={160}><Checkbox>Email</Checkbox></Field>
+      </>,
+    );
+    const [start, group] = [...container.children] as HTMLElement[];
+    expect(start).toHaveAttribute("data-control-width", "240");
+    expect(start).toHaveAttribute("data-label-position", "start");
+    expect(group.tagName).toBe("FIELDSET");
+    expect(group).toHaveAttribute("data-control-width", "160");
+  });
+
+  it("each step sizes every child but the label and the message, and lets it shrink", () => {
+    for (const step of steps) {
+      const re = new RegExp(
+        String.raw`\.field\[data-control-width="${step}"\]\s*>\s*:not\(\.label\):not\(\.message\)\s*\{([^}]*)\}`,
+      );
+      const rule = re.exec(css())?.[1];
+      expect(rule, `step ${step}`).toBeDefined();
+      expect(rule).toMatch(new RegExp(String.raw`inline-size:\s*${step}px;`));
+      expect(rule).toMatch(/max-inline-size:\s*100%;/);
+    }
+  });
+
+  it("a sized Field's track shrinks with the field, in the right source order", () => {
+    const text = css();
+    expect(text).toContain(".field[data-control-width] {\n  grid-template-columns: minmax(0, 1fr);\n}");
+    const start = text.indexOf(
+      '.field[data-control-width][data-label-position="start"] {\n  grid-template-columns: auto minmax(0, 1fr);',
+    );
+    expect(start).toBeGreaterThan(-1);
+    expect(start).toBeGreaterThan(text.indexOf('.field[data-label-position="start"] {'));
+    expect(start).toBeLessThan(text.indexOf("grid-template-columns: subgrid"));
+    expect(start).toBeLessThan(text.indexOf("@container psi-field-stack"));
+  });
+});

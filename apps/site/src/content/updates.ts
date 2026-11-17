@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-11-17",
+    tag: "release",
+    title: "0.32.0 — tables that round and scroll, counts in the navigation, and fields that fit",
+    body: "Table's border now follows its rounded corner in every theme, and a sticky header or a hovered or selected first or last row stays inside the curve. TableContainer is new: it wraps a table that is wider than its space or must scroll in a fixed height, scrolls both ways, keeps the sticky header at its top, and is a named, focusable region. A numeric cell no longer wraps, and a sortable column shows its mark before it is sorted. Count is new too: a number after a label, in tabular numerals, capped at 999+, with an attention tone that never relies on colour alone. NavItem takes an icon and a count, and NavGroup an icon, coloured with the text in every state. A Field can size its control with controlWidth, from 80 to 480px, so a short value gets a short field, and a FieldStack stops at 640px through a new token. A pattern can now fill a Field's error. 57 components, 24 patterns.",
+  },
+  {
     date: "2026-11-16",
     tag: "release",
     title: "0.31.0 — controls you can find, and a text link",

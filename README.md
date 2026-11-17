@@ -17,7 +17,7 @@ OKLCH-based design system for web applications, built on four core principles:
 ## Workspace
 
 - **packages/tokens** — Formula DSL, token definitions, codegen, CSS + JSON artifacts
-- **packages/react** — 55 React 19 components (Button, IconButton, Card, Panel, Stack, Text, PageHeading, Toolbar, NavBar, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell, AspectRatio, Input, Select, Field, FieldStack, Dialog, Checkbox, Switch, Textarea, RadioGroup, Radio, Tag, Tooltip, Menu, MenuItem, MenuSeparator, MenuText, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination, Toast, ToastRegion, ToastProvider, Announcement, Tabs, TabList, Tab, TabPanel, DescriptionList, DescriptionItem, Banner, InlineAlert, Skeleton, CopyButton) + 30 icons
+- **packages/react** — 57 React 19 components (Button, IconButton, Card, Panel, Stack, Text, PageHeading, Toolbar, NavBar, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell, AspectRatio, Input, Select, Field, FieldStack, Dialog, Checkbox, Switch, Textarea, RadioGroup, Radio, Tag, Tooltip, Menu, MenuItem, MenuSeparator, MenuText, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, TableContainer, Pagination, CursorPagination, Toast, ToastRegion, ToastProvider, Announcement, Tabs, TabList, Tab, TabPanel, DescriptionList, DescriptionItem, Banner, InlineAlert, Skeleton, CopyButton, Count) + 30 icons
 - **packages/figma-plugin** — In-repo Figma plugin syncing resolved tokens
 - **apps/storybook** — Workbench and generated component documentation
 - **apps/site** — Public website: the homepage and update feed, plus the docs at `/docs/` (guides, a page per component, token pages), built with Psi itself

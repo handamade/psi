@@ -1,5 +1,29 @@
 # @handamade/psi-react
 
+## 0.32.0
+
+### Minor Changes
+
+- 89527cb: A Field sizes its control, and a stacked form stops at 640px (D125).
+
+  - **`Field controlWidth={80 | 120 | 160 | 240 | 320 | 480}`.** The control the Field wraps — an Input, a Select, a Textarea, or a control built on `useFieldControl` — takes that width in px and shrinks in a narrower column. The label and the message line keep the Field's width. At size 32 an Input fits about 7, 12, 17, 26, 36 and 55 digits: an ICCID's 20 digits fit 240, a page-size Select fits 80. Without the prop a control fills its Field, as before.
+  - **`FieldStack` is capped by a new token, `--psi-field-stack-max-width` (640px).** A stacked form in a page's main column was as wide as the column. **What changes for you:** a FieldStack wider than 640px is now 640px, at the start of its container. Set `--psi-field-stack-max-width` on a scope, `none` included, to change it for one form, or in a theme's `componentOverrides`.
+  - **A pattern can fill a Field's `error`.** `error` is now a slot of `Field`.
+
+- 32717a7: An icon and a count in the navigation tree, and a new `Count` component (D124).
+
+  - **`Count`**: a number after a label, such as _Cards 238_. Tabular numerals, quiet by default, capped at `max` (_999+_). `tone="attention"` is a pill in the warning tint and medium weight, so colour is never the only signal. `label` gives a screen reader words in place of the number (_4 stuck_). It is never a live region.
+  - **`NavItem` `icon` and `count`**, and **`NavGroup` `icon`**: a decorative icon before the text, sized by `--psi-nav-tree-icon-size` and coloured with the text in every state, and a count at the end of the row. Both go inside the link: with a router link, `NavItem` clones it to hold them. Without them, nothing changes.
+  - **Tokens**: `--psi-count-*`, `--psi-nav-tree-icon-size`, `--psi-nav-tree-icon-gap`.
+  - **Manifest**: `NavItem` and `NavGroup` list their slots (`icon`, `count`, `label`, `body`).
+
+- 3bd0e92: A table frame that rounds, and a container that scrolls (D126).
+
+  - **`Table`'s border follows its rounded corner** in every theme. The table moves to the separate border model; the corner cells take the inner radius, so a sticky header or a hovered or selected first or last row stays inside the curve. Hover and selected colours now paint the row's cells rather than the `<tr>`: if you styled a row's hover through a `className`, style its cells.
+  - **`TableContainer`**, new: wraps a `Table` that is wider than its space or must scroll in a fixed height (`maxBlockSize`). It scrolls both ways and keeps a `stickyHeader` at its top, draws the frame itself, and is a named, focusable region (named by the table's `TableCaption`, or by `aria-label`).
+  - **A `numeric` cell no longer wraps**, so an amount stays on one line.
+  - **A sortable column shows a two-way mark before it is sorted**; a sorted column shows an up or down arrow in the accent, as before. The marks are SVGs now, not text arrows.
+
 ## 0.31.0
 
 ### Minor Changes
