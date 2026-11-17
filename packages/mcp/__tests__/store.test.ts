@@ -144,9 +144,9 @@ describe("search", () => {
   });
 
   it("degrades by shedding components, not patterns, past the envelope (D61)", () => {
-    // 16 synthetic on top of 23 real = 39 total, past the 32-pattern
-    // envelope documented in the D100 spec's Operating envelope section. At
-    // this size the component floor provably cannot hold: 39 patterns'
+    // 16 synthetic on top of 24 real = 40 total, past the envelope (the
+    // floor holds through 27 patterns since D129's two fixed index rows). At
+    // this size the component floor provably cannot hold: 40 patterns'
     // irreducible per-item JSON overhead (id/kind, never capped, plus the
     // always-uncapped `blocked (gaps: …)` tail) alone
     // exceeds what's left of the 6000-byte budget after topics and any
@@ -156,7 +156,7 @@ describe("search", () => {
     // one at a time rather than vanishing, and neither topics nor patterns
     // are ever sacrificed to make room. If a future change makes patterns
     // start vanishing instead of components, this test must fail.
-    const grown = synthesizePatterns(3);
+    const grown = synthesizePatterns(16);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 
@@ -217,6 +217,13 @@ describe("get", () => {
     // pre-D129 resolution order, so it stays the topic.
     expect(store.get("motion")?.kind).toBe("topic");
     expect(store.get("tokens:motion")?.kind).toBe("tokens");
+  });
+
+  it("does not resolve names inherited from Object.prototype", () => {
+    expect(store.get("constructor")).toBeNull();
+    expect(store.get("__proto__")).toBeNull();
+    expect(store.get("guide:constructor")).toBeNull();
+    expect(store.get("tokens:constructor")).toBeNull();
   });
 
   it("returns null for an unknown id, and suggests the three nearest", () => {

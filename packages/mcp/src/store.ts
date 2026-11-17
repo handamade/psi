@@ -280,7 +280,7 @@ export function createStore(index: PsiIndex): Store {
     // pattern, topic), then the new kinds, so no existing bare id changes.
     if (want("component")) {
       const c = index.components.find((c) => c.name.toLowerCase() === name);
-      const slug = c ? pageOf.get(c.name)! : index.docs.components[name] ? name : null;
+      const slug = c ? pageOf.get(c.name)! : Object.hasOwn(index.docs.components, name) ? name : null;
       if (slug) {
         const page = index.docs.components[slug];
         return { id: `component:${c?.name ?? page.members[0]}`, kind: "component", title: page.title, markdown: page.markdown };
@@ -299,11 +299,11 @@ export function createStore(index: PsiIndex): Store {
       if (key) return { id: `topic:${key}`, kind: "topic", title: key, markdown: index.docs.topics[key] };
     }
     if (want("tokens")) {
-      const page = index.docs.tokenPages[name];
+      const page = Object.hasOwn(index.docs.tokenPages, name) ? index.docs.tokenPages[name] : undefined;
       if (page) return { id: `tokens:${name}`, kind: "tokens", title: page.title, markdown: page.markdown };
     }
     if (want("guide")) {
-      const guide = index.docs.guides[name];
+      const guide = Object.hasOwn(index.docs.guides, name) ? index.docs.guides[name] : undefined;
       if (guide) return { id: `guide:${name}`, kind: "guide", title: guide.title, markdown: guide.markdown };
     }
     return null;
