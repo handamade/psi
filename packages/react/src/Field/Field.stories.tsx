@@ -150,7 +150,7 @@ export const ControlWidth: Story = {
           </Select>
         </Field>
       </Toolbar>
-      <div style={{ width: 360 }}>
+      <div data-testid="narrow-column" style={{ width: 360 }}>
         <Field label="Address, in a 360px column" controlWidth={480}>
           <Input size={32} defaultValue="Unter den Linden 1, 10117 Berlin" />
         </Field>

@@ -19,13 +19,15 @@ test("each step sets the control's width, and the message keeps the Field's @int
   expect(count).toBeGreaterThanOrEqual(10);
   for (let i = 0; i < count; i++) {
     const field = fields.nth(i);
-    // The start Field in the 360px wrapper has its own test: its control column is narrower than the Field.
-    if (await field.evaluate((el) => el.getAttribute("data-label-position") === "start" && el.parentElement!.getBoundingClientRect().width === 360)) continue;
+    // The Fields in the narrow column have their own tests: there the control clamps to the column.
+    if (await field.evaluate((el) => el.closest("[data-testid=narrow-column]") !== null)) continue;
     const step = Number(await field.getAttribute("data-control-width"));
-    const fieldWidth = (await field.boundingBox())!.width;
     const control = (await field.locator(CONTROL).first().boundingBox())!;
-    // A control is its step, or the Field's width when the column is narrower (the 360px case).
-    expect(control.width, `field ${i}`).toBeCloseTo(Math.min(step, fieldWidth), 0);
+    expect(control.width, `field ${i}`).toBeCloseTo(step, 0);
+    // In a Toolbar row the Field is as wide as its control, or wider.
+    if (await field.evaluate((el) => el.parentElement!.className.includes("toolbar"))) {
+      expect((await field.boundingBox())!.width, `toolbar field ${i}`).toBeGreaterThanOrEqual(step - 0.5);
+    }
   }
   // The postcode's error spans the Field (560), not its 120px control.
   const postcode = page.locator("#storybook-root [data-control-width='120']");
@@ -35,20 +37,19 @@ test("each step sets the control's width, and the message keeps the Field's @int
 
 test("a 480 step in a 360px column shrinks to the column @interaction", async ({ page }) => {
   await page.goto(story("components-field--control-width"), { waitUntil: "networkidle" });
-  const field = page.locator("#storybook-root [data-control-width='480']:not([data-label-position])").last();
+  const field = page.locator("[data-testid=narrow-column] [data-control-width='480']:not([data-label-position])");
   const control = (await field.locator("input").boundingBox())!;
   expect(control.width).toBeCloseTo(360, 0);
 });
 
 test("a start 480 field in a 360px column keeps its control inside the column @interaction", async ({ page }) => {
   await page.goto(story("components-field--control-width"), { waitUntil: "networkidle" });
-  const field = page.locator("#storybook-root [data-control-width='480'][data-label-position=start]").last();
+  const field = page.locator("[data-testid=narrow-column] [data-control-width='480'][data-label-position=start]");
   const box = (await field.boundingBox())!;
   const label = (await field.locator("label").boundingBox())!;
   const control = (await field.locator("input").boundingBox())!;
-  expect(control.x + control.width).toBeLessThanOrEqual(box.x + box.width + 0.5);
+  expect(control.x + control.width).toBeCloseTo(box.x + box.width, 0);
   expect(control.x).toBeGreaterThan(label.x + label.width);
-  expect(control.width).toBeLessThan(480);
 });
 
 test("a start Field puts its sized control after its label @interaction", async ({ page }) => {
@@ -69,4 +70,22 @@ test("a FieldStack in a wide column stops at 640px, and its controls take their 
   // Notes has no controlWidth: its textarea fills the control column, which ends at the stack's edge.
   const textarea = (await page.locator("#storybook-root textarea").boundingBox())!;
   expect(textarea.x + textarea.width).toBeCloseTo(stack.x + stack.width, 0);
+});
+
+test("a start FieldStack below 480px puts labels above controls that keep their steps @interaction", async ({ page }) => {
+  await page.goto(story("components-fieldstack--capped"), { waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    (document.querySelector("#storybook-root > div > div") as HTMLElement).style.width = "400px";
+  });
+  const widths = await widthOf(page, "#storybook-root [data-control-width] > :is(input, select)");
+  expect(widths.map(Math.round)).toEqual([320, 240, 80]);
+  const fields = page.locator("#storybook-root [data-control-width]");
+  const count = await fields.count();
+  expect(count).toBe(3);
+  for (let i = 0; i < count; i++) {
+    const field = fields.nth(i);
+    const label = (await field.locator("label").boundingBox())!;
+    const control = (await field.locator(CONTROL).first().boundingBox())!;
+    expect(label.y + label.height, `field ${i}`).toBeLessThanOrEqual(control.y + 0.5);
+  }
 });

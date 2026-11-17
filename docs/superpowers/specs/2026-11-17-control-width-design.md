@@ -57,33 +57,38 @@ other branches in flight at the same time.
       not a theme's.
     - The scale counts px, not characters (`ch`), by the house rule that sizes
       are px numbers.
-  - Field renders a class for the step on its root. The CSS module sizes every
+  - Field writes `data-control-width="<step>"` on its root, beside D115's
+    `data-label-position` (the layout attributes are spread after the caller's
+    props, so the prop wins). The CSS module sizes every
     direct child that is not the label or the message line:
     `inline-size: <step>px; max-inline-size: 100%`.
     - That child is whatever the Field wraps: an `Input`, a `Select`, a
       `Textarea` (or, with a counter, the `Textarea`'s wrapper, so the counter
       lines up with it), or a control built on `useFieldControl`.
-    - The selector `.cw<step> > :not(.label):not(.message)` has specificity
-      (0,3,0), so it beats the controls' own `width: 100%` (0,1,0) and
+    - The selector `.field[data-control-width="<step>"] > :not(.label):not(.message)`
+      has specificity (0,4,0), so it beats the controls' own `width: 100%` (0,1,0) and
       `Toolbar`'s `> input` rule (0,1,1).
     - `max-inline-size: 100%` lets a control shrink where its column is
       narrower than the step: a stack below 480px, a dialog, a phone.
     - So that it can, a Field with `controlWidth` sets its own track to `minmax(0, 1fr)` (`auto minmax(0, 1fr)` in the `start` position): an `auto` track would grow to the control's width and the clamp would never bite. Found by the Chromium layout check.
   - The label and the message line keep the Field's width. An error under a
     120px control does not wrap at 120px.
-  - The props doc and the generated docs carry a table, measured in the browser
-    at sizes 32 and 40, of the digits and of the average characters that fit at
-    each step. It reads, for example, "an ICCID's 20 digits fit 240 at size 32",
+  - The props doc (JSDoc, so the generated docs) and `llms.txt` carry the
+    measured counts as prose, not a table: at size 32 about 7/12/17/26/36/55
+    digits or 9/14/20/32/44/67 characters; at size 40, 5/10/14/22/31/48 digits;
+    a Select 2–3 fewer. Measured in Chromium with the default system font
+    stack. It reads, for example, "an ICCID's 20 digits fit 240 at size 32",
     so a caller picks a step from the value it expects.
   - **With D115's `labelPosition`:**
     - In the `start` position the control sits in column 2 at its width, at the
       start of the column. The message line under it spans the whole column.
     - In a `FieldStack` below 480px, where the label returns above the control,
       the control keeps its width unless the column is narrower.
-  - **In a group Field** (`group`), the prop sizes the group's container. The
-    docs say it is meant for a Field with one control.
+  - **In a group Field** (`group`), the prop sizes each direct child: the
+    RadioGroup, or each Checkbox or Switch placed directly in it. The docs say
+    it is meant for a Field with one control.
   - **In a `Toolbar` row**, a Field with `controlWidth` is as wide as its
-    control or its label, whichever is wider. A row can narrow one field, a page
+    control, its label or its message line, whichever is widest. A row can narrow one field, a page
     size `Select` say, without a new pattern.
 
   **The stacked form's maximum width**
@@ -144,11 +149,11 @@ other branches in flight at the same time.
 
 - **Tests first**, red before the change, on assertion:
   - `Field.test.tsx`:
-    - each step renders its class on the root;
-    - no class without the prop;
+    - each step writes `data-control-width` on the root;
+    - no attribute without the prop;
     - the CSS module's rule for each step sets `inline-size` to the step and
       `max-inline-size: 100%` on `> :not(.label):not(.message)`;
-    - a `start` Field and a group Field carry the class too.
+    - a `start` Field and a group Field carry the attribute too.
   - `FieldStack.test.tsx`: the module binds `max-inline-size` to
     `var(--psi-field-stack-max-width)`.
   - `packages/tokens`: `--psi-field-stack-max-width` resolves to `640px` in
@@ -179,3 +184,14 @@ other branches in flight at the same time.
 
 - The `id` / `aria-invalid` precedence between a caller and a `Field`, as
   framed above, needs its own decision.
+- A Field inside a wrapper element in a `start` FieldStack still matches D115's
+  subgrid rule (`.field[data-in-stack="start"][data-label-position="start"]`).
+  Its parent is not a grid, so Chromium falls back to auto columns, and that
+  later rule also overrides D125's `auto minmax(0, 1fr)` track. A sized control
+  in such a Field does not shrink when the stack is 480px or wider but narrower
+  than label + 12 + step (measured: a 480 step in a 300px wrapper renders 480).
+  A fix verified in Chromium scopes the subgrid rule to the stack's direct
+  children:
+  `:where([data-label-position="start"]:not(.field)) > .field[data-in-stack="start"][data-label-position="start"]`
+  (`:where` keeps (0,3,0), so the container-query rule still wins). It changes
+  a D115 rule, so it gets its own decision.

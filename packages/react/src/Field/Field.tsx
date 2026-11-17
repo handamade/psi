@@ -76,8 +76,9 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
    * 32, 44 and 67 characters of text; at size 40, 5, 10, 14, 22, 31 and 48
    * digits (system font; a Select holds 2–3 fewer for its chevron). An
    * ICCID's 20 digits fit 240. Meant for a Field with one control; on a group
-   * Field it sizes the group. In a Toolbar row the Field is as wide as its
-   * control or its label, whichever is wider. */
+   * Field it sizes each direct child: the RadioGroup, or each Checkbox or
+   * Switch placed directly in it. In a Toolbar row the Field is as wide as the
+   * widest of its label, its control and its message line. */
   controlWidth?: FieldControlWidth;
   /** Forwarded ref to the root element. */
   ref?: Ref<HTMLDivElement | HTMLFieldSetElement>;
