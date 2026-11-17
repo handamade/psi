@@ -316,6 +316,16 @@ The owner chose one standalone component over a `Tabs` variant and a
     frame with four segments. VR baselines come from CI's render (D89, D112).
   - A changeset (minor for `psi-tokens` and `psi-react`).
 
+  ### The MCP's search budget
+
+  The MCP's `search` holds every answer to 6,000 characters (D61, D100), but
+  only the empty-query overview filled to that budget; a query took its top 20
+  hits whatever their size. `Segment`'s description names its `<button>`, so
+  `search("button")` gained a hit and measured 6,065. Query results now fill to
+  the budget, best first, so the lowest-scored hits are the ones that fall off.
+  A test grows the catalog with 30 button-like components and holds the answer
+  to the budget with `Button` still first.
+
 ## Out of scope
 
 - Icons in segments, and icon-only segments. Text labels are what the homepage

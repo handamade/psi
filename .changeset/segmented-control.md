@@ -1,6 +1,7 @@
 ---
 "@handamade/psi-tokens": minor
 "@handamade/psi-react": minor
+"@handamade/psi-mcp": patch
 ---
 
 A segmented control: `SegmentedControl` and `Segment` (D132).
@@ -12,3 +13,4 @@ A segmented control: `SegmentedControl` and `Segment` (D132).
 - **Tabs** shares its tab-stop rule (D93) and keyboard with it, and `Tabs`' body slot accepts `SegmentedControl`. Two changes to `Tabs`:
   - **A `TabPanel` hides its `Tabs` from its content**: children render under an empty `TabsContext`. A `Tab` or `TabList` stranded in a panel now throws instead of joining the outer tab set, and code of your own that reads the exported `TabsContext` inside a panel now gets `null`.
   - Now that the arrow keys reach a disabled tab (D131, in this release), a click on another tab afterwards still leaves exactly one tab stop: each tab re-takes its own when the stop moves.
+- **MCP `search`**: a query's results now fill to the response budget, best first, as the overview's already do. `Segment` made `button` match one component more and pushed that answer past 6,000 characters.

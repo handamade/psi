@@ -263,12 +263,25 @@ export function createStore(index: PsiIndex): Store {
       }
       return out;
     }
-    return briefs
+    const ranked = briefs
       .map((b) => ({ b, s: score(b, terms) }))
       .filter((x) => x.s > 0)
       .sort((a, z) => z.s - a.s)
       .slice(0, MAX_RESULTS)
       .map((x) => x.b);
+    // D132: a query's results fill to the budget too, best first. A common
+    // word ("button") matches more components as the catalog grows, and the
+    // cap on the count alone let the response outgrow the budget the overview
+    // keeps. The lowest-scored hits are the ones that fall off.
+    const out: SearchBrief[] = [];
+    for (const brief of ranked) {
+      out.push(brief);
+      if (JSON.stringify(out).length > RESPONSE_BUDGET) {
+        out.pop();
+        break;
+      }
+    }
+    return out;
   }
 
   function get(id: string): Page | null {

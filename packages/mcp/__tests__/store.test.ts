@@ -57,6 +57,32 @@ describe("search", () => {
     }
   });
 
+  it("fills a query's results to the budget, best first, as the catalog grows (D132)", () => {
+    const extras = Array.from({ length: 30 }, (_, n) => `ExtraButton${n}`);
+    const grownIndex = {
+      ...index,
+      docs: {
+        ...index.docs,
+        components: {
+          ...index.docs.components,
+          extras: { ...Object.values(index.docs.components)[0], title: "ExtraButtons", members: extras },
+        },
+      },
+      components: [
+        ...index.components,
+        ...extras.map((name) => ({
+          ...index.components[0],
+          name,
+          // As long as a summary gets (220): 20 such hits outgrow the budget.
+          description: "A <button> that does a button's work. ".repeat(8),
+        })),
+      ],
+    } as typeof index;
+    const results = createStore(grownIndex).search("button");
+    expect(JSON.stringify(results).length).toBeLessThanOrEqual(6000);
+    expect(results[0].id).toBe("component:Button");
+  });
+
   it("returns an overview for an empty query", () => {
     const briefs = store.search("");
     expect(briefs.some((b) => b.kind === "component")).toBe(true);
