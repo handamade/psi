@@ -1062,7 +1062,20 @@ git commit -m "docs: TableContainer in llms.txt, READMEs and the site, 56 compon
 
 ### Task 6: Merge `main`, five gates, PR (controller, not a subagent)
 
-- [ ] **Step 1:** `git fetch origin && git merge origin/main`. If D124 or D125 landed first, they moved the same counts and the `CLAUDE.md` range: set each count to the merged manifest's real number and the range to the highest decision `main` claims plus D123.
+- [ ] **Step 1:** `git fetch origin && git merge origin/main`. Three branches run beside this one; plan for whichever has landed:
+  - **D124** (`d124-nav-icon-count`) adds a public `Count`, so with `TableContainer` the catalog is **57**, not 56. Task 5 wrote 56 against `main` as it was at branch time; after the merge, run `node tools/check-docs-drift.mjs` and set every count it names to the merged manifest's real number. Same for the `CLAUDE.md` range: the highest decision `main` claims plus D123.
+  - **D124 also changes slot loading**: `packages/react/scripts/slots.ts` reads a per-part file `src/<Dir>/<Name>.slots.json` for a component in `COMPONENT_DIR`. If the merged `slots.ts` has that form, create `packages/react/src/Table/TableContainer.slots.json`:
+
+    ```json
+    {
+      "slots": [
+        { "name": "body", "accepts": { "components": ["Table"] }, "cardinality": "1..1", "order": 1 }
+      ]
+    }
+    ```
+
+    and pin it in `packages/react/scripts/slots.test.ts` the way D124 pins `NavItem` (`TableContainer` has one `body` slot accepting `Table`, `1..1`). If D124 has not landed, add nothing: the loader on this branch cannot read a part file, and D124's own merge-second step owns it then. Tell the coordinator which case applied.
+  - **D125** (`d125-control-width`) edits `Field`, `FieldStack`, field tokens and the seed-patterns test. This plan touches none of them, so expect no conflict there; a conflict in a shared count file is resolved by the drift check above.
 - [ ] **Step 2:** Re-check that no `## Decisions` entry on `origin/main` claims D123.
 - [ ] **Step 3:** From the worktree root, on Node 24:
 

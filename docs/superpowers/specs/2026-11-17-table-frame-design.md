@@ -80,9 +80,12 @@ by branches in flight at the same time.
 
   - **`TableContainer`: a scrolling region that is the frame.**
     - Renders a `<div>` with `overflow: auto`, the 8th member of the Table
-      family, wrapping one `Table`. Like the family's other members it lives
-      in `Table/` and has no `slots.json`: slot contracts are read per
-      component folder, so `TableHead` and `TableCaption` carry none either.
+      family, wrapping one `Table`. It lives in `Table/`. Its one slot,
+      `body` (`1..1`, accepts `Table`), is declared in
+      `Table/TableContainer.slots.json` once the slot loader reads per-part
+      files (D124's change); on a loader that only reads
+      `src/<Name>/slots.json` it has none, like `TableHead` and
+      `TableCaption` today.
     - `maxBlockSize?: number | string` — a number is px, a string any CSS
       length (`"60vh"`, `"calc(100dvh - 200px)"`). It sets
       `max-block-size`. Without it the container only scrolls sideways in
