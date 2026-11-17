@@ -1,6 +1,9 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { countDecisions } from "./src/lib/decisions";
+import { latestRelease } from "./src/lib/release";
 
 const require = createRequire(import.meta.url);
 
@@ -99,6 +102,19 @@ export function psiFacts(): PsiFactsPlugin {
         iconNames: manifest.icons,
         storyTitles: readStoryTitles(pkgRoot, componentNames),
       };
+
+      const specsDir = fileURLToPath(new URL("../../docs/superpowers/specs/", import.meta.url));
+      const specTexts = readdirSync(specsDir)
+        .filter((f) => f.endsWith(".md"))
+        .map((f) => readFileSync(join(specsDir, f), "utf8"));
+      const release = latestRelease(
+        readFileSync(fileURLToPath(new URL("./src/content/updates.ts", import.meta.url)), "utf8"),
+      );
+      Object.assign(facts, {
+        decisionCount: countDecisions(specTexts),
+        releaseVersion: release.version,
+        releaseDate: release.date,
+      });
 
       return Object.entries(facts)
         .map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};`)
