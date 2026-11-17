@@ -1,12 +1,24 @@
 ---
+import { SkipLink } from "@handamade/psi-react";
 import Base from "../layouts/Base.astro";
-import { App } from "../App";
+import { SiteChrome } from "../chrome/SiteChrome";
+import Hero from "../home/Hero.astro";
+import Surfaces from "../home/Surfaces.astro";
+import BuiltWithPsi from "../home/BuiltWithPsi.astro";
+import HowItsBuilt from "../home/HowItsBuilt.astro";
+import SiteFooter from "../home/SiteFooter.astro";
 import "../styles/home.css";
 ---
-
-<Base
-  title="Psi — Color isn’t picked. It’s computed."
-  description="Psi — a themeable design system where every semantic color is an OKLCH formula. Brand anchors in, a contrast-validated multi-theme token set out."
->
-  <App client:load />
+<Base title="Psi — Color isn’t picked. It’s computed." description="Psi — a themeable design system where every semantic color is an OKLCH formula. Brand anchors in, a contrast-validated multi-theme token set out.">
+  <SkipLink href="#main">Skip to content</SkipLink>
+  <SiteChrome client:load />
+  <main id="main" tabindex="-1">
+    <div class="home-wrap">
+      <Hero />
+      <Surfaces />
+      <BuiltWithPsi />
+      <HowItsBuilt />
+    </div>
+  </main>
+  <SiteFooter />
 </Base>

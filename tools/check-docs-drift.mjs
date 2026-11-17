@@ -37,14 +37,12 @@ const claims = [
   // disagrees with the manifest still fails below: that is what catches a
   // reintroduced literal. Rows without this mode keep the original behavior,
   // where a missing match is itself DRIFT.
-  ["apps/site/src/sections/Hero.tsx", /(\d+) components/, nc, "must-not-hardcode"],
-  ["apps/site/src/sections/Hero.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
-  ["apps/site/src/sections/Roadmap.tsx", /(\d+) components/, nc, "must-not-hardcode"],
-  ["apps/site/src/sections/Roadmap.tsx", /(\d+) icons/, ni, "must-not-hardcode"],
-  // Playground.tsx carried the original defect ("Eighteen production
-  // components" — a spelled-out word no /(\d+)/ regex would have caught) and
-  // was not watched at all. It is now.
-  ["apps/site/src/sections/Playground.tsx", /(\d+) production components/, nc, "must-not-hardcode"],
+  // The homepage sections (D133) read counts from virtual:psi-facts; a
+  // literal reintroduced into any of them is drift.
+  ...["Hero", "Surfaces", "BuiltWithPsi", "HowItsBuilt"].flatMap((n) => [
+    [`apps/site/src/home/${n}.astro`, /(\d+) components/, nc, "must-not-hardcode"],
+    [`apps/site/src/home/${n}.astro`, /(\d+) icons/, ni, "must-not-hardcode"],
+  ]),
   // D76 spec: "What stays hand-written (release notes) joins the
   // check-docs-drift claims list." UPDATES is entirely hand-written and is
   // the exact artifact that rotted for six releases (it said 0.8.0 while

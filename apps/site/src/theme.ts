@@ -97,77 +97,14 @@ function useModeEvents(onMode: (mode: Mode) => void): void {
   }, [onMode]);
 }
 
-/**
- * Mode state, synced to <html data-psi-theme>. OS following lives INSIDE
- * this hook and deliberately does not persist: an earlier design routed it
- * through a separate `useSystemModeSync` hook fed the returned `setMode`,
- * but that setter persists, so the first OS change recorded an explicit
- * preference and permanently disabled the listener. Following the OS is not
- * a choice and must not be recorded as one.
- *
- * Returns a THIRD setter, `setModeEphemeral`, for the same reason: a brand
- * derivation carries its own `vector.mode`, and applying it needs to update
- * the visible mode without recording it as the visitor's explicit choice —
- * `psi-brand` already persists the vector (and its mode) on its own, so
- * nothing is lost by not also writing `psi-theme`. Wiring a derived brand's
- * mode through the persisting `setMode` was tried (D57 review) and is the
- * same class of bug commit 0a0806b fixed for the OS-follow listener,
- * re-entering through a different door: typing a brief and never touching
- * the toggle would silently opt the visitor out of OS colour-scheme
- * following forever.
- */
-export function useMode(): [Mode, (next: Mode) => void, (next: Mode) => void] {
-  // The server has no storage and no OS, so the first render is always
-  // light. The boot script has already set <html data-psi-theme>; this only
-  // brings React's copy in line, before paint, without a hydration mismatch.
-  const [mode, setModeState] = useState<Mode>("light");
-  useLayoutEffect(() => {
-    setModeState(readStoredMode() ?? systemMode());
-  }, []);
-
-  /** An explicit choice. This is the only path that persists. */
-  const setMode = useCallback((next: Mode) => {
-    setModeState(next);
-    try {
-      localStorage.setItem(MODE_KEY, next);
-    } catch {
-      /* storage unavailable */
-    }
-    applyMode(next);
-  }, []);
-
-  /** A machine choice (a derived brand's own `vector.mode`), not a
-   * visitor's. Updates the visible mode and <html> without persisting. */
-  const setModeEphemeral = useCallback((next: Mode) => {
-    setModeState(next);
-    applyMode(next);
-  }, []);
-
-  useModeEvents(setModeState);
-
-  useEffect(() => {
-    const mq = matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      if (readStoredMode() !== null) return; // an explicit choice outranks the OS, forever
-      const next: Mode = mq.matches ? "dark" : "light";
-      setModeState(next);
-      applyMode(next);
-      // Deliberately NOT persisted.
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  return [mode, setMode, setModeEphemeral];
-}
-
 export type ModePref = Mode | "system";
 
 /**
  * The visitor's preference, with "system" as a real choice (D133): picking it
  * removes the stored mode, so the OS-follow listener in this hook takes over
- * again. `mode` is what is painted. setModeEphemeral is useMode's, for a
- * derived brand's own mode (never persisted).
+ * again. `mode` is what is painted. setModeEphemeral is for a derived brand's own
+ * mode (never persisted). Following the OS lives in this hook and is not
+ * persisted either: it is not a choice.
  */
 export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode) => void] {
   const [pref, setPrefState] = useState<ModePref>("system");
@@ -225,7 +162,7 @@ export function useBrand(): {
   setBrand: (v: BrandVector, cache: Record<string, string>) => void;
   reset: () => void;
 } {
-  // Same reason as useMode: null on the server and on the first client
+  // Same reason as useModePref: null on the server and on the first client
   // render, the stored vector before paint.
   const [brand, setBrandState] = useState<BrandVector | null>(null);
   useLayoutEffect(() => {

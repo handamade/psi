@@ -17,9 +17,7 @@ import {
   readStoredBrand,
   readStoredMode,
   useBrand,
-  useMode,
   useModePref,
-  type Mode,
 } from "../theme";
 
 beforeEach(() => localStorage.clear());
@@ -175,47 +173,12 @@ describe("storage failures (e.g. Safari private mode)", () => {
   });
 });
 
-describe("useMode", () => {
-  it("follows an OS change when nothing is stored, and does not persist it", () => {
-    const media = stubMatchMedia(false); // OS starts light
-    const { result, unmount } = renderHook(() => useMode());
-    expect(result.current[0]).toBe("light");
-
-    media.setMatches(true); // OS flips to dark
-    expect(result.current[0]).toBe("dark");
-    expect(localStorage.getItem(MODE_KEY)).toBeNull();
-
-    unmount();
-  });
-
-  it("ignores further OS changes once an explicit choice has been made", () => {
-    const media = stubMatchMedia(false); // OS starts light
-    const { result, unmount } = renderHook(() => useMode());
-
-    act(() => {
-      const setMode = result.current[1];
-      setMode("dark" as Mode); // an explicit choice, contradicting the OS
-    });
-    expect(result.current[0]).toBe("dark");
-    expect(localStorage.getItem(MODE_KEY)).toBe("dark");
-
-    media.setMatches(false); // OS "changes" back to light — already was light
-    expect(result.current[0]).toBe("dark");
-
-    media.setMatches(true); // OS flips to dark and back to light again
-    media.setMatches(false);
-    expect(result.current[0]).toBe("dark"); // never reverted by the OS once explicit
-
-    unmount();
-  });
-});
-
 describe("server rendering", () => {
-  it("renders useMode and useBrand without localStorage or matchMedia", () => {
+  it("renders useModePref and useBrand without localStorage or matchMedia", () => {
     vi.stubGlobal("localStorage", undefined);
     vi.stubGlobal("matchMedia", undefined);
     function Probe() {
-      const [mode] = useMode();
+      const [, mode] = useModePref();
       const { brand } = useBrand();
       return createElement("p", null, `${mode}:${brand === null ? "none" : "brand"}`);
     }
@@ -226,8 +189,8 @@ describe("server rendering", () => {
     vi.unstubAllGlobals();
     localStorage.setItem(MODE_KEY, "dark");
     stubMatchMedia(false);
-    const { result, unmount } = renderHook(() => useMode());
-    expect(result.current[0]).toBe("dark");
+    const { result, unmount } = renderHook(() => useModePref());
+    expect(result.current[1]).toBe("dark");
     unmount();
   });
 });
@@ -291,26 +254,8 @@ describe("useModePref", () => {
   });
 });
 
-describe("mode hooks in one document", () => {
+describe("mode preference in one document", () => {
   beforeEach(() => stubMatchMedia(false));
-
-  function Pair({ onRender }: { onRender: (a: ReturnType<typeof useModePref>, b: ReturnType<typeof useMode>) => void }) {
-    const a = useModePref();
-    const b = useMode();
-    onRender(a, b);
-    return null;
-  }
-
-  it("useMode follows a change made through useModePref, and the reverse", () => {
-    let a!: ReturnType<typeof useModePref>;
-    let b!: ReturnType<typeof useMode>;
-    mount(createElement(Pair, { onRender: (x, y) => ((a = x), (b = y)) }));
-    act(() => a[2]("dark"));
-    expect(b[0]).toBe("dark");
-    act(() => b[1]("light"));
-    expect(a[1]).toBe("light");
-    expect(a[0]).toBe("light"); // the preference follows too
-  });
 
   it("choosing System in one instance clears the other's preference", () => {
     localStorage.setItem(MODE_KEY, "dark");
