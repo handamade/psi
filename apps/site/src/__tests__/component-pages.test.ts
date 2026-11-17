@@ -9,7 +9,9 @@ import { allExportNames, docSection, getExport, readGeneratedDoc, summary } from
 const require = createRequire(import.meta.url);
 const srcDir = join(dirname(require.resolve("@handamade/psi-react/manifest.json")), "..", "src");
 const folders = readdirSync(srcDir, { withFileTypes: true })
-  .filter((d) => d.isDirectory() && d.name !== "icons")
+  // A component folder is PascalCase; `icons` and `internal` (D130's shared
+  // popup layers) are not components.
+  .filter((d) => d.isDirectory() && /^[A-Z]/.test(d.name))
   .map((d) => d.name);
 
 describe("componentPages", () => {

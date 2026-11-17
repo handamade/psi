@@ -115,7 +115,7 @@ export const FallbackPlacement: Story = {
       // The stub is installed during render so it is in place for every
       // phase the story might read it from — render, layout effect, or
       // passive effect. Installing it in an effect would couple this story
-      // to which effect kind useMenuPlacement happens to use internally,
+      // to which effect kind usePopupPlacement happens to use internally,
       // and would silently stop forcing the fallback branch if that ever
       // changed. Only the *restore* can be deferred. (D58)
       const originalRef = React.useRef<typeof CSS.supports | null>(null);

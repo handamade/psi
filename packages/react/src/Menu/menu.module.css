@@ -17,7 +17,7 @@
   min-width: 180px;
   /* Gap between trigger and menu (D53). Applies below the anchor floor too:
      the @supports block re-asserts this same value for the anchor-positioned
-     path, but without it here the fallback path (useMenuPlacement.ts) would
+     path, but without it here the fallback path (internal/popup/usePopupPlacement.ts) would
      sit flush against its trigger. */
   margin: var(--psi-space-4);
   padding: var(--psi-space-4);
@@ -115,7 +115,7 @@
 
 /* ── Placement (D53) ──────────────────────────────────────────────
    Above the anchor floor CSS does all the work. Below it, the hook in
-   useMenuPlacement.ts sets inset directly; these rules are inert there
+   internal/popup/usePopupPlacement.ts sets inset directly; these rules are inert there
    because position-area needs an anchor to resolve against. */
 
 @supports (anchor-name: --x) {

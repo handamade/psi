@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 /** Interaction coverage for Menu's dismissal ordering (D58).
  *
@@ -106,7 +107,7 @@ const LONG = "/iframe.html?id=components-menu--long-menu&globals=theme:light";
 const longMenu = '[data-psi-menu][aria-label="Move to"]';
 
 /** The menu's box, and whether an item's box lies inside it. */
-async function inView(page: import("@playwright/test").Page, name: string) {
+async function inView(page: Page, name: string) {
   return page.evaluate(
     ({ sel, name }) => {
       const menu = document.querySelector(sel)!.getBoundingClientRect();
