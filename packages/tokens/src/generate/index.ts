@@ -1,7 +1,8 @@
 export { parsePrompt, fnv1a, seededRandom } from "./prompt.js";
-export { buildBrandPalette } from "./palette.js";
-export { hexFor, contrastOf, solveL } from "./solve.js";
-export { deriveTheme, type DerivedTheme, type DerivedPair } from "./derive.js";
+export { buildBrandPalette, ACCENT_CHROMA } from "./palette.js";
+export type { ContrastResult } from "../contrast-matrix.js";
+export { hexFor, contrastOf, solveL, parseColor } from "./solve.js";
+export { deriveTheme, contrastReport, type DerivedTheme, type DerivedPair } from "./derive.js";
 export { serializeCustomerTheme } from "./serialize.js";
 export {
   isBrandVector,

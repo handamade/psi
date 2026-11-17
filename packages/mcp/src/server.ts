@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { Store } from "./store.js";
+import { ThemeError, themeMarkdown } from "./theme.js";
 
 export function createPsiServer(store: Store, version: string): McpServer {
   const server = new McpServer({ name: "psi", version });
@@ -48,6 +49,39 @@ export function createPsiServer(store: Store, version: string): McpServer {
         };
       }
       return { content: [{ type: "text", text: page.markdown }] };
+    },
+  );
+
+  server.registerTool(
+    "theme",
+    {
+      title: "Make a Psi theme from a colour",
+      description:
+        "Derive a light and a dark Psi theme from one brand colour or a hue, solved so every " +
+        "text and control pair meets WCAG AA. Returns the CSS to save, how to import it, and " +
+        "the contrast of every gated pair. It never calls a model: to start from a brief such " +
+        "as 'calm fintech', choose hue, chroma and radius yourself.",
+      inputSchema: {
+        color: z.string().optional().describe("A brand colour: a hex such as #3b82f6, or an oklch() string. Pass this or hue."),
+        hue: z.number().optional().describe("OKLCH hue, 0 to 359. Pass this or color."),
+        chroma: z
+          .enum(["muted", "calm", "balanced", "vivid", "electric"])
+          .optional()
+          .describe("How saturated the accent is. From a colour, the nearest word is picked for you."),
+        radius: z
+          .union([z.literal(4), z.literal(6), z.literal(8), z.literal(12)])
+          .optional()
+          .describe("Control corner radius in px. Default 8."),
+        name: z.string().optional().describe("kebab-case theme name. Default brand-<hue>."),
+      },
+    },
+    async (input) => {
+      try {
+        return { content: [{ type: "text", text: themeMarkdown(input) }] };
+      } catch (err) {
+        if (err instanceof ThemeError) return { isError: true, content: [{ type: "text", text: err.message }] };
+        throw err;
+      }
     },
   );
 

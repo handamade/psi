@@ -19,9 +19,18 @@ beforeAll(async () => {
 });
 
 describe("psi MCP server", () => {
-  it("lists exactly the two read-only tools", async () => {
+  it("lists the read-only tools", async () => {
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual(["get", "search"]);
+    expect(tools.map((t) => t.name).sort()).toEqual(["get", "search", "theme"]);
+  });
+
+  it("answers theme calls with CSS, and bad input as an error", async () => {
+    const ok = (await client.callTool({ name: "theme", arguments: { color: "#3b82f6", name: "ocean" } })) as ToolCallResult;
+    expect(ok.isError).toBeFalsy();
+    expect(ok.content[0].text).toContain('[data-psi-theme="ocean-dark"]');
+    const bad = (await client.callTool({ name: "theme", arguments: { color: "nope" } })) as ToolCallResult;
+    expect(bad.isError).toBe(true);
+    expect(bad.content[0].text).toContain('Could not read "nope"');
   });
 
   it("answers search calls with briefs", async () => {

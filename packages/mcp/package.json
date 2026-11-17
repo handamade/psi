@@ -28,12 +28,12 @@
     "build": "tsx scripts/build-index.ts && tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "@handamade/psi-tokens": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.16.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {
     "@handamade/psi-docs": "workspace:*",
-    "@handamade/psi-tokens": "workspace:*",
     "@handamade/psi-react": "workspace:*",
     "@types/node": "^20.0.0",
     "tsx": "^4.22.4",

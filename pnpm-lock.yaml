@@ -199,6 +199,9 @@ importers:
 
   packages/mcp:
     dependencies:
+      '@handamade/psi-tokens':
+        specifier: workspace:*
+        version: link:../tokens
       '@modelcontextprotocol/sdk':
         specifier: ^1.16.0
         version: 1.29.0(zod@3.25.76)
@@ -212,9 +215,6 @@ importers:
       '@handamade/psi-react':
         specifier: workspace:*
         version: link:../react
-      '@handamade/psi-tokens':
-        specifier: workspace:*
-        version: link:../tokens
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.43
