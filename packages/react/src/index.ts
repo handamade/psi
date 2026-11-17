@@ -82,6 +82,8 @@ export { TableCell } from "./Table/TableCell.js";
 export type { TableCellProps } from "./Table/TableCell.js";
 export { TableCaption } from "./Table/TableCaption.js";
 export type { TableCaptionProps } from "./Table/TableCaption.js";
+export { TableContainer } from "./Table/TableContainer.js";
+export type { TableContainerProps } from "./Table/TableContainer.js";
 export { Pagination } from "./Pagination/Pagination.js";
 export type { PaginationProps } from "./Pagination/Pagination.js";
 export { CursorPagination } from "./CursorPagination/CursorPagination.js";

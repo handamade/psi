@@ -109,4 +109,11 @@ describe("loadSlotContracts", () => {
     expect(out.NavGroup.map((s) => s.name)).toEqual(["label", "icon", "body"]);
     expect(out.Count).toEqual([]);
   });
+
+  it("real src: TableContainer holds one Table in its D126 body slot; Table keeps its body", () => {
+    const src = join(fileURLToPath(new NodeURL("..", import.meta.url)), "src");
+    const out = loadSlotContracts(src, ["Table", "TableContainer", "TableCaption", "TableHead", "TableBody", "Button", "IconButton", "Menu", "MenuItem", "MenuSeparator", "MenuText", "Tag"], { TableContainer: "Table", TableCaption: "Table", TableHead: "Table", TableBody: "Table" });
+    expect(out.TableContainer).toEqual([{ name: "body", accepts: { components: ["Table"] }, cardinality: "1..1", order: 1 }]);
+    expect(out.Table.map((s) => s.name)).toEqual(["body"]);
+  });
 });

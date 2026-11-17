@@ -35,7 +35,7 @@ export const componentPages: ComponentPage[] = [
   { slug: "skip-link", title: "SkipLink", members: ["SkipLink"] },
   { slug: "stack", title: "Stack", members: ["Stack"] },
   { slug: "switch", title: "Switch", members: ["Switch"] },
-  { slug: "table", title: "Table", members: ["Table", "TableHead", "TableBody", "TableRow", "TableHeaderCell", "TableCell", "TableCaption"] },
+  { slug: "table", title: "Table", members: ["Table", "TableHead", "TableBody", "TableRow", "TableHeaderCell", "TableCell", "TableCaption", "TableContainer"] },
   { slug: "tabs", title: "Tabs", members: ["Tabs", "TabList", "Tab", "TabPanel"] },
   { slug: "tag", title: "Tag", members: ["Tag"] },
   { slug: "text", title: "Text", members: ["Text"] },

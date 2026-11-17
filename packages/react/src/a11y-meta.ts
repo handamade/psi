@@ -158,6 +158,14 @@ export const a11yMeta: Record<string, A11yEntry> = {
     notes:
       "Renders <caption>, which names the table for assistive tech and is visible, unlike an aria-label on Table. Put the range in `detail` (\"Rows 51–100 of more than 100,000\") so that moving focus to the caption after a token-paged page change reads the new range (D85). Remaining attributes land on the element.",
   },
+  TableContainer: {
+    keyboard: [
+      { keys: "Tab", behavior: "A tab stop, so the region can be scrolled from the keyboard in every browser; draws the shared focus ring outside its frame." },
+      { keys: "Arrow keys / Page Up / Page Down / Home / End", behavior: "Scroll the region while it has focus (native)." },
+    ],
+    notes:
+      "A <div role=\"region\"> that scrolls its Table both ways and keeps a stickyHeader at its top (D126); maxBlockSize caps its height. It draws the frame, so the table inside drops its own. Named by the table's TableCaption through aria-labelledby (the caption gets an id if it has none); pass aria-label or aria-labelledby instead when there is no caption. Inside it the caption sits within the frame and scrolls with the content; focusing it after a page change scrolls it back into view.",
+  },
   CursorPagination: {
     keyboard: [
       { keys: "Tab", behavior: "Reaches the Previous and Next buttons in order; a disabled direction is skipped." },
