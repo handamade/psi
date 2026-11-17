@@ -1,6 +1,6 @@
-# A table frame that rounds, and a container that scrolls (D123)
+# A table frame that rounds, and a container that scrolls (D126)
 
-Date: 2026-11-17. Status: **Approved**, branch `d123-table-frame`.
+Date: 2026-11-17. Status: **Approved**, branch `d126-table-frame`.
 
 Provenance: four limits of `Table`, found by rendering it on 0.28.0 in
 Chromium. Two are defects of the frame and the cells. Two are missing pieces:
@@ -8,8 +8,8 @@ a way to scroll a wide table, and a mark that says a column can be sorted.
 Expandable rows, sorting by several columns, hiding columns, striped rows, the
 selection labels and `Pagination` are out of scope.
 
-The number was allocated by the coordinating session. D124 and D125 are held
-by branches in flight at the same time.
+The number was allocated by the coordinating session. It was first D123, which
+#170 claimed on `main` first; D124 and D125 are held by branches in flight.
 
 ## What's there today
 
@@ -44,7 +44,7 @@ by branches in flight at the same time.
 
 ## Decisions
 
-- **D123 — `Table` draws its frame in the separate border model; a new
+- **D126 — `Table` draws its frame in the separate border model; a new
   `TableContainer` scrolls both ways, keeps a sticky header sticking, and
   draws the frame itself; `numeric` cells do not wrap; a sortable column
   shows a two-way mark at rest.**

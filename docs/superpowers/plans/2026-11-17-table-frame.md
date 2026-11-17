@@ -1,4 +1,4 @@
-# Table frame and container (D123) Implementation Plan
+# Table frame and container (D126) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -13,8 +13,8 @@
 ## Global Constraints
 
 - Node 24: run `node -v` first; on anything else run `nvm use` in the worktree root.
-- Work only in the worktree `/Users/dmytrokurkin/Projects/dku/ds/.claude/worktrees/d123-table-frame-e7c763`, branch `d123-table-frame`. Never `cd` into another worktree.
-- The decision number is **D123**. Do not claim any other.
+- Work only in the worktree `/Users/dmytrokurkin/Projects/dku/ds/.claude/worktrees/d123-table-frame-e7c763`, branch `d126-table-frame`. Never `cd` into another worktree.
+- The decision number is **D126**. Do not claim any other.
 - Never hardcode a colour in component CSS: bind `var(--psi-table-*)` or a scale token. **No new tokens** in this decision.
 - Never name a request register, its ids, or any consumer project in code, commits or docs.
 - The dev warning text, verbatim: `Psi TableContainer: no TableCaption inside and no aria-label or aria-labelledby; the scrolling region has no name.`
@@ -71,7 +71,7 @@ const rule = (selector: string): string => {
   return new RegExp(`(?:^|\\})\\s*${escaped}\\s*\\{([^}]*)\\}`, "m").exec(css)?.[1] ?? "";
 };
 
-describe("table.module.css (D123)", () => {
+describe("table.module.css (D126)", () => {
   it("uses the separate border model, so the border follows the radius", () => {
     const table = rule(".table");
     expect(table).toMatch(/border-collapse:\s*separate/);
@@ -124,7 +124,7 @@ In `packages/react/src/Table/table.module.css`:
 Replace the `.table` rule with:
 
 ```css
-/* D123: the separate model, not collapse. A collapsed table does not round
+/* D126: the separate model, not collapse. A collapsed table does not round
    its border: the background takes the curve and the 1px border meets in a
    square corner outside it. --_psi-table-corner is the border's inner radius,
    which the four corner cells take so a sticky header or a hovered first or
@@ -146,7 +146,7 @@ Replace the `.table` rule with:
 Directly after the existing `.cell, .headerCell { border-bottom: … }` rule, add:
 
 ```css
-/* The last row's bottom edge is the table's own border (D123). With no body
+/* The last row's bottom edge is the table's own border (D126). With no body
    rows, the header's last row meets it instead. */
 .body .row:last-child > * {
   border-bottom: 0;
@@ -156,7 +156,7 @@ Directly after the existing `.cell, .headerCell { border-bottom: … }` rule, ad
   border-bottom: 0;
 }
 
-/* Corner cells (D123). Top: the first row of whichever section comes first.
+/* Corner cells (D126). Top: the first row of whichever section comes first.
    Bottom: the body's last row, or the head's when the body is empty. A cell
    that is both first and last (colSpan) takes both. */
 .head .row:first-child > :first-child,
@@ -183,7 +183,7 @@ Directly after the existing `.cell, .headerCell { border-bottom: … }` rule, ad
 Directly after the `.cell[data-numeric], .headerCell[data-numeric] { … }` rule, add:
 
 ```css
-/* An amount stays on one line (D123). Body cells only: a numeric column's
+/* An amount stays on one line (D126). Body cells only: a numeric column's
    header label may wrap rather than widen the column. */
 .cell[data-numeric] {
   white-space: nowrap;
@@ -197,7 +197,7 @@ Replace the whole `── Row states ──` block (its comment and the four rul
    data-selected wins over hover: a hovered selected row stays selected.
    Scoped to .body: TableRow is also used (unstyled-for-hover) inside
    TableHead, and a hovered header row tinting like a data row is wrong.
-   Painted on the cells, not the <tr> (D123): a row's background is not
+   Painted on the cells, not the <tr> (D126): a row's background is not
    clipped by its cells' corner radii in every engine. A consumer's own
    background on a TableRow shows through row-bg (transparent) at rest. */
 
@@ -224,7 +224,7 @@ Replace the `── Sticky header ──` block with:
 /* ── Sticky header ────────────────────────────────────────────────
    Needs no ARIA. The background is required: a transparent sticky header
    would let body rows show through as they scroll under it. In the separate
-   model (D123) border-bottom paints on a sticky <th>, so the box-shadow
+   model (D126) border-bottom paints on a sticky <th>, so the box-shadow
    stand-in the collapsed model needed is gone. It sticks to the nearest
    scrolling ancestor: the page, AppShell's <main>, or a TableContainer. */
 
@@ -250,7 +250,7 @@ Expected: PASS (stylelint's `psi/component-tokens-only` only checks `var(--psi-�
 
 ```bash
 git add packages/react/src/Table/table.module.css packages/react/src/Table/table-css.test.ts
-git commit -m "fix(react): Table's border follows its rounded corner; amounts stay on one line (D123)"
+git commit -m "fix(react): Table's border follows its rounded corner; amounts stay on one line (D126)"
 ```
 
 ---
@@ -269,7 +269,7 @@ git commit -m "fix(react): Table's border follows its rounded corner; amounts st
 Append inside the `describe("Table sorting", …)` block of `packages/react/src/Table/TableSort.test.tsx` (it already has the `sortable()` helper: `date` and `amount` are sortable, `Actions` is not):
 
 ```tsx
-  it("shows a two-way mark on a sortable column that is not sorted (D123)", () => {
+  it("shows a two-way mark on a sortable column that is not sorted (D126)", () => {
     sortable({ key: "date", direction: "asc" });
     const mark = screen.getByRole("columnheader", { name: /Amount/ }).querySelector("[data-mark]");
     expect(mark?.getAttribute("data-mark")).toBe("both");
@@ -312,7 +312,7 @@ In `packages/react/src/Table/TableHeaderCell.tsx`, add above `export function Ta
 ```tsx
 type Mark = "both" | "asc" | "desc";
 
-/** The sort mark (D123): private inline SVGs in currentColor, one size in
+/** The sort mark (D126): private inline SVGs in currentColor, one size in
  * every state, so the slot is always filled and a right-aligned label never
  * shifts when its column becomes sorted. Not exported: the icon set does not
  * change. Same stroke conventions as src/icons. */
@@ -382,7 +382,7 @@ with:
 ```css
 /* At rest the two-way mark takes the header's own colour (currentColor,
    --psi-table-header-fg, already gated as text); a sorted column's arrow is
-   the accent (D123). */
+   the accent (D126). */
 .sortIndicator {
   display: inline-flex;
   flex-shrink: 0;
@@ -402,7 +402,7 @@ Expected: PASS.
 
 ```bash
 git add packages/react/src/Table/TableHeaderCell.tsx packages/react/src/Table/table.module.css packages/react/src/Table/TableSort.test.tsx
-git commit -m "feat(react): a sortable column shows a two-way mark at rest (D123)"
+git commit -m "feat(react): a sortable column shows a two-way mark at rest (D126)"
 ```
 
 ---
@@ -463,7 +463,7 @@ function withCaption(props: Partial<TableContainerProps> = {}, captionId?: strin
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("TableContainer (D123)", () => {
+describe("TableContainer (D126)", () => {
   it("is a focusable region around the table", () => {
     withCaption();
     const region = screen.getByRole("region", { name: "Payments" });
@@ -555,7 +555,7 @@ Expected: FAIL, `TableContainer.js` does not exist.
 Append to `packages/react/src/Table/TableContext.ts`:
 
 ```ts
-/** The id a TableContainer offers its table's caption (D123). A caption with
+/** The id a TableContainer offers its table's caption (D126). A caption with
  * no id of its own takes it, so the container can name itself with
  * aria-labelledby. undefined outside a container: a bare table's caption
  * gets no id. */
@@ -581,7 +581,7 @@ export function TableCaption({ children, detail, className, id, ref, ...rest }: 
 }
 ```
 
-Add one sentence to its doc comment: `Inside a TableContainer it also names the scrolling region (D123).`
+Add one sentence to its doc comment: `Inside a TableContainer it also names the scrolling region (D126).`
 
 - [ ] **Step 4: The component**
 
@@ -607,7 +607,7 @@ export interface TableContainerProps extends Omit<HTMLAttributes<HTMLDivElement>
 const NO_NAME_WARNING =
   "Psi TableContainer: no TableCaption inside and no aria-label or aria-labelledby; the scrolling region has no name.";
 
-/** A scrolling region for a wide or long `Table` (D123): scrolls both ways,
+/** A scrolling region for a wide or long `Table` (D126): scrolls both ways,
  * keeps a `stickyHeader` at its top, and draws the table's frame and corner
  * itself. A tab stop (`role="region"`, `tabIndex={0}`) so the keyboard can
  * scroll it, named by the table's `TableCaption` unless you pass
@@ -668,7 +668,7 @@ export function TableContainer({ maxBlockSize, children, className, style, ref, 
 Append to `packages/react/src/Table/table.module.css`:
 
 ```css
-/* ── TableContainer (D123) ────────────────────────────────────────
+/* ── TableContainer (D126) ────────────────────────────────────────
    The scroller in both axes, so a sticky header sticks to its top. It draws
    the frame and clips the content to the rounded inner edge; the table inside
    drops its own border and corner radii. A tab stop, so it draws the shared
@@ -727,14 +727,14 @@ export type { TableContainerProps } from "./Table/TableContainer.js";
       { keys: "Arrow keys / Page Up / Page Down / Home / End", behavior: "Scroll the region while it has focus (native)." },
     ],
     notes:
-      "A <div role=\"region\"> that scrolls its Table both ways and keeps a stickyHeader at its top (D123); maxBlockSize caps its height. It draws the frame, so the table inside drops its own. Named by the table's TableCaption through aria-labelledby (the caption gets an id if it has none); pass aria-label or aria-labelledby instead when there is no caption. Inside it the caption sits within the frame and scrolls with the content; focusing it after a page change scrolls it back into view.",
+      "A <div role=\"region\"> that scrolls its Table both ways and keeps a stickyHeader at its top (D126); maxBlockSize caps its height. It draws the frame, so the table inside drops its own. Named by the table's TableCaption through aria-labelledby (the caption gets an id if it has none); pass aria-label or aria-labelledby instead when there is no caption. Inside it the caption sits within the frame and scrolls with the content; focusing it after a page change scrolls it back into view.",
   },
 ```
 
 `packages/react/src/a11y.axe.test.tsx`: add `TableContainer` to the import list after `TableCaption`, and a case after the two `Table …` cases:
 
 ```tsx
-  ["TableContainer named by its caption (D123)", (
+  ["TableContainer named by its caption (D126)", (
     <TableContainer maxBlockSize={240}>
       <Table stickyHeader>
         <TableCaption>Payments</TableCaption>
@@ -757,7 +757,7 @@ Expected: PASS. If a test enumerates every exported component (an a11y-meta comp
 
 ```bash
 git add packages/react/src/Table packages/react/src/index.ts packages/react/scripts/emit-manifest.ts packages/react/src/a11y-meta.ts packages/react/src/a11y.axe.test.tsx
-git commit -m "feat(react): TableContainer, a scrolling region that keeps the header sticky and draws the frame (D123)"
+git commit -m "feat(react): TableContainer, a scrolling region that keeps the header sticky and draws the frame (D126)"
 ```
 
 ---
@@ -831,7 +831,7 @@ function ManyRows({ wide }: { wide?: boolean }) {
 Replace `export const Sticky: Story = { render: () => <Demo stickyHeader /> };` with:
 
 ```tsx
-/** D123 — a bare table directly in a scrolling region (like AppShell's
+/** D126 — a bare table directly in a scrolling region (like AppShell's
  * <main>), scrolled by 200px: the header stays at the region's top. */
 export const Sticky: Story = {
   render: function StickyStory() {
@@ -846,7 +846,7 @@ export const Sticky: Story = {
   },
 };
 
-/** D123 — a wide table in a TableContainer, 320px wide and capped at 240px,
+/** D126 — a wide table in a TableContainer, 320px wide and capped at 240px,
  * scrolled both ways: the header sticks to the container's top, and the
  * frame and its corners stay put while the content moves under them. */
 export const InContainer: Story = {
@@ -875,7 +875,7 @@ Create `apps/storybook/vr/table.interaction.spec.ts`:
 ```ts
 import { test, expect } from "@playwright/test";
 
-/** D123 — what jsdom cannot show: a sticky header stays at the top of the
+/** D126 — what jsdom cannot show: a sticky header stays at the top of the
  * element that scrolls, the container scrolls sideways, and the frame's
  * corners are drawn. Geometry, not screenshots. */
 
@@ -953,7 +953,7 @@ Expected: `[ true, true ]`.
 
 ```bash
 git add packages/react/src/Table/Table.stories.tsx apps/storybook/vr/table.interaction.spec.ts
-git commit -m "test(react): a Sticky story that scrolls, InContainer, and geometry checks for D123"
+git commit -m "test(react): a Sticky story that scrolls, InContainer, and geometry checks for D126"
 ```
 
 ---
@@ -970,10 +970,10 @@ git commit -m "test(react): a Sticky story that scrolls, InContainer, and geomet
 - [ ] **Step 2: llms.txt.** In `packages/react/llms.txt` change `## Table family (7)` to `## Table family (8)` and add this bullet after the `TableCaption` bullet:
 
 ```markdown
-- `<TableContainer maxBlockSize={480}>` wraps a `Table` that is wider than its space or must scroll inside a fixed height (D123). It scrolls both ways and is the scroller, so a `stickyHeader` stays at its top — a bare `overflow-x: auto` wrapper silently breaks that. It draws the frame and its corner; the table inside drops its own. It is `role="region"` and a tab stop, named by the table's `TableCaption` (or pass `aria-label`). `maxBlockSize` is px as a number or any CSS length as a string. A bare `Table` does not scroll sideways, and its sticky header sticks to the page or `<main>`.
+- `<TableContainer maxBlockSize={480}>` wraps a `Table` that is wider than its space or must scroll inside a fixed height (D126). It scrolls both ways and is the scroller, so a `stickyHeader` stays at its top — a bare `overflow-x: auto` wrapper silently breaks that. It draws the frame and its corner; the table inside drops its own. It is `role="region"` and a tab stop, named by the table's `TableCaption` (or pass `aria-label`). `maxBlockSize` is px as a number or any CSS length as a string. A bare `Table` does not scroll sideways, and its sticky header sticks to the page or `<main>`.
 ```
 
-- [ ] **Step 3: CLAUDE.md.** Change `decision log **D1–D120, D122** in the specs` to `decision log **D1–D123** in the specs` (D121 is claimed by `2026-11-16-docs-site-design.md`). Task 6 re-checks this against `main`.
+- [ ] **Step 3: CLAUDE.md.** Leave the decision range alone here. `main` moves it as D123 (#170), D124 and D125 merge; Task 6 adds D126 to whatever `main` says at merge time.
 
 - [ ] **Step 4: The site.** In `apps/site/src/content/component-pages.ts`, append `"TableContainer"` to the `table` page's `members` (after `"TableCaption"`). Create `apps/site/src/examples/table/scrolling.tsx`:
 
@@ -1033,7 +1033,7 @@ export default function TableScrolling() {
 "@handamade/psi-react": minor
 ---
 
-A table frame that rounds, and a container that scrolls (D123).
+A table frame that rounds, and a container that scrolls (D126).
 
 - **`Table`'s border follows its rounded corner** in every theme. The table moves to the separate border model; the corner cells take the inner radius, so a sticky header or a hovered or selected first or last row stays inside the curve. Hover and selected colours now paint the row's cells rather than the `<tr>`: if you styled a row's hover through a `className`, style its cells.
 - **`TableContainer`**, new: wraps a `Table` that is wider than its space or must scroll in a fixed height (`maxBlockSize`). It scrolls both ways and keeps a `stickyHeader` at its top, draws the frame itself, and is a named, focusable region (named by the table's `TableCaption`, or by `aria-label`).
@@ -1055,7 +1055,7 @@ Expected: PASS (`component-pages.test.ts` requires every manifest export on exac
 
 ```bash
 git add packages/react/llms.txt README.md packages/react/README.md packages/mcp/README.md CLAUDE.md apps/site .changeset/table-frame.md packages/react/docs
-git commit -m "docs: TableContainer in llms.txt, READMEs and the site, 56 components; changeset (D123)"
+git commit -m "docs: TableContainer in llms.txt, READMEs and the site, 56 components; changeset (D126)"
 ```
 
 ---
@@ -1063,7 +1063,7 @@ git commit -m "docs: TableContainer in llms.txt, READMEs and the site, 56 compon
 ### Task 6: Merge `main`, five gates, PR (controller, not a subagent)
 
 - [ ] **Step 1:** `git fetch origin && git merge origin/main`. Three branches run beside this one; plan for whichever has landed:
-  - **D124** (`d124-nav-icon-count`) adds a public `Count`, so with `TableContainer` the catalog is **57**, not 56. Task 5 wrote 56 against `main` as it was at branch time; after the merge, run `node tools/check-docs-drift.mjs` and set every count it names to the merged manifest's real number. Same for the `CLAUDE.md` range: the highest decision `main` claims plus D123.
+  - **D124** (`d124-nav-icon-count`) adds a public `Count`, so with `TableContainer` the catalog is **57**, not 56. Task 5 wrote 56 against `main` as it was at branch time; after the merge, run `node tools/check-docs-drift.mjs` and set every count it names to the merged manifest's real number. Same for the `CLAUDE.md` range: the highest decision `main` claims plus D126.
   - **D124 also changes slot loading**: `packages/react/scripts/slots.ts` reads a per-part file `src/<Dir>/<Name>.slots.json` for a component in `COMPONENT_DIR`. If the merged `slots.ts` has that form, create `packages/react/src/Table/TableContainer.slots.json`:
 
     ```json
@@ -1076,7 +1076,7 @@ git commit -m "docs: TableContainer in llms.txt, READMEs and the site, 56 compon
 
     and pin it in `packages/react/scripts/slots.test.ts` the way D124 pins `NavItem` (`TableContainer` has one `body` slot accepting `Table`, `1..1`). If D124 has not landed, add nothing: the loader on this branch cannot read a part file, and D124's own merge-second step owns it then. Tell the coordinator which case applied.
   - **D125** (`d125-control-width`) edits `Field`, `FieldStack`, field tokens and the seed-patterns test. This plan touches none of them, so expect no conflict there; a conflict in a shared count file is resolved by the drift check above.
-- [ ] **Step 2:** Re-check that no `## Decisions` entry on `origin/main` claims D123.
+- [ ] **Step 2:** Re-check that no `## Decisions` entry on `origin/main` claims D126.
 - [ ] **Step 3:** From the worktree root, on Node 24:
 
 ```bash
@@ -1084,5 +1084,5 @@ pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint && pnpm 
 ```
 
 Expected: all green.
-- [ ] **Step 4:** Push, open the PR from `d123-table-frame`, arm auto-merge and read it back with `gh pr view <n> --json autoMergeRequest` (fall back to the `enablePullRequestAutoMerge` mutation if null). Report the PR number to the coordinator.
+- [ ] **Step 4:** Push, open the PR from `d126-table-frame`, arm auto-merge and read it back with `gh pr view <n> --json autoMergeRequest` (fall back to the `enablePullRequestAutoMerge` mutation if null). Report the PR number to the coordinator.
 - [ ] **Step 5:** `vr` will fail on every Table baseline (the corner, the rest mark) and the two new stories have none. Every story that renders a `Table` changes too: the `patterns-presets--*` stories that compose one (`data-table`, `loading-table`, `table-pagination`, `cursor-pagination`, and any other the run lists). Download the `vr-baselines` artifact, show the user those renders, and commit them over the baselines only on the user's OK. A story without a `Table` must stay at 0 differing pixels; a diff there is a bug, not a baseline.
