@@ -123,7 +123,15 @@
   outline-offset: var(--psi-focus-ring-offset);
 }
 
+/* At rest the two-way mark takes the header's own colour (currentColor,
+   --psi-table-header-fg, already gated as text); a sorted column's arrow is
+   the accent (D126). */
 .sortIndicator {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.sortIndicator[data-active] {
   color: var(--psi-table-sort-indicator-fg);
 }
 

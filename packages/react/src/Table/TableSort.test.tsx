@@ -77,4 +77,34 @@ describe("Table sorting", () => {
     );
     expect(screen.queryByRole("button")).toBeNull();
   });
+
+  it("shows a two-way mark on a sortable column that is not sorted (D126)", () => {
+    sortable({ key: "date", direction: "asc" });
+    const mark = screen.getByRole("columnheader", { name: /Amount/ }).querySelector("[data-mark]");
+    expect(mark?.getAttribute("data-mark")).toBe("both");
+    expect(mark?.hasAttribute("data-active")).toBe(false);
+    expect(mark?.getAttribute("aria-hidden")).toBe("true");
+    expect(mark?.querySelector("svg")).not.toBeNull();
+  });
+
+  it("shows an up arrow on an ascending column and a down arrow on a descending one", () => {
+    const { unmount } = sortable({ key: "date", direction: "asc" });
+    let mark = screen.getByRole("columnheader", { name: /Date/ }).querySelector("[data-mark]");
+    expect(mark?.getAttribute("data-mark")).toBe("asc");
+    expect(mark?.hasAttribute("data-active")).toBe(true);
+    unmount();
+    sortable({ key: "date", direction: "desc" });
+    mark = screen.getByRole("columnheader", { name: /Date/ }).querySelector("[data-mark]");
+    expect(mark?.getAttribute("data-mark")).toBe("desc");
+  });
+
+  it("keeps the mark out of the header's accessible name", () => {
+    sortable(null);
+    expect(screen.getByRole("button", { name: "Amount" })).toBeTruthy();
+  });
+
+  it("draws no mark on a column without a sortKey", () => {
+    sortable(null);
+    expect(screen.getByRole("columnheader", { name: "Actions" }).querySelector("[data-mark]")).toBeNull();
+  });
 });
