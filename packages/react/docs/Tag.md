@@ -11,6 +11,7 @@ Compact label for status or category; semantic variants, optional subtle tint an
 | `variant` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger"` | neutral | no | Semantic color variant. |
 | `subtle` | `boolean` | false | no | Use tinted background with semantic foreground. |
 | `onDismiss` | `(() => void)` | — | no | When provided, renders a dismiss button that calls this handler. |
+| `dismissLabel` | `string` | Dismiss | no | The dismiss button's accessible name, so several dismissible tags can each say what they remove ("Remove Berlin"). Sets the name only (D117's shape; D130). |
 | `ref` | `Ref<HTMLSpanElement>` | — | no | Forwarded ref to the underlying `<span>` element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
@@ -20,7 +21,7 @@ Compact label for status or category; semantic variants, optional subtle tint an
 |---|---|
 | Enter / Space (dismiss button) | onDismiss renders a real <button>; keyboard-dismissible. |
 
-Passive label otherwise; not in the tab order without onDismiss.
+Passive label otherwise; not in the tab order without onDismiss. dismissLabel names the dismiss button (default "Dismiss"), so several dismissible tags can each say what they remove (D130).
 
 ## Theming
 

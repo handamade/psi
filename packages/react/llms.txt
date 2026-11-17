@@ -1,6 +1,6 @@
 # @handamade/psi-react
 
-57 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
+58 React 19 components consuming @handamade/psi-tokens. Zero runtime deps, CSS Modules, ref-as-prop.
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
@@ -41,7 +41,7 @@
 - The term is a prop and the value is children, matching Field's `label` idiom. No `size` prop: this is type, so restyle through `--psi-description-list-*`.
 
 ## Toolbar
-- <Toolbar gap={8|12|16} aria-label="Filters">: horizontal wrapping row for filter/search controls (Input, Select, Tag, Button). Wraps on overflow (D52); with aria-label it announces as role=group. Deliberately not ARIA role=toolbar (no roving tabindex). Unblocks the filter-toolbar pattern — consult dist/patterns.json for the preset.
+- <Toolbar gap={8|12|16} aria-label="Filters">: horizontal wrapping row for filter/search controls (Input, Select, Combobox, Tag, Button). Wraps on overflow (D52); with aria-label it announces as role=group. Deliberately not ARIA role=toolbar (no roving tabindex). Unblocks the filter-toolbar pattern — consult dist/patterns.json for the preset.
 - `align="start"` lines up the controls of Field-wrapped filters (label above) and a button without a label (D92): items share their top edge, and a direct `button`/`a` child drops by `--psi-toolbar-action-offset` (= `--psi-field-label-height` + `--psi-field-gap`, 26px) onto the control line. A Field's description or error line hangs below its control and moves nothing else — set `error` on the Field. Every label in the row must be one line; a wrapped label pushes its control off the line. filter-form uses it.
 - `align="end"` lines items up on their bottom edge (D87). It aligns each item's last line, so a Field in that row must end on its control — no description or error under it; use `start` when a field can show an error.
 - `as="form"` renders a real `<form>`: a `Button type="submit"` and Enter in a field submit it; wire `onSubmit`. With `aria-label` it is a named form landmark (no role=group). Filters that apply as they change, named by aria-label → filter-toolbar; labelled filters submitted together with *Find* → filter-form. Never name a control by its placeholder alone.
@@ -89,6 +89,17 @@
 - `<InlineAlert variant title>message</InlineAlert>` is **not a live region** (D86), and despite its name it is **not `role="alert"`**: a message inside content, bordered in the variant's foreground colour. Put it above a form after a rejected submission and speak the result separately. Paragraph children behave as in Banner (D95). Consult dist/patterns.json for `form-feedback`.
 - `<Skeleton>` is **not a live region** (D86): a loading placeholder that is always `aria-hidden`, so it says nothing. Put `aria-busy` on the region it stands in for (a `TableBody`, a list) — that is what assistive tech reads. The shimmer stops under `prefers-reduced-motion`. Consult dist/patterns.json for `loading-table`.
 - `<CopyButton value label size onCopy>` is **not a live region** (D86): a Button with a visible label that copies `value` to the clipboard and reports `"copied" | "failed"` through `onCopy`. It never changes its label or icon and announces nothing; speak the result through the announcer or a Toast. Consult dist/patterns.json for `copyable-id`.
+
+## Combobox (D130)
+- `<Combobox options={[{ value, label, description?, disabled? }]} value onChange>` searches a list and picks from it. `Select` is for a short fixed list; `Combobox` when the list is long enough to search, or more than one value is picked. **`Select` has no `multiple`** (D130): use `<Combobox multiple>`.
+- Options are **data, not children**. Single-select (default): `value: string | null`, `onChange(value: string | null)`. `multiple`: `value: string[]`, `onChange(values: string[])`; picked values show as neutral subtle `Tag`s inside the control, which wraps and grows. Controlled or uncontrolled (`defaultValue`). Single-select picks only from the list: on blur unmatched text goes back to the picked label, and emptied text clears the value to `null`.
+- Filtering: the default is a "contains" match on `label`, case- and accent-blind ("zur" finds "Zürich"); `filter={(option, text) => boolean}` replaces it; `filter={false}` hands the list to the caller — pass each read's results as `options`, read the text from `inputValue`/`onInputChange`, set `loading` while a read is in flight (keep passing the last options: they stay on screen, the listbox is `aria-busy`), and `moreMessage` for a cut-off list ("Showing 50 of 812").
+- There is **no `open` prop**: the list opens on typing, Arrow Down/Up and the chevron, and closes on a pick (single), Esc, Tab, blur and an outside pointerdown. It is a manual popover on the top layer (draws above a Dialog), at least as wide as the control, capped at `--psi-combobox-popup-max-height` (an alias of `--psi-popup-max-height`, 320px) and scrolls past it.
+- `size={24|32|40|48}` (default 32; `multiple` excludes 24 in the types). `error`, `disabled`, `placeholder` as on Select; no `variant`. `clearable` adds a clear button (off by default). `name` writes hidden inputs (one per value), so a form submits values, not text; `required` sets a custom validity from the value. `ref` is the `<input>`; `className` goes on the root, which carries `data-psi-combobox`.
+- Inside a `Field` the id, label, description, invalid and required wiring are automatic and the listbox is named by the label; `controlWidth` sizes it. Standalone, give it `aria-label`. In a `Toolbar` a bare Combobox takes `--psi-toolbar-control-width`.
+- Keyboard: ARIA 1.2 combobox with list autocomplete; focus stays in the input and `aria-activedescendant` names the highlighted option. Arrows wrap and reach disabled options (never picked); Page Up/Down move 10; Enter picks and never submits while the list is open; Esc closes the list without closing a Dialog; Backspace in an empty multi-select input removes the last value. The chevron, clear and Tag remove buttons are `tabindex=-1`: one Tab stop.
+- Translatable names: `clearLabel` ("Clear"), `toggleLabel` ("Show options"), `removeLabel={(label) => …}` ("Remove {label}"), `emptyMessage` ("No matches"), `loadingMessage` ("Loading…"), `resultsLabel={(n) => …}` ("1 result" / "N results", said by a polite live region).
+- `<Tag onDismiss dismissLabel="Remove Berlin">` names a dismissible tag's button (default "Dismiss").
 
 ## Count
 - `<Count value={238} />` is a number after a label (D124): tabular numerals, 12/16 regular in fg-secondary, capped at `max` (default 999, so 1000 shows `999+`). It is a `<span>` with no role and no aria-live: a changing count announces nothing on its own.

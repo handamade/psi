@@ -38,7 +38,22 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Arrow keys / typeahead", behavior: "Native option navigation." },
     ],
     notes:
-      "error: same contract as Input — sets a red border only. Inside a Field, aria-invalid and aria-describedby are wired automatically (D49); standalone, pair them yourself.",
+      "error: same contract as Input — sets a red border only. Inside a Field, aria-invalid and aria-describedby are wired automatically (D49); standalone, pair them yourself. No multiple (D130): pick several values with Combobox multiple.",
+  },
+  Combobox: {
+    keyboard: [
+      { keys: "Typing", behavior: "Opens the list and filters it; the first match is highlighted." },
+      { keys: "Arrow Down / Arrow Up", behavior: "Closed: opens the list on the picked option, or else the first / last. Open: moves the highlight, wrapping at the ends. Disabled options are reachable." },
+      { keys: "Alt + Arrow Down / Alt + Arrow Up", behavior: "Alt + Down opens the list without highlighting an option; Alt + Up closes it." },
+      { keys: "Page Down / Page Up", behavior: "Open: moves the highlight 10 options, stopping at the ends." },
+      { keys: "Home / End", behavior: "Move the caret in the text (native); they never move the highlight." },
+      { keys: "Enter", behavior: "Open: picks the highlighted option and never submits the form; single-select closes the list, multi-select keeps it open; on a disabled option it does nothing. Closed: native (submits a form)." },
+      { keys: "Escape", behavior: "Open: closes the list and stops propagation, so a surrounding Dialog stays open. Closed: clears the text, if there is any." },
+      { keys: "Tab / Shift + Tab", behavior: "Closes the list and moves focus on; picks nothing." },
+      { keys: "Backspace (multi-select, empty input)", behavior: "Removes the last picked value." },
+    ],
+    notes:
+      "Follows the ARIA 1.2 combobox pattern with list autocomplete (D130). Focus stays in the <input role=\"combobox\" aria-autocomplete=\"list\" autocomplete=\"off\">; aria-expanded and aria-controls name the listbox, and aria-activedescendant names the highlighted option while the list is open, which is also drawn with the highlighted background while the input keeps its focus ring. The popup is a manual popover on the top layer (it draws above a modal Dialog) holding a role=\"listbox\" (aria-multiselectable in multi-select, aria-busy while loading) named by the Field's label or the input's aria-label; options are role=\"option\" with aria-selected, aria-disabled where disabled, and a description joined into the name. The \"No matches\", loading and \"more\" lines are siblings of the listbox, never options. A polite, visually hidden live region says the result count after filtering (resultsLabel), the loading line or \"No matches\". When the options change, the highlight stays on the same option by value, else moves to the first, else clears. The chevron, the clear button and each Tag's remove button are tabindex=-1, so the Combobox is one Tab stop; pressing them, or an option, keeps focus in the input. Single-select picks only from the list: on blur, unmatched text goes back to the picked label, and emptied text clears the value to null. required sets aria-required and a custom validity read from the value, not the text. Inside a Field the id, label, description, invalid and required wiring are automatic (D49). Translatable names: clearLabel, toggleLabel, removeLabel, emptyMessage, loadingMessage, resultsLabel.",
   },
   Field: {
     keyboard: [
@@ -87,7 +102,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   Tag: {
     keyboard: [{ keys: "Enter / Space (dismiss button)", behavior: "onDismiss renders a real <button>; keyboard-dismissible." }],
-    notes: "Passive label otherwise; not in the tab order without onDismiss.",
+    notes: "Passive label otherwise; not in the tab order without onDismiss. dismissLabel names the dismiss button (default \"Dismiss\"), so several dismissible tags can each say what they remove (D130).",
   },
   Tooltip: {
     keyboard: [
