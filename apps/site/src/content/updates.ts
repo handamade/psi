@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-11-17",
     tag: "release",
+    title: "0.34.0 — a Combobox, a Menu that scrolls, and an MCP that answers like the docs",
+    body: "Combobox is new: type to filter a list and pick one value, or several shown as Tags. It ignores case and accents, takes your own filter or a server-side search with a loading state, sits in a Field with controlWidth, and submits its values with a form. It follows the ARIA combobox pattern: focus stays in the input, Enter never submits while the list is open, and every name it adds can be translated. Select no longer accepts multiple; use Combobox multiple instead. A long Menu now stops at a shared --psi-popup-max-height of 320px and scrolls, keeps focus when its focused item is removed, and lets the keyboard reach disabled items, as Tabs now does too. Tag takes dismissLabel. The MCP's get now returns each docs page's own markdown, and two new tools join it: theme derives a light and dark theme solved to WCAG AA from one colour, and check reports JSX that uses Psi's API wrongly. 58 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-17",
+    tag: "release",
     title: "0.33.0 — a pager that holds still, and tables that keep focus in view",
     body: "Pagination's Previous and Next no longer move under the pointer as the page changes: the pager keeps the same slots and width on every page. At or below 560px it switches to a compact range, so 100 pages fit a 320px screen. When the page change disables the button that had focus, focus stays in the pager instead of falling to the page, in Pagination and CursorPagination. Pagination takes previousLabel and nextLabel, and Table takes selectAllLabel and selectRowLabel, so their names can be translated. A row checkbox is now named from the row's header cell or its position, never its raw id. Inside a TableContainer, a row that keyboard focus scrolls into view lands below the sticky header, not behind it. A table whose last body is empty keeps its rounded edge. 57 components, 24 patterns.",
   },
