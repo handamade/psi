@@ -6,7 +6,7 @@ import { create } from "storybook/theming";
 addons.setConfig({
   theme: create({
     base: "light",
-    brandTitle: "DS design system",
+    brandTitle: "Psi",
     brandUrl: "/",
     brandTarget: "_self",
   }),
