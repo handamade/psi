@@ -74,4 +74,39 @@ describe("loadSlotContracts", () => {
     expect(out.PageHeading.map((x) => x.name)).toEqual(["body"]);
     expect(out.Link.map((x) => x.name)).toEqual(["body"]);
   });
+
+  it("reads <Dir>/<Name>.slots.json for a part that shares its owner's folder (D124)", () => {
+    const dir = fixture({
+      "A/slots.json": { slots: [{ name: "body", accepts: { components: ["B"] }, cardinality: "1..*" }] },
+      "A/B.slots.json": { slots: [{ name: "icon", accepts: {}, cardinality: "0..1" }] },
+    });
+    const out = loadSlotContracts(dir, ["A", "B"], { B: "A" });
+    expect(out.A.map((s) => s.name)).toEqual(["body"]);
+    expect(out.B.map((s) => s.name)).toEqual(["icon"]);
+  });
+
+  it("a part without its own file gets [] (D124)", () => {
+    const dir = fixture({ "A/slots.json": { slots: [] } });
+    expect(loadSlotContracts(dir, ["A", "B"], { B: "A" }).B).toEqual([]);
+  });
+
+  it("validates a part file like any other, naming the file (D124)", () => {
+    const dir = fixture({
+      "A/B.slots.json": { slots: [{ name: "x", accepts: { components: ["Ghost"] }, cardinality: "0..1" }] },
+    });
+    expect(() => loadSlotContracts(dir, ["A", "B"], { B: "A" })).toThrow(/A\/B\.slots\.json: slot "x" accepts unknown component "Ghost"/);
+  });
+
+  it("real src: NavItem and NavGroup carry their D124 slots; NavTree keeps its body", () => {
+    const src = join(fileURLToPath(new NodeURL("..", import.meta.url)), "src");
+    const out = loadSlotContracts(src, ["NavTree", "NavGroup", "NavItem", "Count", "Button", "IconButton", "Menu", "MenuItem", "MenuSeparator", "MenuText", "Tag"], { NavGroup: "NavTree", NavItem: "NavTree" });
+    expect(out.NavTree.map((s) => s.name)).toEqual(["body"]);
+    expect(out.NavItem.map((s) => s.name)).toEqual(["icon", "body", "count"]);
+    expect(out.NavItem.find((s) => s.name === "count")).toMatchObject({ accepts: { components: ["Count"] }, cardinality: "0..1" });
+    // body is 0..* because a preset fills an entry through `content`, and the
+    // pattern check counts an unfilled slot as 0.
+    expect(out.NavItem.find((s) => s.name === "body")?.cardinality).toBe("0..*");
+    expect(out.NavGroup.map((s) => s.name)).toEqual(["label", "icon", "body"]);
+    expect(out.Count).toEqual([]);
+  });
 });

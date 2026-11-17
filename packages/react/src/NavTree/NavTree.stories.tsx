@@ -4,6 +4,11 @@ import type { Meta, StoryObj } from "storybook";
 import { NavTree } from "./NavTree.js";
 import { NavGroup } from "./NavGroup.js";
 import { NavItem } from "./NavItem.js";
+import { Count } from "../Count/Count.js";
+import { IconSimCard } from "../icons/IconSimCard.js";
+import { IconUser } from "../icons/IconUser.js";
+import { IconSettings } from "../icons/IconSettings.js";
+import { IconSearch } from "../icons/IconSearch.js";
 import "./NavTree.stories.css";
 
 const meta: Meta<typeof NavTree> = { title: "Components/NavTree", component: NavTree };
@@ -95,6 +100,59 @@ export const ParentCurrent: Story = {
         </NavItem>
         <NavItem>
           <a href="#invoices">Invoices</a>
+        </NavItem>
+      </NavTree>
+    </Frame>
+  ),
+};
+
+/** D124: an icon before each entry and group label. One group is closed, and
+ * its icon stays. The page is current, and a parent is marked
+ * aria-current="true". Icons take the text's colour. */
+export const WithIcons: Story = {
+  render: () => (
+    <Frame>
+      <NavTree aria-label="Main">
+        <NavItem href="#search" icon={<IconSearch />}>
+          Search
+        </NavItem>
+        <NavGroup label="Cards" icon={<IconSimCard />} open onOpenChange={() => {}}>
+          <NavItem href="#active" current>
+            Active
+          </NavItem>
+          <NavItem>
+            <a href="#archived" aria-current="true">
+              Archived
+            </a>
+          </NavItem>
+        </NavGroup>
+        <NavGroup label="Settings" icon={<IconSettings />} open={false} onOpenChange={() => {}}>
+          <NavItem href="#profile" icon={<IconUser />}>
+            Profile
+          </NavItem>
+        </NavGroup>
+      </NavTree>
+    </Frame>
+  ),
+};
+
+/** D124: counts at the end of an entry. Neutral and attention, a capped one,
+ * a long label that wraps, and the current entry with a count. */
+export const WithCounts: Story = {
+  render: () => (
+    <Frame>
+      <NavTree aria-label="Main">
+        <NavItem href="#cards" icon={<IconSimCard />} count={<Count value={238} />} current>
+          Cards
+        </NavItem>
+        <NavItem href="#stuck" icon={<IconSearch />} count={<Count value={4} tone="attention" label="4 stuck" />}>
+          Stuck
+        </NavItem>
+        <NavItem href="#all" count={<Count value={1204} />}>
+          All records
+        </NavItem>
+        <NavItem href="#long" icon={<IconUser />} count={<Count value={12} />}>
+          Customers waiting for a reply from the support team
         </NavItem>
       </NavTree>
     </Frame>

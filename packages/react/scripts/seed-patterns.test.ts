@@ -121,7 +121,7 @@ describe("the manifest describes children (D72)", () => {
   // react-docgen-typescript reports `children` only when the declaration
   // carries a JSDoc comment — not because of propFilter, extends, or the type
   // spelling, all of which D70 wrongly blamed and D72 disproved with a probe.
-  const TAKES_NO_CHILDREN = ["Input", "Textarea", "Pagination", "MenuSeparator", "CursorPagination", "Skeleton", "CopyButton"];
+  const TAKES_NO_CHILDREN = ["Input", "Textarea", "Pagination", "MenuSeparator", "CursorPagination", "Skeleton", "CopyButton", "Count"];
 
   it("lists children for every component that accepts it", () => {
     const missing = manifest.components
