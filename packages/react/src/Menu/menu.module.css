@@ -17,7 +17,7 @@
   min-width: 180px;
   /* Gap between trigger and menu (D53). Applies below the anchor floor too:
      the @supports block re-asserts this same value for the anchor-positioned
-     path, but without it here the fallback path (useMenuPlacement.ts) would
+     path, but without it here the fallback path (internal/popup/usePopupPlacement.ts) would
      sit flush against its trigger. */
   margin: var(--psi-space-4);
   padding: var(--psi-space-4);
@@ -26,6 +26,19 @@
   background: var(--psi-menu-bg);
   color: var(--psi-menu-fg);
   font: var(--psi-text-14-20-regular);
+  /* D131: past the cap the menu scrolls (the popover's own overflow: auto),
+     and focus() keeps the focused item in view. */
+  max-block-size: var(--psi-menu-max-height);
+  /* What sits between the content box and the room the menu is placed in:
+     two margins, two paddings, two 1px borders. Read by --psi-menu-fit. */
+  --_psi-menu-chrome: calc(4 * var(--psi-space-4) + 2px);
+}
+
+/* D131: a menu emptied while open takes focus itself (tabindex=-1), so Esc
+   and Tab still reach its keyboard. The ring is the items' ring. */
+.menu:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-menu-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
 }
 
 .menu:not([data-open]):not(:popover-open) {
@@ -102,14 +115,21 @@
 
 /* ── Placement (D53) ──────────────────────────────────────────────
    Above the anchor floor CSS does all the work. Below it, the hook in
-   useMenuPlacement.ts sets inset directly; these rules are inert there
+   internal/popup/usePopupPlacement.ts sets inset directly; these rules are inert there
    because position-area needs an anchor to resolve against. */
 
 @supports (anchor-name: --x) {
   .menu {
     position: fixed;
     margin: var(--psi-space-4);
-    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    /* D131: the last two run only for a menu taller than the room on both
+       sides of its trigger, even at the cap. */
+    position-try-fallbacks:
+      flip-block,
+      flip-inline,
+      flip-block flip-inline,
+      --psi-menu-fit,
+      --psi-menu-fit flip-block;
   }
 
   .menu[data-placement="bottom-start"] {
@@ -127,4 +147,14 @@
   .menu[data-placement="top-end"] {
     position-area: block-start span-inline-start;
   }
+}
+
+/* D131: fill the room on the side with more of it. `height`, not
+   `max-height`: Chromium ignores max-height in a @position-try (measured in
+   Chromium 149). `min-height` is half the room the trigger leaves, so the try
+   fits only on the larger side; a menu reaches it only when it overflows both
+   sides, so the height never stretches it. */
+@position-try --psi-menu-fit {
+  height: calc(100% - var(--_psi-menu-chrome));
+  min-height: calc((100dvh - anchor-size(height)) / 2 - var(--_psi-menu-chrome) - 1px);
 }

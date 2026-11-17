@@ -42,17 +42,33 @@ describe("useTabsKeyboard", () => {
     expect(tab("Uncategorised")).toHaveAttribute("aria-selected", "true");
   });
 
-  it("skips disabled tabs in both directions", async () => {
+  it("reaches a disabled tab and focuses it without selecting it (D131)", async () => {
     const user = userEvent.setup();
     render(<Live />);
     tab("All").focus();
 
     await user.keyboard("{ArrowRight}{ArrowRight}");
-    // Archived sits between Uncategorised and This month and must be jumped.
-    expect(document.activeElement).toBe(tab("This month"));
+    // Archived sits between Uncategorised and This month: it takes focus and
+    // the tab stop, and the selection stays where it was.
+    expect(document.activeElement).toBe(tab("Archived"));
+    expect(tab("Archived")).toHaveAttribute("aria-selected", "false");
+    expect(tab("Uncategorised")).toHaveAttribute("aria-selected", "true");
+    expect(tab("Archived")).toHaveAttribute("tabindex", "0");
+    expect(tab("Uncategorised")).toHaveAttribute("tabindex", "-1");
+  });
 
-    await user.keyboard("{ArrowLeft}");
+  it("moves on from a disabled tab in both directions", async () => {
+    const user = userEvent.setup();
+    render(<Live />);
+    tab("All").focus();
+
+    await user.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}");
+    expect(document.activeElement).toBe(tab("This month"));
+    expect(tab("This month")).toHaveAttribute("aria-selected", "true");
+
+    await user.keyboard("{ArrowLeft}{ArrowLeft}");
     expect(document.activeElement).toBe(tab("Uncategorised"));
+    expect(tab("Uncategorised")).toHaveAttribute("aria-selected", "true");
   });
 
   it("wraps at both ends", async () => {
@@ -67,7 +83,7 @@ describe("useTabsKeyboard", () => {
     expect(document.activeElement).toBe(tab("All"));
   });
 
-  it("Home and End jump to the first and last enabled tab", async () => {
+  it("Home and End jump to the first and last tab", async () => {
     const user = userEvent.setup();
     render(<Live />);
     tab("All").focus();
@@ -101,10 +117,11 @@ describe("useTabsKeyboard", () => {
     expect(document.activeElement).toBe(tab("Uncategorised"));
   });
 
-  it("never lands focus on a disabled tab via Home/End", async () => {
+  it("Home and End reach a disabled tab at either end, and select nothing (D131)", async () => {
     const user = userEvent.setup();
+    const onValueChange = vi.fn();
     render(
-      <Tabs value="b" onValueChange={() => {}}>
+      <Tabs value="b" onValueChange={onValueChange}>
         <TabList aria-label="Edges">
           <Tab value="a" disabled>
             A
@@ -122,9 +139,11 @@ describe("useTabsKeyboard", () => {
     tab("B").focus();
 
     await user.keyboard("{Home}");
-    expect(document.activeElement).toBe(tab("B"));
+    expect(document.activeElement).toBe(tab("A"));
     await user.keyboard("{End}");
-    expect(document.activeElement).toBe(tab("B"));
+    expect(document.activeElement).toBe(tab("C"));
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(tab("B")).toHaveAttribute("aria-selected", "true");
   });
 
   it("does not select itself — onValueChange is the only channel", async () => {

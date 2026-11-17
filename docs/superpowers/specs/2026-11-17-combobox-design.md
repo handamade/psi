@@ -295,7 +295,8 @@ interface ComboboxOption {
     no new formula.
   - **`--psi-combobox-popup-max-height`: `320px`**, a standalone literal like
     D125's `--psi-field-stack-max-width`. Not a colour, so it enters no
-    contrast gate.
+    contrast gate. *Amended by D131:* it aliases the shared
+    `--psi-popup-max-height` (320px) instead of holding a value of its own.
   - The popup scrolls past it and keeps the highlighted option in view.
 - **Right to left from the start.**
   - The chevron and the clear button sit at `inline-end`, with logical

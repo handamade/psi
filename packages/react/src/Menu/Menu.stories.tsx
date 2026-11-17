@@ -115,7 +115,7 @@ export const FallbackPlacement: Story = {
       // The stub is installed during render so it is in place for every
       // phase the story might read it from — render, layout effect, or
       // passive effect. Installing it in an effect would couple this story
-      // to which effect kind useMenuPlacement happens to use internally,
+      // to which effect kind usePopupPlacement happens to use internally,
       // and would silently stop forcing the fallback branch if that ever
       // changed. Only the *restore* can be deferred. (D58)
       const originalRef = React.useRef<typeof CSS.supports | null>(null);
@@ -208,4 +208,62 @@ function SwitchingDemo() {
 
 export const SwitchingBetweenMenus: Story = {
   render: () => <SwitchingDemo />,
+};
+
+/** D131: a menu longer than `--psi-popup-max-height` (320px) stops there and
+ * scrolls; the arrow keys keep the focused item in view. Before D131, 43
+ * items ran 1,567px down a 768px window. Driven by
+ * `apps/storybook/vr/menu.interaction.spec.ts`. */
+const countries = [
+  "Argentina", "Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile",
+  "Colombia", "Czechia", "Denmark", "Egypt", "Estonia", "Finland", "France",
+  "Germany", "Greece", "Hungary", "Iceland", "India", "Indonesia", "Ireland",
+  "Israel", "Italy", "Japan", "Kenya", "Latvia", "Lithuania", "Mexico",
+  "Morocco", "Netherlands", "New Zealand", "Nigeria", "Norway", "Peru",
+  "Poland", "Portugal", "Romania", "Spain", "Sweden", "Switzerland",
+];
+
+export const LongMenu: Story = {
+  args: { open: true, onClose: () => {}, placement: "bottom-start", "aria-label": "Move to" },
+  render: (args) => (
+    <Menu {...args} trigger={<Button size={32}>Move to</Button>}>
+      {countries.map((country) => (
+        <MenuItem key={country} onSelect={() => {}}>{country}</MenuItem>
+      ))}
+    </Menu>
+  ),
+};
+
+/** D131: a consumer that keeps the menu open on item-select and removes the
+ * chosen item. Focus moves to the item now at its position, never to the
+ * page; an emptied menu holds focus itself. Driven by
+ * `apps/storybook/vr/menu.interaction.spec.ts`. */
+function RemovingDemo() {
+  const [open, setOpen] = React.useState(true);
+  const [labels, setLabels] = React.useState(["Build failed", "Review requested", "Invite accepted"]);
+  const [lastReason, setLastReason] = React.useState<string>("none");
+  return (
+    <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+      <Menu
+        open={open}
+        onClose={(reason) => {
+          setLastReason(reason);
+          if (reason !== "item-select") setOpen(false);
+        }}
+        aria-label="Notifications"
+        trigger={<Button size={32} onClick={() => setOpen((o) => !o)}>Notifications</Button>}
+      >
+        {labels.map((label) => (
+          <MenuItem key={label} onSelect={() => setLabels((all) => all.filter((l) => l !== label))}>
+            Dismiss {label}
+          </MenuItem>
+        ))}
+      </Menu>
+      <span data-testid="last-reason">{lastReason}</span>
+    </div>
+  );
+}
+
+export const RemovingItems: Story = {
+  render: () => <RemovingDemo />,
 };

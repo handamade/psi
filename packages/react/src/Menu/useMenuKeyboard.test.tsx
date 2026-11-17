@@ -80,22 +80,34 @@ afterEach(() => {
 });
 
 describe("useMenuKeyboard", () => {
-  it("focuses the first enabled item when the menu opens", () => {
+  it("focuses the first item when the menu opens", () => {
     openMenu();
     expect(items()[0]).toHaveFocus();
   });
 
-  it("ArrowDown moves to the next enabled item, skipping disabled", async () => {
+  it("opens on a disabled first item (D131: disabled items are reachable)", () => {
+    openMenu(() => {}, (
+      <>
+        <MenuItem onSelect={() => {}} disabled>Archive</MenuItem>
+        <MenuItem onSelect={() => {}}>Delete</MenuItem>
+      </>
+    ));
+    expect(items()[0]).toHaveFocus();
+  });
+
+  it("ArrowDown moves to the next item, reaching a disabled one (D131)", async () => {
     openMenu();
     await userEvent.keyboard("{ArrowDown}");
     expect(items()[1]).toHaveFocus();
     await userEvent.keyboard("{ArrowDown}");
-    expect(items()[3]).toHaveFocus(); // Archive (index 2) is disabled
+    expect(items()[2]).toHaveFocus(); // Archive, disabled
+    await userEvent.keyboard("{ArrowDown}");
+    expect(items()[3]).toHaveFocus();
   });
 
   it("ArrowDown wraps from the last item to the first", async () => {
     openMenu();
-    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}");
     expect(items()[0]).toHaveFocus();
   });
 
@@ -105,12 +117,31 @@ describe("useMenuKeyboard", () => {
     expect(items()[3]).toHaveFocus();
   });
 
-  it("ArrowUp moves to the previous enabled item, skipping disabled", async () => {
+  it("ArrowUp moves to the previous item, reaching a disabled one (D131)", async () => {
     openMenu();
     await userEvent.keyboard("{End}");
     expect(items()[3]).toHaveFocus();
     await userEvent.keyboard("{ArrowUp}");
-    expect(items()[1]).toHaveFocus(); // Archive (index 2) is disabled
+    expect(items()[2]).toHaveFocus(); // Archive, disabled
+  });
+
+  it("a disabled item holds the tab stop while focused, and Enter on it reports nothing", async () => {
+    const onClose = vi.fn();
+    const onSelect = vi.fn();
+    openMenu(onClose, (
+      <>
+        <MenuItem onSelect={() => {}}>Rename</MenuItem>
+        <MenuItem onSelect={onSelect} disabled>Archive</MenuItem>
+      </>
+    ));
+    await userEvent.keyboard("{ArrowDown}");
+    expect(items()[1]).toHaveFocus();
+    expect(items()[1]).toHaveAttribute("tabindex", "0");
+    expect(items()[0]).toHaveAttribute("tabindex", "-1");
+    await userEvent.keyboard("{Enter}");
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(items()[1]).toHaveFocus();
   });
 
   it("ArrowUp with no item focused goes to the last item, not the second-to-last", () => {
@@ -122,7 +153,7 @@ describe("useMenuKeyboard", () => {
     expect(items()[3]).toHaveFocus();
   });
 
-  it("Home and End jump to the first and last enabled items", async () => {
+  it("Home and End jump to the first and last items", async () => {
     openMenu();
     await userEvent.keyboard("{End}");
     expect(items()[3]).toHaveFocus();
@@ -138,7 +169,7 @@ describe("useMenuKeyboard", () => {
     expect(items()[3]).toHaveFocus();
   });
 
-  it("typeahead skips disabled items and matches the next enabled one", async () => {
+  it("typeahead reaches a disabled item like any other (D131)", async () => {
     openMenu(() => {}, (
       <>
         <MenuItem onSelect={() => {}}>Rename</MenuItem>
@@ -147,12 +178,9 @@ describe("useMenuKeyboard", () => {
       </>
     ));
     await userEvent.keyboard("a");
-    // Both "Archive" and "Archive all" match; only the enabled one may take
-    // focus. Asserting the positive is what makes this test discriminating —
-    // "focus is not on the disabled item" would also pass if typeahead did
-    // nothing at all and focus simply stayed on Rename.
-    expect(items()[2]).toHaveFocus();
-    expect(items()[1]).not.toHaveFocus();
+    // Both "Archive" and "Archive all" match; the first in order, disabled or
+    // not, takes focus.
+    expect(items()[1]).toHaveFocus();
   });
 
   it("typeahead resets the query after the 500ms window lapses", () => {

@@ -18,6 +18,7 @@ describe("menu tokens", () => {
       "separator-border": "var(--psi-border-faint)",
       "focus-ring": "var(--psi-border-focus)",
       "text-fg": "var(--psi-fg-secondary)",
+      "max-height": "var(--psi-popup-max-height)",
     });
   });
 
