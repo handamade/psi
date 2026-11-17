@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Tabs } from "./Tabs.js";
 import { TabList } from "./TabList.js";
 import { Tab } from "./Tab.js";
 import { TabPanel } from "./TabPanel.js";
+import { useTabsKeyboard } from "./useTabsKeyboard.js";
 
 /** Controlled wrapper — automatic activation means arrow keys move focus AND
  * selection, so the tests need selection to actually advance. */
@@ -164,5 +165,48 @@ describe("useTabsKeyboard", () => {
     await user.keyboard("{ArrowRight}");
     expect(onValueChange).toHaveBeenCalledWith("uncat");
     expect(tab("All")).toHaveAttribute("aria-selected", "true");
+  });
+});
+
+/** A bare list driven by the hook alone (D132): a custom item selector and
+ * both axes, which is what a standalone SegmentedControl asks of it. */
+function Bare({ onValueChange }: { onValueChange: (v: string) => void }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const onKeyDown = useTabsKeyboard({
+    listRef: ref,
+    orientation: "both",
+    onValueChange,
+    itemSelector: "[data-psi-segment]",
+    skipDisabled: true,
+  });
+  return (
+    <div ref={ref} onKeyDown={onKeyDown}>
+      <button data-psi-segment data-value="a">A</button>
+      <button data-psi-segment data-value="b" aria-disabled="true">B</button>
+      <button data-psi-segment data-value="c">C</button>
+      <button data-psi-tab data-value="x">X</button>
+    </div>
+  );
+}
+
+describe("useTabsKeyboard options (D132)", () => {
+  it("takes its items from itemSelector, moves on both axes and skips disabled", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Bare onValueChange={onValueChange} />);
+    screen.getByRole("button", { name: "A" }).focus();
+
+    await user.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "C" }));
+    expect(onValueChange).toHaveBeenLastCalledWith("c");
+
+    // Wraps past the end to A; X is not an item.
+    await user.keyboard("{ArrowRight}");
+    expect(onValueChange).toHaveBeenLastCalledWith("a");
+
+    await user.keyboard("{ArrowUp}");
+    expect(onValueChange).toHaveBeenLastCalledWith("c");
+    await user.keyboard("{ArrowLeft}");
+    expect(onValueChange).toHaveBeenLastCalledWith("a");
   });
 });

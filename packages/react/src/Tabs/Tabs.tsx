@@ -1,6 +1,8 @@
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useState } from "react";
+import { createContext, useContext, useId, useMemo } from "react";
 import type { ReactNode, Ref } from "react";
 import styles from "./tabs.module.css";
+import { useRovingStop } from "./useRovingStop.js";
+import type { RovingEntry } from "./useRovingStop.js";
 
 export type TabsOrientation = "horizontal" | "vertical";
 
@@ -23,12 +25,7 @@ export interface TabsContextValue {
 }
 
 /** What a `Tab` tells its `Tabs`, so the provider can pick the tab stop. */
-export interface TabEntry {
-  value: string;
-  disabled: boolean;
-  /** For document-order sorting; set by the time the layout effect runs. */
-  el: HTMLElement | null;
-}
+export type TabEntry = RovingEntry;
 
 export const TabsContext = createContext<TabsContextValue | null>(null);
 
@@ -84,43 +81,9 @@ export function Tabs({
   ref,
 }: TabsProps) {
   const idPrefix = useId();
-  const [tabs, setTabs] = useState<TabEntry[]>([]);
-
-  const registerTab = useCallback((entry: TabEntry) => {
-    setTabs((prev) => [...prev, entry]);
-    return () => setTabs((prev) => prev.filter((t) => t !== entry));
-  }, []);
-
-  // D93: the tab-stop decision lives here, not in `Tab`, because only the
-  // provider sees every registered tab and `value` together. Before any tab
-  // has registered (the server render, the first client render) fall back to
-  // `value` itself, which is what `Tab` did before and what keeps SSR output
-  // unchanged for a value that matches.
-  //
-  // The fallback applies only when `value` names no registered tab. A selected
-  // tab that is disabled keeps the stop (disabled tabs stay focusable, via
-  // aria-disabled, and the stop belongs to the active tab). When every tab is
-  // disabled the first one takes it, so the list never has zero stops.
-  const { tabStop, unmatched } = useMemo(() => {
-    if (tabs.length === 0) return { tabStop: value, unmatched: false };
-    if (tabs.some((t) => t.value === value)) return { tabStop: value, unmatched: false };
-    const ordered = [...tabs].sort((a, b) =>
-      a.el && b.el && a.el !== b.el
-        ? a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING
-          ? -1
-          : 1
-        : 0,
-    );
-    const first = ordered.find((t) => !t.disabled) ?? ordered[0];
-    return { tabStop: first.value, unmatched: true };
-  }, [tabs, value]);
-
-  useEffect(() => {
-    if (!unmatched || process.env.NODE_ENV === "production") return;
-    console.warn(
-      `Tabs: value "${value}" matches no tab; the first enabled tab takes the tab stop.`,
-    );
-  }, [unmatched, value]);
+  // D93: the tab-stop decision lives in the provider; useRovingStop (D132)
+  // holds it so a standalone SegmentedControl shares it.
+  const { tabStop, register: registerTab } = useRovingStop(value, "Tabs", "tab");
 
   const ctx = useMemo<TabsContextValue>(
     () => ({ value, onValueChange, orientation, idPrefix, tabStop, registerTab }),
