@@ -20,7 +20,7 @@ OKLCH-based design system for web applications, built on four core principles:
 - **packages/react** — 60 React 19 components (Button, IconButton, Card, Panel, Stack, Text, PageHeading, Toolbar, NavBar, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell, AspectRatio, Input, Select, Combobox, Field, FieldStack, Dialog, Checkbox, Switch, Textarea, RadioGroup, Radio, Tag, Tooltip, Menu, MenuItem, MenuSeparator, MenuText, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, TableContainer, Pagination, CursorPagination, Toast, ToastRegion, ToastProvider, Announcement, Tabs, TabList, Tab, TabPanel, SegmentedControl, Segment, DescriptionList, DescriptionItem, Banner, InlineAlert, Skeleton, CopyButton, Count) + 30 icons
 - **packages/figma-plugin** — In-repo Figma plugin syncing resolved tokens
 - **apps/storybook** — Workbench and generated component documentation
-- **apps/site** — Public website: the homepage and update feed, plus the docs at `/docs/` (guides, a page per component, token pages), built with Psi itself
+- **apps/site** — Public website: the homepage (the theme console, the surfaces trace and the Canopy showcase), the changelog at `/docs/changelog/`, and the docs at `/docs/` (guides, a page per component, token pages), built with Psi itself
 
 ## Quick start
 

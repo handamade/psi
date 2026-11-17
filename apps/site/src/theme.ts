@@ -8,9 +8,14 @@ export type Mode = "light" | "dark";
 
 export interface StoredBrand {
   vector: BrandVector;
-  /** Resolved custom properties for the vector's own mode, so the boot script
-   * can paint before `generate/` is available. Rewritten whenever it drifts. */
+  /** Resolved custom properties for the mode the page was painted in, so the
+   * boot script can paint before `generate/` is available. Rewritten whenever
+   * it drifts, and on every mode change. */
   cache: Record<string, string>;
+  /** The mode `cache` was resolved for. A page that paints a fixed mode (the
+   * Canopy frame) applies the cache only when this matches, and derives the
+   * other member itself. Absent in brands stored before it was recorded. */
+  mode?: Mode;
 }
 
 function isMode(value: unknown): value is Mode {
@@ -57,7 +62,8 @@ export function readStoredBrand(): StoredBrand | null {
       typeof parsed.cache === "object" && parsed.cache !== null
         ? (parsed.cache as Record<string, string>)
         : {};
-    return { vector: parsed.vector, cache };
+    const mode = (parsed as { mode?: unknown }).mode;
+    return isMode(mode) ? { vector: parsed.vector, cache, mode } : { vector: parsed.vector, cache };
   } catch {
     try {
       localStorage.removeItem(BRAND_KEY);
@@ -77,89 +83,120 @@ function systemMode(): Mode {
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+/** Fired on `window` whenever a mode is painted, so every hook instance in
+ * the document (the chrome's, the homepage's, later the theme console's)
+ * follows a change made by any other. `detail` is the new mode. */
+export const MODE_EVENT = "psi-site:mode";
+
 function applyMode(next: Mode): void {
   document.documentElement.dataset.psiTheme = next;
+  window.dispatchEvent(new CustomEvent<Mode>(MODE_EVENT, { detail: next }));
+}
+
+/** Follow modes painted by other instances. Callers persist BEFORE applying,
+ * so a listener that re-reads storage sees the new preference. */
+function useModeEvents(onMode: (mode: Mode) => void): void {
+  useEffect(() => {
+    const on = (e: Event) => onMode((e as CustomEvent<Mode>).detail);
+    window.addEventListener(MODE_EVENT, on);
+    return () => window.removeEventListener(MODE_EVENT, on);
+  }, [onMode]);
+}
+
+export type ModePref = Mode | "system";
+
+/**
+ * What a mode control shows as selected. Normally the preference; but a derived
+ * brand paints its own mode without persisting it, and then the preference no
+ * longer describes the page: "Light" selected over a dark page. While the painted
+ * mode differs from the one the preference would paint, the control shows the
+ * painted mode. `system` is the OS mode.
+ */
+export function shownPref(pref: ModePref, mode: Mode, system: Mode): ModePref {
+  const expected = pref === "system" ? system : pref;
+  return expected === mode ? pref : mode;
 }
 
 /**
- * Mode state, synced to <html data-psi-theme>. OS following lives INSIDE
- * this hook and deliberately does not persist: an earlier design routed it
- * through a separate `useSystemModeSync` hook fed the returned `setMode`,
- * but that setter persists, so the first OS change recorded an explicit
- * preference and permanently disabled the listener. Following the OS is not
- * a choice and must not be recorded as one.
- *
- * Returns a THIRD setter, `setModeEphemeral`, for the same reason: a brand
- * derivation carries its own `vector.mode`, and applying it needs to update
- * the visible mode without recording it as the visitor's explicit choice —
- * `psi-brand` already persists the vector (and its mode) on its own, so
- * nothing is lost by not also writing `psi-theme`. Wiring a derived brand's
- * mode through the persisting `setMode` was tried (D57 review) and is the
- * same class of bug commit 0a0806b fixed for the OS-follow listener,
- * re-entering through a different door: typing a brief and never touching
- * the toggle would silently opt the visitor out of OS colour-scheme
- * following forever.
+ * The visitor's preference, with "system" as a real choice (D133): picking it
+ * removes the stored mode, so the OS-follow listener in this hook takes over
+ * again. `mode` is what is painted. setModeEphemeral is for a derived brand's own
+ * mode (never persisted). Following the OS lives in this hook and is not
+ * persisted either: it is not a choice.
  */
-export function useMode(): [Mode, (next: Mode) => void, (next: Mode) => void] {
-  // The server has no storage and no OS, so the first render is always
-  // light. The boot script has already set <html data-psi-theme>; this only
-  // brings React's copy in line, before paint, without a hydration mismatch.
+export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode) => void, ModePref] {
+  const [pref, setPrefState] = useState<ModePref>("system");
   const [mode, setModeState] = useState<Mode>("light");
+  // The OS mode, for shownPref. Null on the server and the first client render,
+  // so both agree; read before paint.
+  const [system, setSystem] = useState<Mode | null>(null);
   useLayoutEffect(() => {
-    setModeState(readStoredMode() ?? systemMode());
+    const stored = readStoredMode();
+    const os = systemMode();
+    setSystem(os);
+    setPrefState(stored ?? "system");
+    setModeState(stored ?? os);
   }, []);
 
-  /** An explicit choice. This is the only path that persists. */
-  const setMode = useCallback((next: Mode) => {
+  const setPref = useCallback((p: ModePref) => {
+    setPrefState(p);
+    const next = p === "system" ? systemMode() : p;
     setModeState(next);
-    applyMode(next);
     try {
-      localStorage.setItem(MODE_KEY, next);
+      if (p === "system") localStorage.removeItem(MODE_KEY);
+      else localStorage.setItem(MODE_KEY, p);
     } catch {
       /* storage unavailable */
     }
+    applyMode(next);
   }, []);
 
-  /** A machine choice (a derived brand's own `vector.mode`), not a
-   * visitor's. Updates the visible mode and <html> without persisting. */
-  const setModeEphemeral = useCallback((next: Mode) => {
-    setModeState(next);
-    applyMode(next);
+  // Another instance changed the mode: follow it, and re-read the preference
+  // it stored (or cleared).
+  const followOther = useCallback((m: Mode) => {
+    setModeState(m);
+    setPrefState(readStoredMode() ?? "system");
+  }, []);
+  useModeEvents(followOther);
+
+  const setModeEphemeral = useCallback((m: Mode) => {
+    setModeState(m);
+    applyMode(m);
   }, []);
 
   useEffect(() => {
     const mq = matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => {
-      if (readStoredMode() !== null) return; // an explicit choice outranks the OS, forever
       const next: Mode = mq.matches ? "dark" : "light";
+      setSystem(next);
+      if (readStoredMode() !== null) return;
       setModeState(next);
       applyMode(next);
-      // Deliberately NOT persisted.
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  return [mode, setMode, setModeEphemeral];
+  return [pref, mode, setPref, setModeEphemeral, shownPref(pref, mode, system ?? mode)];
 }
 
 /** Brand state. Orthogonal to mode: reset clears this and never touches that. */
 export function useBrand(): {
   brand: BrandVector | null;
-  setBrand: (v: BrandVector, cache: Record<string, string>) => void;
+  setBrand: (v: BrandVector, cache: Record<string, string>, mode?: Mode) => void;
   reset: () => void;
 } {
-  // Same reason as useMode: null on the server and on the first client
+  // Same reason as useModePref: null on the server and on the first client
   // render, the stored vector before paint.
   const [brand, setBrandState] = useState<BrandVector | null>(null);
   useLayoutEffect(() => {
     setBrandState(readStoredBrand()?.vector ?? null);
   }, []);
 
-  const setBrand = useCallback((v: BrandVector, cache: Record<string, string>) => {
+  const setBrand = useCallback((v: BrandVector, cache: Record<string, string>, mode?: Mode) => {
     setBrandState(v);
     try {
-      localStorage.setItem(BRAND_KEY, JSON.stringify({ vector: v, cache }));
+      localStorage.setItem(BRAND_KEY, JSON.stringify(mode ? { vector: v, cache, mode } : { vector: v, cache }));
     } catch {
       /* storage unavailable */
     }

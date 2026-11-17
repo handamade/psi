@@ -1,0 +1,20 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import H2 from "../../components/H2.astro";
+import { UPDATES } from "../../content/updates";
+import { changelogMd, entryAnchor } from "../../lib/changelog";
+
+const headings = UPDATES.map((u) => ({ depth: 2, slug: entryAnchor(u.title), text: u.title }));
+const fmt = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+---
+
+<DocsLayout title="Changelog" description="Every Psi release, newest first." headings={headings} mdHref="/docs/changelog.md" mdSource={changelogMd(UPDATES)}>
+  {UPDATES.map((u, i) => (
+    <section>
+      <H2 id={headings[i].slug}>{u.title}</H2>
+      <p><time datetime={u.date}>{fmt(u.date)}</time> · {u.tag}</p>
+      <p>{u.body}</p>
+      {u.link && <p><a href={u.link.href}>{u.link.label}</a></p>}
+    </section>
+  ))}
+</DocsLayout>

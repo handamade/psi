@@ -1,0 +1,11 @@
+---
+import { releaseDate, releaseVersion } from "virtual:psi-facts";
+import { REPO_URL, STORYBOOK_BASE } from "../lib/storybook";
+const LINKS = [["Docs", "/docs/"], ["Components", "/docs/components/"], ["Storybook", STORYBOOK_BASE], ["MCP", "/docs/get-started/ai/"], ["llms.txt", "/llms.txt"], ["Changelog", "/docs/changelog/"], ["GitHub", REPO_URL]];
+---
+<footer class="site-footer">
+  <div class="home-wrap">
+    <nav aria-label="Footer"><ul>{LINKS.map(([l, h]) => <li><a href={h}>{l}</a></li>)}</ul></nav>
+    <p><span>© {releaseDate.slice(0, 4)} handamade · MIT license</span> <span>Psi v{releaseVersion} · this site is built with Psi</span></p>
+  </div>
+</footer>

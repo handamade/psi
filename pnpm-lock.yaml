@@ -88,9 +88,21 @@ importers:
       '@astrojs/sitemap':
         specifier: 3.7.5
         version: 3.7.5
+      '@fontsource-variable/rubik':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/ibm-plex-mono':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/rubik-glitch':
+        specifier: 5.3.0
+        version: 5.3.0
       '@handamade/psi-docs':
         specifier: workspace:*
         version: link:../../packages/docs
+      '@handamade/psi-mcp':
+        specifier: workspace:*
+        version: link:../../packages/mcp
       '@handamade/psi-react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -1318,6 +1330,15 @@ packages:
 
   '@figma/plugin-typings@1.129.0':
     resolution: {integrity: sha512-LW3UhslmR0QMPwvycDhxLGh3ACjb4Ebh1MjSG5PnyYlmJiOVQ/I+98XLyEtJSXbeGs3DDiJxGuu8Xa+PBoon4w==}
+
+  '@fontsource-variable/rubik@5.3.0':
+    resolution: {integrity: sha512-yQUf8qle24MJYA+EuauyF+cqjjN6I715nGjitt3sGmwZA0XfA4fWJcLq1C/diREZl4Qzn1E80nLMc0ipC/a4Lg==}
+
+  '@fontsource/ibm-plex-mono@5.3.0':
+    resolution: {integrity: sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==}
+
+  '@fontsource/rubik-glitch@5.3.0':
+    resolution: {integrity: sha512-TUe1qXVF+5IeMWU73HvfDdao9IssUK06hOHOdF8QKmPJj36pWGLVtdFWUgHGQQjytxpWitSHgmcJ7DkiWmTXQA==}
 
   '@hono/node-server@1.19.14':
     resolution: {integrity: sha512-GwtvgtXxnWsucXvbQXkRgqksiH2Qed37H9xHZocE5sA3N8O8O8/8FA3uclQXxXVzc9XBZuEOMK7+r02FmSpHtw==}
@@ -6094,6 +6115,12 @@ snapshots:
   '@exodus/bytes@1.15.1': {}
 
   '@figma/plugin-typings@1.129.0': {}
+
+  '@fontsource-variable/rubik@5.3.0': {}
+
+  '@fontsource/ibm-plex-mono@5.3.0': {}
+
+  '@fontsource/rubik-glitch@5.3.0': {}
 
   '@hono/node-server@1.19.14(hono@4.12.30)':
     dependencies:

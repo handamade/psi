@@ -17,6 +17,7 @@ export const docsNav: NavSection[] = [
     links: [
       { label: "Overview", href: "/docs/" },
       ...GUIDE_ORDER.map((id) => ({ label: GUIDE_LABELS[id], href: `/docs/get-started/${id}/` })),
+      { label: "Changelog", href: "/docs/changelog/" },
     ],
   },
   {

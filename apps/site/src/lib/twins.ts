@@ -22,6 +22,7 @@ export async function allTwins(): Promise<TwinEntry[]> {
       const g = byId.get(id)!;
       return { url: `/docs/get-started/${id}.md`, title: g.data.title, summary: g.data.description };
     }),
+    { url: "/docs/changelog.md", title: "Changelog", summary: "Every Psi release, newest first." },
     ...componentPages.map((p) => ({
       url: `/docs/components/${p.slug}.md`,
       title: p.title,

@@ -35,16 +35,19 @@ test("a copy anywhere is spoken once, through the shell's region", async ({ page
   await expect(page.getByText("Copied", { exact: true })).toBeAttached();
 });
 
-test("the sidebar is open at desktop width and behind a toggle below it", async ({ page }) => {
+test("the sidebar is open at desktop width and behind the Menu below it", async ({ page }) => {
   await page.setViewportSize({ width: 600, height: 800 });
   await page.goto(`${BASE}/docs/`, { waitUntil: "networkidle" });
   const sidebar = page.locator("#docs-sidebar");
   await expect(sidebar).toBeHidden();
+  await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(sidebar).toBeVisible();
+  // Focus goes to what was opened (the current page's link on /docs/), not back to Menu.
+  await expect(sidebar.locator("[aria-current]")).toBeFocused();
   await page.setViewportSize({ width: 1300, height: 800 });
   await expect(sidebar).toBeVisible();
-  await expect(page.getByRole("button", { name: /navigation/ })).toBeHidden();
+  await expect(page.getByRole("button", { name: "Menu" })).toBeHidden();
 });
 
 function componentSlugs(): string[] {
@@ -111,9 +114,14 @@ test("every guide exists and has no axe violations, light and dark", async ({ pa
   }
 });
 
+// Paths that tools/assemble-site.mjs adds after the site build, so they are absent
+// from apps/site/dist, which this gate serves. Links to them are correct in production.
+const ASSEMBLED_PATHS = ["/storybook/", "/llms.txt", "/packages/"];
+
 test("no internal link on a docs page points at a missing page", async ({ page, request }) => {
   test.setTimeout(300_000);
   const pages = [
+    "/",
     "/docs/",
     ...componentSlugs().map((s) => `/docs/components/${s}/`),
     ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}/`),
@@ -123,11 +131,13 @@ test("no internal link on a docs page points at a missing page", async ({ page, 
   const broken: string[] = [];
   for (const path of pages) {
     await page.goto(`${BASE}${path}`);
-    const hrefs = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLAnchorElement>("a[href]")]
-        .map((a) => new URL(a.href, location.href))
-        .filter((u) => u.origin === location.origin && !u.pathname.startsWith("/storybook/"))
-        .map((u) => u.pathname),
+    const hrefs = await page.evaluate(
+      (assembled) =>
+        [...document.querySelectorAll("a[href]")]
+          .map((a) => new URL(a.getAttribute("href")!, location.href))
+          .filter((u) => u.origin === location.origin && !assembled.some((p) => u.pathname.startsWith(p)))
+          .map((u) => u.pathname),
+      ASSEMBLED_PATHS,
     );
     for (const href of hrefs) {
       if (seen.has(href)) continue;
@@ -178,7 +188,6 @@ test.describe("at 375px", () => {
       const width = await page.locator("main#main").evaluate((el) => el.getBoundingClientRect().width);
       expect(width).toBeGreaterThanOrEqual(300);
       await expect(page.locator("#docs-sidebar")).toBeHidden();
-      await expect(page.locator(".docs-menu-toggle")).toBeHidden();
     });
   });
 
@@ -256,6 +265,7 @@ test("every docs page has a markdown twin, and /docs/llms.txt lists exactly them
   const expected = [
     "/docs/index.md",
     ...GUIDE_IDS.map((g) => `/docs/get-started/${g}.md`),
+    "/docs/changelog.md",
     ...componentSlugs().map((s) => `/docs/components/${s}.md`),
     ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}.md`),
   ];

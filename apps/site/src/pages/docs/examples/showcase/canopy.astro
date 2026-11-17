@@ -1,0 +1,39 @@
+---
+import Base from "../../../../layouts/Base.astro";
+import { CanopyFrame } from "../../../../home/CanopyFrame";
+---
+
+<Base title="Canopy, a greenhouse monitor — Psi" description="Canopy, a demo built only from Psi, shown in the homepage's frame.">
+  <meta slot="head" name="robots" content="noindex" />
+  <!-- Canopy brings its own <main> and <header>, so there is no wrapper here.
+       This runs after Base's boot script, before paint: ?theme= picks the theme
+       (anything else is dark, as frameTheme in CanopyFrame.tsx). Base painted the
+       stored brand's cache, which holds the mode the homepage was painted in, so it
+       is stripped and kept only when that mode is this frame's. CanopyFrame then
+       derives this mode's member from the vector, and follows later changes. -->
+  <script is:inline>
+    (function () {
+      var doc = document.documentElement;
+      var theme = new URLSearchParams(location.search).get("theme");
+      if (["light", "dark", "acme", "ember"].indexOf(theme) < 0) theme = "dark";
+      var brand = null;
+      try {
+        brand = JSON.parse(localStorage.getItem("psi-brand") || "null");
+      } catch (_) {
+        /* storage unavailable */
+      }
+      for (var i = doc.style.length - 1; i >= 0; i--) {
+        if (doc.style[i].indexOf("--psi-") === 0) doc.style.removeProperty(doc.style[i]);
+      }
+      delete doc.dataset.psiCustom;
+      if (brand && brand.mode === theme && brand.cache && typeof brand.cache === "object") {
+        for (var name in brand.cache) {
+          if (name.indexOf("--psi-") === 0) doc.style.setProperty(name, brand.cache[name]);
+        }
+        doc.dataset.psiCustom = "";
+      }
+      doc.dataset.psiTheme = theme;
+    })();
+  </script>
+  <CanopyFrame client:load />
+</Base>

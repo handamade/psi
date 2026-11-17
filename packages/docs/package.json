@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./node": "./src/node.ts",
+    "./trace": "./src/trace.ts",
     "./package.json": "./package.json"
   },
   "dependencies": {

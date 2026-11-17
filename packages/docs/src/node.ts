@@ -14,7 +14,9 @@ export const EXAMPLES_DIR = join(pkgDir, "examples");
 export const GUIDES_DIR = join(pkgDir, "guides");
 
 const manifestPath = require.resolve("@handamade/psi-react/manifest.json");
-const reactRoot = join(dirname(manifestPath), "..");
+export const reactRoot = join(dirname(manifestPath), "..");
+// @handamade/psi-tokens exports no ./package.json; guidance.json sits in dist/.
+export const tokensRoot = join(dirname(require.resolve("@handamade/psi-tokens/guidance.json")), "..");
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as { components: ExportInfo[]; icons: string[] };
 const byName = new Map(manifest.components.map((c) => [c.name, c]));

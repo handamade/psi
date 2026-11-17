@@ -1,0 +1,21 @@
+@import "@fontsource-variable/rubik/wght.css";
+@import "@fontsource/rubik-glitch/400.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+/* The site is a Psi consumer: it loads its own webfonts and sets the three
+ * font roles at its root (D29). Psi itself is unchanged. Ember brings its own
+ * type (D29), so the overrides stop at data-psi-theme="ember"; a demo rendered
+ * under that theme shows Ember's type. */
+:root:not([data-psi-theme="ember"]) {
+  --psi-font-sans: "Rubik Variable", ui-sans-serif, system-ui, sans-serif;
+  --psi-font-display: "Rubik Variable", ui-sans-serif, system-ui, sans-serif;
+  --psi-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* The one glitched word (D133). Falls back to Rubik 700 if the face fails. */
+.glitch {
+  font-family: "Rubik Glitch", "Rubik Variable", ui-sans-serif, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}

@@ -16,9 +16,9 @@ import {
   MODE_KEY,
   readStoredBrand,
   readStoredMode,
+  shownPref,
   useBrand,
-  useMode,
-  type Mode,
+  useModePref,
 } from "../theme";
 
 beforeEach(() => localStorage.clear());
@@ -174,47 +174,12 @@ describe("storage failures (e.g. Safari private mode)", () => {
   });
 });
 
-describe("useMode", () => {
-  it("follows an OS change when nothing is stored, and does not persist it", () => {
-    const media = stubMatchMedia(false); // OS starts light
-    const { result, unmount } = renderHook(() => useMode());
-    expect(result.current[0]).toBe("light");
-
-    media.setMatches(true); // OS flips to dark
-    expect(result.current[0]).toBe("dark");
-    expect(localStorage.getItem(MODE_KEY)).toBeNull();
-
-    unmount();
-  });
-
-  it("ignores further OS changes once an explicit choice has been made", () => {
-    const media = stubMatchMedia(false); // OS starts light
-    const { result, unmount } = renderHook(() => useMode());
-
-    act(() => {
-      const setMode = result.current[1];
-      setMode("dark" as Mode); // an explicit choice, contradicting the OS
-    });
-    expect(result.current[0]).toBe("dark");
-    expect(localStorage.getItem(MODE_KEY)).toBe("dark");
-
-    media.setMatches(false); // OS "changes" back to light — already was light
-    expect(result.current[0]).toBe("dark");
-
-    media.setMatches(true); // OS flips to dark and back to light again
-    media.setMatches(false);
-    expect(result.current[0]).toBe("dark"); // never reverted by the OS once explicit
-
-    unmount();
-  });
-});
-
 describe("server rendering", () => {
-  it("renders useMode and useBrand without localStorage or matchMedia", () => {
+  it("renders useModePref and useBrand without localStorage or matchMedia", () => {
     vi.stubGlobal("localStorage", undefined);
     vi.stubGlobal("matchMedia", undefined);
     function Probe() {
-      const [mode] = useMode();
+      const [, mode] = useModePref();
       const { brand } = useBrand();
       return createElement("p", null, `${mode}:${brand === null ? "none" : "brand"}`);
     }
@@ -225,8 +190,142 @@ describe("server rendering", () => {
     vi.unstubAllGlobals();
     localStorage.setItem(MODE_KEY, "dark");
     stubMatchMedia(false);
-    const { result, unmount } = renderHook(() => useMode());
-    expect(result.current[0]).toBe("dark");
+    const { result, unmount } = renderHook(() => useModePref());
+    expect(result.current[1]).toBe("dark");
     unmount();
+  });
+});
+
+/** Mounts a node into the DOM under act(), as Header.test.ts does. */
+function mount(node: ReturnType<typeof createElement>) {
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+  let root: Root;
+  act(() => {
+    root = createRoot(container);
+    root.render(node);
+  });
+  return {
+    container,
+    unmount: () => {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    },
+  };
+}
+
+describe("useModePref", () => {
+  beforeEach(() => {
+    // jsdom has no matchMedia; OS is light.
+    stubMatchMedia(false);
+  });
+
+  function Probe({ onRender }: { onRender: (v: ReturnType<typeof useModePref>) => void }) {
+    onRender(useModePref());
+    return null;
+  }
+
+  it("starts at system when nothing is stored", () => {
+    let last!: ReturnType<typeof useModePref>;
+    mount(createElement(Probe, { onRender: (v) => (last = v) }));
+    expect(last[0]).toBe("system");
+    expect(last[1]).toBe("light"); // matchMedia stub: matches false
+  });
+
+  it("an explicit choice persists, and system clears it", () => {
+    let last!: ReturnType<typeof useModePref>;
+    mount(createElement(Probe, { onRender: (v) => (last = v) }));
+    act(() => last[2]("dark"));
+    expect(localStorage.getItem(MODE_KEY)).toBe("dark");
+    expect(document.documentElement.dataset.psiTheme).toBe("dark");
+    act(() => last[2]("system"));
+    expect(localStorage.getItem(MODE_KEY)).toBeNull();
+    expect(last[0]).toBe("system");
+    expect(document.documentElement.dataset.psiTheme).toBe("light");
+  });
+
+  it("a stored choice is read as that preference", () => {
+    localStorage.setItem(MODE_KEY, "dark");
+    let last!: ReturnType<typeof useModePref>;
+    mount(createElement(Probe, { onRender: (v) => (last = v) }));
+    expect(last[0]).toBe("dark");
+    expect(last[1]).toBe("dark");
+  });
+});
+
+describe("mode preference in one document", () => {
+  beforeEach(() => stubMatchMedia(false));
+
+  it("choosing System in one instance clears the other's preference", () => {
+    localStorage.setItem(MODE_KEY, "dark");
+    let a!: ReturnType<typeof useModePref>;
+    let c!: ReturnType<typeof useModePref>;
+    function Two() {
+      a = useModePref();
+      c = useModePref();
+      return null;
+    }
+    mount(createElement(Two));
+    expect(c[0]).toBe("dark");
+    act(() => a[2]("system"));
+    expect(c[0]).toBe("system");
+    expect(c[1]).toBe("light");
+  });
+});
+
+describe("the mode a control shows", () => {
+  it("is the preference while the page paints what the preference asks for", () => {
+    expect(shownPref("light", "light", "dark")).toBe("light");
+    expect(shownPref("dark", "dark", "light")).toBe("dark");
+    expect(shownPref("system", "dark", "dark")).toBe("system");
+  });
+
+  it("is the painted mode while a brand's own mode overrides the preference", () => {
+    expect(shownPref("light", "dark", "light")).toBe("dark");
+    expect(shownPref("dark", "light", "dark")).toBe("light");
+    expect(shownPref("system", "dark", "light")).toBe("dark");
+  });
+
+  it("follows a derived brand's mode in another instance, and a click still sets the preference", () => {
+    stubMatchMedia(false);
+    localStorage.setItem(MODE_KEY, "light");
+    let chrome!: ReturnType<typeof useModePref>;
+    let console_!: ReturnType<typeof useModePref>;
+    function Two() {
+      chrome = useModePref();
+      console_ = useModePref();
+      return null;
+    }
+    mount(createElement(Two));
+    expect(chrome[4]).toBe("light");
+    // The theme console paints its brand's dark member without persisting it.
+    act(() => console_[3]("dark"));
+    expect(document.documentElement.dataset.psiTheme).toBe("dark");
+    expect(chrome[0]).toBe("light"); // the stored preference is unchanged…
+    expect(chrome[4]).toBe("dark"); // …but the control says what is painted
+    // Clicking Light still works: it paints light and the control agrees.
+    act(() => chrome[2]("light"));
+    expect(document.documentElement.dataset.psiTheme).toBe("light");
+    expect(chrome[4]).toBe("light");
+    expect(console_[1]).toBe("light");
+  });
+});
+
+describe("a stored brand's mode", () => {
+  const v = { hue: 30, chroma: "vivid", mode: "dark", radius: 8, name: "kept" } as const;
+
+  it("is recorded beside the cache, and read back", () => {
+    let last!: ReturnType<typeof useBrand>;
+    mount(createElement(function P() { last = useBrand(); return null; }));
+    act(() => last.setBrand(v, { "--psi-bg-primary": "x" }, "light"));
+    expect(JSON.parse(localStorage.getItem(BRAND_KEY)!).mode).toBe("light");
+    expect(readStoredBrand()?.mode).toBe("light");
+  });
+
+  it("is absent from a brand stored without one", () => {
+    localStorage.setItem(BRAND_KEY, JSON.stringify({ vector: v, cache: {}, mode: "sepia" }));
+    expect(readStoredBrand()).toEqual({ vector: v, cache: {} });
   });
 });

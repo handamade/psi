@@ -1,0 +1,22 @@
+---
+import { decisionCount } from "virtual:psi-facts";
+const RULES = [
+  { title: "Colors are formulas, not swatches", body: "A semantic color is an OKLCH formula over a few brand anchors. Change one anchor and every hover, active and tint follows:", code: "fgAccent: token({ from: slot.accent, l: set(0.48) })", href: "/docs/get-started/theming/", link: "Theming" },
+  { title: "Names say the pixels", body: "psi-gap-8 is 8px. A size is 24 | 32 | 40 | 48, never S/M/L.", href: "/docs/get-started/sizes-and-variants/", link: "Sizes and variants" },
+  { title: "Variants say what they are", body: "accent, neutral, danger, each with a -subtle, plus ghost and outline. One accent per group.", href: "/docs/get-started/sizes-and-variants/", link: "Sizes and variants" },
+  { title: "Contrast is a gate", body: "A theme that fails WCAG AA fails the build. A theme the console derives is solved to AA before it renders.", href: "/docs/get-started/dark-mode/", link: "Dark mode" },
+];
+---
+<section class="home-section" aria-labelledby="how-h">
+  <h2 id="how-h">How it's built</h2>
+  <p class="home-lede">Four rules hold across every component and theme. The build enforces each one.</p>
+  <dl class="rules">
+    {RULES.map((r) => (
+      <div class="rule">
+        <dt>{r.title}</dt>
+        <dd>{r.body} {r.code && <code>{r.code}</code>} <a href={r.href}>{r.link}</a></dd>
+      </div>
+    ))}
+  </dl>
+  <p class="home-foot">{decisionCount} decisions so far, each written down with its reasons.</p>
+</section>
