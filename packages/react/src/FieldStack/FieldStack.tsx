@@ -32,7 +32,11 @@ const gapClass: Record<Gap, string> = {
  * columns only as a direct child; one inside a wrapper element keeps its
  * label beside its control in columns of its own. Every Field inside a
  * FieldStack takes its position, including one inside a nested container;
- * give a nested Field its own `labelPosition` to opt out. */
+ * give a nested Field its own `labelPosition` to opt out.
+ * It is capped at `--psi-field-stack-max-width` (640px) and sits at the start
+ * of a wider container (D125); set the variable on a scope, `none` included,
+ * to change the cap for one form. Size a short control with its Field's
+ * `controlWidth`. */
 export function FieldStack({ labelPosition = "top", gap = 24, className, children, ref, ...rest }: FieldStackProps) {
   const value = useMemo(() => ({ labelPosition }), [labelPosition]);
   const cls = [styles.stack, gapClass[gap], labelPosition === "start" && styles.start, className]

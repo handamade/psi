@@ -68,3 +68,30 @@ export const RightToLeft: Story = { render: () => <div dir="rtl" style={{ maxWid
 
 /** labelPosition="top": a column of Fields with the gap, as Stack would lay them out. */
 export const LabelsAbove: Story = { render: () => <div style={{ maxWidth: 420 }}><Form labelPosition="top" /></div> };
+
+/** D125: a stacked form in a wide column stops at --psi-field-stack-max-width (640px). Each control takes its
+ * Field's controlWidth; Notes, without one, fills the control column. */
+export const Capped: Story = {
+  render: () => (
+    <div style={{ width: 960 }}>
+      <FieldStack labelPosition="start">
+        <Field label="Display name" controlWidth={320}>
+          <Input size={32} defaultValue="Ada Lovelace" />
+        </Field>
+        <Field label="ICCID" controlWidth={240} description="19 or 20 digits.">
+          <Input size={32} defaultValue="89490200001234567890" />
+        </Field>
+        <Field label="Rows per page" controlWidth={80}>
+          <Select size={32} defaultValue="50">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </Select>
+        </Field>
+        <Field label="Notes">
+          <Textarea rows={3} />
+        </Field>
+      </FieldStack>
+    </div>
+  ),
+};

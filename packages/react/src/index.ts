@@ -27,7 +27,7 @@ export type { AppShellProps } from "./AppShell/AppShell.js";
 export { AspectRatio } from "./AspectRatio/AspectRatio.js";
 export type { AspectRatioProps } from "./AspectRatio/AspectRatio.js";
 export { Field, FieldContext } from "./Field/Field.js";
-export type { FieldProps, FieldContextValue } from "./Field/Field.js";
+export type { FieldProps, FieldContextValue, FieldControlWidth } from "./Field/Field.js";
 export { FieldStack } from "./FieldStack/FieldStack.js";
 export type { FieldStackProps } from "./FieldStack/FieldStack.js";
 export type { FieldLabelPosition } from "./FieldStack/FieldStackContext.js";

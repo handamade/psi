@@ -18,7 +18,13 @@
  * the label's text-align (a theme sets `end` to put each label against its
  * control); label-max-width caps a FieldStack's label column, a standalone
  * literal like label-height; column-gap separates the label from its
- * control. None is a colour, so none enters the contrast gates. */
+ * control. None is a colour, so none enters the contrast gates.
+ *
+ * D125: stack-max-width caps a FieldStack's inline size, so a stacked form in
+ * a page's main column is not as wide as the page. A standalone literal like
+ * label-max-width; not a colour, so it enters no contrast gate. A theme
+ * retunes it in componentOverrides; a caller sets it on a scope, `none`
+ * included, to lift the cap for one form. */
 export const fieldVars: Record<string, string> = {
   "label-fg": "var(--psi-fg-secondary)",
   "message-fg": "var(--psi-fg-tertiary)",
@@ -34,4 +40,5 @@ export const fieldVars: Record<string, string> = {
   "label-align": "start",
   "label-max-width": "240px",
   "column-gap": "var(--psi-space-12)",
+  "stack-max-width": "640px",
 };
