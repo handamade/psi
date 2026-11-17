@@ -100,3 +100,123 @@ test("Arrow Up opens the menu on its last item @interaction", async ({ page }) =
   await page.keyboard.press("ArrowUp");
   await expect(page.locator(menu("a")).getByRole("menuitem", { name: "Duplicate" })).toBeFocused();
 });
+
+/** D131 — a menu longer than the popup cap. */
+const LONG = "/iframe.html?id=components-menu--long-menu&globals=theme:light";
+const longMenu = '[data-psi-menu][aria-label="Move to"]';
+
+/** The menu's box, and whether an item's box lies inside it. */
+async function inView(page: import("@playwright/test").Page, name: string) {
+  return page.evaluate(
+    ({ sel, name }) => {
+      const menu = document.querySelector(sel)!.getBoundingClientRect();
+      const item = [...document.querySelectorAll(`${sel} [role="menuitem"]`)].find(
+        (el) => el.textContent === name,
+      )!.getBoundingClientRect();
+      return item.top >= menu.top - 0.5 && item.bottom <= menu.bottom + 0.5;
+    },
+    { sel: longMenu, name },
+  );
+}
+
+test("a long menu stops at the popup cap and scrolls, keeping the focused item in view @interaction", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto(LONG, { waitUntil: "networkidle" });
+  const menu = page.locator(longMenu);
+  await expect(menu.getByRole("menuitem", { name: "Argentina" })).toBeFocused();
+
+  const box = await menu.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return { height: r.height, bottom: r.bottom, scrolls: el.scrollHeight > el.clientHeight };
+  });
+  // 320px of content plus 4px padding and a 1px border on each side.
+  expect(box.height).toBe(330);
+  expect(box.scrolls).toBe(true);
+  expect(box.bottom).toBeLessThanOrEqual(768);
+
+  await page.keyboard.press("End");
+  await expect(menu.getByRole("menuitem", { name: "Switzerland" })).toBeFocused();
+  expect(await inView(page, "Switzerland")).toBe(true);
+  expect(await inView(page, "Argentina")).toBe(false);
+
+  await page.keyboard.press("ArrowDown"); // wraps
+  await expect(menu.getByRole("menuitem", { name: "Argentina" })).toBeFocused();
+  expect(await inView(page, "Argentina")).toBe(true);
+
+  await page.keyboard.press("p"); // typeahead: Peru
+  await expect(menu.getByRole("menuitem", { name: "Peru" })).toBeFocused();
+  expect(await inView(page, "Peru")).toBe(true);
+});
+
+test("a long menu in a short window fits it, on the side with more room @interaction", async ({ page }) => {
+  // Trigger near the top: too little room above or below for 330px, more below.
+  await page.setViewportSize({ width: 1024, height: 300 });
+  await page.goto(LONG, { waitUntil: "networkidle" });
+  const geometry = () =>
+    page.evaluate((sel) => {
+      const menu = document.querySelector(sel)!.getBoundingClientRect();
+      const trigger = document.querySelector("[data-psi-menu-trigger]")!.getBoundingClientRect();
+      return { menuTop: menu.top, menuBottom: menu.bottom, triggerTop: trigger.top, triggerBottom: trigger.bottom };
+    }, longMenu);
+
+  let g = await geometry();
+  expect(g.menuTop).toBeGreaterThanOrEqual(g.triggerBottom);
+  expect(g.menuBottom).toBeLessThanOrEqual(300);
+  expect(g.menuBottom).toBeGreaterThan(280); // fills the room, not a sliver
+
+  // Trigger near the bottom: more room above, so it opens there.
+  await page.evaluate(() => {
+    const t = document.querySelector<HTMLElement>("[data-psi-menu-trigger]")!;
+    t.style.position = "fixed";
+    t.style.top = "220px";
+  });
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)!.getBoundingClientRect().bottom <= 220,
+    longMenu,
+  );
+  g = await geometry();
+  expect(g.menuBottom).toBeLessThanOrEqual(g.triggerTop);
+  expect(g.menuTop).toBeGreaterThanOrEqual(0);
+  expect(g.menuTop).toBeLessThan(20);
+});
+
+/** D131 — removing the focused item. */
+const REMOVING = "/iframe.html?id=components-menu--removing-items&globals=theme:light";
+
+test("removing the focused item moves focus to its neighbour, and an emptied menu keeps Esc @interaction", async ({ page }) => {
+  await page.goto(REMOVING, { waitUntil: "networkidle" });
+  const menu = page.locator('[data-psi-menu][aria-label="Notifications"]');
+  const item = (name: string) => menu.getByRole("menuitem", { name: `Dismiss ${name}` });
+
+  await expect(item("Build failed")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter"); // removes "Review requested", the middle one
+  await expect(item("Invite accepted")).toBeFocused();
+
+  await page.keyboard.press("Enter"); // removes the last: focus goes to the new last
+  await expect(item("Build failed")).toBeFocused();
+
+  await page.keyboard.press("Enter"); // removes the only one
+  await expect(menu).toBeFocused();
+  await expect(menu).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("last-reason")).toHaveText("esc");
+  await expect(menu).toBeHidden();
+});
+
+/** D131 — disabled items are reachable and inert. */
+test("Arrow Down reaches a disabled item, and Enter there does nothing @interaction", async ({ page }) => {
+  await page.goto("/iframe.html?id=components-menu--with-disabled-item&globals=theme:light", { waitUntil: "networkidle" });
+  const menu = page.locator("[data-psi-menu]");
+  await expect(menu.getByRole("menuitem", { name: "Edit" })).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  const archive = menu.getByRole("menuitem", { name: "Archive" });
+  await expect(archive).toBeFocused();
+  await expect(archive).toHaveAttribute("aria-disabled", "true");
+  await page.keyboard.press("Enter");
+  await expect(archive).toBeFocused();
+  await expect(menu).toBeVisible();
+  await page.keyboard.press("ArrowDown");
+  await expect(menu.getByRole("menuitem", { name: "Delete" })).toBeFocused();
+});

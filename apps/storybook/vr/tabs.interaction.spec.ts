@@ -38,13 +38,20 @@ test("the tab list is a single tab stop, and Tab lands on the panel @interaction
   expect(role).toBe("tabpanel");
 });
 
-test("arrows wrap and skip the disabled tab @interaction", async ({ page }) => {
+test("arrows reach the disabled tab without selecting it, and wrap (D131) @interaction", async ({ page }) => {
   await page.goto(story("components-tabs--with-disabled-tab"), { waitUntil: "networkidle" });
 
   await page.getByRole("tab", { name: "All" }).focus();
   await page.keyboard.press("ArrowRight");
-  // "Uncategorised" is the disabled one in this story, so it must be jumped.
+  // "Uncategorised" is the disabled one in this story: it takes focus, and
+  // the selection and its panel stay on "All".
+  expect(await activeText(page)).toBe("Uncategorised");
+  await expect(page.getByRole("tab", { name: "Uncategorised" })).toHaveAttribute("aria-selected", "false");
+  await expect(page.getByRole("tab", { name: "All" })).toHaveAttribute("aria-selected", "true");
+
+  await page.keyboard.press("ArrowRight");
   expect(await activeText(page)).toBe("This month");
+  await expect(page.getByRole("tab", { name: "This month" })).toHaveAttribute("aria-selected", "true");
 
   await page.keyboard.press("ArrowRight");
   expect(await activeText(page)).toBe("All"); // wrapped

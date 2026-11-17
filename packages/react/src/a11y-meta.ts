@@ -126,21 +126,21 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   Menu: {
     keyboard: [
-      { keys: "Arrow Down / Arrow Up", behavior: "Moves between enabled items, wrapping at both ends. Disabled items are skipped." },
-      { keys: "Home / End", behavior: "Jumps to the first or last enabled item." },
-      { keys: "Any single printable key", behavior: "Typeahead — focuses the first enabled item whose label starts with the typed prefix; the prefix resets after 500ms. Keystrokes with Meta/Ctrl/Alt held are ignored." },
+      { keys: "Arrow Down / Arrow Up", behavior: "Moves between items, wrapping at both ends. Disabled items are reachable, so a user learns they exist, and cannot be activated (D131)." },
+      { keys: "Home / End", behavior: "Jumps to the first or last item." },
+      { keys: "Any single printable key", behavior: "Typeahead — focuses the first item whose label starts with the typed prefix; the prefix resets after 500ms. Keystrokes with Meta/Ctrl/Alt held are ignored." },
       { keys: "Esc", behavior: "Suppresses the platform's own dismissal and reports onClose(\"esc\"); the menu stays open until the consumer flips `open` (D50)." },
       { keys: "Enter / Space", behavior: "Activates the focused item (native button behavior)." },
-      { keys: "Arrow Down / Arrow Up on the closed trigger", behavior: "Opens the menu on its first / last enabled item by clicking the trigger, since Menu cannot open itself; the consumer's onClick flips `open` (D102)." },
+      { keys: "Arrow Down / Arrow Up on the closed trigger", behavior: "Opens the menu on its first / last item by clicking the trigger, since Menu cannot open itself; the consumer's onClick flips `open` (D102)." },
       { keys: "Tab / Shift Tab", behavior: "Reports onClose(\"tab\") and lets focus move on to the next control; the consumer flips `open`, and focus is not pulled back to the trigger (D102)." },
     ],
     notes:
-      "Opens on the native top layer via popover=\"auto\", which supplies light dismiss. Controlled-only: every dismissal path (esc, item-select, outside) only reports onClose(reason) — the consumer must flip `open` to actually close it; outside is the one path the platform has already acted on by the time it is reported. Opening moves focus to the first enabled item — Menu takes focus off the trigger as soon as `open` becomes true. Focus returns to the trigger when the menu actually closes, and only if focus is still inside the menu, so a light dismiss onto another control does not steal focus back. Requires an accessible name — pass aria-label. Placement uses CSS anchor positioning where supported and a JS fallback below that floor; below it there is no collision flip.",
+      "Opens on the native top layer via popover=\"auto\", which supplies light dismiss. Controlled-only: every dismissal path (esc, item-select, outside) only reports onClose(reason) — the consumer must flip `open` to actually close it; outside is the one path the platform has already acted on by the time it is reported. Opening moves focus to the first item — Menu takes focus off the trigger as soon as `open` becomes true. A re-render that removes the focused item moves focus to the item now at its position, or the last item; an emptied menu holds focus itself (tabindex=-1, never a Tab stop), so Esc and Tab still report their own reasons (D131). Focus returns to the trigger when the menu actually closes, and only if focus is still inside the menu, so a light dismiss onto another control does not steal focus back. Requires an accessible name — pass aria-label. Placement uses CSS anchor positioning where supported and a JS fallback below that floor; below it there is no collision flip. Past --psi-menu-max-height (the shared --psi-popup-max-height, 320px) the menu scrolls and the focused item stays in view; a menu taller than the room on both sides of its trigger opens on the larger side and fills it (D131).",
   },
   MenuItem: {
     keyboard: [{ keys: "Enter / Space", behavior: "Activates; Menu reports onClose(\"item-select\") but does not close itself." }],
     notes:
-      "Renders a real <button>. disabled sets aria-disabled (not the disabled attribute) so the item stays discoverable to assistive tech while being skipped by roving navigation. variant=\"danger\" is for destructive actions only.",
+      "Renders a real <button>. disabled sets aria-disabled (not the disabled attribute) so the item stays focusable and discoverable: the arrow keys, Home, End and typeahead reach it (D131), and activating it does nothing and reports nothing. variant=\"danger\" is for destructive actions only.",
   },
   MenuSeparator: {
     keyboard: [],
@@ -296,9 +296,9 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   TabList: {
     keyboard: [
-      { keys: "Arrow Left / Arrow Right", behavior: "Horizontal orientation: moves to the previous/next enabled tab, wrapping at both ends. Selection follows focus (automatic activation)." },
+      { keys: "Arrow Left / Arrow Right", behavior: "Horizontal orientation: moves to the previous/next tab, wrapping at both ends. Selection follows focus (automatic activation), except onto a disabled tab, which takes focus and the tab stop but not the selection (D131)." },
       { keys: "Arrow Up / Arrow Down", behavior: "Vertical orientation: the same, on the block axis. The cross-axis arrows are ignored rather than swallowed." },
-      { keys: "Home / End", behavior: "Jumps to the first or last enabled tab." },
+      { keys: "Home / End", behavior: "Jumps to the first or last tab, disabled or not." },
     ],
     notes:
       "Renders role=\"tablist\" with aria-orientation. Requires an accessible name — pass aria-label, which is promoted onto its own props interface (D60) so the manifest shows it. Owns the roving tabindex: exactly one tab is in the page tab order at a time.",
@@ -306,7 +306,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   Tab: {
     keyboard: [{ keys: "Enter / Space", behavior: "Activates (native button behavior); arrow keys already select on focus." }],
     notes:
-      "Renders a real <button> with role=\"tab\", aria-selected and aria-controls. disabled sets aria-disabled (not the disabled attribute) so the tab stays discoverable to assistive tech while being skipped by roving navigation and refused for selection — the same choice MenuItem made in D53.",
+      "Renders a real <button> with role=\"tab\", aria-selected and aria-controls. disabled sets aria-disabled (not the disabled attribute) so the tab stays focusable and discoverable: the arrow keys reach it (D131), and it is refused for selection — the same choice MenuItem made in D53.",
   },
   TabPanel: {
     keyboard: [
