@@ -4,7 +4,7 @@ import type { BrandVector, ChromaWord } from "./types.js";
 
 /** Accent chroma by character. Values sit inside sRGB for most hues; the
  * solver (Task 4) caps per-hue where a given hue cannot carry them. */
-const ACCENT_CHROMA: Readonly<Record<ChromaWord, number>> = {
+export const ACCENT_CHROMA: Readonly<Record<ChromaWord, number>> = {
   muted: 0.06,
   calm: 0.10,
   balanced: 0.15,

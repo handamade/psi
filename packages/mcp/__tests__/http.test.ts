@@ -1,10 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createServer, type Server } from "node:http";
-import { fileURLToPath } from "node:url";
-import { buildIndex } from "../src/index-builder.js";
 import { createMcpHandler } from "../src/http.js";
+import { loadTestIndex } from "./test-index.js";
 
-const pkgs = fileURLToPath(new URL("../..", import.meta.url));
 let server: Server;
 let url: string;
 
@@ -18,12 +16,7 @@ function rpc(id: number, method: string, params: object) {
 }
 
 beforeAll(async () => {
-  const index = await buildIndex({
-    tokensDist: `${pkgs}tokens/dist`,
-    reactDist: `${pkgs}react/dist`,
-    reactDocs: `${pkgs}react/docs`,
-    version: "0.0.0-test",
-  });
+  const index = await loadTestIndex();
   const handler = createMcpHandler(index);
   server = createServer((req, res) => void handler(req, res));
   await new Promise<void>((ok) => server.listen(0, ok));
@@ -59,5 +52,38 @@ describe("streamable HTTP handler (stateless)", () => {
     const body = await res.json();
     const briefs = JSON.parse(body.result.content[0].text);
     expect(briefs[0].id).toBe("component:Button");
+  });
+
+  it("answers a get call through the handler", async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: HEADERS,
+      body: rpc(3, "tools/call", { name: "get", arguments: { id: "component:Button" } }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.result.content[0].text).toContain("## Examples");
+  });
+
+  it("answers a theme call through the handler", async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: HEADERS,
+      body: rpc(4, "tools/call", { name: "theme", arguments: { hue: 264, name: "ocean" } }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.result.content[0].text).toContain('[data-psi-theme="ocean-dark"]');
+  });
+
+  it("answers a check call through the handler", async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: HEADERS,
+      body: rpc(5, "tools/call", { name: "check", arguments: { code: '<Button size="md">x</Button>' } }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.result.content[0].text).toContain("invalid-value");
   });
 });

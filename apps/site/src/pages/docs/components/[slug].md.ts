@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { componentPages, type ComponentPage } from "../../../content/component-pages";
-import { examplesFor } from "../../../examples/registry";
 import { componentPageMd } from "../../../lib/markdown";
 
 export function getStaticPaths() {
@@ -9,7 +8,7 @@ export function getStaticPaths() {
 
 export const GET: APIRoute = ({ props }) => {
   const page = props.page as ComponentPage;
-  return new Response(componentPageMd(page, examplesFor(page.slug)), {
+  return new Response(componentPageMd(page), {
     headers: { "Content-Type": "text/markdown; charset=utf-8" },
   });
 };

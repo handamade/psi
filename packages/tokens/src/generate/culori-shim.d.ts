@@ -31,6 +31,7 @@ declare module "culori" {
   export function formatHex(color: string | Oklch | Rgb): string | undefined;
   export function clampChroma(color: Oklch, mode?: string, rgbGamut?: string): Oklch;
   export function rgb(color: string | Oklch | Rgb): Rgb | undefined;
+  export function oklch(color: string | Oklch | Rgb): Oklch | undefined;
   /** Returns a ΔE2000 metric over two colours. */
   export function differenceCiede2000(): (a: string | Oklch | Rgb, b: string | Oklch | Rgb) => number;
 }

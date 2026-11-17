@@ -17,7 +17,7 @@ function axes(c: ComponentEntry): string {
   return parts.length ? ` — ${parts.join("; ")}` : "";
 }
 
-export function renderAgentsBlock(index: PsiIndex): string {
+export function renderAgentsBlock(index: Pick<PsiIndex, "version" | "themes" | "components">): string {
   return [
     START_MARKER,
     `# Psi (Ψ) design system — agent guide`,
@@ -35,7 +35,8 @@ export function renderAgentsBlock(index: PsiIndex): string {
     `## Components (${index.components.length})`,
     ...index.components.map((c) => `- ${c.name}${axes(c)}`),
     "",
-    "## Live documentation (MCP, tools: search/get)",
+    "## Live documentation (MCP)",
+    "- Tools: search, get (a docs page as markdown), theme (an AA-solved theme from a colour), check (JSX that uses Psi wrongly)",
     "- Hosted: https://psi.kurkin.de/mcp (Streamable HTTP)",
     "- Local: `npx @handamade/psi-mcp` (stdio)",
     END_MARKER,

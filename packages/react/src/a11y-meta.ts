@@ -7,6 +7,9 @@
 export interface A11yEntry {
   keyboard: Array<{ keys: string; behavior: string }>;
   notes?: string;
+  /** Machine-readable form of "Requires an accessible name": at least one of
+   * these attributes must be present. Read by the MCP's check tool (D129). */
+  accessibleName?: { oneOf: string[] };
 }
 
 export const a11yMeta: Record<string, A11yEntry> = {
@@ -20,6 +23,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   IconButton: {
     keyboard: [{ keys: "Enter / Space", behavior: "Activates." }],
+    accessibleName: { oneOf: ["aria-label"] },
     notes:
       "Requires an accessible name — pass aria-label. IconButton does not hide its icon for you; mark the icon aria-hidden yourself.",
   },
@@ -134,6 +138,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Arrow Down / Arrow Up on the closed trigger", behavior: "Opens the menu on its first / last item by clicking the trigger, since Menu cannot open itself; the consumer's onClick flips `open` (D102)." },
       { keys: "Tab / Shift Tab", behavior: "Reports onClose(\"tab\") and lets focus move on to the next control; the consumer flips `open`, and focus is not pulled back to the trigger (D102)." },
     ],
+    accessibleName: { oneOf: ["aria-label"] },
     notes:
       "Opens on the native top layer via popover=\"auto\", which supplies light dismiss. Controlled-only: every dismissal path (esc, item-select, outside) only reports onClose(reason) — the consumer must flip `open` to actually close it; outside is the one path the platform has already acted on by the time it is reported. Opening moves focus to the first item — Menu takes focus off the trigger as soon as `open` becomes true. A re-render that removes the focused item moves focus to the item now at its position, or the last item; an emptied menu holds focus itself (tabindex=-1, never a Tab stop), so Esc and Tab still report their own reasons (D131). Focus returns to the trigger when the menu actually closes, and only if focus is still inside the menu, so a light dismiss onto another control does not steal focus back. Requires an accessible name — pass aria-label. Placement uses CSS anchor positioning where supported and a JS fallback below that floor; below it there is no collision flip. Past --psi-menu-max-height (the shared --psi-popup-max-height, 320px) the menu scrolls and the focused item stays in view; a menu taller than the room on both sides of its trigger opens on the larger side and fills it (D131).",
   },
@@ -300,6 +305,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Arrow Up / Arrow Down", behavior: "Vertical orientation: the same, on the block axis. The cross-axis arrows are ignored rather than swallowed." },
       { keys: "Home / End", behavior: "Jumps to the first or last tab, disabled or not." },
     ],
+    accessibleName: { oneOf: ["aria-label"] },
     notes:
       "Renders role=\"tablist\" with aria-orientation. Requires an accessible name — pass aria-label, which is promoted onto its own props interface (D60) so the manifest shows it. Owns the roving tabindex: exactly one tab is in the page tab order at a time.",
   },

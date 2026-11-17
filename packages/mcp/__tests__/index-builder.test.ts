@@ -24,6 +24,15 @@ describe("buildIndex", () => {
     expect(button!.doc).toContain("Button");
   });
 
+  it("carries attribute sets, contracts and the export surface (D129)", async () => {
+    const index = await buildIndex(inputs);
+    const button = index.components.find((c) => c.name === "Button")!;
+    expect(button.attributes).toBe("ButtonHTMLAttributes");
+    expect(index.attributeSets[button.attributeSet!]).toContain("onClick");
+    expect(index.contracts.interactive).toContain("Button");
+    expect(index.exports).toEqual(expect.arrayContaining(["Button", "ButtonProps", "IconPlus"]));
+  });
+
   it("indexes tokens with formula and per-theme values", async () => {
     const index = await buildIndex(inputs);
     expect(index.themes).toEqual(["light", "dark", "acme", "ember"]);

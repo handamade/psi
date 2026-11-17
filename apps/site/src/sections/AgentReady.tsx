@@ -24,11 +24,11 @@ export function AgentReady() {
       <div className="container">
         <div className="section-head">
           <span className="annot annot--accent">05 · Agents</span>
-          <h2>Two tools, zero hallucinated props.</h2>
+          <h2>Four tools, zero hallucinated props.</h2>
           <p className="lede">
-            Search and get answers from the same generated artifacts the
-            build gates on — every prop union, every token formula, every
-            theme value.
+            Search, get, theme and check answer from the same generated
+            artifacts the build gates on — every prop union, every token
+            formula, every theme value.
           </p>
         </div>
         <div className="theme-grid">

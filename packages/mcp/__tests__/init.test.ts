@@ -1,20 +1,13 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { fileURLToPath } from "node:url";
-import { buildIndex } from "../src/index-builder.js";
 import { renderAgentsBlock, applyBlock, START_MARKER, END_MARKER } from "../src/init.js";
 import type { PsiIndex } from "../src/types.js";
+import { loadTestIndex } from "./test-index.js";
 
-const pkgs = fileURLToPath(new URL("../..", import.meta.url));
 let index: PsiIndex;
 let block: string;
 
 beforeAll(async () => {
-  index = await buildIndex({
-    tokensDist: `${pkgs}tokens/dist`,
-    reactDist: `${pkgs}react/dist`,
-    reactDocs: `${pkgs}react/docs`,
-    version: "0.0.0-test",
-  });
+  index = await loadTestIndex();
   block = renderAgentsBlock(index);
 });
 
