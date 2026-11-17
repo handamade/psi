@@ -203,6 +203,12 @@ The owner chose one standalone component over a `Tabs` variant and a
   text. An unsuffixed key is not scope-checked, the same posture as
   `focus-ring`. Found by the gate during D132.
 
+  **Forced colours** drop both the tint and the box-shadow ring. There the
+  selected segment paints `Highlight` / `HighlightText` with
+  `forced-color-adjust: none`. These are system colour keywords, not theme
+  colours, so they are not tokens. (An outline would also work, but the
+  `psi/focus-ring` lint rule keeps `outline` for the focus ring alone.)
+
   **Contrast.** Every text pair is one the matrix already gates in all four
   themes, so no pair is added and the pinned pair count does not move:
 

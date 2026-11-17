@@ -114,6 +114,14 @@ export { Tab } from "./Tabs/Tab.js";
 export type { TabProps } from "./Tabs/Tab.js";
 export { TabPanel } from "./Tabs/TabPanel.js";
 export type { TabPanelProps } from "./Tabs/TabPanel.js";
+export { SegmentedControl, SegmentedContext } from "./SegmentedControl/SegmentedControl.js";
+export type {
+  SegmentedControlProps,
+  SegmentedControlSize,
+  SegmentedContextValue,
+} from "./SegmentedControl/SegmentedControl.js";
+export { Segment } from "./SegmentedControl/Segment.js";
+export type { SegmentProps } from "./SegmentedControl/Segment.js";
 export { useToast, ToastContext } from "./Toast/useToast.js";
 export type { AnnounceOptions, ToastHandle, ToastOptions } from "./Toast/useToast.js";
 export {

@@ -1,0 +1,128 @@
+/* packages/react/src/SegmentedControl/segmented.module.css */
+/* One module serves SegmentedControl and Segment (D132), so every custom
+   property here is --psi-segmented-* or a global scale token. Aliasing to the
+   semantic layer and the control ramp happens in
+   packages/tokens/src/components/segmented.ts. */
+
+/* ── Track ────────────────────────────────────────────────────── */
+
+/* A pill that never wraps: a pill on two lines is no longer a pill. It is as
+   wide as its labels, never wider than its container; when the container is
+   narrower, the labels truncate. The track paints bg-primary so the selected
+   tint composites onto the surface the contrast gate measures it on. */
+.root {
+  display: inline-flex;
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  padding: var(--psi-segmented-inset);
+  border: 1px solid var(--psi-segmented-border);
+  border-radius: var(--psi-segmented-radius);
+  background: var(--psi-segmented-bg);
+  vertical-align: middle;
+}
+
+.fill {
+  display: flex;
+  inline-size: 100%;
+}
+
+.size24 {
+  height: var(--psi-segmented-24-height);
+}
+
+.size32 {
+  height: var(--psi-segmented-32-height);
+}
+
+.size40 {
+  height: var(--psi-segmented-40-height);
+}
+
+/* ── Segment ──────────────────────────────────────────────────── */
+
+/* Stretches to the track's content box: the control's height minus the 1px
+   outline and the inset on each side (18 / 26 / 34). */
+.segment {
+  appearance: none;
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 0;
+  margin: 0;
+  padding-block: 0;
+  border: 0;
+  border-radius: var(--psi-segmented-radius);
+  background: none;
+  color: var(--psi-segmented-fg);
+  cursor: pointer;
+  transition:
+    color var(--psi-duration-150) var(--psi-ease-standard),
+    background-color var(--psi-duration-150) var(--psi-ease-standard);
+}
+
+.fill .segment {
+  flex: 1 1 0;
+}
+
+.size24 .segment {
+  padding-inline: var(--psi-segmented-24-padding-x);
+  font: var(--psi-segmented-24-font);
+}
+
+.size32 .segment {
+  padding-inline: var(--psi-segmented-32-padding-x);
+  font: var(--psi-segmented-32-font);
+}
+
+.size40 .segment {
+  padding-inline: var(--psi-segmented-40-padding-x);
+  font: var(--psi-segmented-40-font);
+}
+
+/* The label truncates; it stays whole in the DOM, so the name is whole. */
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.segment[aria-checked="false"]:not([aria-disabled="true"]):hover,
+.segment[aria-selected="false"]:not([aria-disabled="true"]):hover {
+  background: var(--psi-segmented-bg-hover);
+  color: var(--psi-segmented-fg-hover);
+}
+
+/* The tint, the accent label, and a 1px inset ring: the tint alone is far
+   below 3:1 against an unselected segment (WCAG 1.4.11), and the ring is
+   fg-accent, gated at 4.5 on bg-primary. Inset, so selecting moves nothing. */
+.segment[aria-checked="true"],
+.segment[aria-selected="true"] {
+  background: var(--psi-segmented-selected-bg);
+  color: var(--psi-segmented-selected-fg);
+  box-shadow: inset 0 0 0 1px var(--psi-segmented-selected-ring);
+}
+
+.segment[aria-disabled="true"] {
+  color: var(--psi-segmented-fg-disabled);
+  cursor: default;
+}
+
+/* Inset (D82): segments sit flush inside the track, so an outside ring would
+   cross the neighbouring segment and the outline. */
+.segment:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-segmented-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
+/* Forced colours drop the tint and the box-shadow ring, which would leave the
+   selected segment looking like the rest. Paint it in the system's selection
+   colours instead. */
+@media (forced-colors: active) {
+  .segment[aria-checked="true"],
+  .segment[aria-selected="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+}

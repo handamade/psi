@@ -1,0 +1,10 @@
+{
+  "slots": [
+    {
+      "name": "body",
+      "accepts": { "components": ["Segment"] },
+      "cardinality": "1..*",
+      "order": 1
+    }
+  ]
+}
