@@ -77,6 +77,12 @@ describe("check: the API rules", () => {
     expect(md).toContain("No problems found.");
   });
 
+  it("with no Psi import, leaves a component imported from elsewhere alone", () => {
+    const md = run('import { Card } from "./my-card";\n<Card tone="loud" />');
+    expect(md).toContain("No problems found.");
+    expect(md).toContain("Not checked: Card (imported from elsewhere).");
+  });
+
   it("does not judge spreads or computed values, and says so", () => {
     // Semicolons: without them, "</Button>" + newline + "<IconButton" reads as a less-than.
     const md = run(IMPORT + "<Button {...rest} size={size}>x</Button>;\n<IconButton {...p}><IconPlus /></IconButton>;");

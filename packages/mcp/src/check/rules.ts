@@ -134,6 +134,10 @@ export function runCheck(code: string, index: CheckIndex): Report {
       report.notChecked.set(tag, "member expression");
       return null;
     }
+    if (otherLocals.has(tag) && !psiLocals.has(tag)) {
+      report.notChecked.set(tag, hasPsiImport ? `not imported from ${PSI}` : "imported from elsewhere");
+      return null;
+    }
     const exportName = hasPsiImport ? psiLocals.get(tag) : components.has(tag) ? tag : undefined;
     if (exportName === undefined) {
       report.notChecked.set(tag, hasPsiImport ? `not imported from ${PSI}` : "not a Psi export");
