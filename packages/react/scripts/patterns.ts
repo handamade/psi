@@ -86,6 +86,13 @@ const CANONICAL_CARDINALITIES = new Set(["0..1", "1..1", "0..*", "1..*"]);
  * text is prose either way. Use bracketed prose (`[verb the object]`). */
 const JSX_UNSAFE_TEXT = /[<{]/;
 
+/** Native elements a compose tree may name besides manifest components
+ * (D127). Exactly `option`, so a preset can fill a `Select`; not "any
+ * lowercase name", which would let a preset route around a Psi component with
+ * raw HTML. An intrinsic node is not looked up in the manifest: its props are
+ * only scanned for placeholders, and it takes only a `body` slot. */
+export const INTRINSIC_ELEMENTS: ReadonlySet<string> = new Set(["option"]);
+
 /** Validates every pattern's compose tree against the manifest and the D45
  * slot contracts (D48 error classes 1-8, plus class 9: fill text must be
  * JSX-safe so `renderPreset` can only emit a parseable preset). Throws on
@@ -179,6 +186,20 @@ export function validatePatterns(
     };
 
     const walk = (node: PatternNode, path: string) => {
+      if (INTRINSIC_ELEMENTS.has(node.component)) {
+        for (const propValue of Object.values(node.props ?? {})) trackPropPlaceholders(propValue);
+        if (node.content !== undefined) referencedContent.add(node.content);
+        for (const [slotName, fills] of Object.entries(node.slots ?? {})) {
+          if (slotName !== "body") {
+            throw new Error(`${prefix}${path}: intrinsic "${node.component}" takes only a body slot, not "${slotName}"`);
+          }
+          for (const [i, fill] of fills.entries()) {
+            if (typeof fill === "string") trackTextPlaceholder(fill);
+            else walk(fill, `${path}.body[${i}]`);
+          }
+        }
+        return;
+      }
       const isGap = pattern.gaps.includes(node.component);
       const manifestComponent = byName.get(node.component);
 
@@ -557,7 +578,8 @@ export function renderPresetElement(
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- component prop shapes are determined by runtime pattern data, not statically knowable — this is the dynamic-dispatch boundary the function exists to cross.
-  const componentFor = (name: string): ComponentType<any> => {
+  const componentFor = (name: string): ComponentType<any> | string => {
+    if (INTRINSIC_ELEMENTS.has(name)) return name;
     const Component = registry[name];
     if (!Component) throw new Error(`renderPresetElement: no component registered for "${name}"`);
     return Component;

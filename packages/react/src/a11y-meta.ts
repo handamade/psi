@@ -169,10 +169,18 @@ export const a11yMeta: Record<string, A11yEntry> = {
   CursorPagination: {
     keyboard: [
       { keys: "Tab", behavior: "Reaches the Previous and Next buttons in order; a disabled direction is skipped." },
-      { keys: "Enter / Space", behavior: "Activates the focused button (native button behavior)." },
+      { keys: "Enter / Space", behavior: "Activates the focused button (native button behavior). If that disables it — Next on the last page — focus moves to the other direction (D127)." },
     ],
     notes:
       "A <nav> named \"Pagination\" (override with aria-label) holding two ghost Buttons with visible words — Previous and Next, translatable through previousLabel/nextLabel — each with a chevron that only reinforces the word (D85). A direction that is unavailable is disabled, not hidden. It holds no state: the consumer holds the page tokens and answers hasPrevious/hasNext. Pair it with a TableCaption whose detail states the range, and move focus there after a page change.",
+  },
+  Pagination: {
+    keyboard: [
+      { keys: "Tab", behavior: "Reaches Previous, each page button and Next in order; a disabled arrow is skipped, and the ellipsis is not a stop." },
+      { keys: "Enter / Space", behavior: "Activates the focused button (native button behavior). If Previous or Next reaches an end and disables itself, focus moves to the current page's button (D127)." },
+    ],
+    notes:
+      "A <nav> named \"Pagination\" (override with aria-label). The arrows are icon-only IconButtons named \"Previous page\" and \"Next page\" — translatable through previousLabel/nextLabel. The current page's button carries aria-current=\"page\"; the ellipsis is aria-hidden. The slot count and slot width are fixed, so the arrows do not move under the pointer as the page changes (D127). At or below 560px of viewport the wide form's extra pages are display: none, so they leave the tab order and the accessibility tree too. After a page change focus stays in the pager: the current page's aria-current reports where the user is.",
   },
   Toast: {
     keyboard: [

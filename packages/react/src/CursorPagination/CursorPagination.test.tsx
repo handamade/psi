@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { useState } from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CursorPagination } from "./CursorPagination.js";
 
@@ -61,5 +62,73 @@ describe("CursorPagination (D85)", () => {
     const nav = screen.getByRole("navigation");
     expect(nav.className.split(" ")).toContain("mine");
     expect(nav.className.split(" ").length).toBeGreaterThan(1);
+  });
+});
+
+describe("CursorPagination keeps focus when a button disables itself (D127)", () => {
+  // Three pages by token: index 0..last.
+  function Controlled({ start, last = 2 }: { start: number; last?: number }) {
+    const [index, setIndex] = useState(start);
+    return (
+      <CursorPagination
+        hasPrevious={index > 0}
+        hasNext={index < last}
+        onPrevious={() => setIndex((i) => i - 1)}
+        onNext={() => setIndex((i) => i + 1)}
+      />
+    );
+  }
+
+  it("moves focus to Previous when Next reaches the end", async () => {
+    const user = userEvent.setup();
+    render(<Controlled start={1} />);
+    screen.getByRole("button", { name: "Next" }).focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Previous" })).toHaveFocus();
+  });
+
+  it("moves focus to Next when Previous reaches the start", async () => {
+    const user = userEvent.setup();
+    render(<Controlled start={1} />);
+    screen.getByRole("button", { name: "Previous" }).focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("button", { name: "Next" })).toHaveFocus();
+  });
+
+  it("leaves focus on Next while it stays enabled", async () => {
+    const user = userEvent.setup();
+    render(<Controlled start={0} />);
+    const next = screen.getByRole("button", { name: "Next" });
+    next.focus();
+    await user.keyboard("{Enter}");
+    expect(next).toHaveFocus();
+  });
+
+  it("moves no focus when the other button is disabled too", async () => {
+    // A list that empties on the way: after Next, neither direction exists.
+    function Emptying() {
+      const [empty, setEmpty] = useState(false);
+      return (
+        <CursorPagination
+          hasPrevious={false}
+          hasNext={!empty}
+          onPrevious={() => {}}
+          onNext={() => setEmpty(true)}
+        />
+      );
+    }
+    const user = userEvent.setup();
+    render(<Emptying />);
+    screen.getByRole("button", { name: "Next" }).focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Previous" })).not.toHaveFocus();
+  });
+
+  it("moves no focus for a click on a button that did not have it", () => {
+    render(<Controlled start={1} />);
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("button", { name: "Previous" })).not.toHaveFocus();
   });
 });

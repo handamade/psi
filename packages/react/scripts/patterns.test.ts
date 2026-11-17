@@ -298,3 +298,60 @@ describe("aria-* props (D73)", () => {
     expect(() => validatePatterns([p], components, contracts)).toThrow(/unknown prop/);
   });
 });
+
+describe("intrinsic option nodes (D127)", () => {
+  const ok = (p: Pattern) => validatePatterns([p], components, contracts);
+  const options = (over: object = {}) =>
+    base({
+      compose: {
+        component: "Dialog",
+        slots: {
+          body: [{ component: "option", props: { value: "10" }, slots: { body: ["10"] }, ...over }],
+          footer: [{ component: "Button" }],
+        },
+      },
+    });
+
+  it("accepts an option, which is no manifest component", () => {
+    expect(() => ok(options())).not.toThrow();
+  });
+
+  it("still rejects any other lowercase name", () => {
+    expect(() => ok(base({ compose: { component: "div" } }))).toThrow(/unknown component "div"/);
+  });
+
+  it("gives an option only a body slot", () => {
+    expect(() => ok(options({ slots: { label: ["10"] } }))).toThrow(/option.*takes only a body slot/);
+  });
+
+  it("still tracks a content placeholder in an option's props", () => {
+    const p = options({ props: { value: "{content:size}" } });
+    expect(() => ok({ ...p, content: { size: "10" } })).not.toThrow();
+  });
+});
+
+describe("the pagination presets render a pager and page sizes (D127)", () => {
+  const root = join(import.meta.dirname, "..");
+  const manifest = JSON.parse(readFileSync(join(root, "dist", "manifest.json"), "utf8")) as {
+    components: ManifestComponent[];
+  };
+  const patterns = loadPatterns(join(root, "patterns"));
+  const preset = (id: string) => renderPreset(patterns.find((p) => p.id === id)!, manifest.components) ?? "";
+
+  it("table-pagination gives Pagination a page and a page count", () => {
+    expect(preset("table-pagination")).toMatch(/<Pagination\s+page=\{1\}\s+pageCount=\{10\}\s*\/>/);
+  });
+
+  for (const id of ["table-pagination", "cursor-pagination"]) {
+    it(`${id} gives its Select the page sizes`, () => {
+      const out = preset(id);
+      for (const n of [10, 50, 100]) expect(out).toContain(`<option value="${n}">${n}</option>`);
+    });
+  }
+
+  it("table-pagination says where focus goes after a page change", () => {
+    const intent = patterns.find((p) => p.id === "table-pagination")!.intent;
+    expect(intent).toMatch(/focus/i);
+    expect(intent).toMatch(/current page/i);
+  });
+});

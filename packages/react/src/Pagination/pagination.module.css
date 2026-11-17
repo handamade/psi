@@ -1,7 +1,8 @@
 /* packages/react/src/Pagination/pagination.module.css
-   No --psi-pagination-* family: every visual comes from Button and
-   IconButton, which already bind their own tokens. Adding a family here
-   would be indirection with nothing behind it. */
+   No --psi-pagination-* token family: every visual comes from Button and
+   IconButton, which already bind their own tokens. The one --psi-pagination-*
+   name, --psi-pagination-digits, is not a token: the component sets it inline
+   to the digit count of pageCount. */
 
 .nav {
   display: flex;
@@ -9,6 +10,47 @@
   gap: var(--psi-space-4);
 }
 
-.ellipsis {
+/* D127: nothing shrinks. Before, a pager wider than its container squeezed
+   its arrows (flex items with no width of their own) from 32px to 16px. */
+.nav > * {
+  flex-shrink: 0;
+}
+
+/* D127: every page button and every ellipsis is one slot of one width, as
+   wide as the widest page number, so the arrows hold still as the page
+   changes. 1ch (the advance of "0") is at least a tabular digit's width.
+   Content-box, so the floor and the digits measure the content and the 4px
+   insets add to both: a 32px square up to two digits, wider from three. */
+.slot {
+  box-sizing: content-box;
+  min-inline-size: max(var(--psi-size-24), calc(var(--psi-pagination-digits, 1) * 1ch));
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two classes, so the inset outranks Button's single size class whatever
+   order the stylesheets load in. */
+.nav .slot {
   padding-inline: var(--psi-space-4);
+}
+
+/* Set in the button's text style, so its 1ch measures the same digit. */
+.ellipsis {
+  display: inline-flex;
+  justify-content: center;
+  font: var(--psi-text-14-20-medium);
+}
+
+/* breakpoints.sm = 560 (D31: build-time constant, baked). At or below it the
+   pager shows its compact form; display: none also takes the hidden form's
+   buttons out of the tab order and the accessibility tree. */
+@media (width <= 560px) {
+  .nav [data-only="wide"] {
+    display: none;
+  }
+}
+
+@media (width > 560px) {
+  .nav [data-only="compact"] {
+    display: none;
+  }
 }

@@ -1,6 +1,6 @@
 {
   "id": "table-pagination",
-  "intent": "Page-size selector and page range control beneath a data table. The page-size label sits beside its select (D115).",
+  "intent": "Page-size selector and page range control beneath a data table. The page-size label sits beside its select (D115). After a page change focus stays in the pager: on the button pressed, or on the current page's button when Previous or Next reaches an end and disables itself (D127). The current page's aria-current tells a screen reader where it is, so the pager needs no caption focus, unlike cursor-pagination.",
   "match": ["pagination", "table pagination", "page controls", "rows per page", "paging"],
   "compose": {
     "component": "Toolbar",
@@ -12,10 +12,22 @@
           "props": { "labelPosition": "start" },
           "slots": {
             "label": ["{content:page-size-label}"],
-            "body": [{ "component": "Select", "props": { "size": 32 } }]
+            "body": [
+              {
+                "component": "Select",
+                "props": { "size": 32 },
+                "slots": {
+                  "body": [
+                    { "component": "option", "props": { "value": "10" }, "slots": { "body": ["10"] } },
+                    { "component": "option", "props": { "value": "50" }, "slots": { "body": ["50"] } },
+                    { "component": "option", "props": { "value": "100" }, "slots": { "body": ["100"] } }
+                  ]
+                }
+              }
+            ]
           }
         },
-        { "component": "Pagination" }
+        { "component": "Pagination", "props": { "page": 1, "pageCount": 10 } }
       ]
     }
   },
