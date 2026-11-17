@@ -80,7 +80,9 @@ by branches in flight at the same time.
 
   - **`TableContainer`: a scrolling region that is the frame.**
     - Renders a `<div>` with `overflow: auto`, the 8th member of the Table
-      family. It accepts one child, a `Table` (`slots.json`).
+      family, wrapping one `Table`. Like the family's other members it lives
+      in `Table/` and has no `slots.json`: slot contracts are read per
+      component folder, so `TableHead` and `TableCaption` carry none either.
     - `maxBlockSize?: number | string` — a number is px, a string any CSS
       length (`"60vh"`, `"calc(100dvh - 200px)"`). It sets
       `max-block-size`. Without it the container only scrolls sideways in
@@ -187,11 +189,12 @@ by branches in flight at the same time.
 
 ## Docs
 
-`llms.txt` ("Table family" 7 → 8, and every count that includes it), the
-React README, guidance (`TableContainer` intent: a wide table, or a
-fixed-height region with a pinned header), `a11y-meta`, `contracts.json` if
-it lists the family, the `data-table` pattern note, and the site's Table
-page. `check-docs-drift` is the arbiter of which prose states a count.
+`llms.txt` ("Table family" 7 → 8, with a `TableContainer` line: a wide
+table, or a fixed-height region with a pinned header; and "55 React 19
+components" → 56 wherever it is stated), the READMEs, `a11y-meta`, the
+generated `packages/react/docs/TableContainer.md`, and the site's Table page
+(the member list and a scrolling example). The `data-table` pattern is
+unchanged: wrapping is a layout choice the consumer makes. `check-docs-drift` is the arbiter of which prose states a count.
 D124 and D125 move the same counts: whichever branch merges second merges
 `origin/main` and re-runs drift first.
 
