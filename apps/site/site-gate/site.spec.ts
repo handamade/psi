@@ -218,13 +218,14 @@ test.describe("without JavaScript", () => {
 
   test("the Canopy frame page server-renders its zone table", async ({ page }) => {
     await page.goto(`${BASE}docs/examples/showcase/canopy/`);
-    expect(await page.content()).toContain("B · Basil");
+    await expect(page.locator("table").filter({ hasText: "B · Basil" })).toHaveCount(1);
   });
 });
 
 for (const theme of ["light", "dark"] as const) {
   test(`the Canopy frame page has no axe violations (${theme})`, async ({ page }) => {
     await page.goto(`${BASE}docs/examples/showcase/canopy/?theme=${theme}`, { waitUntil: "networkidle" });
+    await expect(page.locator("html")).toHaveAttribute("data-psi-theme", theme);
     expect(await runAxe(page)).toEqual([]);
   });
 }
@@ -239,20 +240,30 @@ test("the header links pages, never fragments", async ({ page }) => {
 test.describe("at 375px", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
-  test("no axe violations, light and dark", async ({ page }) => {
+  test("no axe violations, light and dark, with the mobile layout hydrated", async ({ browser }) => {
     for (const theme of ["light", "dark"] as const) {
+      const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
+      const page = await context.newPage();
       await page.addInitScript((t) => localStorage.setItem("psi-theme", t), theme);
       await page.goto(BASE, { waitUntil: "networkidle" });
+      await expect(page.locator("html")).toHaveAttribute("data-psi-theme", theme);
+      // Both islands are client:visible: bring each into view so the audit sees the hydrated mobile layout.
+      await page.getByRole("heading", { level: 2, name: "One source, every surface" }).scrollIntoViewIfNeeded();
+      await expect(page.getByRole("tab", { name: "Map" })).toBeVisible();
+      await page.getByRole("heading", { level: 2, name: "Built only from Psi" }).scrollIntoViewIfNeeded();
+      await expect(page.getByRole("tab", { name: "Preview" })).toBeVisible();
       expect(await runAxe(page), theme).toEqual([]);
+      await context.close();
     }
   });
 
   test("the bottom bar's targets are at least 48px, and Menu opens and closes the drawer", async ({ page }) => {
     await page.goto(BASE, { waitUntil: "networkidle" });
     const bar = page.getByRole("navigation", { name: "Site, bottom" });
-    for (const h of await bar.locator("a, button").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height))) {
-      expect(h).toBeGreaterThanOrEqual(48);
-    }
+    await expect(bar).toBeVisible();
+    const heights = await bar.locator("a, button").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
+    expect(heights.length, "Docs, Components, Menu").toBeGreaterThanOrEqual(3);
+    for (const h of heights) expect(h).toBeGreaterThanOrEqual(48);
     const menu = page.getByRole("button", { name: "Menu" });
     await menu.click();
     await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
@@ -278,14 +289,27 @@ test.describe("at 375px", () => {
 
   test("a docs page's last content clears the bottom bar", async ({ page }) => {
     await page.goto(`${BASE}docs/components/button/`, { waitUntil: "networkidle" });
+    const toEnd = () => page.evaluate(() => { const m = document.querySelector<HTMLElement>("main#main")!; m.scrollTop = m.scrollHeight; });
+    await toEnd();
+    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
+    await toEnd();
     const m = await page.evaluate(() => {
       const main = document.querySelector<HTMLElement>("main#main")!;
-      main.scrollTop = main.scrollHeight;
-      const bar = document.querySelector<HTMLElement>('nav[aria-label="Site, bottom"]')!;
-      let last: Element = main;
-      while (last.lastElementChild) last = last.lastElementChild;
-      return { lastBottom: last.getBoundingClientRect().bottom, barTop: bar.getBoundingClientRect().top };
+      const bar = document.querySelector<HTMLElement>('nav[aria-label="Site, bottom"]')!.getBoundingClientRect();
+      let last: Element | null = null;
+      for (const el of main.querySelectorAll("*")) {
+        const r = el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden") last = el;
+      }
+      return {
+        atEnd: main.scrollTop + main.clientHeight >= main.scrollHeight - 1,
+        lastBottom: last!.getBoundingClientRect().bottom,
+        barTop: bar.top,
+        barHeight: bar.height,
+      };
     });
+    expect(m.atEnd, "main scrolled to its end").toBe(true);
+    expect(m.barHeight).toBeGreaterThanOrEqual(48);
     expect(m.lastBottom).toBeLessThanOrEqual(m.barTop);
   });
 });
@@ -294,12 +318,18 @@ test("every trace Storybook link names a story Storybook built", async ({ page }
   const { readFileSync } = await import("node:fs");
   const index = JSON.parse(readFileSync("apps/storybook/storybook-static/index.json", "utf8")) as { entries: Record<string, unknown> };
   await page.goto(BASE, { waitUntil: "networkidle" });
-  const hrefs = await page.locator('a[href*="?path=/docs/"]').evaluateAll((as) => as.map((a) => new URL(a.getAttribute("href")!, location.href).href));
-  expect(hrefs.length).toBeGreaterThan(0);
-  for (const href of hrefs) {
-    const id = new URL(href).searchParams.get("path")!.replace(/^\/docs\//, "");
-    expect(Object.keys(index.entries), href).toContain(id);
+  const trace = page.getByRole("radiogroup", { name: "Trace" });
+  await trace.scrollIntoViewIfNeeded();
+  let checked = 0;
+  for (const target of ["Button", "Field", "Table", "Token"]) {
+    await trace.getByRole("radio", { name: target }).click();
+    await expect(trace.getByRole("radio", { name: target })).toHaveAttribute("aria-checked", "true");
+    const href = await page.locator('a.map-link[data-surface="storybook"]').first().getAttribute("href");
+    const id = new URL(href!, "http://x/").searchParams.get("path")!.replace(/^\/docs\//, "");
+    expect(Object.keys(index.entries), `${target}: ${href}`).toContain(id);
+    checked++;
   }
+  expect(checked).toBeGreaterThanOrEqual(4);
 });
 
 test("hydrating the homepage logs no errors, with a stored dark mode and brand", async ({ page }) => {
@@ -311,6 +341,6 @@ test("hydrating the homepage logs no errors, with a stored dark mode and brand",
   await page.addInitScript(() => localStorage.setItem("psi-theme", "dark"));
   await page.goto(BASE, { waitUntil: "networkidle" });
   await expect(page.locator("html")).toHaveAttribute("data-psi-theme", "dark");
-  await expect(page.getByRole("radio", { name: "Dark" }).first()).toHaveAttribute("aria-checked", "true");
+  await expect(page.locator("header.site-header").getByRole("radio", { name: "Dark" })).toHaveAttribute("aria-checked", "true");
   expect(errors).toEqual([]);
 });

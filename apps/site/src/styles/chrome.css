@@ -15,6 +15,9 @@
   .site-nav, .site-header-mode { display: none; }
   .site-header { padding-inline: var(--psi-space-16); gap: var(--psi-space-12); }
   body { padding-block-end: calc(64px + env(safe-area-inset-bottom)); }
+  /* The docs shell's <main> is its own scroller and ends under the fixed bar, so the body padding
+     above never reaches it: pad its end by the bar's height too. */
+  main#main:has(.docs-content) { padding-block-end: calc(64px + var(--psi-space-24) + env(safe-area-inset-bottom)); }
   .site-bottom-bar { display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; inset-inline: 0; inset-block-end: 0; z-index: var(--psi-z-nav);
     padding: var(--psi-space-4) var(--psi-space-8) calc(var(--psi-space-4) + env(safe-area-inset-bottom));
     background: var(--psi-bg-primary); border-block-start: 1px solid var(--psi-border-faint); }
