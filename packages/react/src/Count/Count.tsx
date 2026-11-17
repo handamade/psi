@@ -33,13 +33,13 @@ export function Count({ value, max = 999, tone = "neutral", label, className, re
     .join(" ");
   return (
     <span ref={ref} className={cls} {...rest}>
-      {label === undefined ? (
-        text
-      ) : (
+      {label ? (
         <>
           <span aria-hidden="true">{text}</span>
           <span className="psi-sr-only">{label}</span>
         </>
+      ) : (
+        text
       )}
     </span>
   );

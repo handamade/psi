@@ -20,7 +20,7 @@ export interface NavItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "child
    * without a size: the entry sizes it (`--psi-nav-tree-icon-size`) and
    * colours it with the text. Always decorative: it is wrapped in
    * `aria-hidden`, and the text is the name. Needs `href`, or one link
-   * element as the child. */
+   * element as the child. A router link whose children is a function (a render prop) keeps it: NavItem wraps the function so its result becomes the label. */
   icon?: ReactNode;
   /** A `<Count>` after the text (D124), at the row's inline end. Its text
    * joins the link's name ("Cards 238"). Needs `href`, or one link element as
@@ -77,7 +77,7 @@ export function NavItem({ children, href, current, icon, count, className, ref, 
   // aria-current survives.
   const child =
     href === undefined && isValidElement(children) && children.type !== Fragment
-      ? (children as ReactElement<{ "aria-current"?: string; children?: ReactNode }>)
+      ? (children as ReactElement<{ "aria-current"?: string; children?: ReactNode | ((...args: unknown[]) => ReactNode) }>)
       : null;
   const dropped = decorated && href === undefined && child === null;
 
@@ -95,9 +95,18 @@ export function NavItem({ children, href, current, icon, count, className, ref, 
     );
   } else if (child && (current || decorated)) {
     const extra = current ? { "aria-current": "page" } : {};
-    content = decorated
-      ? cloneElement(child, extra, entryContent(child.props.children, icon, count))
-      : cloneElement(child, extra);
+    if (decorated) {
+      const own = child.props.children;
+      // A render-prop link (`({ isActive }) => ...`) keeps its function: it is
+      // wrapped, so what it returns becomes the label.
+      const filled =
+        typeof own === "function"
+          ? (...args: unknown[]) => entryContent(own(...args), icon, count)
+          : entryContent(own, icon, count);
+      content = cloneElement(child, { ...extra, children: filled });
+    } else {
+      content = cloneElement(child, extra);
+    }
   }
 
   return (

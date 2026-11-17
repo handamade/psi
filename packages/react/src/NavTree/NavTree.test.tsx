@@ -1,4 +1,5 @@
 import { createRef } from "react";
+import type { ReactNode } from "react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, it, expect, vi } from "vitest";
@@ -414,6 +415,39 @@ describe("NavItem icon and count (D124)", () => {
     expect(container.querySelector("li")).toHaveTextContent("Cards");
     expect(container.querySelector("svg")).toBeNull();
     expect(warn).toHaveBeenCalledOnce();
+  });
+
+  it("a Fragment child with a count renders its content, no count, and warns once", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container } = render(
+      <NavTree aria-label="Main">
+        <NavItem count={<Count value={3} />}>
+          <>
+            <a href="#a">A</a>
+          </>
+        </NavItem>
+      </NavTree>,
+    );
+    expect(container.querySelector("li")).toHaveTextContent(/^A$/);
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
+  it("a router link with function children keeps working: icon, label and count, no console.error", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    function FnLink({ to, children }: { to: string; children: (s: { isActive: boolean }) => ReactNode }) {
+      return <a href={to}>{children({ isActive: true })}</a>;
+    }
+    render(
+      <NavTree aria-label="Main">
+        <NavItem icon={<IconSimCard />} count={<Count value={238} />}>
+          <FnLink to="#cards">{({ isActive }) => (isActive ? "Cards" : "x")}</FnLink>
+        </NavItem>
+      </NavTree>,
+    );
+    const link = screen.getByRole("link", { name: "Cards 238" });
+    expect(link.firstElementChild).toHaveAttribute("aria-hidden", "true");
+    expect(link.firstElementChild?.querySelector("svg")).not.toBeNull();
+    expect(error).not.toHaveBeenCalled();
   });
 
   it("does not warn when the props have somewhere to go", () => {

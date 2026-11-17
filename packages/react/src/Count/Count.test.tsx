@@ -51,6 +51,14 @@ describe("Count (D124)", () => {
     expect(screen.getByTestId("c").querySelector(".psi-sr-only")).toBeNull();
   });
 
+  it("an empty label renders the number as plain text, no screen-reader span", () => {
+    render(<Count value={4} label="" data-testid="c" />);
+    const el = screen.getByTestId("c");
+    expect(el).toHaveTextContent(/^4$/);
+    expect(el.querySelector(".psi-sr-only")).toBeNull();
+    expect(el.querySelector("[aria-hidden]")).toBeNull();
+  });
+
   it("forwards ref and merges className onto the span", () => {
     const ref = createRef<HTMLSpanElement>();
     render(<Count value={1} className="mine" ref={ref} data-testid="c" />);
