@@ -1,0 +1,7 @@
+{
+  "slots": [
+    { "name": "icon", "accepts": {}, "cardinality": "0..1", "order": 1 },
+    { "name": "body", "accepts": {}, "cardinality": "0..*", "order": 2 },
+    { "name": "count", "accepts": { "components": ["Count"] }, "cardinality": "0..1", "order": 3 }
+  ]
+}
