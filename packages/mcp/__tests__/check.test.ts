@@ -110,7 +110,7 @@ describe("check: the API rules", () => {
 
 describe("check: slots (D45 contracts)", () => {
   const PSI =
-    'import { Banner, Button, DescriptionItem, DescriptionList, Link, Tab, TabList, TabPanel, Tabs } from "@handamade/psi-react";\n';
+    'import { Banner, Button, DescriptionItem, DescriptionList, Link, Menu, Tab, TabList, TabPanel, Tabs } from "@handamade/psi-react";\n';
 
   it("flags a child the slot does not accept", () => {
     const md = run(PSI + "<DescriptionList><p>x</p></DescriptionList>");
@@ -138,6 +138,13 @@ describe("check: slots (D45 contracts)", () => {
   it("does not treat a component imported from elsewhere as Psi's", () => {
     const md = run(PSI + 'import { Link as RouterLink } from "react-router";\n<Banner action={<RouterLink to="/">Undo</RouterLink>}>Saved.</Banner>');
     expect(lines(md, "slot")).toHaveLength(1);
+  });
+
+  it("reports a missing required body once, from missing-required", () => {
+    const md = run(PSI + "<Menu open onClose={close} trigger={<Button>Open</Button>}></Menu>");
+    expect(lines(md, "missing-required")).toHaveLength(1);
+    expect(lines(md, "missing-required")[0]).toContain("`Menu` needs `children`.");
+    expect(lines(md, "slot")).toHaveLength(0);
   });
 
   it("looks through fragments, and skips computed children", () => {

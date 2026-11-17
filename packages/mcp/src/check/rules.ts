@@ -170,7 +170,7 @@ export function checkSlots(el: Element, index: CheckIndex, ctx: RuleContext): vo
 
     if (el.spread) continue; // a spread may supply children or the prop
     const [min, max] = CARDINALITY[slot.cardinality] ?? [0, null];
-    const requiredProp = c.props.some((p) => p.name === slot.name && p.required);
+    const requiredProp = c.props.some((p) => p.name === (slot.name === "body" ? "children" : slot.name) && p.required);
     if (items.length < min && !requiredProp) {
       ctx.find(el.node, "slot", `${label} need${slot.name === "body" ? "" : "s"} at least ${min} ${slot.name === "body" ? "child" : "element"}.`);
     }
