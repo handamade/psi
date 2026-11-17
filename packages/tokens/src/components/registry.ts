@@ -35,6 +35,7 @@ import { fieldVars } from "./field.js";
 import { descriptionListVars } from "./description-list.js";
 import { textareaVars } from "./textarea.js";
 import { radioGroupVars } from "./radio-group.js";
+import { segmentedVars } from "./segmented.js";
 
 export const componentVars: Record<string, Record<string, string>> = {
   "app-shell": appShellVars,
@@ -57,6 +58,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   panel: panelVars,
   popup: popupVars,
   "radio-group": radioGroupVars,
+  segmented: segmentedVars,
   select: selectVars,
   skeleton: skeletonVars,
   "nav-tree": navTreeVars,

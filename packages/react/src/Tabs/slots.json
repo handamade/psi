@@ -2,7 +2,13 @@
   "slots": [
     {
       "name": "body",
-      "accepts": { "components": ["TabList", "TabPanel"] },
+      "accepts": {
+        "components": [
+          "TabList",
+          "SegmentedControl",
+          "TabPanel"
+        ]
+      },
       "cardinality": "1..*",
       "order": 1
     }

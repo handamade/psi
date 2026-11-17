@@ -31,6 +31,7 @@ export const componentPages: ComponentPage[] = [
   { slug: "pagination", title: "Pagination", members: ["Pagination"] },
   { slug: "panel", title: "Panel", members: ["Panel"] },
   { slug: "radio-group", title: "RadioGroup", members: ["RadioGroup", "Radio"] },
+  { slug: "segmented-control", title: "SegmentedControl", members: ["SegmentedControl", "Segment"] },
   { slug: "select", title: "Select", members: ["Select"] },
   { slug: "skeleton", title: "Skeleton", members: ["Skeleton"] },
   { slug: "skip-link", title: "SkipLink", members: ["SkipLink"] },

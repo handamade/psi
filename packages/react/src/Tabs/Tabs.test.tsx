@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -294,6 +295,38 @@ describe("Tabs when value matches no tab (D93)", () => {
       expect(stopsOf()).toHaveLength(1);
       expect(stopsOf()[0]).toHaveTextContent("A");
     });
+  });
+
+  it("keeps one tab stop after the keyboard reaches a disabled tab and a click moves on (D132)", async () => {
+    const user = userEvent.setup();
+    function Live() {
+      const [v, setV] = useState("all");
+      return <Fixture value={v} onValueChange={setV} />;
+    }
+    render(<Live />);
+    screen.getByRole("tab", { name: "Uncategorised" }).focus();
+    await user.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Archived" }));
+    await user.click(screen.getByRole("tab", { name: "This month" }));
+    const stops = screen.getAllByRole("tab").filter((t) => t.tabIndex === 0);
+    expect(stops).toEqual([screen.getByRole("tab", { name: "This month" })]);
+  });
+
+  it("hides its Tabs from a panel's content: a Tab in a panel throws (D132)", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() =>
+      render(
+        <Tabs value="a" onValueChange={() => {}}>
+          <TabList aria-label="Views">
+            <Tab value="a">A</Tab>
+          </TabList>
+          <TabPanel value="a">
+            <Tab value="stray">Stray</Tab>
+          </TabPanel>
+        </Tabs>,
+      ),
+    ).toThrow(/must be rendered inside <Tabs>/);
+    vi.restoreAllMocks();
   });
 
   it("still works under a hand-written TabsContext.Provider, falling back to value", () => {

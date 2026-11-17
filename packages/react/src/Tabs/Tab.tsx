@@ -39,6 +39,15 @@ export function Tab({ value, children, disabled = false, className, ref }: TabPr
     [registerTab, value, disabled],
   );
 
+  // The keyboard writes tabIndex straight to the DOM (useTabsKeyboard), so a
+  // disabled tab it focused (D131) keeps a DOM 0 that its unchanged prop never
+  // overwrites; a later click elsewhere would leave two stops. Whenever the
+  // stop moves, every tab re-takes its own (D132).
+  const stop = ctx.tabStop ?? ctx.value;
+  useLayoutEffect(() => {
+    if (innerRef.current) innerRef.current.tabIndex = stop === value ? 0 : -1;
+  }, [stop, value]);
+
   return (
     <button
       ref={setRef}

@@ -100,6 +100,8 @@ for (const c of components) {
     NavBar: "navbar",
     NavGroup: "nav-tree",
     NavItem: "nav-tree",
+    SegmentedControl: "segmented",
+    Segment: "segmented",
   };
   const familyName = TOKEN_NAME_OVERRIDES[c.name] ?? toKebabCase(c.name);
   const tokenName = `--psi-${familyName}-*`;
