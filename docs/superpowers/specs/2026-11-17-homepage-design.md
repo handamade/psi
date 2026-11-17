@@ -1,6 +1,6 @@
 # A homepage that leads into the system (D133)
 
-Date: 2026-11-17. Status: **Draft**, awaiting the owner's review.
+Date: 2026-11-17. Status: **Implemented** on branch `d133-homepage`.
 Branch `d133-homepage`.
 
 Provenance: the *homepage project* deferred by D121 (`2026-11-16-docs-site-design.md`, *Deferred*). Brainstormed with
@@ -158,11 +158,12 @@ Astro sections render to HTML. Four islands:
 | Trace | `client:visible` | Component and surface selection, the map highlight, *Map / Trace* on phones |
 | Canopy | `client:visible` | The demo, *Preview / Code*, its theme switch, switches and toasts |
 
-- **No state is shared between islands.** The mode and a derived brand live on `<html>` (`data-psi-theme` and the
-  custom properties `useBrand` writes), and `theme.ts` already carries them through attributes and `storage`
-  events. An island reads them; none passes them to another.
-- **The map is static SVG.** The trace island adds the highlight by class, so with no JavaScript the map still
-  shows every surface and link.
+- **Islands share state only through `<html>` and events.** The mode and a derived brand live on `<html>`
+  (`data-psi-theme` and the custom properties `useBrand` writes), and `theme.ts` carries them through attributes and
+  `storage` events. The mode control also fires a `MODE_EVENT` that every mode hook listens to. No island passes
+  state to another directly.
+- **The trace island renders the map's SVG itself.** The island is server-rendered, so with no JavaScript the map
+  still shows every surface and link; the highlight is added by class.
 
 ### Data, at build time
 
@@ -177,17 +178,18 @@ Astro sections render to HTML. Four islands:
   - Figma: the semantic tokens the component's `*.vars.css` binds, written as the Figma variable names Psi Token
     Sync gives them (`fill/accent`), with one mode per theme, and the file's link as a constant. A token's own trace
     shows that one variable.
-  - MCP: a `check` call and its result, run through the MCP package's `checkMarkdown` at build.
+  - MCP: a `check` call and its result, run through the MCP package's `checkMarkdown` at build. `traceFor` returns
+    every surface except this one: the excerpt is added in `apps/site/src/lib/trace-data.ts`, because
+    `@handamade/psi-mcp` depends on `@handamade/psi-docs`.
   - llms.txt: the lines of `packages/react/llms.txt` that name the component; when none does, the *Rules for
     generated code* lines.
   - Markdown: the head of the component's generated `.md`, and its URL.
 - **A missing input fails the build**, naming what is missing: a component with no story, no example or no manifest
   entry cannot reach the page quietly.
-- **Canopy** is an example in `packages/docs`, rendered by the site as an island and shown as source in its Code
-  view, the way `ExampleTabs` reads an example.
+- **Canopy** is an example in `packages/docs`, framed by the homepage (see *Implementation notes*) and shown as
+  source in its Code view, the way `ExampleTabs` reads an example.
 - **Counts:** the component count from `virtual:psi-facts`, as today; the version and release date from the top entry
-  of `updates.ts`; the decision count from the distinct `D<n>` numbers that open an entry under a `## Decisions`
-  heading in `docs/superpowers/specs/`.
+  of `updates.ts`; the decision count from the distinct `D<n>` numbers the specs record (see *Implementation notes*).
 - **`updates.ts` stays where it is.** `tools/check-docs-drift.mjs` reads its first title for the version check, and
   `/docs/changelog/` renders it.
 
@@ -230,6 +232,29 @@ with D121.
 ```bash
 pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint && pnpm --dir apps/site build && pnpm test:site
 ```
+
+## Implementation notes
+
+What differed from the text above, as built.
+
+- **The MCP excerpt is built in the site**, in `apps/site/src/lib/trace-data.ts`, not in `packages/docs`
+  (`@handamade/psi-mcp` depends on `@handamade/psi-docs`). `astro.config.ts` externalises `@handamade/psi-mcp` for
+  the prerender environment so `loadIndex()` finds its `dist/psi-index.json`.
+- **A token's MCP tab shows `theme`, not `check`.** For `--psi-fg-accent` it shows `theme({ hue: 260 })` with its AA
+  claim and the solved `--psi-fg-accent` in light and dark, because `check` has nothing to say about a token. The
+  components keep `check`.
+- **The trace island renders the map's SVG itself**, server-rendered, not a separate Astro component.
+- **Canopy is shown in an iframe** (the owner's ruling): `/docs/examples/showcase/canopy/?theme=<name>`. Its
+  `AppShell` brings its own `<main>` and `<header>`, which would nest inside the page's. Light and dark follow a
+  derived brand through `storage` events; acme and ember don't take it.
+- **The mode control shares state across islands** through a `MODE_EVENT` that every mode hook listens to.
+- **The font override skips ember** (`:root:not([data-psi-theme="ember"])`), so ember keeps its own type in the
+  Canopy frame.
+- **The decision count** reads every way the specs record a decision: `## Decisions` sections, decision-log tables
+  and items, and `## ... (D<n>)` headings. D74 is the one number never claimed.
+- **Docs pages on a phone:** `main` gets bottom padding so content clears the fixed bar.
+- **The internal-link gate exempts `/storybook/`, `/llms.txt` and `/packages/`**, which `tools/assemble-site.mjs`
+  adds after the site build.
 
 ## Out of scope
 
