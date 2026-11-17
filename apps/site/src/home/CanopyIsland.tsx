@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { SegmentedControl, Segment, TabPanel, Tabs } from "@handamade/psi-react";
 
-import { canopy } from "../examples/registry";
 import { CodeView } from "../components/CodeView";
 
 const THEMES = ["light", "dark", "acme", "ember"] as const;
 
-export function CanopyIsland({ sourceHtml }: { sourceHtml: string }) {
+/** `source` comes from BuiltWithPsi.astro, so this island never imports Canopy
+ * itself: the frame renders it, and the code view only needs its text. */
+export function CanopyIsland({ sourceHtml, source }: { sourceHtml: string; source: string }) {
   const [view, setView] = useState("preview");
   const [theme, setTheme] = useState<(typeof THEMES)[number]>("dark");
   return (
@@ -30,7 +31,7 @@ export function CanopyIsland({ sourceHtml }: { sourceHtml: string }) {
           />
         </TabPanel>
         <TabPanel value="code">
-          <CodeView html={sourceHtml} code={canopy.source} />
+          <CodeView html={sourceHtml} code={source} />
         </TabPanel>
       </Tabs>
     </div>

@@ -1,6 +1,6 @@
 ---
 import { CanopyIsland } from "./CanopyIsland";
-import { canopy } from "../examples/registry";
+import { canopy } from "../examples/canopy";
 import { highlight } from "../lib/highlight";
 import { componentCount } from "virtual:psi-facts";
 
@@ -9,6 +9,6 @@ const sourceHtml = await highlight(canopy.source, "tsx");
 <section class="home-section" aria-labelledby="built-h">
   <h2 id="built-h">Built only from Psi</h2>
   <p class="home-lede">Canopy, a greenhouse monitor, with no CSS of its own. It adapts to its own width, so it works in a column, a sidebar or a phone.</p>
-  <CanopyIsland client:visible sourceHtml={sourceHtml} />
+  <CanopyIsland client:visible sourceHtml={sourceHtml} source={canopy.source} />
   <p class="home-foot"><a href="/docs/components/">All {componentCount} components</a></p>
 </section>
