@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-11-17",
     tag: "release",
+    title: "0.33.0 — a pager that holds still, and tables that keep focus in view",
+    body: "Pagination's Previous and Next no longer move under the pointer as the page changes: the pager keeps the same slots and width on every page. At or below 560px it switches to a compact range, so 100 pages fit a 320px screen. When the page change disables the button that had focus, focus stays in the pager instead of falling to the page, in Pagination and CursorPagination. Pagination takes previousLabel and nextLabel, and Table takes selectAllLabel and selectRowLabel, so their names can be translated. A row checkbox is now named from the row's header cell or its position, never its raw id. Inside a TableContainer, a row that keyboard focus scrolls into view lands below the sticky header, not behind it. A table whose last body is empty keeps its rounded edge. 57 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-17",
+    tag: "release",
     title: "0.32.0 — tables that round and scroll, counts in the navigation, and fields that fit",
     body: "Table's border now follows its rounded corner in every theme, and a sticky header or a hovered or selected first or last row stays inside the curve. TableContainer is new: it wraps a table that is wider than its space or must scroll in a fixed height, scrolls both ways, keeps the sticky header at its top, and is a named, focusable region. A numeric cell no longer wraps, and a sortable column shows its mark before it is sorted. Count is new too: a number after a label, in tabular numerals, capped at 999+, with an attention tone that never relies on colour alone. NavItem takes an icon and a count, and NavGroup an icon, coloured with the text in every state. A Field can size its control with controlWidth, from 80 to 480px, so a short value gets a short field, and a FieldStack stops at 640px through a new token. A pattern can now fill a Field's error. 57 components, 24 patterns.",
   },
