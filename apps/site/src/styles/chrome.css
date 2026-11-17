@@ -1,5 +1,9 @@
 /* One chrome for every page (D133): header, phone bottom bar, Menu drawer.
  * 960px is `breakpoints.md` (D31), baked as in docs.css. */
+/* What content must leave clear under the fixed bottom bar: its 48px targets,
+ * its padding and border, rounded up, plus the home indicator's inset. The one
+ * place this number lives; each page that renders the bar pads its own end by it. */
+:root { --site-bar-clearance: calc(64px + env(safe-area-inset-bottom)); }
 .site-header { position: sticky; top: 0; z-index: var(--psi-z-nav); display: flex; align-items: center; gap: var(--psi-space-24);
   block-size: 56px; padding-inline: var(--psi-space-24); background: var(--psi-bg-primary); border-block-end: 1px solid var(--psi-border-faint); }
 .wordmark { display: inline-flex; align-items: center; gap: var(--psi-space-8); color: var(--psi-fg-primary); text-decoration: none; font: var(--psi-text-16-24-medium); }
@@ -14,10 +18,12 @@
 @media (max-width: 959.98px) {
   .site-nav, .site-header-mode { display: none; }
   .site-header { padding-inline: var(--psi-space-16); gap: var(--psi-space-12); }
-  body { padding-block-end: calc(64px + env(safe-area-inset-bottom)); }
-  /* The docs shell's <main> is its own scroller and ends under the fixed bar, so the body padding
-     above never reaches it: pad its end by the bar's height too. */
-  main#main:has(.docs-content) { padding-block-end: calc(64px + var(--psi-space-24) + env(safe-area-inset-bottom)); }
+  /* Not on <body>: the docs shell is 100dvh, so body padding would scroll the whole document (and
+     its header) by the bar's height, and the Canopy frame page, which renders no chrome, would
+     grow a blank band. The docs shell's <main> and sidebar are their own scrollers that end under
+     the bar, so they pad their own ends; the homepage pads its footer (home.css). */
+  .docs-shell main#main { padding-block-end: calc(var(--site-bar-clearance) + var(--psi-space-24)); }
+  .docs-shell #docs-sidebar { padding-block-end: var(--site-bar-clearance); }
   .site-bottom-bar { display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; inset-inline: 0; inset-block-end: 0; z-index: var(--psi-z-nav);
     padding: var(--psi-space-4) var(--psi-space-8) calc(var(--psi-space-4) + env(safe-area-inset-bottom));
     background: var(--psi-bg-primary); border-block-start: 1px solid var(--psi-border-faint); }

@@ -287,6 +287,39 @@ test.describe("at 375px", () => {
     await expect(page.getByRole("navigation", { name: "Site, bottom" })).toBeVisible();
   });
 
+  // The bar's clearance is padded by the scrollers that end under it, never by
+  // <body>: the docs shell is 100dvh, and body padding scrolled the whole
+  // document by the bar's height, header and all (876 against 812).
+  for (const path of ["docs/", "docs/examples/showcase/canopy/"]) {
+    test(`/${path} does not scroll the document`, async ({ page }) => {
+      await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+      const m = await page.evaluate(() => ({
+        scroll: document.documentElement.scrollHeight,
+        client: document.documentElement.clientHeight,
+      }));
+      expect(m.scroll, `scrollHeight against clientHeight`).toBe(m.client);
+    });
+  }
+
+  test("a docs page's header stays at the top when the window is scrolled", async ({ page }) => {
+    await page.goto(`${BASE}docs/`, { waitUntil: "networkidle" });
+    // "instant": the site sets scroll-behavior: smooth, and a smooth scroll would not have moved yet.
+    await page.evaluate(() => window.scrollTo({ top: 1000, behavior: "instant" }));
+    const top = await page.locator("header.site-header").evaluate((el) => el.getBoundingClientRect().top);
+    expect(top).toBe(0);
+  });
+
+  test("the homepage's footer clears the bottom bar", async ({ page }) => {
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+    const m = await page.evaluate(() => {
+      const links = document.querySelector(".site-footer p")!.getBoundingClientRect();
+      const bar = document.querySelector('nav[aria-label="Site, bottom"]')!.getBoundingClientRect();
+      return { textBottom: links.bottom, barTop: bar.top };
+    });
+    expect(m.textBottom).toBeLessThanOrEqual(m.barTop);
+  });
+
   test("a docs page's last content clears the bottom bar", async ({ page }) => {
     await page.goto(`${BASE}docs/components/button/`, { waitUntil: "networkidle" });
     const toEnd = () => page.evaluate(() => { const m = document.querySelector<HTMLElement>("main#main")!; m.scrollTop = m.scrollHeight; });

@@ -285,3 +285,8 @@
 .site-footer a { color: var(--psi-fg-secondary); font: var(--psi-text-14-20-medium); text-decoration: none; }
 .site-footer a:hover { color: var(--psi-fg-primary); text-decoration: underline; }
 .site-footer p { margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--psi-space-8) var(--psi-space-16); color: var(--psi-fg-secondary); font: var(--psi-text-12-16-regular); font-family: var(--psi-font-mono); }
+/* The homepage renders the phone bottom bar (chrome.css) and is not an AppShell, so its document
+ * scrolls: the footer's end clears the fixed bar, in the footer's own colour. */
+@media (max-width: 959.98px) {
+  .site-footer { padding-block-end: calc(var(--psi-space-32) + var(--site-bar-clearance)); }
+}
