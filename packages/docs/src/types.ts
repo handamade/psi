@@ -65,3 +65,35 @@ export interface ColorToken {
   formula: string;
   byTheme: Record<ThemeName, { hex: string; oklch: string }>;
 }
+
+export interface ExampleSource {
+  slug: string;
+  name: string;
+  source: string;
+}
+
+export interface GuideSource {
+  id: string;
+  title: string;
+  description: string;
+  order: number;
+  /** The MDX after its frontmatter, as written. */
+  body: string;
+}
+
+/** Everything a docs page is built from. The builders in markdown.ts read
+ * nothing else, so the site and the MCP's index build produce the same
+ * text from the same input. */
+export interface DocsInput {
+  /** @handamade/psi-react's version. */
+  version: string;
+  componentCount: number;
+  iconCount: number;
+  exports: ExportInfo[];
+  /** packages/react/docs/<Export>.md, without its leading comment line. */
+  generatedDocs: Record<string, string>;
+  guidance: Guidance;
+  resolved: Record<ThemeName, Resolved>;
+  examples: ExampleSource[];
+  guides: GuideSource[];
+}

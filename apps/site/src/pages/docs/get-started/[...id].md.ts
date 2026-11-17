@@ -8,4 +8,4 @@ export async function getStaticPaths() {
 }
 
 export const GET: APIRoute = ({ props }) =>
-  new Response(guideMd(props.entry as Parameters<typeof guideMd>[0]), { headers: { "Content-Type": "text/markdown; charset=utf-8" } });
+  new Response(guideMd((props.entry as { id: string }).id), { headers: { "Content-Type": "text/markdown; charset=utf-8" } });

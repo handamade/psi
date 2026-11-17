@@ -1,12 +1,14 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 
-import type { ExportInfo, Guidance, Resolved, ThemeName } from "./types.js";
+import { THEMES } from "./data.js";
+import type { DocsInput, ExampleSource, ExportInfo, GuideSource, Guidance, Resolved, ThemeName } from "./types.js";
 
 const require = createRequire(import.meta.url);
-const pkgDir = join(dirname(fileURLToPath(import.meta.url)), "..");
+// Resolved through the package, not import.meta.url: a bundler (the site's
+// prerender) moves this module, and a path relative to it would then miss.
+const pkgDir = dirname(require.resolve("@handamade/psi-docs/package.json"));
 
 export const EXAMPLES_DIR = join(pkgDir, "examples");
 export const GUIDES_DIR = join(pkgDir, "guides");
@@ -48,4 +50,58 @@ export function guidance(): Guidance {
     readFileSync(require.resolve("@handamade/psi-tokens/guidance.json"), "utf8"),
   ) as Guidance;
   return guidanceCache;
+}
+
+export function loadExamples(): ExampleSource[] {
+  return readdirSync(EXAMPLES_DIR, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .flatMap((d) =>
+      readdirSync(join(EXAMPLES_DIR, d.name))
+        .filter((f) => f.endsWith(".tsx"))
+        .map((f) => ({
+          slug: d.name,
+          name: f.replace(/\.tsx$/, ""),
+          source: readFileSync(join(EXAMPLES_DIR, d.name, f), "utf8"),
+        })),
+    )
+    .sort((a, b) => `${a.slug}/${a.name}`.localeCompare(`${b.slug}/${b.name}`));
+}
+
+export function loadGuides(): GuideSource[] {
+  return readdirSync(GUIDES_DIR)
+    .filter((f) => f.endsWith(".mdx"))
+    .map((f) => {
+      const raw = readFileSync(join(GUIDES_DIR, f), "utf8");
+      const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+      if (!m) throw new Error(`guides/${f}: no frontmatter`);
+      const field = (k: string): string => {
+        const v = m[1].match(new RegExp(`^${k}:\\s*(.*)$`, "m"));
+        if (!v) throw new Error(`guides/${f}: no "${k}" in frontmatter`);
+        return v[1].trim().replace(/^(["'])(.*)\1$/, "$2");
+      };
+      return {
+        id: f.replace(/\.mdx$/, ""),
+        title: field("title"),
+        description: field("description"),
+        order: Number(field("order")),
+        body: m[2],
+      };
+    })
+    .sort((a, b) => a.order - b.order);
+}
+
+let inputCache: DocsInput | undefined;
+export function loadDocsInput(): DocsInput {
+  inputCache ??= {
+    version: (JSON.parse(readFileSync(join(reactRoot, "package.json"), "utf8")) as { version: string }).version,
+    componentCount: manifest.components.length,
+    iconCount: manifest.icons.length,
+    exports: manifest.components.map(({ name, description, props }) => ({ name, description, props })),
+    generatedDocs: Object.fromEntries(manifest.components.map((c) => [c.name, readGeneratedDoc(c.name)])),
+    guidance: guidance(),
+    resolved: Object.fromEntries(THEMES.map((t) => [t, resolved(t)])) as Record<ThemeName, Resolved>,
+    examples: loadExamples(),
+    guides: loadGuides(),
+  };
+  return inputCache;
 }
