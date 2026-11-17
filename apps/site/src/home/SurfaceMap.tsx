@@ -1,13 +1,15 @@
 import type { MouseEvent } from "react";
 import type { Surface } from "@handamade/psi-docs/trace";
 
-const PEOPLE = [
+// Each box's second line is either a count passed in from the build or words
+// with no number in them: the section claims its counts can't drift.
+const people = (themeCount: number) => [
   ["docs", "Docs", "/docs/components/…", 432],
   ["storybook", "Storybook", "stories · VR", 494],
-  ["figma", "Figma", "variables · 4 modes", 556],
+  ["figma", "Figma", `variables · ${themeCount} modes`, 556],
 ] as const;
 const AGENTS = [
-  ["mcp", "MCP", "four tools", 432],
+  ["mcp", "MCP", "tools over the index", 432],
   ["llms", "llms.txt", "rules · index", 494],
   ["md", "Markdown", "a .md per page", 556],
 ] as const;
@@ -22,11 +24,13 @@ export function SurfaceMap({
   current,
   onSelect,
   componentCount,
+  themeCount,
   hrefs,
 }: {
   current: Surface;
   onSelect: (s: Surface) => void;
   componentCount: number;
+  themeCount: number;
   hrefs: Record<Surface, string>;
 }) {
   const href = (s: Surface) => hrefs[s];
@@ -85,7 +89,7 @@ export function SurfaceMap({
         <g className="map-node" transform="translate(40,124)">
           <rect width="300" height="118" rx="10" />
           <text className="map-cap" x="16" y="22">BUILD GATES</text>
-          {[["WCAG AA contrast", "4 themes"], ["Token scopes", "per property"], ["Slot contracts", "what nests"], ["Visual regression", "0 px allowed"]].map(([h, s], i) => (
+          {[["WCAG AA contrast", `${themeCount} themes`], ["Token scopes", "per property"], ["Slot contracts", "what nests"], ["Visual regression", "0 px allowed"]].map(([h, s], i) => (
             <g key={h}>
               <text className="map-gate" x="16" y={46 + i * 21}>✓</text>
               <text className="map-h" x="32" y={46 + i * 21}>{h}</text>
@@ -103,7 +107,7 @@ export function SurfaceMap({
 
         <text className="map-cap" x="20" y="418" aria-hidden="true">FOR PEOPLE</text>
         <text className="map-cap" x="210" y="418" aria-hidden="true">FOR AGENTS</text>
-        {PEOPLE.map(([s, l, sub, y]) => box(s, l, sub, 20, y))}
+        {people(themeCount).map(([s, l, sub, y]) => box(s, l, sub, 20, y))}
         {AGENTS.map(([s, l, sub, y]) => box(s, l, sub, 210, y))}
         <g className="map-node map-ghost" transform="translate(20,618)">
           <rect width="150" height="50" rx="9" />

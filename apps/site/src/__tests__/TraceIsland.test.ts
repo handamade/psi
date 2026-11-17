@@ -12,7 +12,7 @@ import { TraceIsland } from "../home/TraceIsland";
 const ex = (s: string) => ({ kind: "text" as const, text: s, from: "x" });
 const surf = (p: string) => ({ code: ex(`${p} code`), docs: { kind: "rows" as const, rows: [["variant", "accent", "neutral"]], from: "m" }, storybook: ex(`${p} sb`), figma: ex(`${p} fig`), llms: ex(`${p} llms`), md: ex(`${p} md`), mcp: ex(`${p} mcp`) });
 const data = { Button: surf("B"), Field: surf("F"), Table: surf("T"), "--psi-fg-accent": surf("K") };
-const props = { data, storybookHref: { Button: "/sb/b", Field: "/sb/f", Table: "/sb/t", "--psi-fg-accent": "/sb/k" }, figmaHref: "https://figma.example", componentCount: 60 };
+const props = { data, storybookHref: { Button: "/sb/b", Field: "/sb/f", Table: "/sb/t", "--psi-fg-accent": "/sb/k" }, figmaHref: "https://figma.example", componentCount: 60, themeCount: 4 };
 
 function stubWide(matches: boolean) {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches, media: "", addEventListener: () => {}, removeEventListener: () => {} })));

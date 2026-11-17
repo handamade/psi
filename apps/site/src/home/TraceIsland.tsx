@@ -35,11 +35,12 @@ function ExcerptView({ e, href }: { e: Excerpt; href?: string }) {
   );
 }
 
-export function TraceIsland({ data, storybookHref, figmaHref, componentCount }: {
+export function TraceIsland({ data, storybookHref, figmaHref, componentCount, themeCount }: {
   data: Record<TraceTarget, Record<Surface, Excerpt>>;
   storybookHref: Record<TraceTarget, string>;
   figmaHref: string;
   componentCount: number;
+  themeCount: number;
 }) {
   const [target, setTarget] = useState<TraceTarget>("Button");
   const [surface, setSurface] = useState<Surface>("docs");
@@ -62,7 +63,7 @@ export function TraceIsland({ data, storybookHref, figmaHref, componentCount }: 
     llms: data[target].llms.href ?? "/llms.txt",
     md: data[target].md.href ?? "/docs/get-started/ai/",
   };
-  const map = <SurfaceMap current={surface} onSelect={select} componentCount={componentCount} hrefs={hrefs} />;
+  const map = <SurfaceMap current={surface} onSelect={select} componentCount={componentCount} themeCount={themeCount} hrefs={hrefs} />;
   const trace = (
     <div className="trace">
       <div className="trace-top">
