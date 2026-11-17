@@ -1,0 +1,19 @@
+---
+import { Button } from "@handamade/psi-react";
+import { ThemeConsole } from "./ThemeConsole";
+import { releaseDate, releaseVersion } from "virtual:psi-facts";
+
+const date = new Date(`${releaseDate}T00:00:00`).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+---
+<section class="home-hero" aria-labelledby="hero-h">
+  <div class="home-hero-text">
+    <h1 id="hero-h">Color isn’t picked.<br />It’s <em class="glitch">computed</em>.</h1>
+    <p class="home-hero-lede">Psi is a themeable design system where every semantic color is an OKLCH formula. Give it brand anchors, get back a contrast-checked token set for every theme. No swatch ladders, no fork per customer.</p>
+    <div class="home-hero-ctas">
+      <Button variant="accent" size={48} href="/docs/get-started/installation/">Get started</Button>
+      <Button variant="neutral-subtle" size={48} href="/docs/components/">Browse components</Button>
+    </div>
+    <p class="home-hero-version">v{releaseVersion} · <time datetime={releaseDate}>{date}</time> · <a href="/docs/changelog/">What changed</a></p>
+  </div>
+  <ThemeConsole client:load />
+</section>

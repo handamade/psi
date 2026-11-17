@@ -1,4 +1,4 @@
-import { act, createElement, useState } from "react";
+import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type * as GenerateModule from "@handamade/psi-tokens/generate";
@@ -18,8 +18,8 @@ vi.mock("@handamade/psi-tokens/generate", async (importOriginal) => {
   return { ...actual, deriveTheme: vi.fn(actual.deriveTheme) };
 });
 
-import { Hero } from "../sections/Hero";
-import { BRAND_KEY, type Mode } from "../theme";
+import { ThemeConsole } from "../home/ThemeConsole";
+import { BRAND_KEY, useModePref, type Mode } from "../theme";
 import { deriveTheme } from "@handamade/psi-tokens/generate";
 
 const deriveThemeSpy = deriveTheme as unknown as ReturnType<typeof vi.fn>;
@@ -29,15 +29,17 @@ const PROMPT = "midnight fintech, confident and calm";
 beforeEach(() => {
   localStorage.clear();
   deriveThemeSpy.mockClear();
-  // jsdom has no real matchMedia. Hero's `log()` checks
+  // jsdom has no real matchMedia. The console's `log()` checks
   // prefers-reduced-motion on every transcript line; forcing it "on" here
   // replaces the 90ms typewriter stagger with an immediate microtask, so
-  // tests don't need real timers to observe the console settle.
+  // tests don't need real timers to observe the console settle. Only that
+  // query matches: useModePref also asks prefers-color-scheme, and "dark"
+  // there would make the starting mode depend on the stub.
   vi.stubGlobal(
     "matchMedia",
-    vi.fn(() => ({
-      matches: true,
-      media: "(prefers-reduced-motion: reduce)",
+    vi.fn((query: string) => ({
+      matches: query.includes("prefers-reduced-motion"),
+      media: query,
       addEventListener: () => {},
       removeEventListener: () => {},
     })) as unknown as typeof matchMedia,
@@ -114,23 +116,13 @@ function inlineStyleText() {
   return document.documentElement.getAttribute("style") ?? "";
 }
 
-describe("Hero console — reset", () => {
+describe("ThemeConsole — reset", () => {
   it("clears the brand and the applied properties, but keeps the mode", async () => {
     // The remote leg is irrelevant to this test and must not add a second
     // brand application — fail it fast so only the local derivation lands.
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
 
-    const onModeCalls: Mode[] = [];
-    function Harness() {
-      return createElement(Hero, {
-        mode: "light" as Mode,
-        onMode: (m: Mode) => {
-          onModeCalls.push(m);
-          document.documentElement.dataset.psiTheme = m;
-        },
-      });
-    }
-    const { container, unmount } = mount(createElement(Harness));
+    const { container, unmount } = mount(createElement(ThemeConsole));
 
     await act(async () => {
       submit(container, PROMPT);
@@ -143,8 +135,7 @@ describe("Hero console — reset", () => {
     expect(inlineStyleText()).toMatch(/--psi-/);
     expect(findResetButton(container), "reset control did not appear after deriving").toBeDefined();
     const modeAfterDerive = document.documentElement.dataset.psiTheme;
-    expect(modeAfterDerive, "derive should have set a mode via onMode").toBeDefined();
-    expect(onModeCalls.length).toBeGreaterThan(0);
+    expect(modeAfterDerive, "derive should have painted a mode").toBeDefined();
 
     await act(async () => {
       findResetButton(container)!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -156,24 +147,27 @@ describe("Hero console — reset", () => {
     // ...the reset control itself is gone (brand is back to null)...
     expect(findResetButton(container)).toBeUndefined();
     // ...but the mode — the whole-page decision reset must not touch — is
-    // exactly what it was a moment ago. handleReset never calls onMode.
+    // exactly what it was a moment ago. handleReset never paints a mode.
     expect(document.documentElement.dataset.psiTheme).toBe(modeAfterDerive);
 
     unmount();
   });
 });
 
-describe("Hero console — mode toggle", () => {
+describe("ThemeConsole — mode toggle", () => {
   it("selects the other solved member on a mode swap, without re-deriving", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
 
+    // The site chrome's mode control is another useModePref instance; a
+    // sibling probe stands in for it. Its ephemeral setter paints the mode
+    // and broadcasts MODE_EVENT, which the console follows.
     let setMode!: (m: Mode) => void;
-    function Harness() {
-      const [mode, setModeState] = useState<Mode>("light");
-      setMode = setModeState;
-      return createElement(Hero, { mode, onMode: () => {} });
+    function Probe() {
+      setMode = useModePref()[3];
+      return null;
     }
-    const { container, unmount } = mount(createElement(Harness));
+    mount(createElement(Probe));
+    const { container, unmount } = mount(createElement(ThemeConsole));
 
     await act(async () => {
       submit(container, PROMPT);
@@ -185,7 +179,7 @@ describe("Hero console — mode toggle", () => {
     expect(propsAtInitialMode).toMatch(/--psi-/);
 
     await act(async () => {
-      setMode("dark");
+      setMode(document.documentElement.dataset.psiTheme === "dark" ? "light" : "dark");
       await flush();
     });
 
@@ -204,7 +198,7 @@ describe("Hero console — mode toggle", () => {
   });
 });
 
-describe("Hero console — mount-restore self-heal", () => {
+describe("ThemeConsole — mount-restore self-heal", () => {
   it("clears a stored vector that no longer derives, instead of bricking every future mount", async () => {
     // readStoredBrand only validates the vector's SHAPE (isBrandVector) —
     // it cannot prove the vector still derives. Seed a shape-valid vector,
@@ -226,16 +220,12 @@ describe("Hero console — mount-restore self-heal", () => {
     });
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
 
-    function Harness() {
-      return createElement(Hero, { mode: "light" as Mode, onMode: () => {} });
-    }
-
     // The bug this guards: without a try/catch around the mount-restore
     // deriveTheme call, this throw would propagate out of the effect and
     // crash the render entirely — mount() itself would throw, since nothing
     // catches it upstream (no error boundary in this harness, matching
     // production's App).
-    const { container, unmount } = mount(createElement(Harness));
+    const { container, unmount } = mount(createElement(ThemeConsole));
     await act(async () => {
       await flush();
     });
@@ -254,7 +244,7 @@ describe("Hero console — mount-restore self-heal", () => {
   });
 });
 
-describe("Hero console — the generation guard", () => {
+describe("ThemeConsole — the generation guard", () => {
   it("discards a stale response that resolves after a reset", async () => {
     let resolveFetch!: (value: { status: number; json: () => Promise<unknown> }) => void;
     const pendingResponse = new Promise<{ status: number; json: () => Promise<unknown> }>(
@@ -264,10 +254,7 @@ describe("Hero console — the generation guard", () => {
     );
     vi.stubGlobal("fetch", vi.fn(() => pendingResponse));
 
-    function Harness() {
-      return createElement(Hero, { mode: "light" as Mode, onMode: () => {} });
-    }
-    const { container, unmount } = mount(createElement(Harness));
+    const { container, unmount } = mount(createElement(ThemeConsole));
 
     await act(async () => {
       submit(container, PROMPT);

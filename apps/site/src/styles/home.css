@@ -842,3 +842,40 @@
 .canopy { border: 1px solid var(--psi-border-faint); border-radius: var(--psi-radius-12); overflow: hidden; background: var(--psi-bg-primary); }
 .canopy-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--psi-space-12); padding: var(--psi-space-12); border-block-end: 1px solid var(--psi-border-faint); }
 .canopy-frame { display: block; inline-size: 100%; block-size: 480px; border: 0; }
+
+/* ------------------------------------------------------- home hero (D133) */
+/* `.hero` still belongs to the retired homepage until it is deleted, so the
+ * new section is `.home-hero`. 960px is `breakpoints.md` (D31). */
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--psi-space-32);
+  align-items: center;
+  padding-block: var(--psi-space-48) var(--psi-space-32);
+}
+.home-hero h1 {
+  margin: 0 0 var(--psi-space-24);
+  font: 700 44px/1.02 var(--psi-font-display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.home-hero h1 em { font-style: normal; color: var(--psi-fg-accent); }
+.home-hero-lede {
+  max-width: 34em;
+  margin: 0 0 var(--psi-space-32);
+  font: var(--psi-text-18-28-medium);
+  font-weight: 400;
+  color: var(--psi-fg-secondary);
+  text-wrap: pretty;
+}
+.home-hero-ctas { display: flex; flex-wrap: wrap; gap: var(--psi-space-12); }
+.home-hero-version { margin: var(--psi-space-24) 0 0; font: var(--psi-text-14-20-regular); color: var(--psi-fg-secondary); }
+.home-hero-version a { color: var(--psi-fg-accent); }
+@media (min-width: 960px) {
+  .home-hero {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--psi-space-48);
+    padding-block: var(--psi-space-80) var(--psi-space-64);
+  }
+  .home-hero h1 { font-size: 64px; }
+}
