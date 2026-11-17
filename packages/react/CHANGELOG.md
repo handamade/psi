@@ -1,5 +1,25 @@
 # @handamade/psi-react
 
+## 0.33.0
+
+### Minor Changes
+
+- 2fd1ba5: A pager that holds still, keeps focus, translates and fits a phone (D127).
+
+  - **`Pagination`'s Previous and Next no longer move as the page changes.** Once the pages don't all fit, it shows `2 × siblingCount + 5` slots on every page: near an end the window fills out on the far side (`1 2 3 4 5 … 100` on page 2, where it was `1 2 3 … 100`). Every page button and ellipsis is one slot as wide as the widest page number, with tabular numerals, and page buttons have a smaller inline padding. At 100 pages the pager is 342px on every page, where it was 251–361px.
+  - **A compact form at or below 560px of viewport.** The pager shows the `siblingCount={0}` range, `1 … 50 … 100`: 264px at 100 pages, so it fits a 320px screen. Pass `siblingCount={0}` for that form at any width. The arrows no longer shrink when the pager is wider than its container.
+  - **`previousLabel` and `nextLabel`** on `Pagination` translate the arrows' accessible names. The defaults are today's _Previous page_ and _Next page_.
+  - **Focus stays in the pager.** When Previous or Next had focus and the new page disables it, `Pagination` moves focus to the current page's button, and `CursorPagination` to the other direction's button.
+  - **The `table-pagination` preset renders a working pager** (`page={1} pageCount={10}`), and both pagination presets give their `Select` the page sizes 10, 50 and 100. The pattern language accepts `option` as a native element, for exactly this. `table-pagination`'s intent says where focus goes after a page change.
+
+- dc25cd4: Table follow-ups (D128).
+
+  - **Selection names you can translate.** `Table` takes `selectAllLabel` (default "Select all rows") and `selectRowLabel` (default "Select row"). A row checkbox without `selectLabel` is now named by `selectRowLabel` and the row's header cell (`TableCell rowHeader`), "Select row Acme", or, with no row header, by its position, "Select row 3". It no longer reads out the raw `rowId`. Tests that find a row checkbox by its old name need the new one.
+  - **Focus no longer lands under a sticky header.** Inside a `TableContainer`, a sticky header's measured height is kept clear at the top (`scroll-padding-block-start`), so a row that keyboard focus scrolls into view lands below the header, not behind it (WCAG 2.4.11).
+  - **The frame's edge with an empty body.** With several `TableBody`s where the last one is empty, the last body that has rows now draws the bottom edge: no doubled border, rounded corners. The same goes for the top corners when there is no `TableHead` and the first body is empty.
+  - **`TableContainer`** warns once about a missing name under `StrictMode`, not twice, and a `TableCaption` with `id=""` no longer gives the region `aria-labelledby=""`.
+  - **Generated docs:** a family member without its own tokens (the `Table` parts, `MenuItem`, `Tab`, `Radio` and others) now says which family's tokens it binds, instead of "scale tokens only".
+
 ## 0.32.0
 
 ### Minor Changes

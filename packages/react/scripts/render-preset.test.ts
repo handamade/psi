@@ -185,4 +185,18 @@ describe("renderPreset", () => {
     expect(jsx).toContain("banner={");
     expect(jsx).toContain("<Banner");
   });
+
+  it("emits an intrinsic option as a native element (D127)", () => {
+    const pattern: Pattern = {
+      id: "o", intent: "i", match: ["m"], parameters: [], content: {}, gaps: [], requires: [],
+      compose: {
+        component: "Dialog",
+        slots: {
+          body: [{ component: "option", props: { value: "10" }, slots: { body: ["10"] } }],
+          footer: [{ component: "Button" }],
+        },
+      },
+    };
+    expect(renderPreset(pattern, components)).toContain('<option value="10">10</option>');
+  });
 });
