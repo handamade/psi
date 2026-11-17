@@ -8,7 +8,7 @@ import {
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, Pagination, CursorPagination,
   Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, Count, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell,
   Tabs, TabList, Tab, TabPanel,
-  useFieldControl, useToast,
+  useFieldControl, useToast, IconSimCard,
 } from "./index.js";
 
 /** A control Psi did not write, joined to a Field through useFieldControl (D84). */
@@ -31,6 +31,7 @@ const cases: Array<[string, React.ReactElement]> = [
   ["SkipLink with a target", <><SkipLink href="#main">Skip to content</SkipLink><main id="main" tabIndex={-1}><h1>Page</h1></main></>],
   ["NavTree open", <NavTree aria-label="Main"><NavItem><a href="#o">Overview</a></NavItem><NavGroup label="Reports" open onOpenChange={() => {}}><NavItem><a href="#s" aria-current="page">Sales</a></NavItem><NavItem><a href="#t">Traffic</a></NavItem></NavGroup></NavTree>],
   ["NavTree closed", <NavTree aria-label="Main"><NavItem><a href="#o">Overview</a></NavItem><NavGroup label="Reports" open={false} onOpenChange={() => {}}><NavItem><a href="#s">Sales</a></NavItem></NavGroup></NavTree>],
+  ["NavTree with icons and counts (D124)", <NavTree aria-label="Main"><NavItem href="#c" current icon={<IconSimCard />} count={<Count value={238} />}>Cards</NavItem><NavItem href="#s" count={<Count value={4} tone="attention" label="4 stuck" />}>Stuck</NavItem><NavGroup label="Settings" icon={<IconSimCard />} open={false} onOpenChange={() => {}}><NavItem href="#p">Profile</NavItem></NavGroup></NavTree>],
   ["NavTree in a dark sub-theme", <div data-psi-theme="dark"><NavTree aria-label="Main"><NavGroup label="Reports" open onOpenChange={() => {}}><NavItem><a href="#s" aria-current="page">Sales</a></NavItem><NavItem><a href="#t">Traffic</a></NavItem></NavGroup></NavTree></div>],
   ["Link inline and current (D119)", <Text>Read the <Link href="/terms">terms</Link> or go <Link href="/" current>home</Link>.</Text>],
   ["AppShell open", <AppShell skipLink={<SkipLink href="#main">Skip to content</SkipLink>} header={<NavBar fluid brand={<Button size={32} aria-expanded aria-controls="sidebar">Menu</Button>} />} sidebar={<NavTree aria-label="Main"><NavItem href="#o" current>Overview</NavItem></NavTree>}><h1>Page</h1></AppShell>],

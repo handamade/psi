@@ -6,6 +6,10 @@ import styles from "./nav-tree.module.css";
 export interface NavGroupProps {
   /** The group's visible label, such as "Reports". */
   label: ReactNode;
+  /** An icon before the label (D124), passed without a size. Decorative
+   * (`aria-hidden`), sized by `--psi-nav-tree-icon-size`, coloured with the
+   * label. It stays when the group is closed: only the chevron turns. */
+  icon?: ReactNode;
   /** Whether the group's items are shown. Controlled. */
   open: boolean;
   /** Called with the next state when the button is pressed. The group never
@@ -23,7 +27,7 @@ export interface NavGroupProps {
  * accessibility tree while `aria-controls` keeps naming an element. The
  * chevron turns with the state and is `aria-hidden`: the label and
  * `aria-expanded` carry the meaning. */
-export function NavGroup({ label, open, onOpenChange, children, className }: NavGroupProps) {
+export function NavGroup({ label, icon, open, onOpenChange, children, className }: NavGroupProps) {
   const listId = useId();
   const cls = [styles.group, className].filter(Boolean).join(" ");
   return (
@@ -35,6 +39,11 @@ export function NavGroup({ label, open, onOpenChange, children, className }: Nav
         aria-controls={listId}
         onClick={() => onOpenChange(!open)}
       >
+        {icon !== undefined && icon !== null && icon !== false ? (
+          <span className={styles.icon} aria-hidden="true">
+            {icon}
+          </span>
+        ) : null}
         <span className={styles.groupLabel}>{label}</span>
         <IconChevronDown size={16} className={styles.chevron} aria-hidden="true" />
       </button>

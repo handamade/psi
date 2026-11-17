@@ -111,6 +111,8 @@
 
 .chevron {
   flex: none;
+  /* D124: with an icon in the row, keep the label beside it and the chevron at the end. With two items, space-between already put it there. */
+  margin-inline-start: auto;
   transition: transform var(--psi-duration-150) var(--psi-ease-standard);
 }
 
@@ -126,4 +128,38 @@
 
 .groupList[hidden] {
   display: none;
+}
+
+/* ── Icon and count (D124) ────────────────────────────────────── */
+
+/* Decorative, coloured by currentColor so it follows the link's or the
+   button's state: item-fg at rest and on hover, item-fg-current for the page
+   and its parent (D96), group-fg in a group's button. The CSS size beats the
+   width and height attributes an icon writes, as in a Button (D97). */
+.icon {
+  display: flex;
+  flex: none;
+}
+
+.icon > svg {
+  inline-size: var(--psi-nav-tree-icon-size);
+  block-size: var(--psi-nav-tree-icon-size);
+}
+
+/* In an entry, the icon is followed by the label. The group's button has its
+   own gap. */
+.item .icon {
+  margin-inline-end: var(--psi-nav-tree-icon-gap);
+}
+
+/* A long label wraps, and the count keeps the row's inline end. */
+.label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.countSlot {
+  flex: none;
+  margin-inline-start: auto;
+  padding-inline-start: var(--psi-nav-tree-icon-gap);
 }

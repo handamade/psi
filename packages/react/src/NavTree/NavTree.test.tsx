@@ -1,12 +1,14 @@
 import { createRef } from "react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, it, expect, vi } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NavTree } from "./NavTree.js";
 import { NavGroup } from "./NavGroup.js";
 import { NavItem } from "./NavItem.js";
+import { Count } from "../Count/Count.js";
+import { IconSimCard } from "../icons/IconSimCard.js";
 
 describe("NavTree (D88)", () => {
   it("is a labelled navigation landmark around a list", () => {
@@ -309,5 +311,166 @@ describe("NavItem parent of the current screen (D96)", () => {
   it("gives the parent no surface and no bar: those stay the marks of the page itself", () => {
     expect(rule('.item a[aria-current="true"]')).not.toMatch(/background/);
     expect(css).not.toMatch(/aria-current="true"\]::before/);
+  });
+});
+
+const navCss = readFileSync(join(import.meta.dirname, "nav-tree.module.css"), "utf8");
+
+describe("NavItem icon and count (D124)", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("with href: icon, label and count sit inside the link, in that order", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem href="#cards" icon={<IconSimCard />} count={<Count value={238} />}>
+          Cards
+        </NavItem>
+      </NavTree>,
+    );
+    const link = screen.getByRole("link", { name: "Cards 238" });
+    const parts = Array.from(link.children).map((el) => el.className);
+    expect(parts[0]).toMatch(/icon/);
+    expect(parts[1]).toMatch(/label/);
+    expect(parts[2]).toMatch(/countSlot/);
+    expect(link.children[0]).toHaveAttribute("aria-hidden", "true");
+    expect(link.children[0].querySelector("svg")).not.toBeNull();
+  });
+
+  it("a count's label joins the link's name in place of the number", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem href="#cards" count={<Count value={4} tone="attention" label="4 stuck" />}>
+          Cards
+        </NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("link", { name: "Cards 4 stuck" })).toBeInTheDocument();
+  });
+
+  it("an icon alone leaves the name as the label", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem href="#cards" icon={<IconSimCard />}>
+          Cards
+        </NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("link", { name: "Cards" })).toBeInTheDocument();
+  });
+
+  it("with a router child: clones it, keeps its props and handlers, and fills it", async () => {
+    const onClick = vi.fn((e: React.MouseEvent) => e.preventDefault());
+    render(
+      <NavTree aria-label="Main">
+        <NavItem current icon={<IconSimCard />} count={<Count value={238} />}>
+          <a href="#cards" className="router" onClick={onClick}>
+            Cards
+          </a>
+        </NavItem>
+      </NavTree>,
+    );
+    const link = screen.getByRole("link", { name: "Cards 238" });
+    expect(link).toHaveClass("router");
+    expect(link).toHaveAttribute("aria-current", "page");
+    expect(link.children[0]).toHaveAttribute("aria-hidden", "true");
+    await userEvent.click(link);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it("without current, a decorated router child keeps its own aria-current", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavItem icon={<IconSimCard />}>
+          <a href="#cards" aria-current="true">
+            Cards
+          </a>
+        </NavItem>
+      </NavTree>,
+    );
+    expect(screen.getByRole("link", { name: "Cards" })).toHaveAttribute("aria-current", "true");
+  });
+
+  it("with neither prop, the markup is what it was: no wrappers", () => {
+    const { container } = render(
+      <NavTree aria-label="Main">
+        <NavItem href="#a">A</NavItem>
+        <NavItem>
+          <a href="#b">B</a>
+        </NavItem>
+      </NavTree>,
+    );
+    for (const link of container.querySelectorAll("a")) {
+      expect(link.children).toHaveLength(0);
+    }
+  });
+
+  it("a string child with an icon renders the string, no icon, and warns once in development", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container } = render(
+      <NavTree aria-label="Main">
+        <NavItem icon={<IconSimCard />}>Cards</NavItem>
+      </NavTree>,
+    );
+    expect(container.querySelector("li")).toHaveTextContent("Cards");
+    expect(container.querySelector("svg")).toBeNull();
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
+  it("does not warn when the props have somewhere to go", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(
+      <NavTree aria-label="Main">
+        <NavItem href="#a" icon={<IconSimCard />}>
+          A
+        </NavItem>
+      </NavTree>,
+    );
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("CSS: the icon is sized by the token and the count is pushed to the inline end", () => {
+    expect(navCss).toMatch(/\.icon > svg\s*\{[^}]*inline-size:\s*var\(--psi-nav-tree-icon-size\)/);
+    expect(navCss).toMatch(/\.icon > svg\s*\{[^}]*block-size:\s*var\(--psi-nav-tree-icon-size\)/);
+    expect(navCss).toMatch(/\.countSlot\s*\{[^}]*margin-inline-start:\s*auto/);
+    expect(navCss).toMatch(/\.label\s*\{[^}]*min-width:\s*0/);
+  });
+});
+
+describe("NavGroup icon (D124)", () => {
+  it("puts the icon in the button before the label, hidden; the name is the label", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavGroup label="Reports" icon={<IconSimCard />} open={false} onOpenChange={() => {}}>
+          <NavItem href="#s">Sales</NavItem>
+        </NavGroup>
+      </NavTree>,
+    );
+    const button = screen.getByRole("button", { name: "Reports" });
+    const first = button.children[0];
+    expect(first.className).toMatch(/icon/);
+    expect(first).toHaveAttribute("aria-hidden", "true");
+    expect(first.querySelector("svg")).not.toBeNull();
+  });
+
+  it("keeps the icon when the group is closed", () => {
+    const { rerender } = render(
+      <NavTree aria-label="Main">
+        <NavGroup label="Reports" icon={<IconSimCard />} open onOpenChange={() => {}}>
+          <NavItem href="#s">Sales</NavItem>
+        </NavGroup>
+      </NavTree>,
+    );
+    rerender(
+      <NavTree aria-label="Main">
+        <NavGroup label="Reports" icon={<IconSimCard />} open={false} onOpenChange={() => {}}>
+          <NavItem href="#s">Sales</NavItem>
+        </NavGroup>
+      </NavTree>,
+    );
+    expect(screen.getByRole("button", { name: "Reports" }).children[0].className).toMatch(/icon/);
+  });
+
+  it("CSS: the chevron keeps the inline end when an icon joins the row", () => {
+    expect(navCss).toMatch(/\.chevron\s*\{[^}]*margin-inline-start:\s*auto/);
   });
 });
