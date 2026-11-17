@@ -33,7 +33,7 @@ describe("countDecisions", () => {
     expect(countDecisions(["## Notes\n\nSee D61, reserved.\n\n## Rides-along (no decision numbers)\n\n- **D9 — x**\n"])).toBe(0);
   });
   it("counts the real specs: at least 128, at most the highest D-number", () => {
-    const dir = resolve(process.cwd(), "../../docs/superpowers/specs");
+    const dir = resolve(__dirname, "../../../../docs/superpowers/specs");
     const texts = readdirSync(dir)
       .filter((f) => f.endsWith(".md"))
       .map((f) => readFileSync(join(dir, f), "utf8"));
