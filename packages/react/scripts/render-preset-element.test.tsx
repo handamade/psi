@@ -152,4 +152,22 @@ describe("renderPresetElement", () => {
     };
     expect(() => renderPresetElement(usesUnregistered, components, {})).toThrow(/no component registered for "Toolbar"/);
   });
+
+  it("creates an intrinsic option as a native <option> (D127)", () => {
+    const pattern: Pattern = {
+      id: "o", intent: "i", match: [], parameters: [], content: {}, gaps: [], requires: [],
+      compose: {
+        component: "Toolbar",
+        slots: {
+          body: [
+            { component: "option", props: { value: "10" }, slots: { body: ["10"] } },
+            { component: "option", props: { value: "50" }, slots: { body: ["50"] } },
+          ],
+        },
+      },
+    };
+    const { container } = render(<select>{renderPresetElement(pattern, components, registry)}</select>);
+    const opts = container.querySelectorAll("option");
+    expect([...opts].map((o) => [o.value, o.textContent])).toEqual([["10", "10"], ["50", "50"]]);
+  });
 });

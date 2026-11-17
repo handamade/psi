@@ -62,7 +62,7 @@
       "properties": {
         "component": {
           "type": "string",
-          "description": "Component name; must be in the manifest or listed in the pattern's `gaps`."
+          "description": "Component name; must be in the manifest or listed in the pattern's `gaps`. The one exception is `option`, a native element (D127): it is not looked up in the manifest, its props are not validated, and it takes only a `body` slot, so a preset can fill a `Select`."
         },
         "props": {
           "type": "object",

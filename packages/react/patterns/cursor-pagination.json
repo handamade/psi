@@ -12,7 +12,19 @@
           "props": { "labelPosition": "start" },
           "slots": {
             "label": ["{content:page-size-label}"],
-            "body": [{ "component": "Select", "props": { "size": 32 } }]
+            "body": [
+              {
+                "component": "Select",
+                "props": { "size": 32 },
+                "slots": {
+                  "body": [
+                    { "component": "option", "props": { "value": "10" }, "slots": { "body": ["10"] } },
+                    { "component": "option", "props": { "value": "50" }, "slots": { "body": ["50"] } },
+                    { "component": "option", "props": { "value": "100" }, "slots": { "body": ["100"] } }
+                  ]
+                }
+              }
+            ]
           }
         },
         { "component": "CursorPagination", "props": { "hasPrevious": true, "hasNext": true } }
