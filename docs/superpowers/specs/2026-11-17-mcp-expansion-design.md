@@ -126,9 +126,14 @@ Ids keep today's forms; a bare name resolves as today, with guides and token
 pages added to the lookup. The largest page (Toast) is about 20.5k characters;
 `get` keeps no budget, as today.
 
-`search` gains the `guide` and `tokens` kinds. Its 6,000-character response
-budget stays, and the overview's per-kind allocation (D61) gains the two
-kinds; the budget test covers them.
+`search` gains the `guide` and `tokens` kinds: a keyword query returns their
+briefs like any other. Its 6,000-character response budget stays. The
+empty-query overview measured 5,813 characters at `dc25cd4` with only the
+8-component floor, so one brief per guide and token page (about 1,700
+characters) would break the D61 envelope. Instead, the overview gains **one
+index row per new kind** — `guide:*` listing the five guide names and
+`tokens:*` listing the six page names — charged as fixed cost like the topics.
+The budget tests cover both rows.
 
 #### 3. `theme(input)`
 
