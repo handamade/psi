@@ -25,6 +25,9 @@ export interface FieldContextValue {
 
 export const FieldContext = createContext<FieldContextValue | null>(null);
 
+/** A control's width in px (D125), pixel-true like Dialog's `width`. */
+export type FieldControlWidth = 80 | 120 | 160 | 240 | 320 | 480;
+
 export interface FieldProps extends HTMLAttributes<HTMLElement> {
   /** The control this field labels. */
   children?: ReactNode;
@@ -64,6 +67,18 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
    * In a toolbar row, use the default `align="center"`: `align="start"`
    * offsets buttons for labels above. */
   labelPosition?: FieldLabelPosition;
+  /** The width of the control, in px (D125): 80 | 120 | 160 | 240 | 320 | 480.
+   * Without it the control fills the Field. It sizes whatever the Field wraps
+   * (an Input, a Select, a Textarea with its counter, a `useFieldControl`
+   * control) and shrinks it in a narrower column; the label and the message
+   * line keep the Field's width. Pick the step from the value you expect: at
+   * size 32 an Input fits about 7, 12, 17, 26, 36 and 55 digits, or 9, 14, 20,
+   * 32, 44 and 67 characters of text; at size 40, 5, 10, 14, 22, 31 and 48
+   * digits (system font; a Select holds 2–3 fewer for its chevron). An
+   * ICCID's 20 digits fit 240. Meant for a Field with one control; on a group
+   * Field it sizes the group. In a Toolbar row the Field is as wide as its
+   * control or its label, whichever is wider. */
+  controlWidth?: FieldControlWidth;
   /** Forwarded ref to the root element. */
   ref?: Ref<HTMLDivElement | HTMLFieldSetElement>;
 }
@@ -85,6 +100,7 @@ export function Field({
   htmlFor,
   announce = true,
   labelPosition,
+  controlWidth,
   className,
   children,
   ref,
@@ -97,6 +113,7 @@ export function Field({
   const layout = {
     "data-label-position": position === "start" ? "start" : undefined,
     "data-in-stack": stack ? stack.labelPosition : undefined,
+    "data-control-width": controlWidth,
   };
   const groupAsDiv = group && position === "start";
   const groupLabelId = groupAsDiv && label != null ? `${id}-label` : undefined;
