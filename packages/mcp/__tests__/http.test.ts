@@ -1,10 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createServer, type Server } from "node:http";
-import { fileURLToPath } from "node:url";
-import { buildIndex } from "../src/index-builder.js";
 import { createMcpHandler } from "../src/http.js";
+import { loadTestIndex } from "./test-index.js";
 
-const pkgs = fileURLToPath(new URL("../..", import.meta.url));
 let server: Server;
 let url: string;
 
@@ -18,12 +16,7 @@ function rpc(id: number, method: string, params: object) {
 }
 
 beforeAll(async () => {
-  const index = await buildIndex({
-    tokensDist: `${pkgs}tokens/dist`,
-    reactDist: `${pkgs}react/dist`,
-    reactDocs: `${pkgs}react/docs`,
-    version: "0.0.0-test",
-  });
+  const index = await loadTestIndex();
   const handler = createMcpHandler(index);
   server = createServer((req, res) => void handler(req, res));
   await new Promise<void>((ok) => server.listen(0, ok));

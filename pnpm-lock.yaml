@@ -206,6 +206,9 @@ importers:
         specifier: ^3.25.0
         version: 3.25.76
     devDependencies:
+      '@handamade/psi-docs':
+        specifier: workspace:*
+        version: link:../docs
       '@handamade/psi-react':
         specifier: workspace:*
         version: link:../react

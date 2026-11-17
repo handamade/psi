@@ -32,6 +32,7 @@
     "zod": "^3.25.0"
   },
   "devDependencies": {
+    "@handamade/psi-docs": "workspace:*",
     "@handamade/psi-tokens": "workspace:*",
     "@handamade/psi-react": "workspace:*",
     "@types/node": "^20.0.0",

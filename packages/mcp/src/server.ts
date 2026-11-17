@@ -23,25 +23,31 @@ export function createPsiServer(store: Store, version: string): McpServer {
   server.registerTool(
     "get",
     {
-      title: "Get full Psi detail by id",
+      title: "Get Psi docs by id",
       description:
-        "Full detail for one id from search: component (props, defaults, a11y doc), " +
-        "pattern (composition recipe: compose tree, clarifying parameters, content, " +
-        "gaps/blocked status, and a copy-paste preset when unblocked), token (formula + " +
-        "resolved OKLCH/hex in all four themes), or topic (guidance). Accepts " +
-        "'component:Button', 'pattern:destructive-confirm', 'token:bgPrimary', " +
-        "'topic:variants', or a bare name.",
+        "The docs for one id from search, as markdown: a component's whole docs page " +
+        "(examples, props, keyboard, theming, rules — the same text as " +
+        "psi.kurkin.de/docs/components/<page>.md), a token page ('tokens:color'), a guide " +
+        "('guide:theming'), one token ('token:bgPrimary': formula and value in every theme), " +
+        "a pattern ('pattern:destructive-confirm': recipe and preset), or a topic " +
+        "('topic:variants'). A bare name also works.",
       inputSchema: { id: z.string().describe("An id from search results, or a bare name") },
     },
     async ({ id }) => {
-      const detail = store.get(id);
-      if (!detail) {
+      const page = store.get(id);
+      if (!page) {
+        const near = store.suggest(id);
         return {
           isError: true,
-          content: [{ type: "text", text: `Unknown id "${id}". Use the search tool to discover ids.` }],
+          content: [
+            {
+              type: "text",
+              text: `Unknown id "${id}".${near.length ? ` Nearest: ${near.join(", ")}.` : ""} Use the search tool to discover ids.`,
+            },
+          ],
         };
       }
-      return { content: [{ type: "text", text: JSON.stringify(detail, null, 1) }] };
+      return { content: [{ type: "text", text: page.markdown }] };
     },
   );
 

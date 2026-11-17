@@ -1,20 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeAll } from "vitest";
-import { fileURLToPath } from "node:url";
-import { buildIndex } from "../src/index-builder.js";
 import { createStore, type Store } from "../src/store.js";
+import type { PsiIndex } from "../src/types.js";
+import { loadTestIndex } from "./test-index.js";
 
-const pkgs = fileURLToPath(new URL("../..", import.meta.url));
 let store: Store;
-let index: Awaited<ReturnType<typeof buildIndex>>;
+let index: PsiIndex;
 
 beforeAll(async () => {
-  index = await buildIndex({
-    tokensDist: `${pkgs}tokens/dist`,
-    reactDist: `${pkgs}react/dist`,
-    reactDocs: `${pkgs}react/docs`,
-    version: "0.0.0-test",
-  });
+  index = await loadTestIndex();
   store = createStore(index);
 });
 
@@ -47,9 +41,8 @@ describe("search", () => {
     expect(store.search("space").some((b) => b.id === "topic:scales")).toBe(true);
     expect(store.search("radius").some((b) => b.id === "topic:scales")).toBe(true);
     expect(store.search("themes").some((b) => b.id === "topic:themes")).toBe(true);
-    const themes = store.get("topic:themes") as { content: { themes: string[] } };
-    expect(themes.content.themes).toContain("ember");
-    expect((store.get("topic:scales") as { content: object }).content).toHaveProperty("space");
+    expect(store.get("topic:themes")!.markdown).toContain("ember");
+    expect(store.get("topic:scales")!.markdown).toContain("space");
   });
 
   it("stays within the response budget", () => {
@@ -115,14 +108,13 @@ describe("search", () => {
   });
 
   it("keeps every pattern and the component floor inside the operating envelope (D61, D100)", () => {
-    // 23 real + 5 synthetic = 28: today's catalog plus the five patterns
-    // the 0.22 handoff's tier 2 could add. Measured directly against this
-    // store.ts (docs/superpowers/specs/2026-10-15-overview-pattern-cost-design.md,
-    // "Operating envelope"): with realistic ~20-char pattern ids the floor
-    // holds through 32 patterns and first breaks at 33. Before D100 it
-    // broke at 24, because every overview pattern row repeated its id as
-    // `title`; at 28 it showed 6 components. The synthetic count is what you
-    // lower when the real catalog grows.
+    // 23 real + 3 synthetic = 26. D129 added two fixed index rows to the
+    // overview (guide:* and tokens:*, about 220 characters), so the edge
+    // moved in: the component floor holds through 3 synthetic patterns and
+    // first breaks at 4 (7 components at 4, measured against this store.ts),
+    // where before D129 it held through 5. The synthetic count is what you
+    // lower when the real catalog grows; the 6000-character budget and the
+    // floor of 8 do not move.
     //
     // The envelope is a function of per-pattern *cost*, not pattern count:
     // id, kind and the never-capped `blocked (gaps: …)` tail are not
@@ -130,7 +122,7 @@ describe("search", () => {
     // count of dearer ones does not. A sweep with short synthetic ids puts
     // the edge at 36; this test deliberately uses long ids, which is the
     // conservative case and the one closer to Psi's real ids.
-    const grown = synthesizePatterns(5);
+    const grown = synthesizePatterns(3);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 
@@ -164,7 +156,7 @@ describe("search", () => {
     // one at a time rather than vanishing, and neither topics nor patterns
     // are ever sacrificed to make room. If a future change makes patterns
     // start vanishing instead of components, this test must fail.
-    const grown = synthesizePatterns(16);
+    const grown = synthesizePatterns(3);
     const grownStore = createStore(grown as typeof index);
     const briefs = grownStore.search("");
 
@@ -179,42 +171,64 @@ describe("search", () => {
       expect(brief?.summary).toContain("blocked (gaps:");
     }
   });
+
+  it("finds guides and token pages by keyword", () => {
+    expect(store.search("theming").some((b) => b.id === "guide:theming")).toBe(true);
+    expect(store.search("typography").some((b) => b.id === "tokens:typography")).toBe(true);
+  });
+
+  it("lists the guides and token pages in one index row each in the overview (D129)", () => {
+    const overview = store.search("");
+    const guides = overview.find((b) => b.id === "guide:*")!;
+    const tokenPages = overview.find((b) => b.id === "tokens:*")!;
+    for (const id of Object.keys(index.docs.guides)) expect(guides.summary).toContain(id);
+    for (const slug of Object.keys(index.docs.tokenPages)) expect(tokenPages.summary).toContain(slug);
+  });
 });
 
 describe("get", () => {
-  it("returns full component detail with props and doc", () => {
-    const detail = store.get("component:Button");
-    expect(detail).toMatchObject({ kind: "component", name: "Button" });
-    expect((detail as any).props.length).toBeGreaterThan(3);
+  it("returns a component's whole docs page", () => {
+    const page = store.get("component:Button")!;
+    expect(page).toMatchObject({ id: "component:Button", kind: "component", title: "Button" });
+    expect(page.markdown).toBe(index.docs.components.button.markdown);
+    expect(page.markdown).toContain("## Examples");
+  });
+
+  it("returns the page that holds a member export", () => {
+    const page = store.get("TableRow")!;
+    expect(page.kind).toBe("component");
+    expect(page.markdown).toBe(index.docs.components.table.markdown);
   });
 
   it("resolves bare names case-insensitively", () => {
-    expect((store.get("button") as any).name).toBe("Button");
-    expect((store.get("BGPRIMARY") as any).name).toBe("bgPrimary");
+    expect(store.get("button")?.id).toBe("component:Button");
   });
 
-  it("returns token values for all four themes", () => {
-    const detail = store.get("token:bgPrimary") as any;
-    expect(Object.keys(detail.values)).toEqual(["light", "dark", "acme", "ember"]);
-    expect(detail.formula).toBe("slot(canvas)");
+  it("returns a token page, a guide, a token, a pattern and a topic as markdown", () => {
+    expect(store.get("tokens:color")?.markdown).toBe(index.docs.tokenPages.color.markdown);
+    expect(store.get("guide:theming")?.markdown).toBe(index.docs.guides.theming.markdown);
+    expect(store.get("token:bgPrimary")?.markdown).toContain("| ember | oklch(");
+    expect(store.get("pattern:destructive-confirm")?.markdown).toMatch(/^# Pattern: destructive-confirm\n/);
+    expect(store.get("topic:variants")?.markdown).toMatch(/^# Topic: variants\n/);
   });
 
-  it("returns topic content and null for unknown ids", () => {
-    expect((store.get("topic:getting-started") as any).content).toHaveProperty("cssImports");
-    expect(store.get("nope:nothing")).toBeNull();
+  it("keeps today's meaning for a bare name that is both a topic and a token page", () => {
+    // "motion" is a guidance topic and a token page. Bare names keep their
+    // pre-D129 resolution order, so it stays the topic.
+    expect(store.get("motion")?.kind).toBe("topic");
+    expect(store.get("tokens:motion")?.kind).toBe("tokens");
   });
 
-  it("returns full pattern detail with parameters (D47)", () => {
-    const detail = store.get("pattern:destructive-confirm");
-    expect(detail).toMatchObject({ kind: "pattern", id: "destructive-confirm" });
-    expect((detail as any).parameters.length).toBeGreaterThan(0);
+  it("returns null for an unknown id, and suggests the three nearest", () => {
+    expect(store.get("component:Buton")).toBeNull();
+    expect(store.suggest("component:Buton")).toHaveLength(3);
+    expect(store.suggest("component:Buton")[0]).toBe("component:Button");
   });
 
   it("filter-toolbar is now unblocked with a preset (D52)", () => {
     const brief = store.search("filter toolbar").find((b) => b.id === "pattern:filter-toolbar");
     expect(brief).toBeDefined();
     expect(brief!.summary).not.toContain("blocked");
-    const detail = store.get("pattern:filter-toolbar");
-    expect(JSON.stringify(detail)).toContain("<Toolbar");
+    expect(store.get("pattern:filter-toolbar")!.markdown).toContain("<Toolbar");
   });
 });

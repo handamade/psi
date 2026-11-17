@@ -1,23 +1,16 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { buildIndex } from "../src/index-builder.js";
 import { createStore } from "../src/store.js";
 import { createPsiServer } from "../src/server.js";
+import { loadTestIndex } from "./test-index.js";
 
 type ToolCallResult = { content: Array<{ type: string; text: string }>; isError?: boolean };
 
-const pkgs = fileURLToPath(new URL("../..", import.meta.url));
 let client: Client;
 
 beforeAll(async () => {
-  const index = await buildIndex({
-    tokensDist: `${pkgs}tokens/dist`,
-    reactDist: `${pkgs}react/dist`,
-    reactDocs: `${pkgs}react/docs`,
-    version: "0.0.0-test",
-  });
+  const index = await loadTestIndex();
   const server = createPsiServer(createStore(index), index.version);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   client = new Client({ name: "test", version: "0.0.0" });
@@ -37,15 +30,16 @@ describe("psi MCP server", () => {
     expect(briefs[0].id).toBe("component:Button");
   });
 
-  it("answers get calls with full detail", async () => {
+  it("answers get calls with the docs page's markdown", async () => {
     const res = (await client.callTool({ name: "get", arguments: { id: "token:bgPrimary" } })) as ToolCallResult;
-    const detail = JSON.parse(res.content[0].text);
-    expect(detail.values.ember.hex).toMatch(/^#/);
+    expect(res.content[0].text).toMatch(/^# `--psi-bg-primary`\n/);
+    expect(res.content[0].text).toContain("| ember | oklch(");
   });
 
   it("flags unknown ids as errors without throwing", async () => {
     const res = (await client.callTool({ name: "get", arguments: { id: "component:DoesNotExist" } })) as ToolCallResult;
     expect(res.isError).toBe(true);
     expect(res.content[0].text).toContain("search");
+    expect(res.content[0].text).toContain("Nearest:");
   });
 });

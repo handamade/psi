@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { ComponentEntry, Oklch, PatternEntry, PropDoc, PsiIndex, TokenEntry } from "./types.js";
+import type { BaseIndex, ComponentEntry, Oklch, PatternEntry, PropDoc, TokenEntry } from "./types.js";
 
 const THEMES = ["light", "dark", "acme", "ember"];
 
@@ -65,7 +65,7 @@ async function readJson(path: string): Promise<unknown> {
   return JSON.parse(await readFile(path, "utf8"));
 }
 
-export async function buildIndex(inputs: BuildInputs): Promise<PsiIndex> {
+export async function buildIndex(inputs: BuildInputs): Promise<BaseIndex> {
   const manifest = (await readJson(join(inputs.reactDist, "manifest.json"))) as {
     components: ManifestComponent[];
   };

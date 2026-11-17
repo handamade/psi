@@ -64,6 +64,25 @@ export interface PatternEntry {
   preset: string | null;
 }
 
+/** Everything the MCP index serves as markdown, built from one DocsInput.
+ * A mirror of `@handamade/psi-docs`' `DocsPages`: src/ never imports that
+ * package, so tsc does not compile its TS source (D129). */
+export interface DocsPages {
+  overview: string;
+  /** By page slug. */
+  components: Record<string, { title: string; members: string[]; markdown: string }>;
+  /** By token page slug; title is e.g. "Color tokens". */
+  tokenPages: Record<string, { title: string; markdown: string }>;
+  /** By guide id. */
+  guides: Record<string, { title: string; description: string; markdown: string }>;
+  /** By token name, e.g. "bgPrimary". */
+  tokens: Record<string, string>;
+  /** By pattern id. */
+  patterns: Record<string, string>;
+  /** By topic name. */
+  topics: Record<string, string>;
+}
+
 export interface PsiIndex {
   version: string;
   themes: string[];
@@ -72,4 +91,10 @@ export interface PsiIndex {
   patterns: PatternEntry[];
   scales: Record<string, unknown>;
   topics: Record<string, unknown>;
+  /** Every docs page and every single-token, pattern and topic page, as
+   * markdown, baked from @handamade/psi-docs at publish time (D129). */
+  docs: DocsPages;
 }
+
+/** What `buildIndex` returns: the index before its docs are baked. */
+export type BaseIndex = Omit<PsiIndex, "docs">;
