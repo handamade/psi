@@ -1,13 +1,21 @@
 /* packages/react/src/Table/table.module.css */
 
+/* D126: the separate model, not collapse. A collapsed table does not round
+   its border: the background takes the curve and the 1px border meets in a
+   square corner outside it. --_psi-table-corner is the border's inner radius,
+   which the four corner cells take so a sticky header or a hovered first or
+   last row stays inside the curve. It is private (not a token): TableContainer
+   draws the frame itself and sets it to 0px. */
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background: var(--psi-table-bg);
   color: var(--psi-table-fg);
   font: var(--psi-text-14-20-regular);
   border: 1px solid var(--psi-table-border);
   border-radius: var(--psi-table-radius);
+  --_psi-table-corner: calc(var(--psi-table-radius) - 1px);
 }
 
 /* ── Caption (D85) ───────────────────────────────────────────────
@@ -46,6 +54,39 @@
   border-bottom: 1px solid var(--psi-table-cell-border);
 }
 
+/* The last row's bottom edge is the table's own border (D126). With no body
+   rows, the header's last row meets it instead. */
+.body .row:last-child > * {
+  border-bottom: 0;
+}
+
+.table:not(:has(.body .row)) .head .row:last-child > * {
+  border-bottom: 0;
+}
+
+/* Corner cells (D126). Top: the first row of whichever section comes first.
+   Bottom: the body's last row, or the head's when the body is empty. A cell
+   that is both first and last (colSpan) takes both. */
+.head .row:first-child > :first-child,
+.table:not(:has(.head)) .body .row:first-child > :first-child {
+  border-start-start-radius: var(--_psi-table-corner);
+}
+
+.head .row:first-child > :last-child,
+.table:not(:has(.head)) .body .row:first-child > :last-child {
+  border-start-end-radius: var(--_psi-table-corner);
+}
+
+.body .row:last-child > :first-child,
+.table:not(:has(.body .row)) .head .row:last-child > :first-child {
+  border-end-start-radius: var(--_psi-table-corner);
+}
+
+.body .row:last-child > :last-child,
+.table:not(:has(.body .row)) .head .row:last-child > :last-child {
+  border-end-end-radius: var(--_psi-table-corner);
+}
+
 /* A row header (D85): the cell that names its row. Weight marks it; the
    colour stays the body's, unlike a column header's. */
 .rowHeader {
@@ -57,6 +98,12 @@
 .headerCell[data-numeric] {
   text-align: end;
   font-variant-numeric: var(--psi-font-variant-numeric);
+}
+
+/* An amount stays on one line (D126). Body cells only: a numeric column's
+   header label may wrap rather than widen the column. */
+.cell[data-numeric] {
+  white-space: nowrap;
 }
 
 .sortButton {
@@ -128,34 +175,37 @@
 /* ── Row states ───────────────────────────────────────────────────
    data-selected wins over hover: a hovered selected row stays selected.
    Scoped to .body: TableRow is also used (unstyled-for-hover) inside
-   TableHead, and a hovered header row tinting like a data row is wrong. */
+   TableHead, and a hovered header row tinting like a data row is wrong.
+   Painted on the cells, not the <tr> (D126): a row's background is not
+   clipped by its cells' corner radii in every engine. A consumer's own
+   background on a TableRow shows through row-bg (transparent) at rest. */
 
-.body .row:hover {
+.row > * {
+  background: var(--psi-table-row-bg);
+}
+
+.body .row:hover > * {
   background: var(--psi-table-row-bg-hover);
 }
 
-.body .row[data-selected]:hover {
+.row[data-selected] > * {
   background: var(--psi-table-row-bg-selected);
 }
 
-.row[data-selected] {
+.body .row[data-selected]:hover > * {
   background: var(--psi-table-row-bg-selected);
-}
-
-.row {
-  background: var(--psi-table-row-bg);
 }
 
 /* ── Sticky header ────────────────────────────────────────────────
    Needs no ARIA. The background is required: a transparent sticky header
-   would let body rows show through as they scroll under it. border-bottom
-   does not paint on a sticky <th> under border-collapse: collapse in
-   Chromium/WebKit, so the bottom edge is drawn with box-shadow instead. */
+   would let body rows show through as they scroll under it. In the separate
+   model (D126) border-bottom paints on a sticky <th>, so the inset-shadow
+   stand-in the collapsed model needed is gone. It sticks to the nearest
+   scrolling ancestor: the page, AppShell's <main>, or a TableContainer. */
 
 .sticky .headerCell {
   position: sticky;
   inset-block-start: 0;
   z-index: var(--psi-z-sticky);
   background: var(--psi-table-bg);
-  box-shadow: inset 0 -1px 0 var(--psi-table-cell-border);
 }
