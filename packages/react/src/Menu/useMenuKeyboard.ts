@@ -76,6 +76,46 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
     };
   }, [open, popoverRef, openAtRef, menuItems, focusItem, focusTrigger]);
 
+  // D131: a re-render that removes the focused item must not drop focus to
+  // the page, where the menu's keyboard can no longer hear Esc or the arrows.
+  // React keeps an item's element for a stable key, so an item that survives
+  // keeps its focus by itself. One that goes hands focus to the item now at
+  // its position (the new last, if it was last), or, in an emptied menu, to
+  // the menu element (tabindex=-1). Focus the user moved elsewhere is left.
+  useEffect(() => {
+    const root = popoverRef.current;
+    if (!open || !root) return;
+    let last: { el: HTMLElement; index: number } | null = null;
+
+    const onFocusIn = (event: FocusEvent) => {
+      const el = event.target as HTMLElement;
+      const index = menuItems().indexOf(el);
+      if (index !== -1) last = { el, index };
+    };
+    const observer = new MutationObserver(() => {
+      if (!last || last.el.isConnected) return;
+      const active = document.activeElement;
+      if (active && active !== document.body && !root.contains(active)) return;
+      const items = menuItems();
+      const next = items[Math.min(last.index, items.length - 1)];
+      last = null;
+      if (next) focusItem(next);
+      else root.focus();
+    });
+
+    root.addEventListener("focusin", onFocusIn);
+    observer.observe(root, { childList: true, subtree: true });
+    // The open effect above may already have focused an item.
+    if (document.activeElement instanceof HTMLElement) {
+      const index = menuItems().indexOf(document.activeElement);
+      if (index !== -1) last = { el: document.activeElement, index };
+    }
+    return () => {
+      root.removeEventListener("focusin", onFocusIn);
+      observer.disconnect();
+    };
+  }, [open, popoverRef, menuItems, focusItem]);
+
   return useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
       // Checked first, ahead of the empty-items guard below: Esc must be

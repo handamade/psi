@@ -202,6 +202,9 @@ export function Menu({
         ref={setRef}
         {...popupProps}
         role="menu"
+        // D131: an emptied menu takes focus itself, so its keyboard still
+        // hears Esc and Tab. Never a Tab stop.
+        tabIndex={-1}
         data-psi-menu
         data-placement={placement}
         className={[styles.menu, className].filter(Boolean).join(" ")}
