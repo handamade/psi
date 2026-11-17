@@ -28,6 +28,7 @@
     "build": "tsx scripts/build-index.ts && tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "@babel/parser": "^7.29.7",
     "@handamade/psi-tokens": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.16.0",
     "zod": "^3.25.0"

@@ -53,4 +53,37 @@ describe("streamable HTTP handler (stateless)", () => {
     const briefs = JSON.parse(body.result.content[0].text);
     expect(briefs[0].id).toBe("component:Button");
   });
+
+  it("answers a get call through the handler", async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: HEADERS,
+      body: rpc(3, "tools/call", { name: "get", arguments: { id: "component:Button" } }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.result.content[0].text).toContain("## Examples");
+  });
+
+  it("answers a theme call through the handler", async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: HEADERS,
+      body: rpc(4, "tools/call", { name: "theme", arguments: { hue: 264, name: "ocean" } }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.result.content[0].text).toContain('[data-psi-theme="ocean-dark"]');
+  });
+
+  it("answers a check call through the handler", async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: HEADERS,
+      body: rpc(5, "tools/call", { name: "check", arguments: { code: '<Button size="md">x</Button>' } }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.result.content[0].text).toContain("invalid-value");
+  });
 });

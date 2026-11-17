@@ -20,6 +20,12 @@ export interface ComponentEntry {
     cardinality: string;
     order?: number;
   }>;
+  /** The React attribute interface its props extend, e.g. "ButtonHTMLAttributes"; null when none (D129). */
+  attributes: string | null;
+  /** Index into PsiIndex.attributeSets: the attribute names it passes through. */
+  attributeSet: number | null;
+  /** At least one of these attributes must be present (D129). */
+  accessibleName: { oneOf: string[] } | null;
 }
 
 export interface Oklch { l: number; c: number; h: number; alpha?: number }
@@ -91,6 +97,12 @@ export interface PsiIndex {
   patterns: PatternEntry[];
   scales: Record<string, unknown>;
   topics: Record<string, unknown>;
+  /** Attribute names components pass through to their element, deduplicated (D129). */
+  attributeSets: string[][];
+  /** Slot contract name → member components (src/contracts.json). */
+  contracts: Record<string, string[]>;
+  /** Every name @handamade/psi-react exports, values and types. */
+  exports: string[];
   /** Every docs page and every single-token, pattern and topic page, as
    * markdown, baked from @handamade/psi-docs at publish time (D129). */
   docs: DocsPages;

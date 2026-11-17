@@ -16,6 +16,7 @@ export { buildIndex, GETTING_STARTED } from "./index-builder.js";
 export { createStore } from "./store.js";
 export type { Store, Brief, OverviewPatternBrief, SearchBrief, Page, DocKind } from "./store.js";
 export { createPsiServer } from "./server.js";
+export { checkMarkdown, CheckInputError, MAX_CODE, type CheckIndex } from "./check/index.js";
 export { themeMarkdown, themeVector, ThemeError, type ThemeInput } from "./theme.js";
 
 /** Loads the index baked next to the compiled module at publish time. */

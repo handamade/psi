@@ -1,9 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { CheckInputError, checkMarkdown, type CheckIndex } from "./check/index.js";
 import type { Store } from "./store.js";
 import { ThemeError, themeMarkdown } from "./theme.js";
 
-export function createPsiServer(store: Store, version: string): McpServer {
+export function createPsiServer(store: Store, version: string, index: CheckIndex): McpServer {
   const server = new McpServer({ name: "psi", version });
 
   server.registerTool(
@@ -80,6 +81,30 @@ export function createPsiServer(store: Store, version: string): McpServer {
         return { content: [{ type: "text", text: themeMarkdown(input) }] };
       } catch (err) {
         if (err instanceof ThemeError) return { isError: true, content: [{ type: "text", text: err.message }] };
+        throw err;
+      }
+    },
+  );
+
+  server.registerTool(
+    "check",
+    {
+      title: "Check JSX against the Psi API",
+      description:
+        "Report where a JSX snippet uses Psi wrongly: a name Psi does not export, an unknown " +
+        "prop, a value outside a prop's allowed values (size=\"md\", variant=\"primary\"), a " +
+        "missing required prop, a child a slot does not accept, or a component without the " +
+        "accessible name it needs. Reports only; never rewrites the code. Spreads and computed " +
+        "values are listed as skipped, not guessed.",
+      inputSchema: {
+        code: z.string().describe("TSX or JSX: a module, or one or more elements. At most 20000 characters."),
+      },
+    },
+    async ({ code }) => {
+      try {
+        return { content: [{ type: "text", text: checkMarkdown(code, index) }] };
+      } catch (err) {
+        if (err instanceof CheckInputError) return { isError: true, content: [{ type: "text", text: err.message }] };
         throw err;
       }
     },

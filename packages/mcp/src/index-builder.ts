@@ -53,6 +53,8 @@ interface ManifestComponent {
     cardinality: string;
     order?: number;
   }>;
+  attributes: string | null;
+  accessibleName: { oneOf: string[] } | null;
 }
 
 /** Shape of `packages/tokens/dist/resolved/<theme>.json`. */
@@ -68,12 +70,26 @@ async function readJson(path: string): Promise<unknown> {
 export async function buildIndex(inputs: BuildInputs): Promise<BaseIndex> {
   const manifest = (await readJson(join(inputs.reactDist, "manifest.json"))) as {
     components: ManifestComponent[];
+    contracts: Record<string, string[]>;
   };
   // Fail-fast is deliberate: requires @handamade/psi-react built first — same posture
   // as the manifest/guidance reads above.
   const patternsFile = (await readJson(join(inputs.reactDist, "patterns.json"))) as {
     patterns: PatternEntry[];
   };
+  const attributes = (await readJson(join(inputs.reactDist, "attributes.json"))) as {
+    sets: string[][];
+    components: Record<string, number>;
+  };
+  // The export surface, as verify-published reads it: every `export { … }`
+  // and `export type { … }` in the compiled entry's declarations.
+  const dts = await readFile(join(inputs.reactDist, "index.d.ts"), "utf8");
+  const exportNames = [...dts.matchAll(/^export\s+(?:type\s+)?\{([^}]+)\}/gm)].flatMap((m) =>
+    m[1]
+      .split(",")
+      .map((n) => n.trim().split(/\s+as\s+/).pop()!)
+      .filter(Boolean),
+  );
   const guidance = (await readJson(join(inputs.tokensDist, "guidance.json"))) as Record<
     string,
     unknown
@@ -92,6 +108,9 @@ export async function buildIndex(inputs: BuildInputs): Promise<BaseIndex> {
       description: c.description,
       props: c.props,
       slots: c.slots,
+      attributes: c.attributes,
+      attributeSet: attributes.components[c.name] ?? null,
+      accessibleName: c.accessibleName,
       doc: await readFile(join(inputs.reactDocs, `${c.name}.md`), "utf8"),
     });
   }
@@ -115,6 +134,9 @@ export async function buildIndex(inputs: BuildInputs): Promise<BaseIndex> {
     tokens,
     patterns: patternsFile.patterns,
     scales: light.scales,
+    attributeSets: attributes.sets,
+    contracts: manifest.contracts,
+    exports: [...new Set(exportNames)].sort(),
     topics: {
       ...guidance,
       "getting-started": GETTING_STARTED,

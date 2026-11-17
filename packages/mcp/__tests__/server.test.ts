@@ -11,7 +11,7 @@ let client: Client;
 
 beforeAll(async () => {
   const index = await loadTestIndex();
-  const server = createPsiServer(createStore(index), index.version);
+  const server = createPsiServer(createStore(index), index.version, index);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   client = new Client({ name: "test", version: "0.0.0" });
   await server.connect(serverTransport);
@@ -21,7 +21,7 @@ beforeAll(async () => {
 describe("psi MCP server", () => {
   it("lists the read-only tools", async () => {
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual(["get", "search", "theme"]);
+    expect(tools.map((t) => t.name).sort()).toEqual(["check", "get", "search", "theme"]);
   });
 
   it("answers theme calls with CSS, and bad input as an error", async () => {
@@ -50,5 +50,12 @@ describe("psi MCP server", () => {
     expect(res.isError).toBe(true);
     expect(res.content[0].text).toContain("search");
     expect(res.content[0].text).toContain("Nearest:");
+  });
+
+  it("answers check calls with findings, and over-long code as an error", async () => {
+    const res = (await client.callTool({ name: "check", arguments: { code: '<Button size="md">x</Button>' } })) as ToolCallResult;
+    expect(res.content[0].text).toContain("**invalid-value**");
+    const long = (await client.callTool({ name: "check", arguments: { code: "x".repeat(20_001) } })) as ToolCallResult;
+    expect(long.isError).toBe(true);
   });
 });
