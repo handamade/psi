@@ -456,6 +456,46 @@ From the ARIA 1.2 combobox pattern with list autocomplete.
   - Toolbar's control-width rule reaches a bare Combobox;
   - the tokens gain the `--psi-combobox-*` set.
 
+## As built (2026-11-17)
+
+Built on D131's layers, as the plan `docs/superpowers/plans/2026-11-17-combobox.md`
+sets out. Where the build measured something or settled a choice this spec
+left open:
+
+- **`mousedown`, not `pointerdown`, keeps focus in the input.** Cancelling
+  `pointerdown` suppresses the compatibility mouse events (and, in
+  user-event, the click) without holding focus; cancelling `mousedown`, whose
+  default action is what moves focus, does. Pressing an option, a button or
+  the popup's scrollbar cancels `mousedown`. Pinned in Chromium by
+  `combobox.interaction.spec.ts`.
+- **The focus ring is the input's**, drawn around the whole control by
+  `.combobox:has(.input:focus-visible)`, so it stays keyed on `:focus-visible`
+  (D82's lint rule). The input's own ring is a transparent outline.
+- **`required`** sets `aria-required` and a custom validity from the value. It
+  can't be the native attribute: that reads the text, which is empty in a
+  multi-select that has values. The message is the browser's own, read from a
+  detached `<input required>`, so it needs no new translatable prop.
+- **Opening shows the whole list; typing filters.** Arrow keys and the chevron
+  open the list unfiltered, even with a single-select's picked label in the
+  input.
+- **Typing highlights the first option, and keeps following it** while the
+  list changes until a key or the pointer picks another, so an async read
+  that lands later is highlighted from its top. Alt + Down opens with nothing
+  highlighted. The chevron opens on the picked option, or nothing.
+- **Enter never submits while the list is open,** even with nothing
+  highlighted. Esc that clears the text also stops propagation; with no text
+  and the list closed, Esc reaches a surrounding Dialog.
+- **One live region** speaks the count, the loading line and "No matches";
+  the visible status lines are not live, so nothing is said twice.
+- **Tag's remove buttons** get `tabindex="-1"` from the Combobox, since Tag has
+  no prop for its button and this decision adds only `dismissLabel`.
+- **A click in the input doesn't open the list** (React Aria's default): typing,
+  the arrow keys and the chevron do.
+- **Open-list stories open under `vr` only,** like Tooltip's, and
+  `stories.spec.ts` waits for their popup.
+- **A type test** (`packages/react/scripts/types.test.ts`) compiles fixtures
+  with the TypeScript API, since no gate type-checks test files.
+
 ## Follow-ups
 
 - **A public `Popover`.** A decision of its own, with focus management, dialog

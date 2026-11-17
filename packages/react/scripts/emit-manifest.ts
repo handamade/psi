@@ -27,6 +27,7 @@ const COMPONENTS = [
   "RadioGroup",
   "Radio",
   "Tag",
+  "Combobox",
   "Toolbar",
   "Tooltip",
   "NavBar",
