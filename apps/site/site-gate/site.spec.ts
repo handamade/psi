@@ -16,18 +16,14 @@ for (const theme of ["light", "dark"] as const) {
 }
 
 /**
- * The hero's derive labels, measured directly — because axe structurally cannot.
- *
- * `.hero::before` / `::after` (the blueprint grid and the accent glow) mean axe
- * cannot determine an effective background for anything in the hero, so it files
- * all 34 hero nodes under `incomplete` rather than `violations` — the derive
- * labels among them. Asserting on `incomplete` was tried and rejected: it cannot
- * tell "a real failure axe couldn't measure" from "a decorative pseudo-element".
+ * The theme console's derive labels, measured directly at both ends of the Δ
+ * slider. axe audits the page once, at rest; the slider moves the swatches'
+ * lightness, so only a measurement after moving it covers what a visitor sees.
  *
  * These labels used to sit ON the accent swatches: measured 4.38:1 at rest and
  * 2.88:1 with the Δ slider at maximum — a contrast demo that failed contrast.
- * Task 8 moved them onto the panel. If anyone moves them back, the effective
- * background becomes the accent fill again and this fails. (D76)
+ * They were moved below the swatches, onto the card. If anyone moves them back,
+ * the effective background becomes the accent fill again and this fails. (D76)
  */
 test("the hero's derive labels clear AA at both slider extremes", async ({ page }) => {
   await page.goto(BASE, { waitUntil: "networkidle" });
@@ -172,8 +168,8 @@ test("no Storybook link points at a missing docs page", async ({ page }) => {
   expect(missing, "generated ids missing from the Storybook build index").toEqual([]);
 });
 
-// 320 is the WCAG reflow floor. 760 sits inside the band where the nav is still
-// shown but no longer fits — the failure the 720px breakpoint alone missed.
+// 320 is the WCAG reflow floor. 760 sits between breakpoints.sm (560) and
+// breakpoints.md (960): the phone chrome with the wider page gutter. 1440 is desktop.
 for (const width of [320, 760, 1440]) {
   test(`no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
@@ -293,9 +289,15 @@ test.describe("at 375px", () => {
     await expect(page.getByRole("tab", { name: "MCP" })).toHaveAttribute("aria-selected", "true");
   });
 
-  test("the same bottom bar on a docs page", async ({ page }) => {
+  test("the same bottom bar on a docs page, and Escape returns focus to Menu", async ({ page }) => {
     await page.goto(`${BASE}docs/`, { waitUntil: "networkidle" });
     await expect(page.getByRole("navigation", { name: "Site, bottom" })).toBeVisible();
+    const menu = page.getByRole("button", { name: "Menu" });
+    await menu.click();
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect(menu).toBeFocused();
   });
 
   // The bar's clearance is padded by the scrollers that end under it, never by
@@ -390,9 +392,15 @@ test("hydrating the homepage logs no errors, with a stored dark mode and brand",
     if (m.type() === "error") errors.push(m.text());
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.addInitScript(() => localStorage.setItem("psi-theme", "dark"));
+  await page.addInitScript((brand) => {
+    localStorage.setItem("psi-theme", "dark");
+    localStorage.setItem("psi-brand", JSON.stringify(brand));
+  }, LIGHT_PAINTED_BRAND);
   await page.goto(BASE, { waitUntil: "networkidle" });
   await expect(page.locator("html")).toHaveAttribute("data-psi-theme", "dark");
+  // The brand was read and kept: the console re-derived it rather than rejecting it.
+  await expect(page.locator("html")).toHaveAttribute("data-psi-custom", "");
+  expect(JSON.parse((await page.evaluate(() => localStorage.getItem("psi-brand")))!).vector.name).toBe("gate-brand");
   await expect(page.locator("header.site-header").getByRole("radio", { name: "Dark" })).toHaveAttribute("aria-checked", "true");
   expect(errors).toEqual([]);
 });

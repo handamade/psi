@@ -187,7 +187,6 @@ test.describe("at 375px", () => {
       const width = await page.locator("main#main").evaluate((el) => el.getBoundingClientRect().width);
       expect(width).toBeGreaterThanOrEqual(300);
       await expect(page.locator("#docs-sidebar")).toBeHidden();
-      await expect(page.locator(".docs-menu-toggle")).toBeHidden();
     });
   });
 
