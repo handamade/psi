@@ -23,21 +23,23 @@
     outline var(--psi-duration-150) var(--psi-ease-standard);
 }
 
-.combobox:hover:not(.disabled):not(:focus-within) {
+.combobox:hover:not(.disabled):not(:has(.input:focus-visible)) {
   border-color: var(--psi-combobox-border-hover);
 }
 
 /* Inset (D82), as on Select: the ring replaces the border, inside the
-   control's own box. Focus stays in the input, so the ring stays while the
-   list is open and an option is highlighted. */
-.combobox:focus-within {
+   control's own box. It is the input's ring, drawn around the whole control
+   (Tags and buttons included): focus stays in the input, so the ring stays
+   while the list is open and an option is highlighted. A text input matches
+   :focus-visible whenever it has focus. */
+.combobox:has(.input:focus-visible) {
   outline: var(--psi-focus-ring-width) solid var(--psi-combobox-focus-ring);
   outline-offset: var(--psi-focus-ring-offset-inset);
   border-color: transparent;
 }
 
 .error,
-.error:hover:not(.disabled):not(:focus-within) {
+.error:hover:not(.disabled):not(:has(.input:focus-visible)) {
   border-color: var(--psi-combobox-border-error);
 }
 
@@ -61,10 +63,15 @@
   margin: 0;
   padding: 0;
   border: 0;
-  outline: none;
   background: transparent;
   color: inherit;
   font: inherit;
+}
+
+/* The control draws this input's ring (above); a transparent one here
+   replaces the browser's own, which would draw a second ring inside it. */
+.input:focus-visible {
+  outline: var(--psi-focus-ring-width) solid transparent;
 }
 
 .input::placeholder {

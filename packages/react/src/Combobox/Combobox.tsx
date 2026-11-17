@@ -159,16 +159,16 @@ export function Combobox(props: ComboboxProps) {
     className,
     style,
     ref,
-    multiple: _multiple,
-    value: _value,
-    defaultValue: _defaultValue,
-    onChange: _onChange,
+    multiple: multipleProp,
+    value: valueProp,
+    defaultValue: defaultValueProp,
+    onChange: onChangeProp,
     size: sizeProp,
     onKeyDown: onKeyDownProp,
     onBlur: onBlurProp,
     ...rest
   } = props;
-  const multiple = props.multiple === true;
+  const multiple = multipleProp === true;
   const size = sizeProp ?? 32;
 
   const field = useContext(FieldContext);
@@ -189,24 +189,25 @@ export function Combobox(props: ComboboxProps) {
   const listboxRef = useRef<HTMLDivElement | null>(null);
 
   // ── The value: controlled or not, one string or several ──
-  const isControlled = props.value !== undefined;
+  const isControlled = valueProp !== undefined;
   const [uncontrolled, setUncontrolled] = useState<string[]>(() => {
-    const initial = props.defaultValue;
-    if (Array.isArray(initial)) return initial;
-    return initial == null ? [] : [initial];
+    if (Array.isArray(defaultValueProp)) return defaultValueProp;
+    return defaultValueProp == null ? [] : [defaultValueProp];
   });
   const values: string[] = isControlled
-    ? Array.isArray(props.value)
-      ? props.value
-      : props.value == null
+    ? Array.isArray(valueProp)
+      ? valueProp
+      : valueProp == null
         ? []
-        : [props.value]
+        : [valueProp]
     : uncontrolled;
 
+  // The union keeps value and onChange in step for callers; inside, one
+  // string[] carries both shapes, and multiple says which one to report.
   const commit = (next: string[]) => {
     if (!isControlled) setUncontrolled(next);
-    if (props.multiple === true) props.onChange?.(next);
-    else props.onChange?.(next[0] ?? null);
+    if (multiple) (onChangeProp as ((values: string[]) => void) | undefined)?.(next);
+    else (onChangeProp as ((value: string | null) => void) | undefined)?.(next[0] ?? null);
   };
 
   // A picked value keeps its label when a caller-owned list no longer holds
@@ -233,7 +234,6 @@ export function Combobox(props: ComboboxProps) {
     lastValueKey.current = key;
     if (!multiple) writeText(singleLabel);
     // writeText is recreated each render; the value is the trigger.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.join("\u0000"), multiple]);
 
   // ── The list ──
@@ -277,7 +277,6 @@ export function Combobox(props: ComboboxProps) {
     const el = document.getElementById(optionId(activeIndex));
     el?.scrollIntoView?.({ block: "nearest" });
     // optionId is derived from uid, which is stable.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, activeIndex]);
 
   // ── Picking ──
