@@ -65,7 +65,7 @@ export function ThemeConsole() {
       const member = derived[vector.mode];
       applyCustomProperties(member.customProperties);
       setModeEphemeral(vector.mode);
-      setBrand(vector, member.customProperties);
+      setBrand(vector, member.customProperties, member.mode);
       setPair(derived);
       await log(`> art direction: ${source} · "${vector.name.replace(/-/g, " ")}"`);
       await log("> applied. both modes. zero failures — by construction.");
@@ -172,7 +172,7 @@ export function ThemeConsole() {
       const member = derived[mode];
       applyCustomProperties(member.customProperties);
       setPair(derived);
-      setBrand(stored.vector, member.customProperties);
+      setBrand(stored.vector, member.customProperties, member.mode);
     } catch {
       reset();
     }
@@ -189,7 +189,7 @@ export function ThemeConsole() {
     if (!brand || !pair) return;
     const member = pair[mode];
     applyCustomProperties(member.customProperties);
-    setBrand(brand, member.customProperties);
+    setBrand(brand, member.customProperties, member.mode);
   }, [mode, brand, pair, setBrand]);
 
   return (

@@ -8,9 +8,14 @@ export type Mode = "light" | "dark";
 
 export interface StoredBrand {
   vector: BrandVector;
-  /** Resolved custom properties for the vector's own mode, so the boot script
-   * can paint before `generate/` is available. Rewritten whenever it drifts. */
+  /** Resolved custom properties for the mode the page was painted in, so the
+   * boot script can paint before `generate/` is available. Rewritten whenever
+   * it drifts, and on every mode change. */
   cache: Record<string, string>;
+  /** The mode `cache` was resolved for. A page that paints a fixed mode (the
+   * Canopy frame) applies the cache only when this matches, and derives the
+   * other member itself. Absent in brands stored before it was recorded. */
+  mode?: Mode;
 }
 
 function isMode(value: unknown): value is Mode {
@@ -57,7 +62,8 @@ export function readStoredBrand(): StoredBrand | null {
       typeof parsed.cache === "object" && parsed.cache !== null
         ? (parsed.cache as Record<string, string>)
         : {};
-    return { vector: parsed.vector, cache };
+    const mode = (parsed as { mode?: unknown }).mode;
+    return isMode(mode) ? { vector: parsed.vector, cache, mode } : { vector: parsed.vector, cache };
   } catch {
     try {
       localStorage.removeItem(BRAND_KEY);
@@ -159,7 +165,7 @@ export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode)
 /** Brand state. Orthogonal to mode: reset clears this and never touches that. */
 export function useBrand(): {
   brand: BrandVector | null;
-  setBrand: (v: BrandVector, cache: Record<string, string>) => void;
+  setBrand: (v: BrandVector, cache: Record<string, string>, mode?: Mode) => void;
   reset: () => void;
 } {
   // Same reason as useModePref: null on the server and on the first client
@@ -169,10 +175,10 @@ export function useBrand(): {
     setBrandState(readStoredBrand()?.vector ?? null);
   }, []);
 
-  const setBrand = useCallback((v: BrandVector, cache: Record<string, string>) => {
+  const setBrand = useCallback((v: BrandVector, cache: Record<string, string>, mode?: Mode) => {
     setBrandState(v);
     try {
-      localStorage.setItem(BRAND_KEY, JSON.stringify({ vector: v, cache }));
+      localStorage.setItem(BRAND_KEY, JSON.stringify(mode ? { vector: v, cache, mode } : { vector: v, cache }));
     } catch {
       /* storage unavailable */
     }

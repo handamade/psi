@@ -273,3 +273,20 @@ describe("mode preference in one document", () => {
     expect(c[1]).toBe("light");
   });
 });
+
+describe("a stored brand's mode", () => {
+  const v = { hue: 30, chroma: "vivid", mode: "dark", radius: 8, name: "kept" } as const;
+
+  it("is recorded beside the cache, and read back", () => {
+    let last!: ReturnType<typeof useBrand>;
+    mount(createElement(function P() { last = useBrand(); return null; }));
+    act(() => last.setBrand(v, { "--psi-bg-primary": "x" }, "light"));
+    expect(JSON.parse(localStorage.getItem(BRAND_KEY)!).mode).toBe("light");
+    expect(readStoredBrand()?.mode).toBe("light");
+  });
+
+  it("is absent from a brand stored without one", () => {
+    localStorage.setItem(BRAND_KEY, JSON.stringify({ vector: v, cache: {}, mode: "sepia" }));
+    expect(readStoredBrand()).toEqual({ vector: v, cache: {} });
+  });
+});

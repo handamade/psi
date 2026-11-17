@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 import { BASE as ORIGIN, runAxe } from "./helpers";
 
@@ -376,6 +376,14 @@ test("every trace Storybook link names a story Storybook built", async ({ page }
   expect(checked).toBeGreaterThanOrEqual(4);
 });
 
+/** A brand as the homepage stores it. The cache is a stand-in whose one value
+ * is a light background, as if the homepage had been painted light. */
+const LIGHT_PAINTED_BRAND = {
+  vector: { hue: 30, chroma: "vivid", mode: "light", radius: 8, name: "gate-brand" },
+  cache: { "--psi-bg-primary": "oklch(0.99 0 0)" },
+  mode: "light",
+};
+
 test("hydrating the homepage logs no errors, with a stored dark mode and brand", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (m) => {
@@ -387,4 +395,38 @@ test("hydrating the homepage logs no errors, with a stored dark mode and brand",
   await expect(page.locator("html")).toHaveAttribute("data-psi-theme", "dark");
   await expect(page.locator("header.site-header").getByRole("radio", { name: "Dark" })).toHaveAttribute("aria-checked", "true");
   expect(errors).toEqual([]);
+});
+
+/** The relative luminance of an element's background, whatever colour syntax
+ * the browser computes it in: a canvas resolves it to sRGB. */
+async function bgLuminance(page: Page, selector: string): Promise<number> {
+  return page.evaluate((sel) => {
+    const ctx = document.createElement("canvas").getContext("2d")!;
+    ctx.fillStyle = getComputedStyle(document.querySelector(sel)!).backgroundColor;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = [...ctx.getImageData(0, 0, 1, 1).data].map((v) => {
+      const x = v / 255;
+      return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }, selector);
+}
+
+test("the Canopy frame paints each segment's own member of a stored brand", async ({ page }) => {
+  await page.addInitScript((brand) => localStorage.setItem("psi-brand", JSON.stringify(brand)), LIGHT_PAINTED_BRAND);
+  for (const [theme, dark] of [["dark", true], ["light", false]] as const) {
+    await page.goto(`${BASE}docs/examples/showcase/canopy/?theme=${theme}`, { waitUntil: "networkidle" });
+    await expect(page.locator("html")).toHaveAttribute("data-psi-theme", theme);
+    await expect(page.locator("html")).toHaveAttribute("data-psi-custom", "");
+    // body's background eases over 200ms, so poll until it settles.
+    const luminance = expect.poll(() => bgLuminance(page, "body"), { message: `${theme} segment body luminance` });
+    if (dark) await luminance.toBeLessThan(0.1);
+    else await luminance.toBeGreaterThan(0.5);
+  }
+});
+
+test("an unknown ?theme= in the Canopy frame is dark", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("psi-theme", "light"));
+  await page.goto(`${BASE}docs/examples/showcase/canopy/?theme=nope`, { waitUntil: "networkidle" });
+  await expect(page.locator("html")).toHaveAttribute("data-psi-theme", "dark");
 });
