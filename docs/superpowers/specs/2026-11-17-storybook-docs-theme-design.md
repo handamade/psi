@@ -1,6 +1,6 @@
 # Docs pages that follow the theme, on the latest Storybook (D123)
 
-Date: 2026-11-17. Status: **Proposed**, branch `d123-storybook-docs-theme`.
+Date: 2026-11-17. Status: **Implemented**, branch `d123-storybook-docs-theme`.
 
 Provenance: reported by Dmitry on 2026-11-17 with a screenshot of the `Switch`
 docs page in Dark. The theme toolbar changed the story's colours, but the
@@ -34,25 +34,22 @@ Measured on `main` at `82e1c49`, Storybook 10.4.6, on
    surface.
 2. **All 45 docs pages are affected.** Every one is generated (`autodocs`);
    there is no MDX page with its own markup.
-3. **Text a story places loose takes the docs page's colour and font.**
-   `.sbdocs-wrapper` sets Storybook's own colour and Nunito Sans, and
-   `.docs-story` inherits them. A story's components set their own type, but
-   plain text inherits whatever the docs page has. That is the docs-mode
-   version of what D107 fixed for the canvas.
+3. **Colour and font already follow the theme.** `.sbdocs-wrapper` and
+   `.docs-story` inherit `body`'s Psi colour and font (measured: the dark
+   theme's `fg-primary` and Psi's sans stack). Storybook's docs text sets its
+   own on its own classes. Only the background is missing.
 4. **Storybook is 10.4.6; the latest is 10.6.7** (published 2026-11-10). All
    four Storybook packages move together. A minor upgrade inside 10.x needs no
    migration.
 
 ## Decisions
 
-### D123. A docs page's story box is an app root
+### D123. A docs page's story box paints the theme's background
 
-`.docs-story`, the area inside each docs preview box, gets the same three
-app-root declarations as the canvas's `body`: `background:
-var(--psi-bg-primary)`, `color: var(--psi-fg-primary)` and `font:
-var(--psi-text-14-20-regular)`. The theme toolbar then changes every story
-box on a docs page, on every docs page, and loose text in a story reads as
-it would in an app.
+`.docs-story`, the area inside each docs preview box, gets the canvas's
+page background: `background: var(--psi-bg-primary)`. The theme toolbar then
+changes every story box on a docs page, on every docs page. It takes no
+colour or font of its own, since both already reach it from `body` (point 3).
 
 - **Only the story box, not the whole docs page.** The title, the
   description, the args table and "Show code" stay in Storybook's light docs
@@ -61,9 +58,8 @@ it would in an app.
   Storybook's docs theme is static.
 - **Unlayered, unlike the rest of `preview.css`.** Storybook's docs styles
   are unlayered Emotion rules, and an unlayered rule beats any layered one.
-  The rule only styles the `.docs-story` element. Its colour and font reach
-  stories by inheritance, and every Psi component sets its own, so it cannot
-  override Psi's component layer (D94).
+  The rule sets one property on the `.docs-story` element, which no Psi
+  component styles, so it cannot override Psi's component layer (D94).
 - **The canvas is untouched.** `vr` and the interaction specs load stories
   with `viewMode=story`, where `.docs-story` does not exist. No baseline
   should change because of this rule.
@@ -81,8 +77,9 @@ baselines in this PR, with the counts in the PR body.
 - A new `docs-theme.interaction.spec.ts`: for each of the four themes, on
   the `Switch` docs page, every `.docs-story` has the theme's
   `--psi-bg-primary` as its computed background and its `--psi-fg-primary`
-  as its colour. It fails on `main` today: the box is transparent over white,
-  and the colour is Storybook's.
+  as its colour. On `main` it fails in all four themes on the background (the
+  box is transparent over white) and passes on the colour, which guards
+  point 3.
 - The existing gates: build, `check-docs-drift`, test, lint, the site build
   and `test:site` (it reads `storybook-static/index.json`, so it also proves
   the upgrade kept the story ids).

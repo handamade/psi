@@ -4,7 +4,7 @@
 
 **Goal:** Storybook goes to 10.6.7, and every docs page's story box follows the theme toolbar (D123).
 
-**Architecture:** One unlayered rule in `preview.css` gives `.docs-story` the app-root background, colour and font. One Playwright interaction spec proves it in all four themes.
+**Architecture:** One unlayered rule in `preview.css` gives `.docs-story` the theme's page background. One Playwright interaction spec proves it in all four themes.
 
 **Tech Stack:** Storybook 10, Playwright, pnpm.
 
@@ -34,12 +34,12 @@
 ## Task 2: Failing spec
 
 - [ ] Create `docs-theme.interaction.spec.ts`. For `light`, `dark`, `acme`, `ember`, it opens `iframe.html?viewMode=docs&id=components-switch--docs&globals=theme:<t>`, waits for `.docs-story`, and resolves `--psi-bg-primary` and `--psi-fg-primary` through probe elements. Every `.docs-story` must have that background and colour.
-- [ ] `pnpm test:e2e -- docs-theme`: fails on all four themes (the background is transparent).
+- [ ] `pnpm exec playwright test -c apps/storybook/vr --grep "story boxes" --reporter=list`: fails on all four themes (the background is transparent).
 
 ## Task 3: The rule
 
-- [ ] In `preview.css`, after the `@layer psi.base` block, add an unlayered `.docs-story { background; color; font }` with a comment explaining why it is unlayered (spec, D123).
-- [ ] Rebuild Storybook; `pnpm test:e2e -- docs-theme` passes; the full `pnpm test:e2e` passes.
+- [ ] In `preview.css`, after the `@layer psi.base` block, add an unlayered `.docs-story { background: var(--psi-bg-primary) }` with a comment explaining why it is unlayered (spec, D123).
+- [ ] Rebuild Storybook; `pnpm exec playwright test -c apps/storybook/vr --grep "story boxes" --reporter=list` passes; the full `pnpm test:e2e` passes.
 - [ ] Look at the `Switch` docs page in Dark in the browser.
 - [ ] Commit: `fix: docs pages follow the theme (D123)`.
 
