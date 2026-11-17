@@ -15,6 +15,7 @@ vi.mock("../components/SearchDialog", () => ({ SearchDialog: () => null }));
 import { SiteChrome } from "../chrome/SiteChrome";
 import { PsiMark } from "../PsiMark";
 import { MODE_KEY } from "../theme";
+import { releaseVersion } from "virtual:psi-facts";
 
 beforeEach(() => {
   localStorage.clear();
@@ -87,7 +88,8 @@ describe("SiteChrome", () => {
     act(() => menu.click());
     const dialog = document.querySelector("dialog[open]")!;
     expect(dialog).not.toBeNull();
-    expect(dialog.textContent).toContain("Changelog");
+    // The Changelog entry names the release, read from the build.
+    expect(dialog.textContent).toContain(`Changelog (v${releaseVersion})`);
     expect(dialog.querySelector('[role="radiogroup"]')).not.toBeNull();
   });
 });

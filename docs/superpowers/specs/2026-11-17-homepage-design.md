@@ -255,6 +255,10 @@ What differed from the text above, as built.
 - **Docs pages on a phone:** `main` gets bottom padding so content clears the fixed bar.
 - **The internal-link gate exempts `/storybook/`, `/llms.txt` and `/packages/`**, which `tools/assemble-site.mjs`
   adds after the site build.
+- **Canopy adapts through a `ResizeObserver`**, not a container query: it measures its own width against
+  `breakpoints.sm` (560) and switches from the table to a list, since it has no CSS of its own to hold one.
+- **Component names in Canopy's Code view aren't linked yet.** The view shows the highlighted source only; linking each
+  name to its docs page is a follow-up.
 
 ## Out of scope
 
@@ -271,3 +275,4 @@ What differed from the text above, as built.
 - Register the bottom-sheet placement as a request.
 - Design the Themes and Playground pages, each with its own number, and put them back in the header.
 - The glitch-motion idea, after the content ships.
+- Link the component names in Canopy's Code view to their docs pages.

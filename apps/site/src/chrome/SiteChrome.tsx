@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button, Dialog, IconMenu, Link, SegmentedControl, Segment } from "@handamade/psi-react";
 
+import { releaseVersion } from "virtual:psi-facts";
+
 import { SearchDialog } from "../components/SearchDialog";
 import { REPO_URL, STORYBOOK_BASE } from "../lib/storybook";
 import { PsiMark } from "../PsiMark";
@@ -13,7 +15,7 @@ const PAGES = [
 
 const MORE = [
   ["Storybook", STORYBOOK_BASE],
-  ["Changelog", "/docs/changelog/"],
+  [`Changelog (v${releaseVersion})`, "/docs/changelog/"],
   ["MCP", "/docs/get-started/ai/"],
   ["llms.txt", "/llms.txt"],
   ["GitHub", REPO_URL],
