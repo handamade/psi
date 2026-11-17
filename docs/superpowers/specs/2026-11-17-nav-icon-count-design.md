@@ -1,7 +1,6 @@
 # An icon and a count in the navigation tree — `NavItem`, `NavGroup` and `Count` (D124)
 
-Date: 2026-11-17. Status: **Approved**, not yet implemented. Branch
-`d124-nav-icon-count`.
+Date: 2026-11-17. Status: **Implemented** on branch `d124-nav-icon-count`.
 
 Provenance: two requests from a consumer's sidebar review. One asks for an icon
 before an entry or a group label. The other asks for a count after an entry,
@@ -163,10 +162,11 @@ second merges `origin/main` and runs `check-docs-drift` again.
     label is in `span.label` (`flex: 1 1 auto; min-width: 0`), so a long label
     wraps and the count stays at the end. The count is in `span.countSlot`
     (`flex: none; margin-inline-start: auto; padding-inline-start:
-    --psi-nav-tree-icon-gap`). The slot starts with a space text node, so the
-    name reads *Cards 238*, not *Cards238*, in any accessibility tree. That
-    includes jsdom, which applies no CSS. In a real browser, the flex item is
-    blockified, which also adds the space.
+    --psi-nav-tree-icon-gap`). A space text node sits between the label and
+    the count slot, so the name reads *Cards 238*, not *Cards238*, in any
+    accessibility tree, including jsdom, which applies no CSS. In a flex row it
+    draws nothing, and in a real browser the blockified flex items add the space
+    anyway.
   - **Nothing moves without an icon or a count.** With neither prop set,
     `NavItem` renders exactly what it renders today: no wrappers, and no clone
     unless `current` is set. Every existing story keeps its pixels.
