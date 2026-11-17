@@ -53,7 +53,7 @@ describe("manifest: attributes, accessible names and contracts (D129)", () => {
   });
 
   it("states which components need an accessible name", () => {
-    expect(by("IconButton").accessibleName).toEqual({ oneOf: ["aria-label", "aria-labelledby"] });
+    expect(by("IconButton").accessibleName).toEqual({ oneOf: ["aria-label"] });
     expect(by("TabList").accessibleName).toEqual({ oneOf: ["aria-label"] });
     expect(by("Button").accessibleName).toBeNull();
   });

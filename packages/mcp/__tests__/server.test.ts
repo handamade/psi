@@ -52,6 +52,14 @@ describe("psi MCP server", () => {
     expect(res.content[0].text).toContain("Nearest:");
   });
 
+  it("rejects an over-long get id and search query before any work", async () => {
+    const id = (await client.callTool({ name: "get", arguments: { id: "x".repeat(201) } })) as ToolCallResult;
+    expect(id.isError).toBe(true);
+    expect(id.content[0].text.length).toBeLessThan(1000);
+    const query = (await client.callTool({ name: "search", arguments: { query: "x".repeat(501) } })) as ToolCallResult;
+    expect(query.isError).toBe(true);
+  });
+
   it("answers check calls with findings, and over-long code as an error", async () => {
     const res = (await client.callTool({ name: "check", arguments: { code: '<Button size="md">x</Button>' } })) as ToolCallResult;
     expect(res.content[0].text).toContain("**invalid-value**");

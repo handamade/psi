@@ -213,7 +213,14 @@ export function runCheck(code: string, index: CheckIndex): Report {
   // Imports from Psi: local name → exported name.
   const psiLocals = new Map<string, string>();
   const otherLocals = new Set<string>();
+  const definedHere = new Set<string>();
+  const capitalized = (name: unknown): name is string => typeof name === "string" && /^[A-Z]/.test(name);
   walk(ast, (n) => {
+    if (n.type === "FunctionDeclaration" || n.type === "ClassDeclaration" || n.type === "VariableDeclarator") {
+      const id = n.id as AnyNode | null;
+      if (id && id.type === "Identifier" && capitalized(id.name)) definedHere.add(id.name);
+      return;
+    }
     if (n.type !== "ImportDeclaration") return;
     const fromPsi = (n.source as AnyNode).value === PSI;
     for (const spec of n.specifiers as AnyNode[]) {
@@ -242,13 +249,20 @@ export function runCheck(code: string, index: CheckIndex): Report {
       report.notChecked.set(tag, "member expression");
       return null;
     }
+    if (definedHere.has(tag) && !psiLocals.has(tag)) {
+      report.notChecked.set(tag, "defined in this file");
+      return null;
+    }
     if (otherLocals.has(tag) && !psiLocals.has(tag)) {
       report.notChecked.set(tag, hasPsiImport ? `not imported from ${PSI}` : "imported from elsewhere");
       return null;
     }
     const exportName = hasPsiImport ? psiLocals.get(tag) : components.has(tag) ? tag : undefined;
     if (exportName === undefined) {
-      report.notChecked.set(tag, hasPsiImport ? `not imported from ${PSI}` : "not a Psi export");
+      report.notChecked.set(
+        tag,
+        hasPsiImport ? `not imported from ${PSI}` : exported.has(tag) ? "a Psi export with no manifest entry" : "not a Psi export",
+      );
       return null;
     }
     const component = components.get(exportName);
@@ -263,7 +277,7 @@ export function runCheck(code: string, index: CheckIndex): Report {
     // Same lookup as componentFor, without recording not-checked reasons.
     exportOf: (tag) => {
       if (tag.includes(".") || /^[a-z]/.test(tag)) return null;
-      if (otherLocals.has(tag) && !psiLocals.has(tag)) return null;
+      if ((otherLocals.has(tag) || definedHere.has(tag)) && !psiLocals.has(tag)) return null;
       return (hasPsiImport ? psiLocals.get(tag) : components.has(tag) ? tag : undefined) ?? null;
     },
   };
@@ -308,11 +322,11 @@ export function runCheck(code: string, index: CheckIndex): Report {
         }
         continue;
       }
+      const union = literalUnion(prop.type);
       if (attr.value.kind === "computed") {
-        report.skipped.push(`a computed \`${attr.name}\` on \`${c.name}\` at ${where(attr.node)}`);
+        if (union !== null) report.skipped.push(`a computed \`${attr.name}\` on \`${c.name}\` at ${where(attr.node)}`);
         continue;
       }
-      const union = literalUnion(prop.type);
       if (union === null || attr.value.kind !== "literal") continue;
       const value = attr.value.value;
       if (!union.some((member) => member === value)) {

@@ -105,6 +105,31 @@ describe("check: the API rules", () => {
     expect(lines(md, "invalid-value")[0]).toContain(`\`1:${code.indexOf('size="md"') + 1}\``);
   });
 
+  it("does not let a fragment retry hide a syntax error", () => {
+    const md = run("<Button>x</Button>\nlet y = ;");
+    expect(lines(md, "parse")).toHaveLength(1);
+    expect(md).not.toContain("No problems found.");
+  });
+
+  it("labels a Psi export with no manifest entry in no-import mode", () => {
+    const md = run("<IconPlus />");
+    expect(md).toContain("a Psi export with no manifest entry");
+    expect(md).not.toContain("not a Psi export");
+  });
+
+  it("does not check a component defined in the same file as Psi's", () => {
+    const md = run(IMPORT + "function Card() { return null; }\nconst Panel = () => null;\nexport const A = () => <><Card foo /><Panel bar /></>;");
+    expect(lines(md, "unknown-prop")).toHaveLength(0);
+    expect(md).toContain("defined in this file");
+  });
+
+  it("does not list computed values on props that are not literal unions", () => {
+    const md = run(IMPORT + "<Button onClick={go} className={cx} size={n}>x</Button>");
+    expect(md).toContain("computed `size`");
+    expect(md).not.toContain("computed `onClick`");
+    expect(md).not.toContain("computed `className`");
+  });
+
   it("refuses code over the cap", () => {
     expect(() => run("x".repeat(MAX_CODE + 1))).toThrow(CheckInputError);
   });

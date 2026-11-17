@@ -231,6 +231,10 @@ describe("get", () => {
     expect(store.suggest("component:Buton")[0]).toBe("component:Button");
   });
 
+  it("suggest keeps every kind that shares a bare name", () => {
+    expect(store.suggest("motio")).toContain("topic:motion");
+  });
+
   it("filter-toolbar is now unblocked with a preset (D52)", () => {
     const brief = store.search("filter toolbar").find((b) => b.id === "pattern:filter-toolbar");
     expect(brief).toBeDefined();

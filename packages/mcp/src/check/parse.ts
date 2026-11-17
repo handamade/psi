@@ -20,7 +20,13 @@ export function parseSource(code: string): Parsed {
   try {
     return { ok: true, ast: parse(code, OPTIONS) as unknown as AnyNode, shift: 0 };
   } catch (first) {
+    // A fragment retry is for sibling elements: code that starts and ends as
+    // JSX. Anything else that failed to parse has a real syntax error, which
+    // the wrapper would turn into JSX text.
+    const trimmed = code.trim();
+    const retry = trimmed.startsWith("<") && trimmed.endsWith(">");
     try {
+      if (!retry) throw first;
       return { ok: true, ast: parse(`<>${code}</>`, OPTIONS) as unknown as AnyNode, shift: 2 };
     } catch {
       const e = first as { message: string; loc?: { line: number; column: number } };

@@ -24,6 +24,8 @@ export interface ThemeInput {
 export class ThemeError extends Error {}
 
 const NAME = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+/** Built-in theme names; a theme saved under one would override it. */
+const RESERVED = ["light", "dark", "acme", "ember"];
 const DEFAULT_RADIUS: RadiusRung = 8;
 
 export function chromaWordFor(c: number): ChromaWord {
@@ -66,6 +68,9 @@ export function themeVector(input: ThemeInput): BrandVector {
   const name = input.name ?? `brand-${hue}`;
   if (!NAME.test(name) || name.length > 64) {
     throw new ThemeError("name must be kebab-case (a-z, 0-9, single hyphens), at most 64 characters.");
+  }
+  if (RESERVED.some((r) => name === r || name === `${r}-dark`)) {
+    throw new ThemeError(`"${name}" is reserved for a built-in theme (${RESERVED.join(", ")}, and their -dark forms). Pick another name.`);
   }
   return { hue, chroma, mode: "light", radius, name };
 }

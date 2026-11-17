@@ -318,10 +318,17 @@ export function createStore(index: PsiIndex): Store {
     ...Object.keys(index.docs.guides).map((g) => `guide:${g}`),
   ];
 
+  // Built once: bare name → every id that shares it (topic:motion and tokens:motion).
+  const byBare = new Map<string, string[]>();
+  for (const full of allIds) {
+    const bare = full.split(/:(.*)/s)[1];
+    byBare.set(bare, [...(byBare.get(bare) ?? []), full]);
+  }
+  const bareNames = [...byBare.keys()];
+
   function suggest(id: string): string[] {
     const bare = id.includes(":") ? id.split(/:(.*)/s)[1] ?? id : id;
-    const byBare = new Map(allIds.map((full) => [full.split(/:(.*)/s)[1], full]));
-    return closest(bare, [...byBare.keys()], 3).map((b) => byBare.get(b)!);
+    return [...new Set(closest(bare, bareNames, 3).flatMap((b) => byBare.get(b)!))].slice(0, 3);
   }
 
   return { search, get, suggest };

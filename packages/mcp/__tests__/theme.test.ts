@@ -36,6 +36,10 @@ describe("themeVector", () => {
     [{ hue: 10, name: "Bad_Name" }, /kebab-case/],
     [{ hue: 10, radius: 5 as never }, /radius/],
     [{ hue: 10, chroma: "loud" as never }, /chroma/],
+    [{ hue: 10, name: "light" }, /reserved/],
+    [{ hue: 10, name: "dark" }, /reserved/],
+    [{ hue: 10, name: "acme" }, /reserved/],
+    [{ hue: 10, name: "ember-dark" }, /reserved/],
   ])("rejects %o", (input, message) => {
     expect(() => themeVector(input)).toThrow(ThemeError);
     expect(() => themeVector(input)).toThrow(message);

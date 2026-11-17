@@ -183,17 +183,18 @@ user's own component.
 | `invalid-value` | `size="md"`, `variant="primary"` → the valid literals |
 | `missing-required` | a required prop is absent |
 | `slot` | a child a slot does not accept, or a wrong count (D45 contracts) |
-| `accessible-name` | `<IconButton>` with no `aria-label` or `aria-labelledby` |
+| `accessible-name` | `<TabList>` with no `aria-label` |
 
 Nearest means smallest edit distance, offered only under a threshold so a
 wild guess is not suggested.
 
 **Two new manifest fields**, emitted by `packages/react`'s manifest script:
 
-- **`attributes`** — the HTML element whose attributes a component passes
+- **`attributes`** — the React attributes interface a component passes
   through, read from its props interface (`extends ButtonHTMLAttributes<…>` →
-  `button`; `null` when none). The index build turns each element into the set
-  of attribute names valid on it, from `@types/react` at build time, so
+  `ButtonHTMLAttributes`; `null` when none). The exact attribute names for each
+  interface are written to `dist/attributes.json`, from `@types/react` at build
+  time, and the index build reads them from there, so
   `onClick` on a Button is not an `unknown-prop`. `aria-*`, `data-*`, `key`
   and `ref` are always allowed.
 - **`accessibleName`** — a machine-readable rule per component that needs a

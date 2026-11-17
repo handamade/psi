@@ -23,7 +23,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
   },
   IconButton: {
     keyboard: [{ keys: "Enter / Space", behavior: "Activates." }],
-    accessibleName: { oneOf: ["aria-label", "aria-labelledby"] },
+    accessibleName: { oneOf: ["aria-label"] },
     notes:
       "Requires an accessible name — pass aria-label. IconButton does not hide its icon for you; mark the icon aria-hidden yourself.",
   },

@@ -15,7 +15,7 @@ export function createPsiServer(store: Store, version: string, index: CheckIndex
         "Keyword search over Psi components, composition patterns, semantic tokens, and " +
         "guidance topics. Returns compact briefs with ids for the get tool. Empty query " +
         "returns an overview.",
-      inputSchema: { query: z.string().describe("Keywords, e.g. 'button variants' or 'bg token'") },
+      inputSchema: { query: z.string().max(500).describe("Keywords, e.g. 'button variants' or 'bg token'") },
     },
     async ({ query }) => ({
       content: [{ type: "text", text: JSON.stringify(store.search(query), null, 1) }],
@@ -33,7 +33,7 @@ export function createPsiServer(store: Store, version: string, index: CheckIndex
         "('guide:theming'), one token ('token:bgPrimary': formula and value in every theme), " +
         "a pattern ('pattern:destructive-confirm': recipe and preset), or a topic " +
         "('topic:variants'). A bare name also works.",
-      inputSchema: { id: z.string().describe("An id from search results, or a bare name") },
+      inputSchema: { id: z.string().max(200).describe("An id from search results, or a bare name") },
     },
     async ({ id }) => {
       const page = store.get(id);
