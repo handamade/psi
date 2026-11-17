@@ -143,6 +143,56 @@ export function useMode(): [Mode, (next: Mode) => void, (next: Mode) => void] {
   return [mode, setMode, setModeEphemeral];
 }
 
+export type ModePref = Mode | "system";
+
+/**
+ * The visitor's preference, with "system" as a real choice (D133): picking it
+ * removes the stored mode, so the OS-follow listener in this hook takes over
+ * again. `mode` is what is painted. setModeEphemeral is useMode's, for a
+ * derived brand's own mode (never persisted).
+ */
+export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode) => void] {
+  const [pref, setPrefState] = useState<ModePref>("system");
+  const [mode, setModeState] = useState<Mode>("light");
+  useLayoutEffect(() => {
+    const stored = readStoredMode();
+    setPrefState(stored ?? "system");
+    setModeState(stored ?? systemMode());
+  }, []);
+
+  const setPref = useCallback((p: ModePref) => {
+    setPrefState(p);
+    const next = p === "system" ? systemMode() : p;
+    setModeState(next);
+    applyMode(next);
+    try {
+      if (p === "system") localStorage.removeItem(MODE_KEY);
+      else localStorage.setItem(MODE_KEY, p);
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+
+  const setModeEphemeral = useCallback((m: Mode) => {
+    setModeState(m);
+    applyMode(m);
+  }, []);
+
+  useEffect(() => {
+    const mq = matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => {
+      if (readStoredMode() !== null) return;
+      const next: Mode = mq.matches ? "dark" : "light";
+      setModeState(next);
+      applyMode(next);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  return [pref, mode, setPref, setModeEphemeral];
+}
+
 /** Brand state. Orthogonal to mode: reset clears this and never touches that. */
 export function useBrand(): {
   brand: BrandVector | null;

@@ -18,6 +18,7 @@ import {
   readStoredMode,
   useBrand,
   useMode,
+  useModePref,
   type Mode,
 } from "../theme";
 
@@ -228,5 +229,64 @@ describe("server rendering", () => {
     const { result, unmount } = renderHook(() => useMode());
     expect(result.current[0]).toBe("dark");
     unmount();
+  });
+});
+
+/** Mounts a node into the DOM under act(), as Header.test.ts does. */
+function mount(node: ReturnType<typeof createElement>) {
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+  let root: Root;
+  act(() => {
+    root = createRoot(container);
+    root.render(node);
+  });
+  return {
+    container,
+    unmount: () => {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    },
+  };
+}
+
+describe("useModePref", () => {
+  beforeEach(() => {
+    // jsdom has no matchMedia; OS is light.
+    stubMatchMedia(false);
+  });
+
+  function Probe({ onRender }: { onRender: (v: ReturnType<typeof useModePref>) => void }) {
+    onRender(useModePref());
+    return null;
+  }
+
+  it("starts at system when nothing is stored", () => {
+    let last!: ReturnType<typeof useModePref>;
+    mount(createElement(Probe, { onRender: (v) => (last = v) }));
+    expect(last[0]).toBe("system");
+    expect(last[1]).toBe("light"); // matchMedia stub: matches false
+  });
+
+  it("an explicit choice persists, and system clears it", () => {
+    let last!: ReturnType<typeof useModePref>;
+    mount(createElement(Probe, { onRender: (v) => (last = v) }));
+    act(() => last[2]("dark"));
+    expect(localStorage.getItem(MODE_KEY)).toBe("dark");
+    expect(document.documentElement.dataset.psiTheme).toBe("dark");
+    act(() => last[2]("system"));
+    expect(localStorage.getItem(MODE_KEY)).toBeNull();
+    expect(last[0]).toBe("system");
+    expect(document.documentElement.dataset.psiTheme).toBe("light");
+  });
+
+  it("a stored choice is read as that preference", () => {
+    localStorage.setItem(MODE_KEY, "dark");
+    let last!: ReturnType<typeof useModePref>;
+    mount(createElement(Probe, { onRender: (v) => (last = v) }));
+    expect(last[0]).toBe("dark");
+    expect(last[1]).toBe("dark");
   });
 });
