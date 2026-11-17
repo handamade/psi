@@ -19,7 +19,9 @@
 .alignStart { align-items: flex-start; }
 .alignStart > :is(button, a) { margin-block-start: var(--psi-toolbar-action-offset); }
 
+/* D130: a bare Combobox sizes like a bare input or select. */
 .toolbar > input,
-.toolbar > select {
+.toolbar > select,
+.toolbar > [data-psi-combobox] {
   width: var(--psi-toolbar-control-width);
 }

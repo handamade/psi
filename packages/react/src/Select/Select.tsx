@@ -5,7 +5,13 @@ import styles from "./select.module.css";
 
 type Size = 24 | 32 | 40 | 48;
 
-export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+/**
+ * Props for the native `<select>` wrapper. `multiple` is not accepted (D130):
+ * a native multi-select is a fixed-height listbox that can't grow, and Psi's
+ * `size` is a height, not a row count. Pick several values with `Combobox
+ * multiple`; `Select` is for one value from a short fixed list.
+ */
+export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "multiple"> {
   /** The <option> elements. */
   children?: ReactNode;
   /**
@@ -29,6 +35,8 @@ const sizeClass: Record<Size, string> = {
 };
 
 /** Styled native `<select>` with pixel-true heights (24–48) and an error state.
+ * One value from a short fixed list; for a list long enough to search, or
+ * several values, use Combobox (D130).
  * Inside a Field, id/aria-describedby/aria-invalid/required are wired
  * automatically (D49). */
 export function Select({

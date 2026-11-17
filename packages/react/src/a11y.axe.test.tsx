@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import axe from "axe-core";
 import {
-  Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Checkbox, Switch, Tag, Tooltip, Toolbar,
+  Button, IconButton, Card, Panel, Stack, Text, PageHeading, NavBar, AspectRatio, Field, FieldStack, Dialog, Input, Select, Combobox, Checkbox, Switch, Tag, Tooltip, Toolbar,
   Menu, MenuItem, MenuSeparator, MenuText, Textarea, RadioGroup, Radio,
   Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, TableContainer, Pagination, CursorPagination,
   Toast, ToastRegion, ToastProvider, Announcement, Banner, InlineAlert, Skeleton, CopyButton, Count, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell,
@@ -44,6 +44,16 @@ const cases: Array<[string, React.ReactElement]> = [
   ["Field with its label beside its control", <Field label="Rows per page" labelPosition="start"><Select size={32}><option>50</option></Select></Field>],
   ["FieldStack with side labels", <FieldStack labelPosition="start"><Field label="Name" required><Input /></Field><Field group label="Status" error="Pick one."><RadioGroup value="a" onValueChange={() => {}}><Radio value="a">Active</Radio><Radio value="b">Blocked</Radio></RadioGroup></Field><Field><Checkbox>Notify the owner</Checkbox></Field></FieldStack>],
   ["Select", <label>Plan<Select size={32}><option>Free</option></Select></label>],
+  // D130: every story state. The popup renders in jsdom's hidden [popover], so the open list is exercised through its markup only.
+  ["Combobox standalone", <Combobox options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="City" placeholder="Search cities" />],
+  ["Combobox single with a value, clearable", <Combobox options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="City" defaultValue="ber" clearable />],
+  ["Combobox multiple with Tags", <Combobox multiple options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="Cities" defaultValue={["ams", "ber"]} clearable />],
+  ["Combobox error and disabled", <><Combobox error options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="City" /><Combobox disabled multiple options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="Cities" defaultValue={["ams"]} /></>],
+  ["Combobox in a Field with controlWidth", <Field label="City" description="Where it ships from." error="Pick a city" required controlWidth={240}><Combobox options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} /></Field>],
+  ["Combobox in a Toolbar", <Toolbar aria-label="Filters"><Combobox options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="City" /><Button size={32}>Apply</Button></Toolbar>],
+  ["Combobox right to left", <div dir="rtl"><Combobox clearable options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="City" defaultValue="ber" /></div>],
+  ["Combobox loading with a more line", <Combobox options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} filter={false} loading moreMessage="Showing 3 of 812" aria-label="City" />],
+  ["Combobox in a form with a name", <form aria-label="Ship"><Combobox options={[{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }]} aria-label="City" name="city" required /></form>],
   ["Field with Input", <Field label="Email" description="We never share it."><Input size={40} /></Field>],
   ["Field error", <Field label="Email" error="Invalid email." required><Input size={40} /></Field>],
   ["Field group", <Field group label="Notifications" description="Pick channels."><Checkbox>Email</Checkbox><Switch>Push</Switch></Field>],
@@ -157,6 +167,37 @@ describe("axe: no violations in rendered components", () => {
   for (const [name, el] of cases) {
     it(name, async () => {
       expect(await violationsOf(el)).toEqual([]);
+    });
+  }
+
+  // D130: the open list. jsdom's UA sheet hides a [popover] its polyfill can't
+  // mark :popover-open, and axe skips hidden content, so show the popup for
+  // the run: the listbox, its options, the status lines and the live region.
+  for (const [name, multiple, extra] of [
+    ["Combobox open, single, a highlighted option", false, {}],
+    ["Combobox open, multiple with picks", true, {}],
+    ["Combobox open, loading with a more line", false, { loading: true, filter: false as const, moreMessage: "Showing 3 of 812" }],
+  ] as const) {
+    it(name, async () => {
+      const style = document.createElement("style");
+      style.textContent = "[data-psi-combobox-popup] { display: block !important; }";
+      document.head.append(style);
+      try {
+        const options = [{ value: "ams", label: "Amsterdam" }, { value: "ber", label: "Berlin", description: "Germany" }, { value: "bru", label: "Brussels", disabled: true }];
+        const { container } = render(
+          multiple
+            ? <Combobox multiple options={options} aria-label="Cities" defaultValue={["ber"]} {...extra} />
+            : <Combobox options={options} aria-label="City" defaultValue="ber" {...extra} />,
+        );
+        fireEvent.keyDown(container.querySelector("input")!, { key: "ArrowDown" });
+        expect(container.querySelector("[aria-activedescendant]")).not.toBeNull();
+        // Proof that axe reads the list rather than skipping it as hidden.
+        expect(getComputedStyle(container.querySelector("[data-psi-combobox-popup]")!).display).toBe("block");
+        const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
+        expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(", ")}`)).toEqual([]);
+      } finally {
+        style.remove();
+      }
     });
   }
 

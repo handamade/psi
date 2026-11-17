@@ -39,6 +39,14 @@ export { Input } from "./Input/Input.js";
 export type { InputProps } from "./Input/Input.js";
 export { Select } from "./Select/Select.js";
 export type { SelectProps } from "./Select/Select.js";
+export { Combobox } from "./Combobox/Combobox.js";
+export type {
+  ComboboxProps,
+  ComboboxSingleProps,
+  ComboboxMultipleProps,
+  ComboboxOption,
+  ComboboxFilter,
+} from "./Combobox/Combobox.js";
 export { Checkbox } from "./Checkbox/Checkbox.js";
 export type { CheckboxProps } from "./Checkbox/Checkbox.js";
 export { Switch } from "./Switch/Switch.js";
