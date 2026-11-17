@@ -16,6 +16,7 @@ import {
   MODE_KEY,
   readStoredBrand,
   readStoredMode,
+  shownPref,
   useBrand,
   useModePref,
 } from "../theme";
@@ -271,6 +272,44 @@ describe("mode preference in one document", () => {
     act(() => a[2]("system"));
     expect(c[0]).toBe("system");
     expect(c[1]).toBe("light");
+  });
+});
+
+describe("the mode a control shows", () => {
+  it("is the preference while the page paints what the preference asks for", () => {
+    expect(shownPref("light", "light", "dark")).toBe("light");
+    expect(shownPref("dark", "dark", "light")).toBe("dark");
+    expect(shownPref("system", "dark", "dark")).toBe("system");
+  });
+
+  it("is the painted mode while a brand's own mode overrides the preference", () => {
+    expect(shownPref("light", "dark", "light")).toBe("dark");
+    expect(shownPref("dark", "light", "dark")).toBe("light");
+    expect(shownPref("system", "dark", "light")).toBe("dark");
+  });
+
+  it("follows a derived brand's mode in another instance, and a click still sets the preference", () => {
+    stubMatchMedia(false);
+    localStorage.setItem(MODE_KEY, "light");
+    let chrome!: ReturnType<typeof useModePref>;
+    let console_!: ReturnType<typeof useModePref>;
+    function Two() {
+      chrome = useModePref();
+      console_ = useModePref();
+      return null;
+    }
+    mount(createElement(Two));
+    expect(chrome[4]).toBe("light");
+    // The theme console paints its brand's dark member without persisting it.
+    act(() => console_[3]("dark"));
+    expect(document.documentElement.dataset.psiTheme).toBe("dark");
+    expect(chrome[0]).toBe("light"); // the stored preference is unchanged…
+    expect(chrome[4]).toBe("dark"); // …but the control says what is painted
+    // Clicking Light still works: it paints light and the control agrees.
+    act(() => chrome[2]("light"));
+    expect(document.documentElement.dataset.psiTheme).toBe("light");
+    expect(chrome[4]).toBe("light");
+    expect(console_[1]).toBe("light");
   });
 });
 

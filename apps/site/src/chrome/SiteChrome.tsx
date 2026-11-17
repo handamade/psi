@@ -30,7 +30,9 @@ function ModeControl({ pref, onPref, fill }: { pref: ModePref; onPref: (p: ModeP
 }
 
 export function SiteChrome({ sidebar }: { sidebar?: { open: boolean; onToggle: () => void; id: string } } = {}) {
-  const [pref, , setPref] = useModePref();
+  // `shown`, not the stored preference: a derived brand can paint its own mode
+  // over an explicit one, and the control must say what the page is.
+  const [, , setPref, , shown] = useModePref();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -76,7 +78,7 @@ export function SiteChrome({ sidebar }: { sidebar?: { open: boolean; onToggle: (
           Search
         </Button>
         <span className="site-header-mode">
-          <ModeControl pref={pref} onPref={setPref} />
+          <ModeControl pref={shown} onPref={setPref} />
         </span>
       </header>
 
@@ -98,7 +100,7 @@ export function SiteChrome({ sidebar }: { sidebar?: { open: boolean; onToggle: (
           </Button>
         )}
         <p className="site-menu-label">Appearance</p>
-        <ModeControl pref={pref} onPref={setPref} fill />
+        <ModeControl pref={shown} onPref={setPref} fill />
         <p className="site-menu-label">More</p>
         <ul className="site-menu-links">
           {MORE.map(([label, href]) => (

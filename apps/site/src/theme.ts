@@ -106,19 +106,36 @@ function useModeEvents(onMode: (mode: Mode) => void): void {
 export type ModePref = Mode | "system";
 
 /**
+ * What a mode control shows as selected. Normally the preference; but a derived
+ * brand paints its own mode without persisting it, and then the preference no
+ * longer describes the page: "Light" selected over a dark page. While the painted
+ * mode differs from the one the preference would paint, the control shows the
+ * painted mode. `system` is the OS mode.
+ */
+export function shownPref(pref: ModePref, mode: Mode, system: Mode): ModePref {
+  const expected = pref === "system" ? system : pref;
+  return expected === mode ? pref : mode;
+}
+
+/**
  * The visitor's preference, with "system" as a real choice (D133): picking it
  * removes the stored mode, so the OS-follow listener in this hook takes over
  * again. `mode` is what is painted. setModeEphemeral is for a derived brand's own
  * mode (never persisted). Following the OS lives in this hook and is not
  * persisted either: it is not a choice.
  */
-export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode) => void] {
+export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode) => void, ModePref] {
   const [pref, setPrefState] = useState<ModePref>("system");
   const [mode, setModeState] = useState<Mode>("light");
+  // The OS mode, for shownPref. Null on the server and the first client render,
+  // so both agree; read before paint.
+  const [system, setSystem] = useState<Mode | null>(null);
   useLayoutEffect(() => {
     const stored = readStoredMode();
+    const os = systemMode();
+    setSystem(os);
     setPrefState(stored ?? "system");
-    setModeState(stored ?? systemMode());
+    setModeState(stored ?? os);
   }, []);
 
   const setPref = useCallback((p: ModePref) => {
@@ -150,8 +167,9 @@ export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode)
   useEffect(() => {
     const mq = matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => {
-      if (readStoredMode() !== null) return;
       const next: Mode = mq.matches ? "dark" : "light";
+      setSystem(next);
+      if (readStoredMode() !== null) return;
       setModeState(next);
       applyMode(next);
     };
@@ -159,7 +177,7 @@ export function useModePref(): [ModePref, Mode, (p: ModePref) => void, (m: Mode)
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  return [pref, mode, setPref, setModeEphemeral];
+  return [pref, mode, setPref, setModeEphemeral, shownPref(pref, mode, system ?? mode)];
 }
 
 /** Brand state. Orthogonal to mode: reset clears this and never touches that. */
