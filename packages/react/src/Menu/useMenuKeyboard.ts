@@ -17,28 +17,29 @@ interface Options {
 
 /** Roving-tabindex keyboard navigation for Menu (D53): Up/Down with wrap,
  * Home/End, character typeahead, Esc, and focus return on close. Disabled
- * items are skipped everywhere. Psi's only keyboard-navigation JS — a
- * deliberate departure from D52, which refused role="toolbar" precisely to
- * avoid it. */
+ * items are reachable by every one of these (D131, after the APG's advice
+ * that disabled menu items stay focusable); MenuItem refuses to activate
+ * them. Psi's first keyboard-navigation JS — a deliberate departure from D52,
+ * which refused role="toolbar" precisely to avoid it. */
 export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc, onTab }: Options) {
   const queryRef = useRef("");
   const queryAtRef = useRef(0);
 
-  const enabledItems = useCallback((): HTMLElement[] => {
+  // D131: every item, disabled or not. A disabled item can be reached and
+  // read; MenuItem's click handler is what refuses it.
+  const menuItems = useCallback((): HTMLElement[] => {
     const root = popoverRef.current;
     if (!root) return [];
-    return Array.from(
-      root.querySelectorAll<HTMLElement>('[data-psi-menu-item]:not([aria-disabled="true"])'),
-    );
+    return Array.from(root.querySelectorAll<HTMLElement>("[data-psi-menu-item]"));
   }, [popoverRef]);
 
   const focusItem = useCallback(
     (item: HTMLElement | undefined) => {
       if (!item) return;
-      for (const other of enabledItems()) other.tabIndex = other === item ? 0 : -1;
+      for (const other of menuItems()) other.tabIndex = other === item ? 0 : -1;
       item.focus();
     },
-    [enabledItems],
+    [menuItems],
   );
 
   /** Moves focus back to the trigger's focusable node. */
@@ -47,7 +48,7 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
     triggerEl?.focus();
   }, [triggerRef]);
 
-  // Focus the first enabled item on open; restore focus to the trigger on
+  // Focus the first item on open; restore focus to the trigger on
   // close — but only if focus is still inside the menu.
   //
   // Every close route funnels through this one cleanup, because a close is
@@ -66,14 +67,14 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
   // any route, including ones no reason is reported for.
   useEffect(() => {
     if (!open) return;
-    const items = enabledItems();
+    const items = menuItems();
     const atLast = openAtRef?.current === "last";
     if (openAtRef) openAtRef.current = "first";
     focusItem(atLast ? items[items.length - 1] : items[0]);
     return () => {
       if (popoverRef.current?.contains(document.activeElement)) focusTrigger();
     };
-  }, [open, popoverRef, openAtRef, enabledItems, focusItem, focusTrigger]);
+  }, [open, popoverRef, openAtRef, menuItems, focusItem, focusTrigger]);
 
   return useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
@@ -106,7 +107,7 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
         return;
       }
 
-      const items = enabledItems();
+      const items = menuItems();
       if (items.length === 0) return;
       const current = items.indexOf(document.activeElement as HTMLElement);
 
@@ -151,6 +152,6 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
         focusItem(match);
       }
     },
-    [enabledItems, focusItem, onEsc, onTab],
+    [menuItems, focusItem, onEsc, onTab],
   );
 }

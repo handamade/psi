@@ -9,8 +9,9 @@ interface Options {
 }
 
 /** Roving-tabindex keyboard navigation for Tabs (D67): arrow keys along the
- * orientation's axis with wrap, Home/End, disabled tabs skipped, and selection
- * following focus (automatic activation).
+ * orientation's axis with wrap, Home/End, and selection following focus
+ * (automatic activation). A disabled tab is reachable (D131): it takes focus
+ * and the tab stop, but not the selection, so the panel stays put.
  *
  * Deliberately separate from useMenuKeyboard rather than abstracted with it.
  * They share "roving tabindex with wrap and Home/End" and diverge on
@@ -20,38 +21,40 @@ interface Options {
  * with more branches than either caller uses. If a third caller appears, that
  * is the signal to abstract. */
 export function useTabsKeyboard({ listRef, orientation, onValueChange }: Options) {
-  const enabledTabs = useCallback((): HTMLElement[] => {
+  // D131: every tab, disabled or not.
+  const allTabs = useCallback((): HTMLElement[] => {
     const root = listRef.current;
     if (!root) return [];
-    return Array.from(
-      root.querySelectorAll<HTMLElement>('[data-psi-tab]:not([aria-disabled="true"])'),
-    );
+    return Array.from(root.querySelectorAll<HTMLElement>("[data-psi-tab]"));
   }, [listRef]);
 
-  /** Focus a tab and report it as the new selection. The roving tabindex is
-   * rewritten here rather than left to render, so keyboard focus lands
-   * correctly even before the consumer's state update commits. */
+  /** Focus a tab and, unless it is disabled, report it as the new selection.
+   * The roving tabindex is rewritten here rather than left to render, so
+   * keyboard focus lands correctly even before the consumer's state update
+   * commits — and so a focused disabled tab holds the stop, and Tab leaves
+   * the list for the panel rather than landing on the selected tab. */
   const activate = useCallback(
     (target: HTMLElement | undefined) => {
       if (!target) return;
-      for (const other of enabledTabs()) other.tabIndex = other === target ? 0 : -1;
+      for (const other of allTabs()) other.tabIndex = other === target ? 0 : -1;
       target.focus();
+      if (target.getAttribute("aria-disabled") === "true") return;
       const value = target.dataset.value;
       if (value != null) onValueChange(value);
     },
-    [enabledTabs, onValueChange],
+    [allTabs, onValueChange],
   );
 
   return useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
-      const tabs = enabledTabs();
+      const tabs = allTabs();
       if (tabs.length === 0) return;
 
       const [prevKey, nextKey] =
         orientation === "vertical" ? ["ArrowUp", "ArrowDown"] : ["ArrowLeft", "ArrowRight"];
 
-      // Index of the focused tab among the enabled ones. -1 when focus sits on
-      // a disabled tab, in which case the arrows still work from the start.
+      // Index of the focused tab; -1 when focus is elsewhere, in which case
+      // the arrows work from the start.
       const current = tabs.indexOf(document.activeElement as HTMLElement);
 
       switch (e.key) {
@@ -77,6 +80,6 @@ export function useTabsKeyboard({ listRef, orientation, onValueChange }: Options
           break;
       }
     },
-    [activate, enabledTabs, orientation],
+    [activate, allTabs, orientation],
   );
 }

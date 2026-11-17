@@ -72,7 +72,7 @@ describe("Menu button keyboard (D102)", () => {
     expect(item("Rename")).toHaveFocus();
   });
 
-  it("Arrow Up on a closed trigger opens the menu on the last enabled item", () => {
+  it("Arrow Up on a closed trigger opens the menu on the last item", () => {
     render(<Controlled />);
     trigger().focus();
     fireEvent.keyDown(trigger(), { key: "ArrowUp" });

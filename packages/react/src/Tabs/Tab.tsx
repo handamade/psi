@@ -8,7 +8,7 @@ export interface TabProps {
   value: string;
   /** Label — keep it to one or two words. */
   children: ReactNode;
-  /** Skipped by arrow navigation and not selectable, but still announced. */
+  /** Reachable by the arrow keys and announced, but never selected (D131). */
   disabled?: boolean;
   className?: string;
   /** Forwarded ref to the underlying `<button>`. */
@@ -18,8 +18,9 @@ export interface TabProps {
 /** One `role="tab"` (D67). Renders a real `<button>`.
  *
  * `disabled` sets `aria-disabled` rather than the `disabled` attribute, so the
- * tab stays discoverable to assistive tech while being skipped by roving
- * navigation — the same choice MenuItem made in D53. */
+ * tab stays focusable and discoverable to assistive tech — the same choice
+ * MenuItem made in D53. Since D131 the arrow keys reach it too; it takes
+ * focus but never the selection. */
 export function Tab({ value, children, disabled = false, className, ref }: TabProps) {
   const ctx = useTabsContext("Tab");
   const selected = ctx.value === value;

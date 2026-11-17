@@ -72,7 +72,7 @@ describe("MenuItem", () => {
   });
 
   // ── D53 query surface: useMenuKeyboard (Task 5) finds items via
-  // [data-psi-menu-item]:not([aria-disabled="true"]) and relies on every item
+  // [data-psi-menu-item] (disabled ones too, since D131) and relies on every item
   // starting outside the tab order until the hook makes one current. Nothing
   // asserted that surface before, so a regression here would silently break
   // the keyboard hook without failing any MenuItem test.
