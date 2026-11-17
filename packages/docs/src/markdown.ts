@@ -1,6 +1,14 @@
-import { colorTokens, docSection, kebab, THEMES } from "./data.js";
+import { colorTokens, docSection, formatOklch, kebab, THEMES } from "./data.js";
+import { componentPages, tokenPages } from "./pages.js";
 import type { ComponentPage, TokenPage } from "./pages.js";
-import type { DocsInput, ExportInfo, GuideSource } from "./types.js";
+import type {
+  DocsInput,
+  DocsPages,
+  ExportInfo,
+  GuideSource,
+  PatternLike,
+  PatternNodeLike,
+} from "./types.js";
 
 /** A table cell value: a literal "|" would split the cell. */
 const cell = (v: unknown) => String(v).replace(/\|/g, "\\|");
@@ -183,4 +191,100 @@ export function overviewMd(input: DocsInput): string {
       "- MCP: https://psi.kurkin.de/mcp",
     ].join("\n\n") + "\n"
   );
+}
+
+export function tokenMd(input: DocsInput, name: string): string {
+  const light = input.resolved.light.tokens[name];
+  if (!light) throw new Error(`No token "${name}" in the docs input`);
+  return (
+    [
+      `# \`--psi-${kebab(name)}\``,
+      `Token \`${name}\`. Formula: \`${light.formula}\``,
+      table(
+        ["Theme", "OKLCH", "Hex"],
+        THEMES.map((t) => {
+          const v = input.resolved[t].tokens[name];
+          return [t, formatOklch(v.oklch), v.hex];
+        }),
+      ),
+    ].join("\n\n") + "\n"
+  );
+}
+
+function composeTree(node: PatternNodeLike | string, indent: string): string[] {
+  if (typeof node === "string") return [`${indent}- ${JSON.stringify(node)}`];
+  const props = node.props && Object.keys(node.props).length > 0 ? ` ${JSON.stringify(node.props)}` : "";
+  const content = node.content ? `: ${node.content}` : "";
+  const lines = [`${indent}- \`${node.component}\`${props}${content}`];
+  for (const [slot, children] of Object.entries(node.slots ?? {})) {
+    lines.push(`${indent}  - ${slot}:`);
+    for (const child of children) lines.push(...composeTree(child, `${indent}    `));
+  }
+  return lines;
+}
+
+export function patternMd(p: PatternLike): string {
+  const out: string[] = [`# Pattern: ${p.id}`, p.intent, `Matches: ${p.match.join("; ")}.`];
+  if (p.parameters.length > 0) {
+    out.push(
+      "## Parameters",
+      table(
+        ["Key", "Ask", "Options", "Default"],
+        p.parameters.map((q) => [`\`${q.key}\``, q.ask, q.options.join(", "), q.default ?? "—"]),
+      ),
+    );
+  }
+  const content = Object.entries(p.content);
+  if (content.length > 0) out.push("## Content", content.map(([k, v]) => `- \`${k}\`: ${v}`).join("\n"));
+  out.push("## Composition", composeTree(p.compose, "").join("\n"));
+  out.push(
+    "## Status",
+    p.blocked
+      ? `Blocked. Gaps: ${p.gaps.join("; ")}`
+      : p.gaps.length > 0
+        ? `Gaps: ${p.gaps.join("; ")}`
+        : "Ready.",
+  );
+  if (p.preset) out.push("## Preset", fence("tsx", p.preset));
+  return out.join("\n\n") + "\n";
+}
+
+const isScalar = (v: unknown): v is string | number | boolean => ["string", "number", "boolean"].includes(typeof v);
+
+function topicList(v: unknown, indent: string): string {
+  if (Array.isArray(v)) {
+    if (v.length === 0) return `${indent}- (none)`;
+    return v.map((x) => (isScalar(x) ? `${indent}- ${x}` : `${indent}-\n${topicList(x, `${indent}  `)}`)).join("\n");
+  }
+  if (v !== null && typeof v === "object") {
+    return Object.entries(v)
+      .map(([k, x]) => (isScalar(x) ? `${indent}- **${k}**: ${x}` : `${indent}- **${k}**:\n${topicList(x, `${indent}  `)}`))
+      .join("\n");
+  }
+  return `${indent}- ${isScalar(v) ? v : "(none)"}`;
+}
+
+export function topicMd(name: string, content: unknown): string {
+  return `# Topic: ${name}\n\n${isScalar(content) ? content : topicList(content, "")}\n`;
+}
+
+export function buildDocsPages(
+  input: DocsInput,
+  extra: { patterns: PatternLike[]; topics: Record<string, unknown> },
+): DocsPages {
+  return {
+    overview: overviewMd(input),
+    components: Object.fromEntries(
+      componentPages.map((p) => [p.slug, { title: p.title, members: p.members, markdown: componentPageMd(input, p) }]),
+    ),
+    tokenPages: Object.fromEntries(
+      tokenPages.map((p) => [p.slug, { title: `${p.title} tokens`, markdown: tokenPageMd(input, p) }]),
+    ),
+    guides: Object.fromEntries(
+      input.guides.map((g) => [g.id, { title: g.title, description: g.description, markdown: guideMd(input, g) }]),
+    ),
+    tokens: Object.fromEntries(Object.keys(input.resolved.light.tokens).map((n) => [n, tokenMd(input, n)])),
+    patterns: Object.fromEntries(extra.patterns.map((p) => [p.id, patternMd(p)])),
+    topics: Object.fromEntries(Object.entries(extra.topics).map(([n, c]) => [n, topicMd(n, c)])),
+  };
 }

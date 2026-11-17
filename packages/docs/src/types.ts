@@ -97,3 +97,39 @@ export interface DocsInput {
   examples: ExampleSource[];
   guides: GuideSource[];
 }
+
+export interface PatternNodeLike {
+  component: string;
+  props?: Record<string, unknown>;
+  slots?: Record<string, Array<PatternNodeLike | string>>;
+  content?: string;
+}
+
+export interface PatternLike {
+  id: string;
+  intent: string;
+  match: string[];
+  compose: PatternNodeLike;
+  parameters: Array<{ key: string; ask: string; options: Array<string | number>; default?: string | number }>;
+  content: Record<string, string>;
+  gaps: string[];
+  blocked: boolean;
+  preset: string | null;
+}
+
+/** Everything the MCP index serves as markdown, built from one DocsInput. */
+export interface DocsPages {
+  overview: string;
+  /** By page slug. */
+  components: Record<string, { title: string; members: string[]; markdown: string }>;
+  /** By token page slug; title is e.g. "Color tokens". */
+  tokenPages: Record<string, { title: string; markdown: string }>;
+  /** By guide id. */
+  guides: Record<string, { title: string; description: string; markdown: string }>;
+  /** By token name, e.g. "bgPrimary". */
+  tokens: Record<string, string>;
+  /** By pattern id. */
+  patterns: Record<string, string>;
+  /** By topic name. */
+  topics: Record<string, string>;
+}
