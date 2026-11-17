@@ -507,4 +507,28 @@ describe("NavGroup icon (D124)", () => {
   it("CSS: the chevron keeps the inline end when an icon joins the row", () => {
     expect(navCss).toMatch(/\.chevron\s*\{[^}]*margin-inline-start:\s*auto/);
   });
+
+  it("marks a group with an icon, and only then, so its items can line up under the label", () => {
+    render(
+      <NavTree aria-label="Main">
+        <NavGroup label="Reports" icon={<IconSimCard />} open onOpenChange={() => {}}>
+          <NavItem href="#s">Sales</NavItem>
+        </NavGroup>
+        <NavGroup label="Settings" open onOpenChange={() => {}}>
+          <NavItem href="#p">Profile</NavItem>
+        </NavGroup>
+      </NavTree>,
+    );
+    const [withIcon, without] = screen.getAllByRole("button").map((b) => b.closest("li")!);
+    expect(withIcon.className).toMatch(/withIcon/);
+    expect(without.className).not.toMatch(/withIcon/);
+  });
+
+  it("CSS: under an icon group, items start where the label's text starts", () => {
+    // The label's text sits after the icon and the button's own gap (space-8),
+    // so the list is inset by exactly that much from the button's padding.
+    expect(navCss).toMatch(
+      /\.withIcon > \.groupList\s*\{[^}]*padding-inline-start:\s*calc\(var\(--psi-nav-tree-icon-size\) \+ var\(--psi-space-8\)\)/,
+    );
+  });
 });

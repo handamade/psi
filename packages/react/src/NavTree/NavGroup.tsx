@@ -29,7 +29,9 @@ export interface NavGroupProps {
  * `aria-expanded` carry the meaning. */
 export function NavGroup({ label, icon, open, onOpenChange, children, className }: NavGroupProps) {
   const listId = useId();
-  const cls = [styles.group, className].filter(Boolean).join(" ");
+  const hasIcon = icon !== undefined && icon !== null && icon !== false;
+  // D124: with an icon, the group's items line up under the label's text.
+  const cls = [styles.group, hasIcon ? styles.withIcon : null, className].filter(Boolean).join(" ");
   return (
     <li className={cls}>
       <button
@@ -39,7 +41,7 @@ export function NavGroup({ label, icon, open, onOpenChange, children, className 
         aria-controls={listId}
         onClick={() => onOpenChange(!open)}
       >
-        {icon !== undefined && icon !== null && icon !== false ? (
+        {hasIcon ? (
           <span className={styles.icon} aria-hidden="true">
             {icon}
           </span>

@@ -130,6 +130,12 @@
   display: none;
 }
 
+/* D124: under a group with an icon, the items start where the label's text
+   starts: after the icon and the button's own gap (space-8, .groupButton). */
+.withIcon > .groupList {
+  padding-inline-start: calc(var(--psi-nav-tree-icon-size) + var(--psi-space-8));
+}
+
 /* ── Icon and count (D124) ────────────────────────────────────── */
 
 /* Decorative, coloured by currentColor so it follows the link's or the

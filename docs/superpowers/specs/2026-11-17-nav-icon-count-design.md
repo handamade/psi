@@ -178,6 +178,12 @@ second merges `origin/main` and runs `check-docs-drift` again.
     gains `margin-inline-start: auto`. With two items this changes nothing
     (`space-between` already put it at the end), and with three it keeps the
     label next to the icon instead of centring it.
+  - **Under a group with an icon, the items line up with the label's text.**
+    The group's `<li>` takes a `withIcon` class, and its list is inset by
+    `calc(var(--psi-nav-tree-icon-size) + var(--psi-space-8))`: the icon plus
+    the button's own gap. Without it, the items' text started 12px before the
+    label's. The user chose this on 2026-11-17, after seeing CI's renders. A
+    group without an icon keeps its one-step indent and its pixels.
   - **`count` is on `NavItem` only.** A count on a group, such as a total for
     its entries, was not asked for.
 
