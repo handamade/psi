@@ -1,5 +1,29 @@
 # @handamade/psi-tokens
 
+## 0.34.0
+
+### Minor Changes
+
+- 6e1bbe5: A Combobox for searching a list and picking one value or several (D130).
+
+  - **New: `Combobox`.** Type to filter a list and pick from it. Options are data, `{ value, label, description?, disabled? }`. The default filter is a "contains" match on the label that ignores case and accents, so "zur" finds "Zürich". Pass `filter={fn}` to replace it, or `filter={false}` to filter the list yourself, with `loading` and a `moreMessage` line for a server-side search.
+  - **Single or several.** By default it picks one value (`string | null`). With `multiple` it picks several (`string[]`), shown as `Tag`s inside the control, which wraps and grows. Backspace in the empty input removes the last value.
+  - **Fits the rest of Psi.** Inside a `Field` it takes the label, description, error and required wiring, and `controlWidth` sizes it. A bare Combobox in a `Toolbar` takes the toolbar's control width. `name` writes hidden inputs, so a form submits the values, not the text. `clearable` adds a clear button. Sizes are 24 to 48, and a multi-select starts at 32.
+  - **Keyboard and screen readers.** It follows the ARIA combobox pattern. Focus stays in the input. Enter picks and never submits the form while the list is open. Esc closes the list without closing a surrounding `Dialog`. Disabled options are reachable but can't be picked. A polite live region says the number of results. Every name it adds can be translated: `clearLabel`, `toggleLabel`, `removeLabel`, `emptyMessage`, `loadingMessage` and `resultsLabel`.
+  - **The popup** is on the top layer, so it draws above a `Dialog`. It is at least as wide as the control, and it scrolls past `--psi-combobox-popup-max-height`, an alias of the shared `--psi-popup-max-height` (320px).
+  - **New tokens: `--psi-combobox-*`.** Each one aliases a value `Select` or `Menu` already uses, so a theme that styles those styles the Combobox too.
+  - **Breaking, before 1.0: `Select` no longer accepts `multiple`.** A native multi-select showed about 1.5 rows of its list in a fixed-height box, and nothing could make it taller. **What changes for you:** remove `multiple` from any `Select` and use `<Combobox multiple>` instead. TypeScript now reports the prop as an error.
+  - **`Tag` takes `dismissLabel`**, the dismiss button's name, so several dismissible tags can each say what they remove ("Remove Berlin"). The default is still "Dismiss".
+
+- 6c05ff4: The MCP answers with the docs (D129). `get` now returns each docs page's own markdown, the same text as psi.kurkin.de/docs/…/<page>.md, examples included, **instead of JSON**: anything that parsed `get`'s JSON must read markdown instead. Two new tools: `theme` derives a light and dark theme, solved to WCAG AA, from one colour or a hue, and `check` reports JSX that uses Psi's API wrongly (unknown exports, props and values, missing required props, slot contracts, missing accessible names). None of the four tools writes files or calls a model. `manifest.json` gains `attributes`, `accessibleName` and `contracts`, with the pass-through attribute names in `dist/attributes.json`; `@handamade/psi-tokens/generate` exports `parseColor`, `contrastReport` and `ACCENT_CHROMA`. In `@handamade/psi-mcp`, the `Detail` type export is removed, and `buildIndex` now returns `BaseIndex`, the index without its baked `docs`. `createPsiServer(store, version)` now takes a third argument, the `index`; `Store` gains `suggest`, and `get` returns a `Page` (`{ id, kind, title, markdown }`).
+- 712e86a: A Menu that scrolls, keeps focus and reaches disabled items, and a shared cap for a popup's height (D131).
+
+  - **A long `Menu` scrolls.** Past `--psi-menu-max-height` it stops and scrolls, and the focused item stays in view as the keys move. 43 items used to run 1,567px down a 768px window; now the menu is 330px tall. A menu taller than the room on both sides of its trigger opens on the side with more room and fills it. **What changes for you:** a menu longer than about eight items now scrolls.
+  - **New tokens: `--psi-popup-max-height` (320px)**, shared by every popup, and **`--psi-menu-max-height`**, Menu's alias of it. Set the shared one in a theme to retune every popup, or the alias for menus alone.
+  - **Removing the focused item keeps focus in the menu.** A re-render that removes it moves focus to the item now at its position, or the new last item. An emptied menu holds focus itself, so Esc and Tab still report `"esc"` and `"tab"`. Before, focus fell to the page and the arrow keys stopped working.
+  - **Disabled menu items and tabs are reachable by the keyboard.** The arrow keys, Home, End and typeahead now land on a `MenuItem disabled`, and a menu whose first item is disabled opens on it; activating it still does nothing. In `Tabs`, the arrows and Home/End focus a disabled tab without selecting it, so the panel stays put. **What changes for you:** a test that expected the arrows to skip a disabled item now lands on it.
+  - Menu's popup and placement code moved into internal layers the coming `Combobox` shares, with no visible change.
+
 ## 0.33.0
 
 ## 0.32.0
