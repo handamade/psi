@@ -2,8 +2,9 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { docSection, kebab } from "./data.js";
-import { EXAMPLES_DIR, getExport, readGeneratedDoc, reactRoot, resolved, tokensRoot } from "./node.js";
-import { componentPages } from "./pages.js";
+import { tokenPageMd } from "./markdown.js";
+import { EXAMPLES_DIR, loadDocsInput, getExport, readGeneratedDoc, reactRoot, resolved, tokensRoot } from "./node.js";
+import { componentPages, tokenPages } from "./pages.js";
 
 export type Surface = "code" | "docs" | "storybook" | "figma" | "llms" | "md" | "mcp";
 export type TraceTarget = "Button" | "Field" | "Table" | "--psi-fg-accent";
@@ -31,8 +32,29 @@ function slugOf(name: string): string {
   return page.slug;
 }
 
-function stories(name: string): { title: string; names: string[]; path: string } {
-  const dir = join(reactRoot, "src", name);
+/** The repo root: packages/tokens/ is two levels below it. */
+const repoRoot = join(tokensRoot, "..", "..");
+const COLOR_STORY = "apps/storybook/src/token-docs/ColorTokens.stories.tsx";
+
+/** The `title:` of a story file, or a TraceError naming the file. Exported for tests. */
+export function storyTitle(path: string, label: string): string {
+  if (!existsSync(path)) throw new TraceError(`trace: no story file at ${label}`);
+  const title = readFileSync(path, "utf8").match(/title:\s*["'`]([^"'`]+)["'`]/)?.[1];
+  if (!title) throw new TraceError(`trace: ${label} has no title`);
+  return title;
+}
+
+/** The first example file of a docs folder, or a TraceError. Exported for tests. */
+export function firstExample(slug: string, examplesDir: string = EXAMPLES_DIR): string {
+  const dir = join(examplesDir, slug);
+  const file = (existsSync(dir) ? readdirSync(dir) : []).filter((f) => f.endsWith(".tsx")).sort()[0];
+  if (!file) throw new TraceError(`trace: no example in packages/docs/examples/${slug}/`);
+  return file;
+}
+
+/** A component's story file; the root is injectable for tests. Exported for tests. */
+export function stories(name: string, root: string = reactRoot): { title: string; names: string[]; path: string } {
+  const dir = join(root, "src", name);
   const file = existsSync(dir) ? readdirSync(dir).find((f) => f.endsWith(".stories.tsx")) : undefined;
   if (!file) throw new TraceError(`trace: ${name} has no story file in packages/react/src/${name}/`);
   const src = readFileSync(join(dir, file), "utf8");
@@ -42,18 +64,26 @@ function stories(name: string): { title: string; names: string[]; path: string }
   return { title, names, path: `packages/react/src/${name}/${file}` };
 }
 
-function componentTokens(name: string): string[] {
-  const css = readFileSync(join(tokensRoot, "dist", "components.css"), "utf8");
+const FIGMA_LINES = 12;
+
+/** Aliases to semantic colour variables only: sizing aliases are not Figma colour variables. */
+export function componentTokens(name: string, cssPath = join(tokensRoot, "dist", "components.css")): string[] {
+  const css = readFileSync(cssPath, "utf8");
   const prefix = `--psi-${kebab(name)}-`;
-  return [...css.matchAll(/(--psi-[a-z0-9-]+):\s*var\((--psi-[a-z0-9-]+)\)/g)]
-    .filter((m) => m[1].startsWith(prefix) && !m[2].startsWith(prefix))
-    .map((m) => `${m[1]}  →  ${figmaName(m[2])}`);
+  const lines = [
+    ...new Set(
+      [...css.matchAll(/(--psi-[a-z0-9-]+):\s*var\((--psi-(?:bg|fg|fill|border)-[a-z0-9-]+)\)/g)]
+        .filter((m) => m[1].startsWith(prefix))
+        .map((m) => `${m[1]}  →  ${figmaName(m[2])}`),
+    ),
+  ];
+  return lines.length > FIGMA_LINES ? [...lines.slice(0, FIGMA_LINES), `… ${lines.length - FIGMA_LINES} more`] : lines;
 }
 
 function llmsLines(name: string): string {
   const lines = readFileSync(join(reactRoot, "llms.txt"), "utf8").split("\n");
   // Only lines that open on the name: a line that merely mentions it (Stack's, Toolbar's) is not Button's rule.
-  const own = lines.filter((l) => l.startsWith(`## ${name}`) || l.startsWith(`- ${name}`) || l.startsWith(`- <${name}`));
+  const own = lines.filter((l) => new RegExp(`^(## |- <?)${name}(?![A-Za-z0-9])`).test(l));
   const rules =
     docSection(lines.join("\n"), "Rules for generated code")
       ?.split("\n")
@@ -64,8 +94,7 @@ function llmsLines(name: string): string {
 function componentTrace(name: string): Trace {
   const slug = slugOf(name);
   const exampleDir = join(EXAMPLES_DIR, slug);
-  const example = (existsSync(exampleDir) ? readdirSync(exampleDir) : []).filter((f) => f.endsWith(".tsx")).sort()[0];
-  if (!example) throw new TraceError(`trace: no example in packages/docs/examples/${slug}/`);
+  const example = firstExample(slug);
   const info = getExport(name);
   const s = stories(name);
   const md = readGeneratedDoc(name);
@@ -121,20 +150,26 @@ function tokenTrace(cssVar: string): Trace {
       href: "/docs/tokens/color/",
       hrefLabel: "Open the colour tokens",
     },
-    storybook: { kind: "text", text: "Tokens and Assets/Color Tokens", from: "apps/storybook", hrefLabel: "Open in Storybook" },
+    storybook: { kind: "text", text: storyTitle(join(repoRoot, COLOR_STORY), COLOR_STORY), from: COLOR_STORY, hrefLabel: "Open in Storybook" },
     figma: { kind: "text", text: `${figmaName(cssVar)}\n  Light · Dark · Acme · Ember`, from: "Psi Token Sync", hrefLabel: "Open in Figma" },
     llms: {
       kind: "text",
       text: readFileSync(join(tokensRoot, "llms.txt"), "utf8")
         .split("\n")
-        .filter((l) => l.includes("fg-") || l.includes("formula"))
+        .filter((l) => l.includes("--psi-fg-") || /formula/i.test(l))
         .slice(0, 6)
         .join("\n"),
       from: "packages/tokens/llms.txt",
       href: "/llms.txt",
       hrefLabel: "/llms.txt",
     },
-    md: { kind: "text", text: "# Color tokens", from: "docs/tokens/color.md", href: "/docs/tokens/color.md", hrefLabel: "/docs/tokens/color.md" },
+    md: {
+      kind: "text",
+      text: tokenPageMd(loadDocsInput(), tokenPages.find((p) => p.slug === "color")!).split("\n").slice(0, 14).join("\n"),
+      from: "packages/docs/src/markdown.ts tokenPageMd",
+      href: "/docs/tokens/color.md",
+      hrefLabel: "/docs/tokens/color.md",
+    },
   };
 }
 
