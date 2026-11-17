@@ -10,9 +10,11 @@ import {
 import type { KeyboardEvent, ReactElement, ReactNode, Ref } from "react";
 import styles from "./menu.module.css";
 import { useMenuKeyboard } from "./useMenuKeyboard.js";
-import { useMenuPlacement } from "./useMenuPlacement.js";
+import { useAnchoredPopup } from "../internal/popup/useAnchoredPopup.js";
+import { usePopupPlacement } from "../internal/popup/usePopupPlacement.js";
+import type { PopupPlacement } from "../internal/popup/usePopupPlacement.js";
 
-export type MenuPlacement = "bottom-start" | "bottom-end" | "top-start" | "top-end";
+export type MenuPlacement = PopupPlacement;
 
 /** Why Menu reports a dismissal (D50, D102). Annotate a handler with this
  * rather than restating the union, so a new reason reaches it. */
@@ -71,10 +73,6 @@ export interface MenuProps {
   ref?: Ref<HTMLDivElement>;
 }
 
-function isPopoverOpen(el: HTMLElement): boolean {
-  return el.hasAttribute("data-open") || el.matches(":popover-open");
-}
-
 /** Action menu on the native Popover API top layer: the top layer and light
  * dismiss come from the platform; Esc, roving keyboard, placement and
  * dismissal reasons are Psi's (D53). Controlled-only, like Dialog (D50).
@@ -108,9 +106,6 @@ export function Menu({
 }: MenuProps) {
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLDivElement | null>(null);
-  // Set by the sync effect immediately before its own hidePopover(), and
-  // consumed by handleToggle, so a consumer-driven close stays silent.
-  const suppressNextCloseRef = useRef(false);
 
   const uid = useId().replace(/:/g, "");
   const anchorName = `--psi-menu-${uid}`;
@@ -119,48 +114,22 @@ export function Menu({
   // read once by the open effect in useMenuKeyboard.
   const openAtRef = useRef<"first" | "last">("first");
 
-  useMenuPlacement({ popoverRef, triggerRef, open, placement, anchorName });
+  // D130: the popup and its placement are internal layers Menu shares with
+  // the Combobox. Menu keeps the platform's light dismiss ("auto").
+  usePopupPlacement({ popoverRef, anchorRef: triggerRef, open, placement, anchorName });
+  const popupProps = useAnchoredPopup({
+    popoverRef,
+    anchorRef: triggerRef,
+    open,
+    mode: "auto",
+    onDismiss: onClose,
+  });
 
   const setRef = (node: HTMLDivElement | null) => {
     popoverRef.current = node;
     if (typeof ref === "function") ref(node);
     else if (ref) ref.current = node;
   };
-
-  useEffect(() => {
-    const el = popoverRef.current;
-    if (!el) return;
-    const isOpen = isPopoverOpen(el);
-    if (open && !isOpen) el.showPopover();
-    else if (!open && isOpen) {
-      suppressNextCloseRef.current = true;
-      el.hidePopover();
-    }
-  }, [open]);
-
-  const handleToggle = useCallback(() => {
-    const el = popoverRef.current;
-    if (!el) return;
-    // Checked before the open/closed test on purpose: the flag must be
-    // consumed by the very next toggle whatever the element's state reads as
-    // by then, or a later genuine dismissal would inherit the suppression.
-    if (suppressNextCloseRef.current) {
-      suppressNextCloseRef.current = false;
-      return;
-    }
-    if (isPopoverOpen(el)) return; // opening toggle — nothing to report
-    // D58: the platform can close this popover before `open` flips — clicking
-    // another menu's trigger light-dismisses this one before the consumer's
-    // click handler runs. In that case the sync effect takes neither branch
-    // (the popover is already closed), so suppressNextCloseRef is never armed.
-    // Report a dismissal only for a menu that is still open according to its
-    // own prop; otherwise this is a stale toggle for a close the consumer
-    // already knows about, and reporting it would clear a selection that has
-    // since moved on. React reads this handler off the committed props at
-    // dispatch time, so the closure's `open` is never staler than the DOM.
-    if (!open) return;
-    onClose("outside");
-  }, [onClose, open]);
 
   // Roving-tabindex keyboard navigation (D53): Up/Down, Home/End, typeahead,
   // and Esc. Esc's own preventDefault() (inside the hook) suppresses the
@@ -231,12 +200,11 @@ export function Menu({
         {...rest}
         id={menuId}
         ref={setRef}
-        popover="auto"
+        {...popupProps}
         role="menu"
         data-psi-menu
         data-placement={placement}
         className={[styles.menu, className].filter(Boolean).join(" ")}
-        onToggle={handleToggle}
         onKeyDown={handleKeyDown}
       >
         <MenuContext.Provider value={{ close }}>{children}</MenuContext.Provider>
