@@ -113,6 +113,10 @@ test("every guide exists and has no axe violations, light and dark", async ({ pa
   }
 });
 
+// Paths that tools/assemble-site.mjs adds after the site build, so they are absent
+// from apps/site/dist, which this gate serves. Links to them are correct in production.
+const ASSEMBLED_PATHS = ["/storybook/", "/llms.txt", "/packages/"];
+
 test("no internal link on a docs page points at a missing page", async ({ page, request }) => {
   test.setTimeout(300_000);
   const pages = [
@@ -125,11 +129,13 @@ test("no internal link on a docs page points at a missing page", async ({ page, 
   const broken: string[] = [];
   for (const path of pages) {
     await page.goto(`${BASE}${path}`);
-    const hrefs = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLAnchorElement>("a[href]")]
-        .map((a) => new URL(a.href, location.href))
-        .filter((u) => u.origin === location.origin && !u.pathname.startsWith("/storybook/"))
-        .map((u) => u.pathname),
+    const hrefs = await page.evaluate(
+      (assembled) =>
+        [...document.querySelectorAll<HTMLAnchorElement>("a[href]")]
+          .map((a) => new URL(a.href, location.href))
+          .filter((u) => u.origin === location.origin && !assembled.some((p) => u.pathname.startsWith(p)))
+          .map((u) => u.pathname),
+      ASSEMBLED_PATHS,
     );
     for (const href of hrefs) {
       if (seen.has(href)) continue;
