@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { useState } from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Pagination, paginationRange } from "./Pagination.js";
+import { Pagination, paginationRange, pagerItems } from "./Pagination.js";
+import type { PagerItem } from "./Pagination.js";
 
 describe("paginationRange", () => {
   it("lists every page when they all fit", () => {
@@ -195,5 +197,127 @@ describe("Pagination out-of-range page (D78)", () => {
     render(<Pagination page={NaN} pageCount={5} onPageChange={vi.fn()} />);
     expect(screen.getByRole("button", { name: "1" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
+  });
+});
+
+describe("pagerItems: the wide and compact forms in one list (D127)", () => {
+  const form = (items: PagerItem[], which: "wide" | "compact") =>
+    items
+      .filter((it) => it.only === undefined || it.only === which)
+      .map((it) => (it.kind === "page" ? it.page : "ellipsis"));
+
+  it("marks the pages and ellipses that belong to one form", () => {
+    expect(pagerItems(50, 100, 1)).toEqual([
+      { kind: "page", page: 1, only: undefined },
+      { kind: "ellipsis", before: 49, only: "wide" },
+      { kind: "page", page: 49, only: "wide" },
+      { kind: "ellipsis", before: 50, only: "compact" },
+      { kind: "page", page: 50, only: undefined },
+      { kind: "page", page: 51, only: "wide" },
+      { kind: "ellipsis", before: 100, only: undefined },
+      { kind: "page", page: 100, only: undefined },
+    ]);
+  });
+
+  it("marks nothing when siblingCount is already 0", () => {
+    expect(pagerItems(50, 100, 0).every((it) => it.only === undefined)).toBe(true);
+  });
+
+  describe("sweep", () => {
+    for (let pageCount = 1; pageCount <= 30; pageCount++) {
+      for (let siblingCount = 0; siblingCount <= 3; siblingCount++) {
+        it(`reproduces both forms for pageCount=${pageCount} siblingCount=${siblingCount}`, () => {
+          for (let page = 1; page <= pageCount; page++) {
+            const items = pagerItems(page, pageCount, siblingCount);
+            expect(form(items, "wide")).toEqual(paginationRange(page, pageCount, siblingCount));
+            expect(form(items, "compact")).toEqual(paginationRange(page, pageCount, 0));
+            // The compact numbers are a subset of the wide ones, so no page
+            // button is compact-only and none is rendered twice.
+            expect(items.some((it) => it.kind === "page" && it.only === "compact")).toBe(false);
+          }
+        });
+      }
+    }
+  });
+});
+
+describe("Pagination forms, slots and names (D127)", () => {
+  it("renders each page button once, marking the wide-only ones", () => {
+    const { container } = render(<Pagination page={50} pageCount={100} onPageChange={() => {}} />);
+    for (const n of ["1", "49", "50", "51", "100"]) {
+      expect(screen.getAllByRole("button", { name: n })).toHaveLength(1);
+    }
+    expect(screen.getByRole("button", { name: "49" })).toHaveAttribute("data-only", "wide");
+    expect(screen.getByRole("button", { name: "50" })).not.toHaveAttribute("data-only");
+    expect(container.querySelectorAll('[aria-hidden="true"][data-only="compact"]')).toHaveLength(1);
+  });
+
+  it("marks nothing with siblingCount 0", () => {
+    const { container } = render(
+      <Pagination page={50} pageCount={100} siblingCount={0} onPageChange={() => {}} />,
+    );
+    expect(container.querySelector("[data-only]")).toBeNull();
+  });
+
+  it("sets the digit count of pageCount for the slot width", () => {
+    render(<Pagination page={1} pageCount={100} onPageChange={() => {}} />);
+    const nav = screen.getByRole("navigation");
+    expect(nav.style.getPropertyValue("--psi-pagination-digits")).toBe("3");
+  });
+
+  it("names the arrows Previous page and Next page by default", () => {
+    render(<Pagination page={2} pageCount={3} onPageChange={() => {}} />);
+    expect(screen.getByRole("button", { name: "Previous page" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Next page" })).toBeTruthy();
+  });
+
+  it("takes translated arrow names", () => {
+    render(
+      <Pagination page={2} pageCount={3} previousLabel="Vorherige Seite" nextLabel="Nächste Seite" onPageChange={() => {}} />,
+    );
+    expect(screen.getByRole("button", { name: "Vorherige Seite" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Nächste Seite" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Next page" })).toBeNull();
+  });
+});
+
+describe("Pagination keeps focus when an arrow disables itself (D127)", () => {
+  function Controlled({ start, count }: { start: number; count: number }) {
+    const [page, setPage] = useState(start);
+    return <Pagination page={page} pageCount={count} onPageChange={setPage} />;
+  }
+
+  it("moves focus to the last page's button when Next reaches it", async () => {
+    const user = userEvent.setup();
+    render(<Controlled start={12} count={13} />);
+    screen.getByRole("button", { name: "Next page" }).focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "13" })).toHaveFocus();
+  });
+
+  it("moves focus to the first page's button when Previous reaches it", async () => {
+    const user = userEvent.setup();
+    render(<Controlled start={2} count={13} />);
+    screen.getByRole("button", { name: "Previous page" }).focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("button", { name: "1" })).toHaveFocus();
+  });
+
+  it("leaves focus on Next while it stays enabled", async () => {
+    const user = userEvent.setup();
+    render(<Controlled start={5} count={13} />);
+    const next = screen.getByRole("button", { name: "Next page" });
+    next.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("button", { name: "6" })).toHaveAttribute("aria-current", "page");
+    expect(next).toHaveFocus();
+  });
+
+  it("moves no focus for a click on an arrow that did not have it", () => {
+    render(<Controlled start={12} count={13} />);
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    expect(screen.getByRole("button", { name: "13" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("button", { name: "13" })).not.toHaveFocus();
   });
 });
