@@ -49,11 +49,11 @@ function ManyRows({ wide }: { wide?: boolean }) {
     <>
       <TableHead>
         <TableRow>
-          <TableHeaderCell>Date</TableHeaderCell>
-          <TableHeaderCell>Payee</TableHeaderCell>
+          <TableHeaderCell sortKey="date">Date</TableHeaderCell>
+          <TableHeaderCell sortKey="payee">Payee</TableHeaderCell>
           {wide && <TableHeaderCell>Category</TableHeaderCell>}
           {wide && <TableHeaderCell>Reference</TableHeaderCell>}
-          <TableHeaderCell numeric>Amount</TableHeaderCell>
+          <TableHeaderCell sortKey="amount" numeric>Amount</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -107,14 +107,19 @@ function Demo({ size }: { size?: 32 | 40 | 48 }) {
 export const Size32: Story = { render: () => <Demo size={32} /> };
 export const Size40: Story = { render: () => <Demo size={40} /> };
 export const Size48: Story = { render: () => <Demo size={48} /> };
-/** D126 — a bare table directly in a scrolling region (like AppShell's
- * <main>), scrolled by 200px: the header stays at the region's top. */
+/** D126 — a bare, sortable table directly in a scrolling region (like
+ * AppShell's <main>), scrolled by 200px: the header stays at the region's
+ * top. Sortable so its tab stops are Psi's sort buttons: a scroller with no
+ * focusable content becomes a tab stop itself in Chromium, drawn with the
+ * browser's ring. (The sortKeys are inert in InContainer, which is not
+ * sortable.) */
 export const Sticky: Story = {
   render: function StickyStory() {
     const ref = useScrolledTo(200);
+    const [sort, setSort] = React.useState<TableSortState | null>({ key: "date", direction: "asc" });
     return (
       <div ref={ref} data-testid="sticky-region" style={{ blockSize: 240, overflow: "auto" }}>
-        <Table stickyHeader>
+        <Table stickyHeader sortable sort={sort} onSortChange={setSort}>
           <ManyRows />
         </Table>
       </div>
