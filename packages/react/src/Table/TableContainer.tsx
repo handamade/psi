@@ -35,6 +35,8 @@ export function TableContainer({
   const offeredId = useId();
   const node = useRef<HTMLDivElement | null>(null);
   const [captionId, setCaptionId] = useState<string | undefined>(undefined);
+  const [headSize, setHeadSize] = useState<number | undefined>(undefined);
+  const warned = useRef(false);
   // An empty string names nothing: treat it as absent.
   const ownLabel = ariaLabel || undefined;
   const ownLabelledBy = ariaLabelledBy || undefined;
@@ -52,19 +54,27 @@ export function TableContainer({
   // The caption registers its id (and withdraws it on unmount), so a caption
   // that arrives with data, changes its id or goes away is followed without
   // this component re-rendering first. Stable, so captions don't re-run.
-  const context = useMemo(() => ({ offeredId, register: setCaptionId }), [offeredId]);
+  const context = useMemo(() => ({ offeredId, register: setCaptionId, setHeadSize }), [offeredId]);
 
   // Dev warning, once after mount. The DOM is read here (not the registered
-  // id) so it stays free of a first-render false alarm.
+  // id) so it stays free of a first-render false alarm. The ref keeps it to
+  // one under StrictMode, which runs mount effects twice but keeps refs (D128).
   useLayoutEffect(() => {
-    if (process.env.NODE_ENV === "production" || ownName) return;
+    if (process.env.NODE_ENV === "production" || ownName || warned.current) return;
+    warned.current = true;
     if (!node.current?.querySelector(":scope > table > caption")) console.warn(NO_NAME_WARNING);
   }, []);
 
-  const sized: CSSProperties | undefined =
-    maxBlockSize === undefined
-      ? style
-      : { ...style, maxBlockSize: typeof maxBlockSize === "number" ? `${maxBlockSize}px` : maxBlockSize };
+  // A sticky header's measured size, as a private custom property the
+  // stylesheet turns into scroll-padding-block-start (D128), so a focused row
+  // scrolls clear of the header instead of under it.
+  const sized = {
+    ...(headSize === undefined ? undefined : { "--_psi-table-head-size": `${headSize}px` }),
+    ...style,
+    ...(maxBlockSize === undefined
+      ? undefined
+      : { maxBlockSize: typeof maxBlockSize === "number" ? `${maxBlockSize}px` : maxBlockSize }),
+  } as CSSProperties;
 
   return (
     <TableContainerContext.Provider value={context}>
@@ -74,7 +84,7 @@ export function TableContainer({
         role="region"
         tabIndex={0}
         aria-label={ownLabel}
-        aria-labelledby={ownLabelledBy ?? (ownLabel !== undefined ? undefined : captionId)}
+        aria-labelledby={ownLabelledBy ?? (ownLabel !== undefined ? undefined : captionId || undefined)}
         className={[styles.container, className].filter(Boolean).join(" ")}
         style={sized}
       >

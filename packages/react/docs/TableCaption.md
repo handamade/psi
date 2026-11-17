@@ -22,7 +22,7 @@ Renders <caption>, which names the table for assistive tech and is visible, unli
 
 ## Theming
 
-This component has no `--psi-table-caption-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-table-caption-*` tokens of its own. Its styling binds the `--psi-table-*` tokens; override those at any scope.
 
 
 

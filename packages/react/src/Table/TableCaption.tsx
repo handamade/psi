@@ -26,7 +26,9 @@ export interface TableCaptionProps extends Omit<HTMLAttributes<HTMLTableCaptionE
  * Inside a TableContainer it also names the scrolling region (D126). */
 export function TableCaption({ children, detail, className, id, ref, ...rest }: TableCaptionProps) {
   const container = useContext(TableContainerContext);
-  const finalId = id ?? container?.offeredId;
+  // An empty id names nothing: treat it as absent (D128), as the container
+  // treats an empty aria-label.
+  const finalId = id || container?.offeredId || undefined;
 
   useLayoutEffect(() => {
     if (!container) return;

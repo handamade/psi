@@ -87,6 +87,19 @@ export interface TableProps extends Omit<TableHTMLAttributes<HTMLTableElement>, 
   selected?: ReadonlySet<string>;
   /** Called with the next selection. See `onSortChange` on why it is optional. */
   onSelectionChange?: (selected: ReadonlySet<string>) => void;
+  /** Accessible name of the select-all checkbox, for a translated app (D128).
+   * @default "Select all rows" */
+  selectAllLabel?: string;
+  /**
+   * The start of each row checkbox's accessible name, for a translated app
+   * (D128). A row without `selectLabel` is named this followed by its row
+   * header — the row's `TableCell rowHeader`, so "Select row Acme" — or, with
+   * no row header, by its position among the table's rows: "Select row 3".
+   * That position counts body rows only, one less than the row number a
+   * screen reader announces with the header row, so prefer a row header.
+   * @default "Select row"
+   */
+  selectRowLabel?: string;
   /** TableHead and TableBody. */
   children: ReactNode;
   className?: string;
@@ -105,6 +118,8 @@ export function Table({
   selectable = false,
   selected = EMPTY_SELECTION,
   onSelectionChange,
+  selectAllLabel = "Select all rows",
+  selectRowLabel = "Select row",
   children,
   className,
   ref,
@@ -119,7 +134,18 @@ export function Table({
     if (selectable && hasRowWithoutId) console.warn("Psi Table: `selectable` is set but a row in `TableBody` has no `rowId`. That row will render without a selection checkbox and select-all will not include it.");
   }
   return (
-    <TableContext.Provider value={{ size, sortable, sort, onSortChange, selectable, selected, onSelectionChange }}>
+    <TableContext.Provider value={{
+        size,
+        stickyHeader: Boolean(stickyHeader),
+        sortable,
+        sort,
+        onSortChange,
+        selectable,
+        selected,
+        onSelectionChange,
+        selectAllLabel,
+        selectRowLabel,
+      }}>
       <TableRowIdsContext.Provider value={rowIds}>
         <table {...rest} ref={ref} className={cls} data-size={size}>
           {children}

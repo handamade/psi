@@ -1,7 +1,7 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { createRef } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { StrictMode, createRef } from "react";
 import { useState } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Table } from "./Table.js";
 import { TableHead } from "./TableHead.js";
 import { TableBody } from "./TableBody.js";
@@ -175,5 +175,97 @@ describe("TableContainer (D126)", () => {
     unmount();
     render(<TableContainer aria-label=""><Table>{rows()}</Table></TableContainer>);
     expect(warn).toHaveBeenCalledWith(WARNING);
+  });
+});
+
+describe("TableContainer follow-ups (D128)", () => {
+  it("warns once under StrictMode", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<StrictMode><TableContainer><Table>{rows()}</Table></TableContainer></StrictMode>);
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it("treats a caption's empty id as none: the offered id names the region", () => {
+    withCaption({}, "");
+    const region = screen.getByRole("region", { name: "Payments" });
+    const caption = region.querySelector("caption")!;
+    expect(caption.id).not.toBe("");
+    expect(region.getAttribute("aria-labelledby")).toBe(caption.id);
+  });
+
+  it("renders no id for a caption with an empty id outside a container", () => {
+    render(<Table><TableCaption id="">Payments</TableCaption>{rows()}</Table>);
+    expect(document.querySelector("caption")!.hasAttribute("id")).toBe(false);
+  });
+});
+
+describe("TableContainer scroll padding under a sticky header (D128)", () => {
+  let observed: Element[] = [];
+  let callbacks: ResizeObserverCallback[] = [];
+  const height = { value: 43 };
+
+  beforeEach(() => {
+    observed = [];
+    callbacks = [];
+    height.value = 43;
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () => ({ height: height.value, width: 0, top: 0, left: 0, right: 0, bottom: height.value, x: 0, y: 0, toJSON() {} }) as DOMRect,
+    );
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(cb: ResizeObserverCallback) { callbacks.push(cb); }
+        observe(el: Element) { observed.push(el); }
+        unobserve() {}
+        disconnect() { observed = []; }
+      },
+    );
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  const sizeVar = () => screen.getByRole("region").style.getPropertyValue("--_psi-table-head-size");
+
+  it("sets the header's measured block size on the container for a sticky table", () => {
+    render(<TableContainer aria-label="Payments"><Table stickyHeader>{rows()}</Table></TableContainer>);
+    expect(sizeVar()).toBe("43px");
+    expect(observed.map((el) => el.tagName)).toEqual(["THEAD"]);
+  });
+
+  it("follows the header when it resizes", () => {
+    render(<TableContainer aria-label="Payments"><Table stickyHeader>{rows()}</Table></TableContainer>);
+    height.value = 64;
+    act(() => callbacks.forEach((cb) => cb([], {} as ResizeObserver)));
+    expect(sizeVar()).toBe("64px");
+  });
+
+  it("sets nothing for a header that does not stick", () => {
+    render(<TableContainer aria-label="Payments"><Table>{rows()}</Table></TableContainer>);
+    expect(sizeVar()).toBe("");
+    expect(observed).toEqual([]);
+  });
+
+  it("clears it when the table stops sticking", () => {
+    const { rerender } = render(<TableContainer aria-label="Payments"><Table stickyHeader>{rows()}</Table></TableContainer>);
+    rerender(<TableContainer aria-label="Payments"><Table>{rows()}</Table></TableContainer>);
+    expect(sizeVar()).toBe("");
+  });
+
+  it("keeps the consumer's style alongside it", () => {
+    render(<TableContainer aria-label="Payments" style={{ marginTop: 8 }} maxBlockSize={240}><Table stickyHeader>{rows()}</Table></TableContainer>);
+    const region = screen.getByRole("region");
+    expect(region.style.marginTop).toBe("8px");
+    expect(region.style.maxBlockSize).toBe("240px");
+    expect(sizeVar()).toBe("43px");
+  });
+
+  it("measures once on mount where there is no ResizeObserver", () => {
+    vi.stubGlobal("ResizeObserver", undefined);
+    render(<TableContainer aria-label="Payments"><Table stickyHeader>{rows()}</Table></TableContainer>);
+    expect(sizeVar()).toBe("43px");
+  });
+
+  it("sets nothing for a sticky table outside a container", () => {
+    render(<Table stickyHeader>{rows()}</Table>);
+    expect(observed).toEqual([]);
   });
 });

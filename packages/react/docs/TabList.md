@@ -24,7 +24,7 @@ Renders role="tablist" with aria-orientation. Requires an accessible name — pa
 
 ## Theming
 
-This component has no `--psi-tab-list-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.
+This component has no `--psi-tab-list-*` tokens of its own. Its styling binds the `--psi-tabs-*` tokens; override those at any scope.
 
 
 
