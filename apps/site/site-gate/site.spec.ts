@@ -16,56 +16,6 @@ for (const theme of ["light", "dark"] as const) {
 }
 
 /**
- * The Theming section's three cards each declare their own data-psi-theme, so
- * an element's own rule beats an inherited value and they stay pinned under a
- * console-derived theme. Those cards ARE the attribute-scoping argument — if a
- * generated theme swallowed them the section would refute itself (D57).
- */
-test("a derived theme does not repaint the pinned Theming cards", async ({ page }) => {
-  await page.goto(BASE, { waitUntil: "networkidle" });
-
-  const cardBg = () =>
-    page.evaluate(() => {
-      const card = document.querySelector('[data-psi-theme="acme"]');
-      return card ? getComputedStyle(card).backgroundColor : null;
-    });
-
-  const before = await cardBg();
-  expect(before).not.toBeNull();
-
-  // Apply an extreme brand directly to <html>, as the console does.
-  await page.evaluate(() => {
-    document.documentElement.style.setProperty("--psi-bg-primary", "#ff00ff");
-    document.documentElement.dataset.psiCustom = "";
-  });
-  // `body` carries `transition: background-color var(--psi-duration-200)`
-  // (200ms) — reading immediately would measure a mid-transition frame
-  // instead of the applied color, so wait past it.
-  await page.waitForTimeout(300);
-
-  expect(await cardBg()).toBe(before);
-
-  // …and prove the page around them DID move, or the test proves nothing.
-  // Every token here is OKLCH-based end to end, and Chromium's computed
-  // style keeps a transitioned background-color in oklab() notation rather
-  // than converting it back to rgb() — a plain string match for
-  // "255, 0, 255" would never pass regardless of the wait above. Rasterize
-  // it through a canvas instead: that always yields real 0–255 sRGB
-  // channels no matter which colour-function syntax the computed style used.
-  const bodyRgb = await page.evaluate(() => {
-    const bg = getComputedStyle(document.body).backgroundColor;
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 1;
-    const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, 1, 1);
-    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-    return { r, g, b };
-  });
-  expect(bodyRgb).toEqual({ r: 255, g: 0, b: 255 });
-});
-
-/**
  * The hero's derive labels, measured directly — because axe structurally cannot.
  *
  * `.hero::before` / `::after` (the blueprint grid and the accent glow) mean axe
@@ -173,21 +123,15 @@ test("the hero's derive labels clear AA at both slider extremes", async ({ page 
 });
 
 // The counts must be right *on the page*, not just in source. check-docs-drift
-// can only see source text, so it cannot catch the stat line being deleted, or
-// an interpolation rewired to the wrong fact (`${iconCount} components`), or a
-// spelled-out word like the "Eighteen production components" heading that
-// started this. Only a rendered assertion closes those. (Task 3 review finding.)
+// can only see source text, so it cannot catch a stat line being deleted or an
+// interpolation rewired to the wrong fact. Only a rendered assertion closes that.
 test("the rendered page states the package's real counts", async ({ page }) => {
   await page.goto(BASE, { waitUntil: "networkidle" });
   const { readFileSync } = await import("node:fs");
-  const manifest = JSON.parse(
-    readFileSync("packages/react/dist/manifest.json", "utf8"),
-  ) as { components: unknown[]; icons: string[] };
-
+  const manifest = JSON.parse(readFileSync("packages/react/dist/manifest.json", "utf8")) as { components: unknown[] };
   const body = await page.locator("body").innerText();
-  expect(body).toContain(`${manifest.components.length} components`);
-  expect(body).toContain(`${manifest.icons.length} icons`);
-  expect(body).not.toMatch(/\bEighteen\b/i);
+  expect(body).toContain(`All ${manifest.components.length} components`);
+  expect(body).toMatch(/\d+ decisions so far/);
 });
 
 // Every Storybook link the site generates must resolve to a real docs page —
@@ -213,9 +157,10 @@ test("no Storybook link points at a missing docs page", async ({ page }) => {
   expect(knownIds.size).toBeGreaterThan(0);
 
   await page.goto(BASE, { waitUntil: "networkidle" });
+  // getAttribute, not `.href`: the map's <a> elements are SVG, whose `.href` is an object.
   const ids = await page.evaluate(() =>
-    [...document.querySelectorAll<HTMLAnchorElement>("a[href*='?path=/docs/']")].map(
-      (a) => new URL(a.href, location.href).searchParams.get("path") ?? "",
+    [...document.querySelectorAll("a[href*='?path=/docs/']")].map(
+      (a) => new URL(a.getAttribute("href")!, location.href).searchParams.get("path") ?? "",
     ),
   );
   expect(ids.length).toBeGreaterThan(0);
@@ -258,13 +203,103 @@ for (const width of [320, 760, 1440]) {
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("the homepage's content is in the HTML", async ({ page }) => {
+  test("every section is in the HTML", async ({ page }) => {
     await page.goto(BASE);
     await expect(page.locator("h1")).toHaveCount(1);
-    const text = await page.locator("main").innerText();
-    expect(text.length).toBeGreaterThan(2000);
-    expect(text).toContain("OKLCH");
+    for (const h of ["One source, every surface", "Built only from Psi", "How it's built"]) {
+      await expect(page.getByRole("heading", { level: 2, name: h })).toBeVisible();
+    }
+    await expect(page.locator("main")).toContainText("variant"); // the trace's default Docs excerpt
+    // Canopy is a framed example: the homepage holds the iframe, the frame is a static page.
+    const frame = page.locator('main iframe[src*="/docs/examples/showcase/canopy/"]');
+    await expect(frame).toHaveCount(1);
+    expect(((await frame.getAttribute("title")) ?? "").trim().length).toBeGreaterThan(0);
   });
+
+  test("the Canopy frame page server-renders its zone table", async ({ page }) => {
+    await page.goto(`${BASE}docs/examples/showcase/canopy/`);
+    expect(await page.content()).toContain("B · Basil");
+  });
+});
+
+for (const theme of ["light", "dark"] as const) {
+  test(`the Canopy frame page has no axe violations (${theme})`, async ({ page }) => {
+    await page.goto(`${BASE}docs/examples/showcase/canopy/?theme=${theme}`, { waitUntil: "networkidle" });
+    expect(await runAxe(page)).toEqual([]);
+  });
+}
+
+test("the header links pages, never fragments", async ({ page }) => {
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  const hrefs = await page.locator("header.site-header a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+  expect(hrefs.length).toBeGreaterThan(0);
+  expect(hrefs.filter((h) => h?.includes("#"))).toEqual([]);
+});
+
+test.describe("at 375px", () => {
+  test.use({ viewport: { width: 375, height: 812 } });
+
+  test("no axe violations, light and dark", async ({ page }) => {
+    for (const theme of ["light", "dark"] as const) {
+      await page.addInitScript((t) => localStorage.setItem("psi-theme", t), theme);
+      await page.goto(BASE, { waitUntil: "networkidle" });
+      expect(await runAxe(page), theme).toEqual([]);
+    }
+  });
+
+  test("the bottom bar's targets are at least 48px, and Menu opens and closes the drawer", async ({ page }) => {
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    const bar = page.getByRole("navigation", { name: "Site, bottom" });
+    for (const h of await bar.locator("a, button").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height))) {
+      expect(h).toBeGreaterThanOrEqual(48);
+    }
+    const menu = page.getByRole("button", { name: "Menu" });
+    await menu.click();
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect(menu).toBeFocused();
+  });
+
+  test("Map shows first, and a surface on the map opens the trace on it", async ({ page }) => {
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    // The trace island hydrates when visible (client:visible); scroll to it first.
+    await page.getByRole("heading", { level: 2, name: "One source, every surface" }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole("tab", { name: "Map" })).toBeVisible();
+    await page.locator('a[data-surface="mcp"]').click();
+    await expect(page.getByRole("tab", { name: "Trace" })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("tab", { name: "MCP" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("the same bottom bar on a docs page", async ({ page }) => {
+    await page.goto(`${BASE}docs/`, { waitUntil: "networkidle" });
+    await expect(page.getByRole("navigation", { name: "Site, bottom" })).toBeVisible();
+  });
+
+  test("a docs page's last content clears the bottom bar", async ({ page }) => {
+    await page.goto(`${BASE}docs/components/button/`, { waitUntil: "networkidle" });
+    const m = await page.evaluate(() => {
+      const main = document.querySelector<HTMLElement>("main#main")!;
+      main.scrollTop = main.scrollHeight;
+      const bar = document.querySelector<HTMLElement>('nav[aria-label="Site, bottom"]')!;
+      let last: Element = main;
+      while (last.lastElementChild) last = last.lastElementChild;
+      return { lastBottom: last.getBoundingClientRect().bottom, barTop: bar.getBoundingClientRect().top };
+    });
+    expect(m.lastBottom).toBeLessThanOrEqual(m.barTop);
+  });
+});
+
+test("every trace Storybook link names a story Storybook built", async ({ page }) => {
+  const { readFileSync } = await import("node:fs");
+  const index = JSON.parse(readFileSync("apps/storybook/storybook-static/index.json", "utf8")) as { entries: Record<string, unknown> };
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  const hrefs = await page.locator('a[href*="?path=/docs/"]').evaluateAll((as) => as.map((a) => new URL(a.getAttribute("href")!, location.href).href));
+  expect(hrefs.length).toBeGreaterThan(0);
+  for (const href of hrefs) {
+    const id = new URL(href).searchParams.get("path")!.replace(/^\/docs\//, "");
+    expect(Object.keys(index.entries), href).toContain(id);
+  }
 });
 
 test("hydrating the homepage logs no errors, with a stored dark mode and brand", async ({ page }) => {

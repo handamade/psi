@@ -120,6 +120,7 @@ const ASSEMBLED_PATHS = ["/storybook/", "/llms.txt", "/packages/"];
 test("no internal link on a docs page points at a missing page", async ({ page, request }) => {
   test.setTimeout(300_000);
   const pages = [
+    "/",
     "/docs/",
     ...componentSlugs().map((s) => `/docs/components/${s}/`),
     ...TOKEN_SLUGS.map((s) => `/docs/tokens/${s}/`),
@@ -131,8 +132,8 @@ test("no internal link on a docs page points at a missing page", async ({ page, 
     await page.goto(`${BASE}${path}`);
     const hrefs = await page.evaluate(
       (assembled) =>
-        [...document.querySelectorAll<HTMLAnchorElement>("a[href]")]
-          .map((a) => new URL(a.href, location.href))
+        [...document.querySelectorAll("a[href]")]
+          .map((a) => new URL(a.getAttribute("href")!, location.href))
           .filter((u) => u.origin === location.origin && !assembled.some((p) => u.pathname.startsWith(p)))
           .map((u) => u.pathname),
       ASSEMBLED_PATHS,
