@@ -20,6 +20,7 @@ import { textVars } from "./text.js";
 import { tooltipVars } from "./tooltip.js";
 import { cardVars } from "./card.js";
 import { controlVars } from "./control.js";
+import { countVars } from "./count.js";
 import { dialogVars } from "./dialog.js";
 import { navbarVars } from "./navbar.js";
 import { panelVars } from "./panel.js";
@@ -40,6 +41,7 @@ export const componentVars: Record<string, Record<string, string>> = {
   card: cardVars,
   checkbox: checkboxVars,
   control: controlVars,
+  count: countVars,
   dialog: dialogVars,
   field: fieldVars,
   input: inputVars,
