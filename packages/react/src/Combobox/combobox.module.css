@@ -1,0 +1,266 @@
+/* packages/react/src/Combobox/combobox.module.css — D130 */
+
+/* ── The control ──────────────────────────────────────────────────
+   Two cells: the values (Tags, then the input) and the actions (clear,
+   chevron) at inline-end. Logical properties throughout, so right to left
+   puts the actions on the left with no rule of its own. */
+
+.combobox {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  box-sizing: border-box;
+  inline-size: 100%;
+  border: 1px solid var(--psi-combobox-border);
+  border-radius: var(--psi-combobox-radius);
+  background-color: var(--psi-combobox-bg);
+  color: var(--psi-combobox-fg);
+  font-family: var(--psi-font-sans);
+  cursor: text;
+  transition:
+    border-color var(--psi-duration-150) var(--psi-ease-standard),
+    outline var(--psi-duration-150) var(--psi-ease-standard);
+}
+
+.combobox:hover:not(.disabled):not(:focus-within) {
+  border-color: var(--psi-combobox-border-hover);
+}
+
+/* Inset (D82), as on Select: the ring replaces the border, inside the
+   control's own box. Focus stays in the input, so the ring stays while the
+   list is open and an option is highlighted. */
+.combobox:focus-within {
+  outline: var(--psi-focus-ring-width) solid var(--psi-combobox-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+  border-color: transparent;
+}
+
+.error,
+.error:hover:not(.disabled):not(:focus-within) {
+  border-color: var(--psi-combobox-border-error);
+}
+
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--psi-space-4);
+  min-inline-size: 0;
+}
+
+.input {
+  flex: 1 1 60px;
+  min-inline-size: 60px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.input::placeholder {
+  color: var(--psi-combobox-placeholder);
+  opacity: 1;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.tag {
+  flex: none;
+  cursor: default;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding-inline-end: var(--psi-space-4);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--psi-radius-6);
+  background: transparent;
+  color: var(--psi-combobox-chevron-fg);
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+.toggle svg {
+  transition: rotate var(--psi-duration-150) var(--psi-ease-standard);
+}
+
+.toggle[aria-expanded="true"] svg {
+  rotate: 180deg;
+}
+
+/* ── Sizes ────────────────────────────────────────────────────────
+   A single-select is exactly its height. A multi-select starts there and
+   grows as Tags wrap: its block padding centres a 24px Tag in the first row,
+   and its input's own padding puts the text where a single-select's is. */
+
+.size24 { min-block-size: var(--psi-combobox-24-height); font: var(--psi-combobox-24-font); }
+.size32 { min-block-size: var(--psi-combobox-32-height); font: var(--psi-combobox-32-font); }
+.size40 { min-block-size: var(--psi-combobox-40-height); font: var(--psi-combobox-40-font); }
+.size48 { min-block-size: var(--psi-combobox-48-height); font: var(--psi-combobox-48-font); }
+
+.size24 .values { padding-inline-start: var(--psi-combobox-24-padding-inline); }
+.size32 .values { padding-inline-start: var(--psi-combobox-32-padding-inline); }
+.size40 .values { padding-inline-start: var(--psi-combobox-40-padding-inline); }
+.size48 .values { padding-inline-start: var(--psi-combobox-48-padding-inline); }
+
+.size24 .input { block-size: calc(var(--psi-combobox-24-height) - 2px); }
+.size32 .input { block-size: calc(var(--psi-combobox-32-height) - 2px); }
+.size40 .input { block-size: calc(var(--psi-combobox-40-height) - 2px); }
+.size48 .input { block-size: calc(var(--psi-combobox-48-height) - 2px); }
+
+.size24 .actions { padding-inline-end: 0; }
+
+.multiple .values {
+  padding-inline-start: var(--psi-space-4);
+}
+
+.multiple.size32 .values { padding-block: calc((var(--psi-combobox-32-height) - 2px - 24px) / 2); }
+.multiple.size40 .values { padding-block: calc((var(--psi-combobox-40-height) - 2px - 24px) / 2); }
+.multiple.size48 .values { padding-block: calc((var(--psi-combobox-48-height) - 2px - 24px) / 2); }
+
+.multiple .input { block-size: 24px; }
+.multiple.size32 .input { padding-inline-start: calc(var(--psi-combobox-32-padding-inline) - var(--psi-space-4)); }
+.multiple.size40 .input { padding-inline-start: calc(var(--psi-combobox-40-padding-inline) - var(--psi-space-4)); }
+.multiple.size48 .input { padding-inline-start: calc(var(--psi-combobox-48-padding-inline) - var(--psi-space-4)); }
+
+/* With Tags before it, the input's text sits a gap after the last Tag. */
+.multiple .tag ~ .input { padding-inline-start: var(--psi-space-4); }
+
+/* ── The popup ────────────────────────────────────────────────────
+   Menu's surface (D53) on a manual popover (D130). Block margin only: the
+   popup lines up with the control's inline-start edge, and matchWidth makes
+   it at least as wide as the control. */
+
+.popup {
+  box-sizing: border-box;
+  margin: var(--psi-space-4) 0;
+  padding: var(--psi-space-4);
+  border: 1px solid var(--psi-combobox-popup-border);
+  border-radius: var(--psi-combobox-popup-radius);
+  background: var(--psi-combobox-popup-bg);
+  color: var(--psi-combobox-option-fg);
+  font: var(--psi-text-14-20-regular);
+  /* Past the cap the popup scrolls (the popover's own overflow: auto), and
+     the highlighted option is scrolled into view as it moves. */
+  max-block-size: var(--psi-combobox-popup-max-height);
+  overflow: auto;
+  /* Two block margins, two paddings, two 1px borders. Read by
+     --psi-combobox-fit. */
+  --_psi-combobox-chrome: calc(4 * var(--psi-space-4) + 2px);
+}
+
+.popup:not([data-open]):not(:popover-open) {
+  display: none;
+}
+
+.listbox[hidden] {
+  display: none;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--psi-space-8);
+  padding: var(--psi-space-8) var(--psi-space-12);
+  padding-inline-start: var(--psi-space-8);
+  border-radius: var(--psi-radius-6);
+  background: var(--psi-combobox-option-bg);
+  color: var(--psi-combobox-option-fg);
+  cursor: pointer;
+}
+
+.option[data-highlighted] {
+  background: var(--psi-combobox-option-bg-highlight);
+}
+
+.option[aria-disabled="true"] {
+  color: var(--psi-combobox-option-fg-disabled);
+  cursor: default;
+}
+
+.check {
+  display: inline-flex;
+  flex: none;
+  inline-size: 16px;
+  block-size: 20px;
+  align-items: center;
+  color: var(--psi-combobox-option-check-fg);
+}
+
+.option[aria-disabled="true"] .check {
+  color: var(--psi-combobox-option-fg-disabled);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.description {
+  color: var(--psi-combobox-option-description-fg);
+  font: var(--psi-text-12-16-regular);
+}
+
+.option[aria-disabled="true"] .description {
+  color: var(--psi-combobox-option-fg-disabled);
+}
+
+.status {
+  padding: var(--psi-space-8) var(--psi-space-12);
+  color: var(--psi-combobox-status-fg);
+  cursor: default;
+}
+
+/* ── Placement ────────────────────────────────────────────────────
+   Above the anchor floor CSS places the popup under the control, flipping
+   above it when there's no room; usePopupPlacement handles the floor. The
+   last two fallbacks are Menu's fit try (D131), copied: a popup taller than
+   the room on both sides fills the side with more of it. */
+
+@supports (anchor-name: --x) {
+  .popup {
+    position: fixed;
+    margin: var(--psi-space-4) 0;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks:
+      flip-block,
+      flip-inline,
+      flip-block flip-inline,
+      --psi-combobox-fit,
+      --psi-combobox-fit flip-block;
+  }
+}
+
+/* `height`, not `max-height`: Chromium ignores max-height in a
+   @position-try (D131, measured in Chromium 149). */
+@position-try --psi-combobox-fit {
+  height: calc(100% - var(--_psi-combobox-chrome));
+  min-height: calc((100dvh - anchor-size(height)) / 2 - var(--_psi-combobox-chrome) - 1px);
+}
