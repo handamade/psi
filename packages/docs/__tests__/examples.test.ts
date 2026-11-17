@@ -31,4 +31,11 @@ describe("examples", () => {
       }
     }
   });
+
+  it("the showcase imports Psi from the package root and exports a default function", () => {
+    const src = readFileSync(join(__dirname, "..", "showcase", "canopy.tsx"), "utf8");
+    expect(src).not.toMatch(/from ["']@handamade\/psi-react\//);
+    expect(src).toMatch(/export default function Canopy/);
+    expect(src).not.toMatch(/style=\{\{|className="(?!psi-)/);
+  });
 });

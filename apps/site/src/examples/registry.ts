@@ -32,3 +32,14 @@ export const FRAMED = new Set(["app-shell/basic"]);
 export function isFramed(slug: string, name: string): boolean {
   return FRAMED.has(`${slug}/${name}`);
 }
+
+/** The homepage showcase, Canopy: one app built only from Psi, outside the
+ * per-component examples. Shown framed, since it brings its own landmarks. */
+const showcase = import.meta.glob<{ default: ComponentType }>("../../../../packages/docs/showcase/canopy.tsx", { eager: true });
+const showcaseSource = import.meta.glob<string>("../../../../packages/docs/showcase/canopy.tsx", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+});
+const showcaseKey = Object.keys(showcase)[0];
+export const canopy = { Component: showcase[showcaseKey].default, source: showcaseSource[showcaseKey] };

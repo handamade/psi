@@ -837,3 +837,8 @@
   .map-hint { display: block; }
 }
 .trace-rows td:first-child { white-space: nowrap; }
+
+/* Built only from Psi: Canopy runs in its own frame, so it brings its own landmarks. */
+.canopy { border: 1px solid var(--psi-border-faint); border-radius: var(--psi-radius-12); overflow: hidden; background: var(--psi-bg-primary); }
+.canopy-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--psi-space-12); padding: var(--psi-space-12); border-block-end: 1px solid var(--psi-border-faint); }
+.canopy-frame { display: block; inline-size: 100%; block-size: 480px; border: 0; }

@@ -1,0 +1,53 @@
+---
+import Base from "../../../../layouts/Base.astro";
+import { CanopyFrame } from "../../../../home/CanopyFrame";
+---
+
+<Base title="Canopy, a greenhouse monitor — Psi" description="Canopy, a demo built only from Psi, shown in the homepage's frame.">
+  <meta slot="head" name="robots" content="noindex" />
+  <!-- Canopy brings its own <main> and <header>, so there is no wrapper here.
+       This runs after Base's boot script: ?theme= picks the theme; a derived
+       brand (stored by the homepage console) only applies to light and dark. -->
+  <script is:inline>
+    (function () {
+      var doc = document.documentElement;
+      var THEMES = ["light", "dark", "acme", "ember"];
+      function apply() {
+        var theme = new URLSearchParams(location.search).get("theme");
+        if (THEMES.indexOf(theme) < 0) theme = doc.dataset.psiTheme;
+        if (theme === "light" || theme === "dark") {
+          var mode = null;
+          var brand = null;
+          try {
+            brand = JSON.parse(localStorage.getItem("psi-brand") || "null");
+          } catch (_) {
+            /* storage unavailable */
+          }
+          for (var i = doc.style.length - 1; i >= 0; i--) {
+            var n = doc.style[i];
+            if (n.indexOf("--psi-") === 0) doc.style.removeProperty(n);
+          }
+          delete doc.dataset.psiCustom;
+          if (brand && brand.cache && typeof brand.cache === "object") {
+            for (var name in brand.cache) {
+              if (name.indexOf("--psi-") === 0) doc.style.setProperty(name, brand.cache[name]);
+            }
+            doc.dataset.psiCustom = "";
+          }
+        } else {
+          for (var j = doc.style.length - 1; j >= 0; j--) {
+            var m = doc.style[j];
+            if (m.indexOf("--psi-") === 0) doc.style.removeProperty(m);
+          }
+          delete doc.dataset.psiCustom;
+        }
+        doc.dataset.psiTheme = theme;
+      }
+      apply();
+      addEventListener("storage", function (e) {
+        if (e.key === "psi-brand" || e.key === "psi-theme") apply();
+      });
+    })();
+  </script>
+  <CanopyFrame client:load />
+</Base>
