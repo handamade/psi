@@ -32,3 +32,13 @@
     font-family: var(--psi-font-mono);
   }
 }
+
+/* D123: on a docs page, each story box paints the theme's page background.
+ * Storybook paints its docs page and preview box white over the themed body,
+ * so without this a Dark story put dark-theme foregrounds on white. Colour and
+ * font already reach the box from body. Unlayered on purpose: Storybook's docs
+ * styles are unlayered, and any layered rule loses to them. It styles only the
+ * box itself, so Psi's component layer (D94) is untouched. */
+.docs-story {
+  background: var(--psi-bg-primary);
+}
