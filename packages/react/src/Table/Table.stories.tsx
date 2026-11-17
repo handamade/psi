@@ -71,13 +71,12 @@ function ManyRows({ wide }: { wide?: boolean }) {
   );
 }
 
-function Demo({ size, stickyHeader }: { size?: 32 | 40 | 48; stickyHeader?: boolean }) {
+function Demo({ size }: { size?: 32 | 40 | 48 }) {
   const [sort, setSort] = React.useState<TableSortState | null>({ key: "date", direction: "asc" });
   const [selected, setSelected] = React.useState<ReadonlySet<string>>(new Set(["t2"]));
   return (
     <Table
       size={size}
-      stickyHeader={stickyHeader}
       sortable
       selectable
       sort={sort}

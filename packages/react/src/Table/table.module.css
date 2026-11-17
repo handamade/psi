@@ -54,9 +54,10 @@
   border-bottom: 1px solid var(--psi-table-cell-border);
 }
 
-/* The last row's bottom edge is the table's own border (D126). With no body
-   rows, the header's last row meets it instead. */
-.body .row:last-child > * {
+/* The last row's bottom edge is the table's own border (D126). With several
+   bodies only the last one's last row; with no body rows, the header's last
+   row meets it instead. */
+.body:last-of-type .row:last-child > * {
   border-bottom: 0;
 }
 
@@ -65,24 +66,37 @@
 }
 
 /* Corner cells (D126). Top: the first row of whichever section comes first.
-   Bottom: the body's last row, or the head's when the body is empty. A cell
-   that is both first and last (colSpan) takes both. */
-.head .row:first-child > :first-child,
-.table:not(:has(.head)) .body .row:first-child > :first-child {
+   Bottom: the last body's last row, or the head's when the body is empty. A
+   cell that is both first and last (colSpan) takes both. The :has() cases are
+   their own rules: an engine without :has() drops only those. */
+.head .row:first-child > :first-child {
   border-start-start-radius: var(--_psi-table-corner);
 }
 
-.head .row:first-child > :last-child,
-.table:not(:has(.head)) .body .row:first-child > :last-child {
+.table:not(:has(.head)) .body:first-of-type .row:first-child > :first-child {
+  border-start-start-radius: var(--_psi-table-corner);
+}
+
+.head .row:first-child > :last-child {
   border-start-end-radius: var(--_psi-table-corner);
 }
 
-.body .row:last-child > :first-child,
+.table:not(:has(.head)) .body:first-of-type .row:first-child > :last-child {
+  border-start-end-radius: var(--_psi-table-corner);
+}
+
+.body:last-of-type .row:last-child > :first-child {
+  border-end-start-radius: var(--_psi-table-corner);
+}
+
 .table:not(:has(.body .row)) .head .row:last-child > :first-child {
   border-end-start-radius: var(--_psi-table-corner);
 }
 
-.body .row:last-child > :last-child,
+.body:last-of-type .row:last-child > :last-child {
+  border-end-end-radius: var(--_psi-table-corner);
+}
+
 .table:not(:has(.body .row)) .head .row:last-child > :last-child {
   border-end-end-radius: var(--_psi-table-corner);
 }
@@ -185,22 +199,24 @@
    Scoped to .body: TableRow is also used (unstyled-for-hover) inside
    TableHead, and a hovered header row tinting like a data row is wrong.
    Painted on the cells, not the <tr> (D126): a row's background is not
-   clipped by its cells' corner radii in every engine. A consumer's own
-   background on a TableRow shows through row-bg (transparent) at rest. */
+   clipped by its cells' corner radii in every engine. Every selector is in
+   :where(), specificity 0, so a consumer's own background on a TableRow or a
+   TableCell shows through at rest and stays on hover and selection; source
+   order alone puts selected over hover. */
 
-.row > * {
+:where(.row) > * {
   background: var(--psi-table-row-bg);
 }
 
-.body .row:hover > * {
+:where(.body .row:hover) > * {
   background: var(--psi-table-row-bg-hover);
 }
 
-.row[data-selected] > * {
+:where(.row[data-selected]) > * {
   background: var(--psi-table-row-bg-selected);
 }
 
-.body .row[data-selected]:hover > * {
+:where(.body .row[data-selected]:hover) > * {
   background: var(--psi-table-row-bg-selected);
 }
 

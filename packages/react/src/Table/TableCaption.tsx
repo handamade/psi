@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useLayoutEffect } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
 import styles from "./table.module.css";
 import { TableContainerContext } from "./TableContext.js";
@@ -21,15 +21,25 @@ export interface TableCaptionProps extends Omit<HTMLAttributes<HTMLTableCaptionE
  * A token-paged list has no page numbers to land on, so after a page change
  * the consumer moves focus here: give it `tabIndex={-1}`, put the range in
  * `detail`, and call `focus()` on the ref. The ring is the shared one (D82),
- * drawn inside the caption's box. Remaining attributes land on the element. Inside a TableContainer it also
- * names the scrolling region (D126). */
+ * drawn inside the caption's box. Remaining attributes land on the element.
+ *
+ * Inside a TableContainer it also names the scrolling region (D126). */
 export function TableCaption({ children, detail, className, id, ref, ...rest }: TableCaptionProps) {
-  const containerCaptionId = useContext(TableContainerContext);
+  const container = useContext(TableContainerContext);
+  const finalId = id ?? container?.offeredId;
+
+  useLayoutEffect(() => {
+    if (!container) return;
+    container.register(finalId);
+    return () => container.register(undefined);
+  }, [container, finalId]);
+
   return (
     <caption
       {...rest}
-      id={id ?? containerCaptionId}
-      ref={ref} className={[styles.caption, className].filter(Boolean).join(" ")}
+      id={finalId}
+      ref={ref}
+      className={[styles.caption, className].filter(Boolean).join(" ")}
     >
       {children}
       {detail != null && <span className={styles.captionDetail}>{detail}</span>}

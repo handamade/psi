@@ -33,6 +33,7 @@ test("a bare table rounds its corner cells and drops the last row's bottom borde
     };
   });
   expect(m.collapse).toBe("separate");
+  expect(m.cornerRadius).toBeGreaterThan(0);
   expect(m.cornerRadius).toBe(m.tableRadius - 1);
   expect(m.lastCornerRadius).toBe(m.tableRadius - 1);
   expect(m.lastBottom).toBe("0px");
@@ -41,7 +42,7 @@ test("a bare table rounds its corner cells and drops the last row's bottom borde
 test("inside a TableContainer the header sticks, the content scrolls sideways, and the frame is the container's @interaction", async ({ page }) => {
   await page.goto(story("in-container"), { waitUntil: "networkidle" });
   const m = await page.evaluate(() => {
-    const c = document.querySelector<HTMLElement>('[role="region"]')!;
+    const c = document.querySelector<HTMLElement>('#storybook-root [role="region"]')!;
     const table = c.querySelector("table")!;
     const th = c.querySelector("th")!;
     return {

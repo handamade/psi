@@ -28,8 +28,14 @@ export const TableContext = createContext<TableContextValue>({
  * checkbox can compute all/some without the consumer restating them. */
 export const TableRowIdsContext = createContext<string[]>([]);
 
-/** The id a TableContainer offers its table's caption (D126). A caption with
- * no id of its own takes it, so the container can name itself with
- * aria-labelledby. undefined outside a container: a bare table's caption
- * gets no id. */
-export const TableContainerContext = createContext<string | undefined>(undefined);
+/** What a TableContainer offers its table's caption (D126): an id for a
+ * caption that has none, and `register`, through which the caption reports the
+ * id it ends up with (undefined when it unmounts), so the container can name
+ * itself with aria-labelledby. undefined outside a container: a bare table's
+ * caption gets no id. */
+export interface TableContainerContextValue {
+  offeredId: string;
+  register: (id: string | undefined) => void;
+}
+
+export const TableContainerContext = createContext<TableContainerContextValue | undefined>(undefined);

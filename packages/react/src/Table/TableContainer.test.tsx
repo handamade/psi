@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRef } from "react";
-import { render, screen } from "@testing-library/react";
+import { useState } from "react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { Table } from "./Table.js";
 import { TableHead } from "./TableHead.js";
 import { TableBody } from "./TableBody.js";
@@ -35,6 +36,29 @@ function withCaption(props: Partial<TableContainerProps> = {}, captionId?: strin
 }
 
 afterEach(() => vi.restoreAllMocks());
+
+function Lazy({ initialId }: { initialId?: string }) {
+  const [state, setState] = useState<"none" | "shown" | "renamed">("none");
+  return (
+    <>
+      <button onClick={() => setState("shown")}>show</button>
+      <button onClick={() => setState("renamed")}>rename</button>
+      <button onClick={() => setState("none")}>hide</button>
+      <Table>
+        {state !== "none" && (
+          <TableCaption id={state === "renamed" ? "second" : initialId}>Payments</TableCaption>
+        )}
+        {rows()}
+      </Table>
+    </>
+  );
+}
+
+function lazy(initialId?: string) {
+  vi.spyOn(console, "warn").mockImplementation(() => {});
+  render(<TableContainer><Lazy initialId={initialId} /></TableContainer>);
+  return screen.getByRole("region");
+}
 
 describe("TableContainer (D126)", () => {
   it("is a focusable region around the table", () => {
@@ -114,5 +138,42 @@ describe("TableContainer (D126)", () => {
   it("leaves a caption outside a container without a generated id", () => {
     render(<Table><TableCaption>Payments</TableCaption>{rows()}</Table>);
     expect(document.querySelector("caption")!.hasAttribute("id")).toBe(false);
+  });
+
+  it("is named by a caption that arrives after the container rendered", () => {
+    const region = lazy();
+    expect(region.hasAttribute("aria-labelledby")).toBe(false);
+    fireEvent.click(screen.getByText("show"));
+    const caption = region.querySelector("caption")!;
+    expect(caption.id).not.toBe("");
+    expect(region.getAttribute("aria-labelledby")).toBe(caption.id);
+  });
+
+  it("follows the caption's id when it changes", () => {
+    const region = lazy("first");
+    fireEvent.click(screen.getByText("show"));
+    expect(region.getAttribute("aria-labelledby")).toBe("first");
+    fireEvent.click(screen.getByText("rename"));
+    expect(region.getAttribute("aria-labelledby")).toBe("second");
+  });
+
+  it("drops aria-labelledby when the caption unmounts", () => {
+    const region = lazy();
+    fireEvent.click(screen.getByText("show"));
+    expect(region.hasAttribute("aria-labelledby")).toBe(true);
+    fireEvent.click(screen.getByText("hide"));
+    expect(region.hasAttribute("aria-labelledby")).toBe(false);
+  });
+
+  it("treats an empty aria-label or aria-labelledby as no name", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { unmount } = withCaption({ "aria-label": "", "aria-labelledby": "" });
+    const region = screen.getByRole("region");
+    expect(region.getAttribute("aria-labelledby")).toBe(region.querySelector("caption")!.id);
+    expect(region.hasAttribute("aria-label")).toBe(false);
+    expect(warn).not.toHaveBeenCalled();
+    unmount();
+    render(<TableContainer aria-label=""><Table>{rows()}</Table></TableContainer>);
+    expect(warn).toHaveBeenCalledWith(WARNING);
   });
 });
