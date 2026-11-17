@@ -178,6 +178,28 @@ describe("SegmentedControl inside Tabs (D132)", () => {
     expect(screen.getByRole("tabpanel", { name: "Map" })).toHaveTextContent("The map");
   });
 
+  it("focuses a disabled segment without selecting it, as a disabled Tab does (D131)", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Tabs value="map" onValueChange={onValueChange}>
+        <SegmentedControl aria-label="Diagram">
+          <Segment value="map">Map</Segment>
+          <Segment value="trace" disabled>
+            Trace
+          </Segment>
+        </SegmentedControl>
+        <TabPanel value="map">The map</TabPanel>
+        <TabPanel value="trace">The trace</TabPanel>
+      </Tabs>,
+    );
+    tab("Map").focus();
+    await user.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(tab("Trace"));
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(tab("Map")).toHaveAttribute("tabindex", "-1");
+  });
+
   it("throws when given value or onValueChange inside Tabs", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() =>

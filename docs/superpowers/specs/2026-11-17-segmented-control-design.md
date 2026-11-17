@@ -116,17 +116,23 @@ The owner chose one standalone component over a `Tabs` variant and a
   | Keys | Radio mode | Tabs mode |
   | --- | --- | --- |
   | Tab | Enters on the checked segment, leaves the control | Same, on the selected segment |
-  | → / ↓ | Next enabled segment, wrapping; selects it | → only (↓ falls through, as in a horizontal `TabList`) |
-  | ← / ↑ | Previous enabled segment, wrapping; selects it | ← only |
-  | Home / End | First / last enabled segment; selects it | Same |
+  | → / ↓ | Next enabled segment, wrapping; selects it | → only (↓ falls through, as in a horizontal `TabList`); a disabled segment takes focus, not the selection (D131) |
+  | ← / ↑ | Previous enabled segment, wrapping; selects it | ← only, as above |
+  | Home / End | First / last enabled segment; selects it | First / last segment; selects it unless disabled |
   | Space / Enter | Selects the focused segment (native button) | Same |
 
   Radio mode takes both axes because the APG radio group does; tabs mode keeps
   `TabList`'s horizontal keys so a segmented tab list and an underlined one
   behave the same.
 
-  The keyboard is `useTabsKeyboard` (D67), taught two options: the selector for
-  its items and an `axes: "both"` setting. That hook's own comment names a
+  The keyboard is `useTabsKeyboard` (D67), taught three options: the selector
+  for its items, `orientation: "both"`, and `skipDisabled`. D131 (merged while
+  this was in review) made a disabled tab reachable: it takes focus and the
+  stop, not the selection. Tabs mode follows it, so a segmented tab list and an
+  underlined one behave the same. Radio mode passes `skipDisabled`, because a
+  native radio group skips a disabled radio and the APG radio group follows it.
+  The roving tabindex is still rewritten over every item, so a skipped
+  disabled segment never keeps a second stop. That hook's own comment names a
   third caller as the signal to share it; this is the second caller with the
   same behaviour, so it is shared rather than copied.
 
@@ -147,8 +153,8 @@ The owner chose one standalone component over a `Tabs` variant and a
 
   `Segment disabled` sets `aria-disabled="true"`, not the `disabled`
   attribute (as `Tab` and `MenuItem` do, D53/D67): the segment stays in the
-  accessibility tree, the arrow keys skip it, a click does nothing, and it shows
-  in `fg-disabled`. It is focusable only when it holds the tab stop under D93.
+  accessibility tree, a click does nothing, and it shows in `fg-disabled`. The
+  arrow keys skip it in a radio group and reach it in a tab list (above). It is focusable only when it holds the tab stop under D93.
   There is no control-wide `disabled`: no use asks for one, and a theme picker
   that cannot be used should not render.
 

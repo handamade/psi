@@ -9,7 +9,8 @@ export interface SegmentProps {
   value: string;
   /** Label: one or two words. It is the segment's accessible name, whole even when truncated. */
   children: ReactNode;
-  /** Skipped by the arrow keys and not selectable, but still announced. */
+  /** Not selectable, but still announced. The arrow keys skip it in a radio
+   * group, and focus it without selecting it inside `Tabs` (D131). */
   disabled?: boolean;
   className?: string;
   /** Forwarded ref to the underlying `<button>`. */
@@ -21,8 +22,9 @@ export interface SegmentProps {
  * `aria-selected` and `aria-controls` inside `Tabs`.
  *
  * `disabled` sets `aria-disabled` rather than the `disabled` attribute, as
- * `Tab` and `MenuItem` do, so the segment stays discoverable while the arrow
- * keys skip it and a click does nothing. */
+ * `Tab` and `MenuItem` do, so the segment stays discoverable and a click does
+ * nothing. The arrow keys skip it in a radio group, as native radios do, and
+ * focus it without selecting it in a tab list, as Tabs does (D131). */
 export function Segment({ value, children, disabled = false, className, ref }: SegmentProps) {
   const ctx = useContext(SegmentedContext);
   const innerRef = useRef<HTMLButtonElement | null>(null);

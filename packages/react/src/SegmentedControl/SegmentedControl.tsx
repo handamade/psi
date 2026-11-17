@@ -59,7 +59,8 @@ export interface SegmentedControlProps
  *   `aria-controls`. `Tabs` owns the value.
  *
  * One tab stop; the arrow keys move and select (both axes as a radio group,
- * Left/Right as a tab list), Home and End jump. Controlled only. A form value
+ * Left/Right as a tab list), Home and End jump. A disabled segment is skipped
+ * in a radio group, and focused but not selected in a tab list (D131). Controlled only. A form value
  * is a `RadioGroup`, not this: it submits nothing. */
 export function SegmentedControl({
   value,
@@ -83,6 +84,9 @@ export function SegmentedControl({
     orientation: inTabs ? "horizontal" : "both",
     onValueChange: (v) => select?.(v),
     itemSelector: "[data-psi-segment]",
+    // A radio group skips a disabled segment, as native radios do; a tab list
+    // reaches it without selecting it, as Tabs does (D131).
+    skipDisabled: !inTabs,
   });
 
   const ctx = useMemo<SegmentedContextValue | null>(() => {
