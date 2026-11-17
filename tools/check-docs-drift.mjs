@@ -109,7 +109,7 @@ for (const [file, re, expected, mode] of claims) {
 // D121: every guide is prose a reader trusts, and new guides appear without
 // anyone remembering to list them here. Walk the folder instead of naming
 // files: a count typed into any guide fails, whatever the guide is called.
-const guidesDir = "apps/site/src/content/guides";
+const guidesDir = "packages/docs/guides";
 for (const file of (await readdir(guidesDir)).filter((f) => f.endsWith(".mdx"))) {
   const text = await readFile(`${guidesDir}/${file}`, "utf8");
   for (const [re, expected] of [

@@ -11,6 +11,6 @@ if (command === "init") {
   await runInit({ cwd: process.cwd(), claude: process.argv.includes("--claude") });
 } else {
   const index = await loadIndex();
-  const server = createPsiServer(createStore(index), index.version);
+  const server = createPsiServer(createStore(index), index.version, index);
   await server.connect(new StdioServerTransport());
 }

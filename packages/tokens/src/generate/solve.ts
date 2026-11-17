@@ -1,4 +1,4 @@
-import { clampChroma, formatHex, wcagContrast } from "culori";
+import { clampChroma, formatHex, oklch, wcagContrast } from "culori";
 
 /** OKLCH → gamut-clamped sRGB hex. Mirrors what the resolver emits, so a
  * solved value renders as the same colour the token build would produce. */
@@ -75,4 +75,13 @@ export function solveL(opts: {
   }
 
   return { l: best, cleared: true };
+}
+
+/** Any CSS colour string → OKLCH, or null when it does not parse. `h` is
+ * left out for a colour with no hue (a grey), where culori leaves it
+ * undefined or NaN. */
+export function parseColor(input: string): { l: number; c: number; h?: number } | null {
+  const o = oklch(input.trim());
+  if (!o || !Number.isFinite(o.l) || !Number.isFinite(o.c)) return null;
+  return o.h !== undefined && Number.isFinite(o.h) ? { l: o.l, c: o.c, h: o.h } : { l: o.l, c: o.c };
 }

@@ -38,6 +38,7 @@ const version = args.find((a) => !a.startsWith("--")) ?? "latest";
 
 const REACT_PKG = "@handamade/psi-react";
 const TOKENS_PKG = "@handamade/psi-tokens";
+const MCP_PKG = "@handamade/psi-mcp";
 /** All five, in the order the docs prescribe. utilities.css is the one that
  * gets forgotten — .psi-container and the reduced-motion zeroing live there. */
 const STYLESHEETS = [
@@ -119,14 +120,14 @@ try {
   // ── Install ──────────────────────────────────────────────────────────
   mkdirSync(join(dir, "src"), { recursive: true });
   writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "psi-verify", private: true, type: "module" }, null, 2));
-  install([`${REACT_PKG}@${version}`, `${TOKENS_PKG}@${version}`, "react", "react-dom"], dir);
+  install([`${REACT_PKG}@${version}`, `${TOKENS_PKG}@${version}`, `${MCP_PKG}@${version}`, "react", "react-dom"], dir);
   install(["-D", "typescript", "vite", "@vitejs/plugin-react", "@types/react", "@types/react-dom"], dir);
 
   const installed = JSON.parse(readFileSync(join(dir, "node_modules", REACT_PKG, "package.json"), "utf8"));
   console.log(`  resolved to ${installed.version}\n`);
 
   // ── LICENSE ships in both tarballs (#54's fix, which nothing in-repo checks)
-  for (const pkg of [REACT_PKG, TOKENS_PKG]) {
+  for (const pkg of [REACT_PKG, TOKENS_PKG, MCP_PKG]) {
     note(existsSync(join(dir, "node_modules", pkg, "LICENSE")), `LICENSE present in ${pkg}`);
   }
 
@@ -153,6 +154,30 @@ try {
     }
     note(ok, `resolves ${spec}`, detail);
   }
+
+  // ── The MCP's tools run from the installed tarball (D129) ─────────────
+  // psi-mcp now has runtime dependencies (psi-tokens, @babel/parser) and a
+  // baked docs index; only a real install proves they resolve.
+  const smoke = `
+import { loadIndex, createStore, themeMarkdown, checkMarkdown } from "${MCP_PKG}";
+const index = await loadIndex();
+const page = createStore(index).get("component:Button");
+if (!page || !page.markdown.includes("## Examples")) throw new Error("get: no Button docs page");
+if (!themeMarkdown({ color: "#3b82f6", name: "smoke" }).includes('[data-psi-theme="smoke-dark"]')) throw new Error("theme: no dark rule");
+if (!checkMarkdown('<Button size="md">x</Button>', index).includes("invalid-value")) throw new Error("check: missed size=md");
+console.log("psi-mcp-ok");
+`;
+  let mcpOk = true;
+  let mcpDetail = "";
+  try {
+    const out = String(run("node", ["--input-type=module", "-e", smoke], dir));
+    mcpOk = out.includes("psi-mcp-ok");
+    if (!mcpOk) mcpDetail = out.trim().split("\n")[0];
+  } catch (e) {
+    mcpOk = false;
+    mcpDetail = String(e.stderr ?? e).split("\n").find((l) => l.includes("Error")) ?? "failed";
+  }
+  note(mcpOk, "psi-mcp get, theme and check run from the tarball", mcpDetail);
 
   // ── The public export surface, read from the INSTALLED package ────────
   const dts = readFileSync(join(dir, "node_modules", REACT_PKG, "dist", "index.d.ts"), "utf8");

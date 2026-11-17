@@ -48,7 +48,7 @@ test("the sidebar is open at desktop width and behind a toggle below it", async 
 });
 
 function componentSlugs(): string[] {
-  const src = readFileSync("apps/site/src/content/component-pages.ts", "utf8");
+  const src = readFileSync("packages/docs/src/pages.ts", "utf8").split("export interface TokenPage")[0];
   return [...src.matchAll(/slug: "([a-z0-9-]+)"/g)].map((m) => m[1]);
 }
 
@@ -309,4 +309,28 @@ test("a failed index load says so, and the next search retries it", async ({ pag
   await page.unroute("**/pagefind/pagefind.js");
   await input.fill("buttons");
   await expect(page.getByRole("link", { name: /^Button/ }).first()).toBeVisible();
+});
+
+test("the MCP's get returns exactly each docs page's markdown twin (D129)", async ({ request }) => {
+  // test:site runs from the repo root, after `pnpm build`.
+  const index = JSON.parse(readFileSync("packages/mcp/dist/psi-index.json", "utf8")) as {
+    docs: {
+      overview: string;
+      components: Record<string, { markdown: string }>;
+      tokenPages: Record<string, { markdown: string }>;
+      guides: Record<string, { markdown: string }>;
+    };
+  };
+  const pairs: Array<[string, string]> = [
+    ["/docs/index.md", index.docs.overview],
+    ...Object.entries(index.docs.components).map(([s, p]) => [`/docs/components/${s}.md`, p.markdown] as [string, string]),
+    ...Object.entries(index.docs.tokenPages).map(([s, p]) => [`/docs/tokens/${s}.md`, p.markdown] as [string, string]),
+    ...Object.entries(index.docs.guides).map(([g, p]) => [`/docs/get-started/${g}.md`, p.markdown] as [string, string]),
+  ];
+  expect(pairs.length).toBeGreaterThan(40);
+  for (const [url, markdown] of pairs) {
+    const res = await request.get(`${BASE}${url}`);
+    expect(res.status(), url).toBe(200);
+    expect(await res.text(), url).toBe(markdown);
+  }
 });

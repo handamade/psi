@@ -11,6 +11,7 @@
     "@astrojs/mdx": "8.1.6",
     "@astrojs/react": "7.1.9",
     "@astrojs/sitemap": "3.7.5",
+    "@handamade/psi-docs": "workspace:*",
     "@handamade/psi-react": "workspace:*",
     "@handamade/psi-tokens": "workspace:*",
     "astro": "7.4.12",

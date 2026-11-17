@@ -44,7 +44,7 @@ const headings = [
   description={summary(main.description)}
   headings={headings}
   mdHref={`/docs/components/${page.slug}.md`}
-  mdSource={componentPageMd(page, examplesFor(page.slug))}
+  mdSource={componentPageMd(page)}
 >
   <Fragment set:html={mdToHtml(main.description, `${page.title} description table`)} />
   <CodeView client:visible html={importHtml} code={importLine} label="Copy import" />

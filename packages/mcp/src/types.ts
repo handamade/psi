@@ -20,6 +20,12 @@ export interface ComponentEntry {
     cardinality: string;
     order?: number;
   }>;
+  /** The React attribute interface its props extend, e.g. "ButtonHTMLAttributes"; null when none (D129). */
+  attributes: string | null;
+  /** Index into PsiIndex.attributeSets: the attribute names it passes through. */
+  attributeSet: number | null;
+  /** At least one of these attributes must be present (D129). */
+  accessibleName: { oneOf: string[] } | null;
 }
 
 export interface Oklch { l: number; c: number; h: number; alpha?: number }
@@ -64,6 +70,25 @@ export interface PatternEntry {
   preset: string | null;
 }
 
+/** Everything the MCP index serves as markdown, built from one DocsInput.
+ * A mirror of `@handamade/psi-docs`' `DocsPages`: src/ never imports that
+ * package, so tsc does not compile its TS source (D129). */
+export interface DocsPages {
+  overview: string;
+  /** By page slug. */
+  components: Record<string, { title: string; members: string[]; markdown: string }>;
+  /** By token page slug; title is e.g. "Color tokens". */
+  tokenPages: Record<string, { title: string; markdown: string }>;
+  /** By guide id. */
+  guides: Record<string, { title: string; description: string; markdown: string }>;
+  /** By token name, e.g. "bgPrimary". */
+  tokens: Record<string, string>;
+  /** By pattern id. */
+  patterns: Record<string, string>;
+  /** By topic name. */
+  topics: Record<string, string>;
+}
+
 export interface PsiIndex {
   version: string;
   themes: string[];
@@ -72,4 +97,16 @@ export interface PsiIndex {
   patterns: PatternEntry[];
   scales: Record<string, unknown>;
   topics: Record<string, unknown>;
+  /** Attribute names components pass through to their element, deduplicated (D129). */
+  attributeSets: string[][];
+  /** Slot contract name → member components (src/contracts.json). */
+  contracts: Record<string, string[]>;
+  /** Every name @handamade/psi-react exports, values and types. */
+  exports: string[];
+  /** Every docs page and every single-token, pattern and topic page, as
+   * markdown, baked from @handamade/psi-docs at publish time (D129). */
+  docs: DocsPages;
 }
+
+/** What `buildIndex` returns: the index before its docs are baked. */
+export type BaseIndex = Omit<PsiIndex, "docs">;

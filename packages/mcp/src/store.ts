@@ -1,8 +1,9 @@
-import type { ComponentEntry, PatternEntry, PsiIndex, TokenEntry } from "./types.js";
+import { closest } from "./nearest.js";
+import type { ComponentEntry, PatternEntry, PsiIndex } from "./types.js";
 
 export interface Brief {
   id: string;
-  kind: "component" | "token" | "topic" | "pattern";
+  kind: DocKind;
   title: string;
   summary: string;
 }
@@ -17,15 +18,20 @@ export type OverviewPatternBrief = Omit<Brief, "title">;
  * query, the overview, where pattern rows are `OverviewPatternBrief`. */
 export type SearchBrief = Brief | OverviewPatternBrief;
 
-export type Detail =
-  | ({ kind: "component" } & ComponentEntry)
-  | ({ kind: "token" } & TokenEntry)
-  | ({ kind: "pattern" } & PatternEntry)
-  | { kind: "topic"; name: string; content: unknown };
+export type DocKind = "component" | "tokens" | "guide" | "token" | "pattern" | "topic";
+
+export interface Page {
+  id: string;
+  kind: DocKind;
+  title: string;
+  markdown: string;
+}
 
 export interface Store {
   search(query: string): SearchBrief[];
-  get(id: string): Detail | null;
+  get(id: string): Page | null;
+  /** The three ids nearest an unknown one, for the error message. */
+  suggest(id: string): string[];
 }
 
 const MAX_RESULTS = 20;
@@ -133,6 +139,14 @@ function overviewPatternSummary(p: PatternEntry, limit: number): string {
 const PATTERN_PREFIX = "pattern:";
 
 export function createStore(index: PsiIndex): Store {
+  const pageOf = new Map<string, string>();
+  for (const [slug, page] of Object.entries(index.docs.components)) {
+    for (const member of page.members) pageOf.set(member, slug);
+  }
+  for (const c of index.components) {
+    if (!pageOf.has(c.name)) throw new Error(`psi-mcp: export "${c.name}" has no docs page`);
+  }
+
   const patternsById = new Map(index.patterns.map((p) => [p.id, p]));
 
   /** Overview-only projection: returns `b` unchanged for every kind except
@@ -171,6 +185,18 @@ export function createStore(index: PsiIndex): Store {
       title: name,
       summary: TOPIC_SUMMARIES[name] ?? "Guidance topic",
     })),
+    ...Object.entries(index.docs.guides).map(([id, g]) => ({
+      id: `guide:${id}`,
+      kind: "guide" as const,
+      title: g.title,
+      summary: g.description,
+    })),
+    ...Object.entries(index.docs.tokenPages).map(([slug, p]) => ({
+      id: `tokens:${slug}`,
+      kind: "tokens" as const,
+      title: p.title,
+      summary: `Psi's ${p.title.toLowerCase()} with values in every theme.`,
+    })),
     ...index.tokens.map((t) => ({
       id: `token:${t.name}`,
       kind: "token" as const,
@@ -194,26 +220,40 @@ export function createStore(index: PsiIndex): Store {
   function search(query: string): SearchBrief[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
-      // D61: allocate before filling. Topics take their full cost, components
+      // D61: allocate before filling. Topics and the two docs index rows take their full cost, components
       // are reserved a floor, and patterns take the remainder via a derived
       // cap — so catalog growth shortens summaries instead of evicting the
       // tail. Whichever kind was filled last used to absorb all growth;
       // that was the bug. (Tokens are omitted; they are discoverable via
       // query.)
-      const topics = briefs.filter((b) => b.kind === "topic");
+      const fixed: Brief[] = [
+        ...briefs.filter((b) => b.kind === "topic"),
+        {
+          id: "guide:*",
+          kind: "guide",
+          title: "Guides",
+          summary: `get guide:<name> — ${Object.keys(index.docs.guides).join(", ")}`,
+        },
+        {
+          id: "tokens:*",
+          kind: "tokens",
+          title: "Token pages",
+          summary: `get tokens:<name> — ${Object.keys(index.docs.tokenPages).join(", ")}`,
+        },
+      ];
       const patterns = briefs.filter((b) => b.kind === "pattern");
       const components = briefs.filter((b) => b.kind === "component");
 
       const reserve = JSON.stringify(components.slice(0, COMPONENT_FLOOR)).length;
       const fits = (limit: number) =>
-        JSON.stringify([...topics, ...patterns.map((b) => overviewBrief(b, limit))]).length +
+        JSON.stringify([...fixed, ...patterns.map((b) => overviewBrief(b, limit))]).length +
           reserve <=
         RESPONSE_BUDGET;
 
       let limit = OVERVIEW_PATTERN_INTRO_MAX;
       while (limit > 0 && !fits(limit)) limit -= 10;
 
-      const out: SearchBrief[] = [...topics, ...patterns.map((b) => overviewBrief(b, limit))];
+      const out: SearchBrief[] = [...fixed, ...patterns.map((b) => overviewBrief(b, limit))];
       for (const component of components) {
         out.push(component);
         if (JSON.stringify(out).length > RESPONSE_BUDGET) {
@@ -231,29 +271,65 @@ export function createStore(index: PsiIndex): Store {
       .map((x) => x.b);
   }
 
-  function get(id: string): Detail | null {
+  function get(id: string): Page | null {
     const [prefix, rest] = id.includes(":") ? id.split(/:(.*)/s) : [null, id];
     const name = (rest ?? id).toLowerCase();
-    const want = (kind: string) => prefix === null || prefix === kind;
+    const want = (kind: DocKind) => prefix === null || prefix === kind;
 
+    // Bare names resolve in the pre-D129 order first (component, token,
+    // pattern, topic), then the new kinds, so no existing bare id changes.
     if (want("component")) {
       const c = index.components.find((c) => c.name.toLowerCase() === name);
-      if (c) return { kind: "component", ...c };
+      const slug = c ? pageOf.get(c.name)! : Object.hasOwn(index.docs.components, name) ? name : null;
+      if (slug) {
+        const page = index.docs.components[slug];
+        return { id: `component:${c?.name ?? page.members[0]}`, kind: "component", title: page.title, markdown: page.markdown };
+      }
     }
     if (want("token")) {
       const t = index.tokens.find((t) => t.name.toLowerCase() === name);
-      if (t) return { kind: "token", ...t };
+      if (t) return { id: `token:${t.name}`, kind: "token", title: t.name, markdown: index.docs.tokens[t.name] };
     }
     if (want("pattern")) {
       const p = index.patterns.find((p) => p.id.toLowerCase() === name);
-      if (p) return { kind: "pattern", ...p };
+      if (p) return { id: `pattern:${p.id}`, kind: "pattern", title: p.id, markdown: index.docs.patterns[p.id] };
     }
     if (want("topic")) {
       const key = Object.keys(index.topics).find((k) => k.toLowerCase() === name);
-      if (key) return { kind: "topic", name: key, content: index.topics[key] };
+      if (key) return { id: `topic:${key}`, kind: "topic", title: key, markdown: index.docs.topics[key] };
+    }
+    if (want("tokens")) {
+      const page = Object.hasOwn(index.docs.tokenPages, name) ? index.docs.tokenPages[name] : undefined;
+      if (page) return { id: `tokens:${name}`, kind: "tokens", title: page.title, markdown: page.markdown };
+    }
+    if (want("guide")) {
+      const guide = Object.hasOwn(index.docs.guides, name) ? index.docs.guides[name] : undefined;
+      if (guide) return { id: `guide:${name}`, kind: "guide", title: guide.title, markdown: guide.markdown };
     }
     return null;
   }
 
-  return { search, get };
+  const allIds = [
+    ...index.components.map((c) => `component:${c.name}`),
+    ...index.tokens.map((t) => `token:${t.name}`),
+    ...index.patterns.map((p) => `pattern:${p.id}`),
+    ...Object.keys(index.topics).map((k) => `topic:${k}`),
+    ...Object.keys(index.docs.tokenPages).map((s) => `tokens:${s}`),
+    ...Object.keys(index.docs.guides).map((g) => `guide:${g}`),
+  ];
+
+  // Built once: bare name → every id that shares it (topic:motion and tokens:motion).
+  const byBare = new Map<string, string[]>();
+  for (const full of allIds) {
+    const bare = full.split(/:(.*)/s)[1];
+    byBare.set(bare, [...(byBare.get(bare) ?? []), full]);
+  }
+  const bareNames = [...byBare.keys()];
+
+  function suggest(id: string): string[] {
+    const bare = id.includes(":") ? id.split(/:(.*)/s)[1] ?? id : id;
+    return [...new Set(closest(bare, bareNames, 3).flatMap((b) => byBare.get(b)!))].slice(0, 3);
+  }
+
+  return { search, get, suggest };
 }

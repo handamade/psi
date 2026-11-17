@@ -2,13 +2,19 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { componentPages } from "../content/component-pages";
-import { tokenPages } from "../content/token-pages";
-import { componentPageMd, guideMd, overviewMd, tokenPageMd } from "../lib/markdown";
+import { componentPages, tokenPages } from "../src/pages";
+import { componentPageMd, guideMd, overviewMd, tokenPageMd } from "../src/markdown";
+import { loadDocsInput } from "../src/node";
+import type { GuideSource } from "../src/types";
+
+const input = loadDocsInput();
 
 describe("componentPageMd", () => {
   const tabs = componentPages.find((p) => p.slug === "tabs")!;
-  const md = componentPageMd(tabs, [{ name: "basic", source: "export default function X() {}" }]);
+  const md = componentPageMd(
+    { ...input, examples: [{ slug: "tabs", name: "basic", source: "export default function X() {}" }] },
+    tabs,
+  );
 
   it("starts with the page title and the import line", () => {
     expect(md.startsWith("# Tabs\n")).toBe(true);
@@ -27,22 +33,22 @@ describe("componentPageMd", () => {
 
 describe("tokenPageMd", () => {
   it("renders the Color page as a table with a row per semantic colour", () => {
-    const md = tokenPageMd(tokenPages.find((p) => p.slug === "color")!);
+    const md = tokenPageMd(input, tokenPages.find((p) => p.slug === "color")!);
     expect(md.startsWith("# Color tokens\n")).toBe(true);
     expect(md).toContain("| `--psi-bg-primary` |");
   });
 
   it("renders every page without throwing", () => {
-    for (const p of tokenPages) expect(tokenPageMd(p).length).toBeGreaterThan(50);
+    for (const p of tokenPages) expect(tokenPageMd(input, p).length).toBeGreaterThan(50);
   });
 });
 
-const dir = join(__dirname, "..", "content", "guides");
-function guide(file: string) {
+const dir = join(__dirname, "..", "guides");
+function guide(file: string): GuideSource {
   const raw = readFileSync(join(dir, file), "utf8");
   const [, fm, body] = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)!;
   const get = (k: string) => fm.match(new RegExp(`^${k}: (.*)$`, "m"))![1];
-  return { data: { title: get("title"), description: get("description") }, body };
+  return { id: file.replace(/\.mdx$/, ""), title: get("title"), description: get("description"), order: 0, body };
 }
 
 /** Markdown with fenced code and inline code spans removed: what is left is
@@ -56,7 +62,7 @@ describe("guideMd", () => {
 
   it("leaves no import line, {identifier} or JSX tag in any guide twin", () => {
     for (const f of files) {
-      const md = prose(guideMd(guide(f)));
+      const md = prose(guideMd(input, guide(f)));
       expect(md, f).not.toMatch(/^import /m);
       expect(md, f).not.toMatch(/\{[a-zA-Z.]+\}/);
       expect(md, f).not.toMatch(/<\/?[a-zA-Z][^>]*>/);
@@ -64,13 +70,13 @@ describe("guideMd", () => {
   });
 
   it("replaces fact placeholders with their values", () => {
-    const md = guideMd({ data: { title: "T", description: "D" }, body: "There are {componentCount} of them.\n" });
+    const md = guideMd(input, { id: "t", title: "T", description: "D", order: 0, body: "There are {componentCount} of them.\n" });
     expect(md).not.toMatch(/\{componentCount\}/);
     expect(md).toMatch(/There are \d+ of them\./);
   });
 
   it("turns the sizes guide's mapped JSX table into a markdown table of every variant", () => {
-    const md = guideMd(guide("sizes-and-variants.mdx"));
+    const md = guideMd(input, guide("sizes-and-variants.mdx"));
     expect(md).toContain("| Variant | Intent | Typical use |");
     for (const v of ["accent", "accent-subtle", "neutral", "ghost", "danger", "outline"]) {
       expect(md).toContain(`| \`${v}\` |`);
@@ -78,14 +84,14 @@ describe("guideMd", () => {
   });
 
   it("keeps fenced code untouched", () => {
-    const md = guideMd(guide("sizes-and-variants.mdx"));
+    const md = guideMd(input, guide("sizes-and-variants.mdx"));
     expect(md).toContain("<Button size={24}>Compact</Button>");
   });
 });
 
 describe("overviewMd", () => {
   it("links the docs llms.txt", () => {
-    expect(overviewMd()).toContain("/docs/llms.txt");
+    expect(overviewMd(input)).toContain("/docs/llms.txt");
   });
 });
 
@@ -107,8 +113,8 @@ const cells = (row: string) => row.replace(/\\\|/g, "").split("|").length;
 
 describe("tables in twins are real tables", () => {
   const twins = [
-    ...tokenPages.map((p) => [`tokens/${p.slug}`, tokenPageMd(p)] as const),
-    ...readdirSync(dir).map((f) => [`guide/${f}`, guideMd(guide(f))] as const),
+    ...tokenPages.map((p) => [`tokens/${p.slug}`, tokenPageMd(input, p)] as const),
+    ...readdirSync(dir).map((f) => [`guide/${f}`, guideMd(input, guide(f))] as const),
   ];
   for (const [name, md] of twins) {
     it(`${name}: no blank line between rows, and every row has the header's cell count`, () => {
@@ -118,4 +124,14 @@ describe("tables in twins are real tables", () => {
       }
     });
   }
+});
+
+describe("loadDocsInput", () => {
+  it("reads every example and every guide, in a stable order", () => {
+    expect(input.examples.length).toBeGreaterThan(30);
+    expect(input.examples.map((e) => `${e.slug}/${e.name}`)).toEqual(
+      [...input.examples.map((e) => `${e.slug}/${e.name}`)].sort((a, b) => a.localeCompare(b)),
+    );
+    expect(input.guides.map((g) => g.id)).toEqual(["installation", "theming", "dark-mode", "ai", "sizes-and-variants"]);
+  });
 });

@@ -8,27 +8,33 @@ Psi publishes its documentation in forms an AI assistant can read. The data come
 
 ## Connect through MCP
 
-The Psi MCP server has two read-only tools. It does not write code.
+The Psi MCP server has four tools. Each returns text and changes nothing: none writes your files or calls a model.
 
 - **Hosted**: Streamable HTTP at `https://psi.kurkin.de/mcp`. Point an MCP client at it. There is nothing to install.
 - **Local**: `npx @handamade/psi-mcp` runs a stdio server.
 
 Check your client's documentation for how it takes a server URL or command.
 
-## The two tools
+## The four tools
 
 `search(query)` returns short briefs with ids. An empty query returns an overview.
 
-`get(id)` returns the full detail for one id:
+`get(id)` returns the docs for one id as markdown. For a docs page it is the same text as the page's `.md` version.
 
 | Id | What `get` returns |
 | --- | --- |
-| `component:Button` | Props, defaults and the accessibility doc |
-| `token:bgPrimary` | The formula, with OKLCH and hex values per theme |
+| `component:Button` | The component's docs page: examples, props, keyboard and theming |
+| `tokens:color` | A token page, with values in every theme |
+| `guide:theming` | A guide from these docs |
+| `token:bgPrimary` | One token's formula and its value in every theme |
 | `topic:variants` | Usage guidance |
-| `pattern:<id>` | The compose tree, clarifying parameters, content, gaps, and preset JSX |
+| `pattern:<id>` | A composition recipe: parameters, content, gaps and preset JSX |
 
 A bare name such as `Button` also resolves, without regard to case.
+
+`theme({ color })` derives a light and a dark theme from one brand colour, or from a hue. Both are solved so every text and control pair meets WCAG AA. It returns the CSS to save, how to import it, and the contrast of every pair. To start from a brief rather than a colour, the assistant picks the hue, chroma and radius itself.
+
+`check({ code })` reads JSX and reports where it uses Psi wrongly: a name Psi does not export, an unknown prop, a value outside a prop's allowed values, a missing required prop, a child a slot does not accept, or a missing accessible name. It does not rewrite the code.
 
 ## Give your project agent context
 

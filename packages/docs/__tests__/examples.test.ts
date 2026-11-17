@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { componentPages } from "../content/component-pages";
+import { componentPages } from "../src/pages";
 
 const dir = join(__dirname, "..", "examples");
 
@@ -23,7 +23,7 @@ describe("examples", () => {
   });
 
   it("examples import Psi from the package root, as a consumer would", () => {
-    for (const slug of readdirSync(dir).filter((f) => !f.endsWith(".ts"))) {
+    for (const slug of readdirSync(dir)) {
       for (const file of readdirSync(join(dir, slug))) {
         const src = readFileSync(join(dir, slug, file), "utf8");
         expect(src, `${slug}/${file}`).not.toMatch(/from ["']@handamade\/psi-react\/|from ["']\.\.\/\.\.\/\.\.\//);

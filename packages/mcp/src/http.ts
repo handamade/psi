@@ -15,7 +15,7 @@ export function createMcpHandler(index: PsiIndex) {
     req: IncomingMessage & { body?: unknown },
     res: ServerResponse,
   ): Promise<void> {
-    const server = createPsiServer(store, index.version);
+    const server = createPsiServer(store, index.version, index);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,

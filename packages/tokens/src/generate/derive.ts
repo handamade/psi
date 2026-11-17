@@ -1,4 +1,10 @@
-import { checkContrast, componentLabelPairs, nonTextPairs, wcagAAPairs } from "../contrast-matrix.js";
+import {
+  checkContrast,
+  componentLabelPairs,
+  nonTextPairs,
+  wcagAAPairs,
+  type ContrastResult,
+} from "../contrast-matrix.js";
 import { resolve, type ResolvedTheme } from "../dsl/resolver.js";
 import { cap, set, slot, token } from "../dsl/builders.js";
 import type { Palette, SlotMap, ThemeDef, TokenDef } from "../dsl/types.js";
@@ -292,4 +298,10 @@ export function deriveTheme(v: BrandVector): DerivedPair {
   }
 
   return pair;
+}
+
+/** Every gated pair of one derived member, with its ratio — the same matrix
+ * deriveTheme checks before it returns. */
+export function contrastReport(theme: DerivedTheme): ContrastResult[] {
+  return checkContrast(theme.resolved, AA_MATRIX);
 }
