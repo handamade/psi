@@ -270,12 +270,17 @@ The owner chose one standalone component over a `Tabs` variant and a
     `flex: 1 1 0`, so the segments share the width equally. This is the phone
     menu's case.
   - **Four segments at 320px.** A 320px viewport with Psi's 16px gutters
-    leaves 288px. `light | dark | acme | ember` measures 239px at size 32,
-    which fits with 49px to spare, and 288px at size 40, which fits with
-    nothing to spare. So on a phone use size 32, or `fill`. Four labels of two
-    words (`Last 7 days | Last 30 days | This quarter | All time`, 390px at 32)
-    do not fit, and truncate. Measured in Storybook's Chromium with the
-    default font stack (the `Narrow` story holds all four cases).
+    leaves 288px. The width of `light | dark | acme | ember` depends on the
+    font, so it was measured twice:
+    - macOS Chromium, default font stack: 239px at size 32, 288px at size 40.
+    - CI's Linux render (the VR baseline, DejaVu Sans): about 247px at size 32;
+      at size 40 it is wider than 288px, so it clamps there and all four
+      labels truncate.
+    So on a phone, four segments take size 32 (49px or more to spare on both),
+    or `fill`. Four labels of two words
+    (`Last 7 days | Last 30 days | This quarter | All time`, 390px at 32 on
+    macOS) do not fit, and truncate. The `Narrow` story holds all four cases,
+    and its baseline shows the size-40 truncation.
   - The root is `inline-size: fit-content`, not `auto`. As a flex item of a
     column, which is what `Tabs` and a vertical `Stack` are, an `auto` width
     stretches the pill across the column. Found in the view-switch story.
