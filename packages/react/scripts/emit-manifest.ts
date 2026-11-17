@@ -1,7 +1,8 @@
-import { writeFileSync, mkdirSync, readdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { withCustomConfig } from "react-docgen-typescript";
+import { a11yMeta } from "../src/a11y-meta.js";
 import { loadSlotContracts } from "./slots.js";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -73,10 +74,20 @@ const COMPONENTS = [
 // component's actual API surface instead of hundreds of native attributes.
 const WELL_KNOWN_PASSTHROUGHS = ["ref", "className", "placeholder"];
 
+/** Props a component inherits from React's DOM types, per component: the
+ * names (what it passes through) and the interfaces they came from. Filled
+ * as a side effect of propFilter, which sees every prop before dropping it. */
+const inherited: Record<string, { names: Set<string>; parents: Set<string> }> = {};
+
 const parser = withCustomConfig(join(root, "tsconfig.json"), {
-  propFilter: (prop) =>
-    !prop.parent?.fileName.includes("node_modules") ||
-    WELL_KNOWN_PASSTHROUGHS.includes(prop.name),
+  propFilter: (prop, component) => {
+    const fromReact = prop.parent?.fileName.includes("node_modules") ?? false;
+    if (!fromReact || WELL_KNOWN_PASSTHROUGHS.includes(prop.name)) return true;
+    const entry = (inherited[component.name] ??= { names: new Set(), parents: new Set() });
+    entry.names.add(prop.name);
+    if (prop.parent?.name) entry.parents.add(prop.parent.name);
+    return false;
+  },
   // Expand literal-only unions (e.g. `"accent" | "accent-subtle" | ...`,
   // `24 | 32 | 40 | 48`) into their individual values instead of collapsing
   // to the type alias name ("Variant", "Size"). Consumers of the manifest
@@ -137,6 +148,16 @@ function typeToString(p: { type: { name: string; value?: { value: string }[] } }
   return p.type.name;
 }
 
+/** The most specific React attribute interface a component's props extend:
+ * ButtonHTMLAttributes over HTMLAttributes over AriaAttributes. */
+function attributesOf(name: string): string | null {
+  const parents = [...(inherited[name]?.parents ?? [])];
+  if (parents.length === 0) return null;
+  const specific = parents.filter((p) => /HTMLAttributes$/.test(p) && p !== "HTMLAttributes").sort();
+  if (specific.length > 0) return specific[0];
+  return parents.includes("HTMLAttributes") ? "HTMLAttributes" : parents.sort()[0];
+}
+
 const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS, COMPONENT_DIR);
 
 const manifest = COMPONENTS.map((name) => {
@@ -170,6 +191,8 @@ const manifest = COMPONENTS.map((name) => {
     // Collapse TSDoc line wrapping — the manifest description is a one-liner.
     description: (doc.description ?? "").replace(/\s+/g, " ").trim(),
     slots: slotsByComponent[name],
+    attributes: attributesOf(name),
+    accessibleName: a11yMeta[name]?.accessibleName ?? null,
     props: Object.values(doc.props ?? {}).map((p) => ({
       name: p.name,
       type: typeToString(p),
@@ -189,11 +212,32 @@ const icons = readdirSync(join(root, "src", "icons"))
   .map((f) => f.replace(/\.tsx$/, ""))
   .sort();
 
+const contracts = JSON.parse(readFileSync(join(root, "src", "contracts.json"), "utf8")) as Record<string, string[]>;
+
 mkdirSync(join(root, "dist"), { recursive: true });
 writeFileSync(
   join(root, "dist", "manifest.json"),
-  JSON.stringify({ components: manifest, icons }, null, 2) + "\n",
+  JSON.stringify({ components: manifest, icons, contracts }, null, 2) + "\n",
 );
+
+// The names themselves go in a separate file: ~250 per component would
+// quadruple manifest.json. Identical sets are stored once.
+const sets: string[][] = [];
+const setIndex = new Map<string, number>();
+const attributeSetOf: Record<string, number> = {};
+for (const name of COMPONENTS) {
+  const names = [...(inherited[name]?.names ?? [])].sort();
+  if (names.length === 0) continue;
+  const key = names.join(",");
+  let i = setIndex.get(key);
+  if (i === undefined) {
+    i = sets.length;
+    sets.push(names);
+    setIndex.set(key, i);
+  }
+  attributeSetOf[name] = i;
+}
+writeFileSync(join(root, "dist", "attributes.json"), JSON.stringify({ sets, components: attributeSetOf }) + "\n");
 console.log(
-  `[react] wrote dist/manifest.json (${manifest.length} components, ${icons.length} icons)`,
+  `[react] wrote dist/manifest.json (${manifest.length} components, ${icons.length} icons, ${sets.length} attribute sets)`,
 );
