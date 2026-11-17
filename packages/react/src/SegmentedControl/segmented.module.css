@@ -9,10 +9,13 @@
 /* A pill that never wraps: a pill on two lines is no longer a pill. It is as
    wide as its labels, never wider than its container; when the container is
    narrower, the labels truncate. The track paints bg-primary so the selected
-   tint composites onto the surface the contrast gate measures it on. */
+   tint composites onto the surface the contrast gate measures it on.
+   fit-content, not auto: as a flex item of a column (Tabs, a Stack) an auto
+   width would stretch the pill across the column. */
 .root {
   display: inline-flex;
   box-sizing: border-box;
+  inline-size: fit-content;
   max-inline-size: 100%;
   padding: var(--psi-segmented-inset);
   border: 1px solid var(--psi-segmented-border);
