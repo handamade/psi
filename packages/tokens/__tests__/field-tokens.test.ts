@@ -15,12 +15,13 @@ describe("field tokens", () => {
       "label-align": "start",
       "label-max-width": "240px",
       "column-gap": "var(--psi-space-12)",
+      "stack-max-width": "640px",
     });
   });
 
   it("the D115 layout tokens carry no -fg/-bg/-border segment, so they stay out of the colour gates", async () => {
     const { keyGroup } = await import("../src/scopes.js");
-    for (const key of ["label-align", "label-max-width", "column-gap"]) expect(keyGroup(key)).toBeUndefined();
+    for (const key of ["label-align", "label-max-width", "column-gap", "stack-max-width"]) expect(keyGroup(key)).toBeUndefined();
   });
 
   it("emits --psi-field-* custom properties", () => {
@@ -28,6 +29,7 @@ describe("field tokens", () => {
     expect(css).toContain("--psi-field-label-fg: var(--psi-fg-secondary)");
     expect(css).toContain("--psi-field-gap: var(--psi-space-6)");
     expect(css).toContain("--psi-field-label-height: 20px");
+    expect(css).toContain("--psi-field-stack-max-width: 640px");
   });
 
   it("label-height carries no -fg/-bg/-border segment, so it stays out of the D46 colour gates", async () => {
