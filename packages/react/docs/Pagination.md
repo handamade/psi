@@ -16,6 +16,15 @@ Numbered pager with ellipsis truncation (D63). Its arrows hold still: a fixed sl
 | `aria-label` | `string` | Pagination | no | Accessible name for the nav landmark. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 
+## Keyboard & assistive tech
+
+| Keys | Behavior |
+|---|---|
+| Tab | Reaches Previous, each page button and Next in order; a disabled arrow is skipped, and the ellipsis is not a stop. |
+| Enter / Space | Activates the focused button (native button behavior). If Previous or Next reaches an end and disables itself, focus moves to the current page's button (D127). |
+
+A <nav> named "Pagination" (override with aria-label). The arrows are icon-only IconButtons named "Previous page" and "Next page" — translatable through previousLabel/nextLabel. The current page's button carries aria-current="page"; the ellipsis is aria-hidden. The slot count and slot width are fixed, so the arrows do not move under the pointer as the page changes (D127). At or below 560px of viewport the wide form's extra pages are display: none, so they leave the tab order and the accessibility tree too. After a page change focus stays in the pager: the current page's aria-current reports where the user is.
+
 ## Theming
 
 This component has no `--psi-pagination-*` tokens — its styling binds scale tokens only, so there is nothing component-scoped to override. Theme changes reach it through the semantic tokens of its children and surroundings.

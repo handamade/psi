@@ -22,7 +22,7 @@ A pager for a list that pages by cursor (D85): a backend that returns a `nextPag
 | Keys | Behavior |
 |---|---|
 | Tab | Reaches the Previous and Next buttons in order; a disabled direction is skipped. |
-| Enter / Space | Activates the focused button (native button behavior). |
+| Enter / Space | Activates the focused button (native button behavior). If that disables it — Next on the last page — focus moves to the other direction (D127). |
 
 A <nav> named "Pagination" (override with aria-label) holding two ghost Buttons with visible words — Previous and Next, translatable through previousLabel/nextLabel — each with a chevron that only reinforces the word (D85). A direction that is unavailable is disabled, not hidden. It holds no state: the consumer holds the page tokens and answers hasPrevious/hasNext. Pair it with a TableCaption whose detail states the range, and move focus there after a page change.
 
