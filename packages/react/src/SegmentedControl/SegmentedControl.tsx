@@ -25,12 +25,14 @@ export const SegmentedContext = createContext<SegmentedContextValue | null>(null
 
 export interface SegmentedControlProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "role" | "onChange" | "defaultValue"> {
-  /** The selected segment's value (controlled). Required on its own. Inside
-   * `Tabs`, leave it out: Tabs owns the value. A value that matches no segment
-   * selects nothing; the first enabled segment takes the tab stop. */
+  /** The selected segment's value (controlled). Given (with `onValueChange`),
+   * the control is a radio group, wherever it sits. Left out (and
+   * `onValueChange` too), it is the tab list of the `Tabs` around it, and Tabs
+   * owns the value. A value that matches no segment selects nothing; the first
+   * enabled segment takes the tab stop. */
   value?: string;
-  /** Fires with the newly selected value; the consumer flips `value`. Required
-   * on its own; leave it out inside `Tabs`. */
+  /** Fires with the newly selected value; the consumer flips `value`. Pass it
+   * with `value`, or leave both out to be a `Tabs`' tab list. */
   onValueChange?: (value: string) => void;
   /** Outer height in px, matching a Button of the same size. @default 32 */
   size?: SegmentedControlSize;
@@ -48,20 +50,22 @@ export interface SegmentedControlProps
   ref?: Ref<HTMLDivElement>;
 }
 
-/** A pill of 2–4 segments, one selected (D132). Two jobs, chosen by where it
- * renders rather than by a prop:
+/** A pill of 2–4 segments, one selected (D132). Two jobs, told apart by
+ * `value` rather than a mode prop:
  *
- * - **On its own** it is a radio group for a setting that applies at once
- *   (Light / Dark / System): `role="radiogroup"`, segments are `role="radio"`.
- *   `value` and `onValueChange` are required.
- * - **Inside `Tabs`** it is the tab list, in place of `TabList`, switching the
- *   `TabPanel`s (Map / Trace): `role="tablist"`, segments are `role="tab"` with
- *   `aria-controls`. `Tabs` owns the value.
+ * - **With `value` and `onValueChange`** it is a radio group for a setting
+ *   that applies at once (Light / Dark / System): `role="radiogroup"`,
+ *   segments are `role="radio"`. That holds anywhere, beside a tab list too.
+ * - **Without them, inside `Tabs`** it is the tab list, in place of `TabList`,
+ *   switching the `TabPanel`s (Map / Trace): `role="tablist"`, segments are
+ *   `role="tab"` with `aria-controls`. `Tabs` owns the value. Content inside a
+ *   `TabPanel` does not see its Tabs, so it must sit outside the panels.
  *
  * One tab stop; the arrow keys move and select (both axes as a radio group,
  * Left/Right as a tab list), Home and End jump. A disabled segment is skipped
- * in a radio group, and focused but not selected in a tab list (D131). Controlled only. A form value
- * is a `RadioGroup`, not this: it submits nothing. */
+ * in a radio group, and focused but not selected in a tab list (D131).
+ * Controlled only. A form value is a `RadioGroup`, not this: it submits
+ * nothing. */
 export function SegmentedControl({
   value,
   onValueChange,
@@ -73,7 +77,13 @@ export function SegmentedControl({
   ref,
   ...rest
 }: SegmentedControlProps) {
-  const tabs = useContext(TabsContext);
+  // D132: `value` decides. Given, the control is a radio group wherever it is
+  // (a setting beside a tab list included). Left out, it is the tab list of
+  // the Tabs it sits in. A TabPanel hides its Tabs from its content, so a
+  // control in a panel never takes itself for that tab set's list.
+  const standalone = value !== undefined || onValueChange !== undefined;
+  const ctxTabs = useContext(TabsContext);
+  const tabs = standalone ? null : ctxTabs;
   const inTabs = tabs !== null;
   const own = useRovingStop(value ?? "", "SegmentedControl", "segment");
   const innerRef = useRef<HTMLDivElement | null>(null);
@@ -106,16 +116,13 @@ export function SegmentedControl({
 
   // Every hook has run; now the misuse checks (D67's posture: a silent
   // failure would surface far from its cause).
-  if (inTabs && (value !== undefined || onValueChange !== undefined)) {
-    throw new Error(
-      "Psi SegmentedControl: inside <Tabs>, leave out value and onValueChange. " +
-        "Tabs owns the selected value, and the segments are its tabs.",
-    );
-  }
   if (!ctx) {
     throw new Error(
-      "Psi SegmentedControl: pass value and onValueChange, or render it inside <Tabs> " +
-        "to switch TabPanels. On its own it is a radio group and holds no state of its own.",
+      standalone
+        ? "Psi SegmentedControl: pass both value and onValueChange. On its own it is " +
+            "a radio group and holds no state of its own."
+        : "Psi SegmentedControl: pass value and onValueChange, or leave both out and " +
+            "render it inside <Tabs> (not inside a TabPanel) to be that Tabs' tab list.",
     );
   }
 

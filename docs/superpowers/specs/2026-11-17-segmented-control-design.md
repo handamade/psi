@@ -56,10 +56,10 @@ The owner chose one standalone component over a `Tabs` variant and a
   `SegmentedControl` props:
 
   - `value?: string`, `onValueChange?: (value: string) => void`. Controlled
-    only, like `Tabs` (D67) and `NavGroup`: there is no `defaultValue`. Both are
-    required on their own. Inside `Tabs` both come from `Tabs` and passing
-    either is an error. The types mark them optional because one component
-    serves both cases; the runtime checks below hold the rule.
+    only, like `Tabs` (D67) and `NavGroup`: there is no `defaultValue`. Passing
+    them makes the control a radio group; leaving both out makes it the tab
+    list of the `Tabs` around it (below). The types mark them optional because
+    one component serves both cases; the runtime checks below hold the rule.
   - `size?: 24 | 32 | 40`, default `32`. The control's outer height, so a 32px
     segmented control lines up with a 32px `Button`. No 48: the pill is a
     compact switch, and 48 is the hero button size.
@@ -73,31 +73,47 @@ The owner chose one standalone component over a `Tabs` variant and a
   `Segment` props: `value: string`, `children: ReactNode` (the label: one or two
   words), `disabled?: boolean`, `className`, `ref` (to the `<button>`).
 
-  ### Semantics: chosen by context, not by a prop
+  ### Semantics: chosen by `value`, not by a mode prop
 
-  There is no `mode` prop. What makes a set of segments tabs is that they
-  control panels, and in Psi a panel is a `TabPanel` inside `Tabs`, paired by
-  value. So:
+  There is no `mode` prop. What tells the two jobs apart is who owns the
+  value: a setting's value is the caller's, a view's value is its `Tabs`'.
 
-  - **On its own** the root is `role="radiogroup"`, and each `Segment` is a
-    `<button type="button" role="radio" aria-checked>`.
-  - **Inside `Tabs`** the root is `role="tablist"` (with
+  - **With `value` and `onValueChange`** the root is `role="radiogroup"`, and
+    each `Segment` is a `<button type="button" role="radio" aria-checked>`.
+    That holds wherever it renders, beside a `TabList` or inside a `TabPanel`
+    included.
+  - **Without them, inside `Tabs`** the root is `role="tablist"` (with
     `aria-orientation="horizontal"`), and each `Segment` is a
     `<button type="button" role="tab" aria-selected aria-controls>`, with the
     id and `aria-controls` that `Tab` uses (`tabId` / `panelId`), so the
     `TabPanel` of the same value is labelled by the segment. It takes the place
     of `TabList`; `Tab` and `TabList` are not used with it.
 
-  A prop would let the two disagree: `mode="tabs"` with no panels, or
-  `mode="radio"` inside `Tabs` beside panels that nothing controls. Reading the
-  context makes the right structure the only one that renders.
+  A `mode` prop would let the two disagree: `mode="tabs"` with no panels, or
+  tab mode with a value of its own that `Tabs` never sees.
+
+  The first draft of this spec chose the role by context alone: inside `Tabs`,
+  a tab list. The site build disproved it. The docs page shows each example in
+  a `Tabs` of its own (Preview / Code), and the setting example there took
+  itself for that tab set's list. Any setting on a settings page laid out in
+  tabs would have done the same. Two changes close it:
+
+  - `value` decides, as above.
+  - **`TabPanel` hides its `Tabs` from its content**: it renders its children
+    under an empty `TabsContext`. A panel's content is not part of the tab set,
+    so nothing in it should read that set's context. A `Tab`, `TabList` or
+    value-less `SegmentedControl` in a panel, with no `Tabs` of its own, now
+    throws instead of wiring itself to the outer set. `TabsContext` is a public
+    export, so a consumer component that read it inside a panel now gets
+    `null`; the changeset says so.
 
   Misuse throws, the way `Tab` outside `Tabs` throws (D67), because each
   failure would otherwise be silent:
 
-  - On its own, without `value` or without `onValueChange`: "pass value and
-    onValueChange, or render it inside `<Tabs>`".
-  - Inside `Tabs`, with `value` or `onValueChange`: "Tabs owns the value".
+  - Only one of `value` and `onValueChange`: "pass both".
+  - Neither, and no `Tabs` around it (or only one beyond a `TabPanel`): "pass
+    value and onValueChange, or leave both out and render it inside `<Tabs>`
+    (not inside a TabPanel)".
   - A `Segment` outside a `SegmentedControl`.
 
   Why `<button role="radio">` rather than native radios, as `RadioGroup` uses
@@ -132,7 +148,19 @@ The owner chose one standalone component over a `Tabs` variant and a
   underlined one behave the same. Radio mode passes `skipDisabled`, because a
   native radio group skips a disabled radio and the APG radio group follows it.
   The roving tabindex is still rewritten over every item, so a skipped
-  disabled segment never keeps a second stop. That hook's own comment names a
+  disabled segment never keeps a second stop.
+
+  Two defects in that keyboard, found by review during D132:
+
+  - With `skipDisabled`, a selected disabled segment holds the stop (D93) but
+    is not among the items the arrows land on, so the arrows stepped from
+    "nowhere": → went to the first segment and ← to the last. The step is now
+    measured from the focused item's place among all items.
+  - The keyboard writes `tabIndex` straight to the DOM, so focus on a disabled
+    tab (D131) leaves it a DOM `0` that its unchanged prop (`-1`) never
+    overwrites. A later click elsewhere then left two stops. `Tab` and
+    `Segment` now re-take their own `tabIndex` in a layout effect whenever the
+    stop moves. This was in `Tabs` since D131 and is fixed there too. That hook's own comment names a
   third caller as the signal to share it; this is the second caller with the
   same behaviour, so it is shared rather than copied.
 

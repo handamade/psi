@@ -113,6 +113,27 @@ describe("SegmentedControl on its own (D132)", () => {
     expect(radio("System")).toHaveAttribute("aria-checked", "true");
   });
 
+  it("from a selected disabled segment, the arrows step from where it is", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <SegmentedControl aria-label="Scheme" value="b" onValueChange={onValueChange}>
+        <Segment value="a">A</Segment>
+        <Segment value="b" disabled>
+          B
+        </Segment>
+        <Segment value="c">C</Segment>
+      </SegmentedControl>,
+    );
+    expect(radio("B")).toHaveAttribute("tabindex", "0");
+    radio("B").focus();
+    await user.keyboard("{ArrowRight}");
+    expect(onValueChange).toHaveBeenLastCalledWith("c");
+    radio("B").focus();
+    await user.keyboard("{ArrowLeft}");
+    expect(onValueChange).toHaveBeenLastCalledWith("a");
+  });
+
   it("with a value that matches nothing: none checked, the first enabled holds the stop, a warning", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     render(<Setting initial="sepia" />);
@@ -141,7 +162,7 @@ describe("SegmentedControl on its own (D132)", () => {
           <Segment value="a">A</Segment>
         </SegmentedControl>,
       ),
-    ).toThrow(/pass value and onValueChange, or render it inside <Tabs>/);
+    ).toThrow(/pass value and onValueChange, or leave both out and render it inside <Tabs>/);
   });
 
   it("a Segment outside a SegmentedControl throws", () => {
@@ -200,17 +221,96 @@ describe("SegmentedControl inside Tabs (D132)", () => {
     expect(tab("Map")).toHaveAttribute("tabindex", "-1");
   });
 
-  it("throws when given value or onValueChange inside Tabs", () => {
+  it("keeps one tab stop after the keyboard reaches a disabled segment and a click moves on", async () => {
+    const user = userEvent.setup();
+    function Live() {
+      const [v, setV] = useState("map");
+      return (
+        <Tabs value={v} onValueChange={setV}>
+          <SegmentedControl aria-label="Diagram">
+            <Segment value="map">Map</Segment>
+            <Segment value="trace" disabled>
+              Trace
+            </Segment>
+            <Segment value="code">Code</Segment>
+          </SegmentedControl>
+          <TabPanel value="map">M</TabPanel>
+          <TabPanel value="trace">T</TabPanel>
+          <TabPanel value="code">C</TabPanel>
+        </Tabs>
+      );
+    }
+    render(<Live />);
+    tab("Map").focus();
+    await user.keyboard("{ArrowRight}");
+    expect(document.activeElement).toBe(tab("Trace"));
+    await user.click(tab("Code"));
+    const stops = screen.getAllByRole("tab").filter((t) => t.tabIndex === 0);
+    expect(stops).toEqual([tab("Code")]);
+  });
+
+  it("with value inside Tabs, it is a radio group beside the tab list, not the tab list", () => {
+    render(
+      <Tabs value="a" onValueChange={() => {}}>
+        <SegmentedControl aria-label="Density" value="compact" onValueChange={() => {}}>
+          <Segment value="compact">Compact</Segment>
+          <Segment value="roomy">Roomy</Segment>
+        </SegmentedControl>
+        <SegmentedControl aria-label="Views">
+          <Segment value="a">A</Segment>
+          <Segment value="b">B</Segment>
+        </SegmentedControl>
+        <TabPanel value="a">Panel A</TabPanel>
+        <TabPanel value="b">Panel B</TabPanel>
+      </Tabs>,
+    );
+    expect(screen.getByRole("radiogroup", { name: "Density" })).toBeInTheDocument();
+    expect(screen.getByRole("tablist", { name: "Views" })).toBeInTheDocument();
+    expect(screen.getAllByRole("tab")).toHaveLength(2);
+  });
+
+  it("inside a TabPanel, a setting is a radio group of its own (the panel hides its Tabs)", () => {
+    render(
+      <Tabs value="a" onValueChange={() => {}}>
+        <SegmentedControl aria-label="Views">
+          <Segment value="a">A</Segment>
+        </SegmentedControl>
+        <TabPanel value="a">
+          <SegmentedControl aria-label="Color scheme" value="light" onValueChange={() => {}}>
+            <Segment value="light">Light</Segment>
+            <Segment value="dark">Dark</Segment>
+          </SegmentedControl>
+        </TabPanel>
+      </Tabs>,
+    );
+    expect(screen.getByRole("radiogroup", { name: "Color scheme" })).toBeInTheDocument();
+    expect(screen.getAllByRole("radio")).toHaveLength(2);
+    expect(screen.getAllByRole("tab")).toHaveLength(1);
+  });
+
+  it("without value inside a TabPanel, throws rather than joining the outer tab set", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() =>
       render(
         <Tabs value="a" onValueChange={() => {}}>
-          <SegmentedControl aria-label="x" value="a" onValueChange={() => {}}>
-            <Segment value="a">A</Segment>
-          </SegmentedControl>
-          <TabPanel value="a">A</TabPanel>
+          <TabPanel value="a">
+            <SegmentedControl aria-label="x">
+              <Segment value="a">A</Segment>
+            </SegmentedControl>
+          </TabPanel>
         </Tabs>,
       ),
-    ).toThrow(/Tabs owns the selected value/);
+    ).toThrow(/not inside a TabPanel/);
+  });
+
+  it("throws with only one of value and onValueChange", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() =>
+      render(
+        <SegmentedControl aria-label="x" value="a">
+          <Segment value="a">A</Segment>
+        </SegmentedControl>,
+      ),
+    ).toThrow(/pass both value and onValueChange/);
   });
 });

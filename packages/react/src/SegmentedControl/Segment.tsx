@@ -36,6 +36,14 @@ export function Segment({ value, children, disabled = false, className, ref }: S
     [register, value, disabled],
   );
 
+  // The keyboard writes tabIndex straight to the DOM (useTabsKeyboard), so a
+  // disabled segment it focused keeps a DOM 0 that its unchanged prop never
+  // overwrites. Whenever the stop moves, every segment re-takes its own.
+  const stop = ctx?.tabStop;
+  useLayoutEffect(() => {
+    if (innerRef.current) innerRef.current.tabIndex = stop === value ? 0 : -1;
+  }, [stop, value]);
+
   if (!ctx) {
     throw new Error(
       "Psi Segment: must be rendered inside <SegmentedControl>, which owns the " +

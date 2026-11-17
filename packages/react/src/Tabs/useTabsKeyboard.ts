@@ -84,18 +84,30 @@ export function useTabsKeyboard({
             ? [["ArrowLeft", "ArrowUp"], ["ArrowRight", "ArrowDown"]]
             : [["ArrowLeft"], ["ArrowRight"]];
 
-      // Index of the focused tab; -1 when focus is elsewhere, in which case
-      // the arrows work from the start.
-      const current = tabs.indexOf(document.activeElement as HTMLElement);
+      // Step from the focused item's place among all of them, to the next one
+      // the arrows land on. Measured over all items, not the reachable ones,
+      // so focus on a skipped disabled item (it can hold the stop when it is
+      // selected, D93) still steps the right way (D132). Focus elsewhere
+      // starts from the first or the last.
+      const all = allTabs();
+      const current = all.indexOf(document.activeElement as HTMLElement);
+      const step = (dir: 1 | -1): HTMLElement | undefined => {
+        if (current === -1) return dir === 1 ? tabs[0] : tabs[tabs.length - 1];
+        for (let i = 1; i <= all.length; i++) {
+          const candidate = all[(current + dir * i + all.length * i) % all.length];
+          if (tabs.includes(candidate)) return candidate;
+        }
+        return undefined;
+      };
 
       if (nextKeys.includes(e.key)) {
         e.preventDefault();
-        activate(tabs[(current + 1 + tabs.length) % tabs.length]);
+        activate(step(1));
         return;
       }
       if (prevKeys.includes(e.key)) {
         e.preventDefault();
-        activate(tabs[(current - 1 + tabs.length) % tabs.length]);
+        activate(step(-1));
         return;
       }
 
@@ -114,6 +126,6 @@ export function useTabsKeyboard({
           break;
       }
     },
-    [activate, reachableTabs, orientation],
+    [activate, allTabs, reachableTabs, orientation],
   );
 }

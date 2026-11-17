@@ -319,7 +319,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Tab", behavior: "The panel itself is a tab stop (tabIndex=0), so a panel whose content has no focusable element is still reachable." },
     ],
     notes:
-      "Renders role=\"tabpanel\" with aria-labelledby pointing back at its tab. Unselected panels stay in the DOM with `hidden`.",
+      "Renders role=\"tabpanel\" with aria-labelledby pointing back at its tab. Unselected panels stay in the DOM with `hidden`. Its content does not see its Tabs (D132): a panel renders its children under an empty TabsContext, so a Tab, TabList or SegmentedControl in a panel never wires itself to the outer tab set.",
   },
   SegmentedControl: {
     keyboard: [
@@ -329,7 +329,7 @@ export const a11yMeta: Record<string, A11yEntry> = {
       { keys: "Home / End", behavior: "Jumps to the first or last segment (the first or last enabled one in a radio group) and selects it unless it is disabled." },
     ],
     notes:
-      "Two roles, chosen by where it renders (D132). On its own it is role=\"radiogroup\" for a setting that applies at once, and value and onValueChange are required. Inside Tabs it is the role=\"tablist\" (aria-orientation=\"horizontal\"), in place of TabList, and Tabs owns the value; passing value or onValueChange there throws. Requires an accessible name: aria-label or aria-labelledby. It is not a form field: it submits nothing and does not join a Field; a form value is a RadioGroup. The selected segment shows by the accent tint, the accent label and a 1px inset ring that clears 3:1, so never by colour alone; in forced colours it paints Highlight.",
+      "Two roles, told apart by value (D132). With value and onValueChange it is role=\"radiogroup\", for a setting that applies at once, wherever it renders. Without them, inside Tabs (outside its TabPanels) it is the role=\"tablist\" (aria-orientation=\"horizontal\"), in place of TabList, and Tabs owns the value; anywhere else that throws. Requires an accessible name: aria-label or aria-labelledby. It is not a form field: it submits nothing and does not join a Field; a form value is a RadioGroup. The selected segment shows by the accent tint, the accent label and a 1px inset ring that clears 3:1, so never by colour alone; in forced colours it paints Highlight.",
     accessibleName: { oneOf: ["aria-label", "aria-labelledby"] },
   },
   Segment: {
