@@ -12,5 +12,5 @@ A segmented control: `SegmentedControl` and `Segment` (D132).
 - **Tokens** `--psi-segmented-*`, on the semantic layer and the control ramp. The shape is a pill (`--psi-radius-full`) whatever the theme's control radius. No new contrast pair.
 - **Tabs** shares its tab-stop rule (D93) and keyboard with it, and `Tabs`' body slot accepts `SegmentedControl`. Two changes to `Tabs`:
   - **A `TabPanel` hides its `Tabs` from its content**: children render under an empty `TabsContext`. A `Tab` or `TabList` stranded in a panel now throws instead of joining the outer tab set, and code of your own that reads the exported `TabsContext` inside a panel now gets `null`.
-  - Now that the arrow keys reach a disabled tab (D131, in this release), a click on another tab afterwards still leaves exactly one tab stop: each tab re-takes its own when the stop moves.
+  - **Fix:** since 0.34.0 the arrow keys reach a disabled tab (D131), and a click on another tab after that left two tab stops. Each tab now re-takes its own when the stop moves.
 - **MCP `search`**: a query's results now fill to the response budget, best first, as the overview's already do. `Segment` made `button` match one component more and pushed that answer past 6,000 characters.
