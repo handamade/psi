@@ -30,7 +30,6 @@ export function SurfaceMap({
   hrefs: Record<Surface, string>;
 }) {
   const href = (s: Surface) => hrefs[s];
-  const lit = (s: Surface | "paper") => (s === current ? "" : undefined);
   const on = (s: Surface) => (s === current ? "" : undefined);
   const click = (s: Surface) => (e: MouseEvent) => {
     e.preventDefault();
