@@ -1,7 +1,7 @@
 # A pager that holds still, keeps focus, speaks any language and fits a phone (D127)
 
-Date: 2026-11-17. Status: **Approved for implementation** (the coordinating
-session's brief), on branch `claude/d127-pagination-fixes-7983e6`.
+Date: 2026-11-17. Status: **Implemented** on branch
+`claude/d127-pagination-fixes-7983e6`.
 
 Provenance: a discussion of Psi's limits on 2026-11-16 measured five defects in
 `Pagination`, `CursorPagination` and the `table-pagination` preset. They ship
@@ -46,7 +46,10 @@ Next.
 4. **Too wide for a phone.** Storybook pads the story by 16px on each side. The
    widest 100-page pager (360.8px at page 97) needs 392.8px of viewport, so it
    overflows a 375px screen by 18px and a 320px screen by 73px. There is no
-   compact form.
+   compact form. And a pager wider than its container squeezes its arrows:
+   they are flex items with no width of their own, so at 320px they measured
+   16px, not 32px. (Psi's Storybook decorator pads a story by another 16px a
+   side, so a story at 320px leaves the pager 256px.)
 5. **The `table-pagination` preset renders a broken pager.** It composes
    `<Pagination />` with no `page` and no `pageCount`. `Pagination` clamps that
    to "no pages": two disabled arrows and no numbers, and the range warning
@@ -89,7 +92,13 @@ Next.
     The arrows stay 32px `IconButton`s. Together, Previous and Next sit at the
     same x on every page of a given `pageCount`.
     - At 1–99 pages a slot is 32px. At 100–999 it is 35.2px, and the pager is
-      342.4px wide on every page.
+      342.5px wide on every page (measured).
+    - The formula is written content-box, as
+      `max(var(--psi-size-24), digits × 1ch)` plus the two 4px insets, because
+      the token-scope rule lets `--psi-space-4` bind padding but not a width.
+      The result is the same: a 32px square up to two digits.
+    - **Nothing in the pager shrinks** (`flex-shrink: 0` on its items), so the
+      arrows stay 32px in a container narrower than the pager.
   - **`siblingCount` stays.** The register asked whether, with a fixed width,
     `siblingCount` becomes a count of slots. It stays a count of siblings: the
     slot count follows from it (`2s + 5`), and renaming it would break every
@@ -121,8 +130,8 @@ Next.
     `breakpoints.sm` (560px, D31: a build-time constant baked into the media
     query), the pager shows the `siblingCount = 0` range, which is five slots
     once the pages don't fit: `1 2 3 … 100`, `1 … 50 … 100`, `1 … 98 99 100`.
-    At 100 pages that is 264px on every page, which fits a 320px screen with
-    16px gutters (288px).
+    At 100 pages that is 264px on every page (measured), which fits a 320px
+    screen with 16px gutters (288px).
     - **One DOM for both forms.** `Pagination` renders the union of the two
       ranges once. An item that belongs to only one form carries
       `data-only="wide"` or `data-only="compact"`, and the media query hides
@@ -135,9 +144,9 @@ Next.
     - **No prop.** `siblingCount={0}` already *is* the compact form, at any
       width, for a pager in a narrow panel on a wide screen. With
       `siblingCount={0}`, the two forms are the same and nothing is hidden.
-    - **Limit.** At 1000–9999 pages a compact slot is 44.3px and the pager is
-      309.5px wide: it fits a 375px screen (343px), not a 320px one. The TSDoc
-      says so.
+    - **Limit.** At 1000–9999 pages a compact slot is 44.3px (measured) and
+      the pager is 309.5px wide: it fits a 375px screen (343px), not a 320px
+      one. The TSDoc says so.
   - **The presets render (P81).** `table-pagination` gives `Pagination`
     `page={1}` and `pageCount={10}`. Both pagination presets give their `Select`
     three options: 10, 50 and 100, the page sizes D85 records.
