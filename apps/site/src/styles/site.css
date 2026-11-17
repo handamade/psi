@@ -58,13 +58,6 @@
   pre {
     font-family: var(--psi-font-mono);
   }
-
-  section {
-    /* Budgeted from the header's tallest state (two-row wrap, ~95px),
-       not its one-row 64px minimum — the original 88px only cleared
-       the fixed-height header because it never wrapped (D76). */
-    scroll-margin-top: 119px;
-  }
 }
 
 /* Mono annotation — the page's signature detail.

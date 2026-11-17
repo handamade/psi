@@ -193,10 +193,7 @@ export function ThemeConsole() {
   }, [mode, brand, pair, setBrand]);
 
   return (
-    <div
-      className="console-card rise"
-      style={{ "--rise": "0.3s" } as CSSProperties}
-    >
+    <div className="console-card">
       <div className="console-head">
         <span className="annot">theme console</span>
         <span className="annot annot--accent">POST /api/theme</span>
