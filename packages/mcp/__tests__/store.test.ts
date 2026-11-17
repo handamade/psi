@@ -108,7 +108,7 @@ describe("search", () => {
   });
 
   it("keeps every pattern and the component floor inside the operating envelope (D61, D100)", () => {
-    // 23 real + 3 synthetic = 26. D129 added two fixed index rows to the
+    // 24 real + 3 synthetic = 27. D129 added two fixed index rows to the
     // overview (guide:* and tokens:*, about 220 characters), so the edge
     // moved in: the component floor holds through 3 synthetic patterns and
     // first breaks at 4 (7 components at 4, measured against this store.ts),
