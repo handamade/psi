@@ -113,7 +113,7 @@ change in behaviour"). It is recorded here and not decided again.
   suffix, so the scope gate leaves it unscoped, as it does
   `--psi-field-stack-max-width` (D125).
 
-**Menu's maximum height (P119's defect)**
+**Menu's maximum height**
 - `.menu` takes `max-block-size: var(--psi-menu-max-height)`. The popover's
   `overflow: auto` then scrolls it.
 - **A menu taller than the room on both sides** of its trigger opens on the
@@ -135,7 +135,7 @@ change in behaviour"). It is recorded here and not decided again.
   scrolls the item into view, so arrowing, Home, End and typeahead keep it
   visible. Pinned by a real-browser test.
 
-**Focus when the focused item is removed (P120's defect)**
+**Focus when the focused item is removed**
 - **Kept by identity.** A re-render that keeps the focused item's element keeps
   its focus; React does that for a stable `key`, and Menu adds nothing.
 - **Otherwise, its neighbour.** When the focused item leaves the DOM and focus
@@ -147,7 +147,7 @@ change in behaviour"). It is recorded here and not decided again.
 - A `MutationObserver` on the open menu watches for the removal; Menu records
   the focused item and its position on `focusin`.
 
-**Disabled items reachable (P121's defect)**
+**Disabled items reachable**
 - **Menu:** a disabled item is an item for every navigation key: Arrow Up and
   Down, Home, End, typeahead, and the focus on open, so a menu whose first
   item is disabled opens on it. It can't be activated: its click does nothing

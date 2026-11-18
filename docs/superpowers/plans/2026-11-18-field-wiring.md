@@ -22,7 +22,7 @@ Spec: `docs/superpowers/specs/2026-11-18-field-wiring-design.md`.
 
 ---
 
-### Task 1: `useFieldWiring`, and the Field's wiring wins in `Input`, `Select`, `Textarea` (P21)
+### Task 1: `useFieldWiring`, and the Field's wiring wins in `Input`, `Select`, `Textarea`
 
 **Files:**
 - Create: `packages/react/src/Field/useFieldWiring.ts`
@@ -161,7 +161,7 @@ Update each component's doc line: "Inside a Field, id/aria-describedby/aria-inva
 
 - [ ] **Step 6: Commit** — `feat(react): inside a Field the Field's id, aria-invalid and required win (D135)`.
 
-### Task 2: `Checkbox` and `Switch` take a non-group Field's wiring (P137)
+### Task 2: `Checkbox` and `Switch` take a non-group Field's wiring
 
 **Files:**
 - Modify: `packages/react/src/Checkbox/Checkbox.tsx`, `packages/react/src/Switch/Switch.tsx`, `Checkbox.stories.tsx`, `Switch.stories.tsx`, `packages/react/src/a11y.axe.test.tsx`
@@ -267,7 +267,7 @@ for (const [id, role] of [["components-checkbox--in-a-field", "checkbox"], ["com
 
 - [ ] **Step 8: Commit** — `feat(react): Checkbox and Switch take a Field's wiring outside group mode (D135)`.
 
-### Task 3: The toolbar's control width reaches a top-labelled Field's control (P123)
+### Task 3: The toolbar's control width reaches a top-labelled Field's control
 
 **Files:**
 - Modify: `packages/react/src/Field/Field.tsx` (`data-psi-field` in `layout`), `packages/react/src/Toolbar/toolbar.module.css`, `Toolbar.tsx` (doc)

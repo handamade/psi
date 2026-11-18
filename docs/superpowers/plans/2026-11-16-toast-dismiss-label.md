@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** `Toast`, `show()` and `ToastProvider` take `dismissLabel`, the dismiss button's accessible name (D117); ESLint skips `.claude/` and `.cursor/` (P61).
+**Goal:** `Toast`, `show()` and `ToastProvider` take `dismissLabel`, the dismiss button's accessible name (D117); ESLint skips `.claude/` and `.cursor/`.
 
 **Architecture:** `Toast` takes the prop with the current name as its default. `show()` stores a per-toast value in the queue; `ToastProvider` reads its own prop at render and passes `t.dismissLabel ?? dismissLabel`. Generated docs and the manifest come from the TSDoc.
 
@@ -61,7 +61,7 @@
 - [ ] **Step 3:** `llms.txt`: the `<Toast …>` line gains `dismissLabel` and a clause (`dismissLabel="Schließen"` renames the dismiss button, D117); the `<ToastProvider …>` line gains `dismissLabel` as a provider default and in the `show({…})` list.
 - [ ] **Step 4:** commit.
 
-## Task 4: P61
+## Task 4: ESLint skips agent folders
 
 - [ ] **Step 1: reproduce.** Create `.claude/worktrees/probe/probe.ts` containing `const unused: any = 1;`. Run `pnpm exec eslint .` and confirm it reports the file. Delete it after Step 3.
 - [ ] **Step 2:** in `eslint.config.js` add `".claude/**"` and `".cursor/**"` to the `ignores` array.
