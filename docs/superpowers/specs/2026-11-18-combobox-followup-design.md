@@ -283,6 +283,12 @@ so. Only the caller knows that, so the caller needs a way to hold it.
 - **The story's button.** The same spec showed that "Try again" inside a
   `<form>` needs `type="button"`. `Button` keeps the native default
   (`submit`), so an implicit submit from Enter clicked it.
+- **The chevron turns on the popup, not on `aria-expanded`.**
+  - D130's CSS rotated it with `.toggle[aria-expanded="true"]`.
+  - With point 2, the "No matches" popup left the chevron pointing down: CI's
+    `vr` measured 24 px on `open-no-matches`, in light and ember.
+  - The toggle now carries `data-open` while the popup is open, and the
+    rotation is keyed on that. Every existing baseline stays as it was.
 - **One function settles.** Blur, open Enter with nothing highlighted, and
   closed Enter on edited text all call it. Escape writes the shown label
   directly.

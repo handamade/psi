@@ -610,6 +610,7 @@ export function Combobox(props: ComboboxProps) {
           aria-label={toggleLabel}
           aria-expanded={expanded}
           aria-controls={listboxId}
+          data-open={open || undefined}
           disabled={disabled}
           onMouseDown={keepFocus}
           onClick={() => {

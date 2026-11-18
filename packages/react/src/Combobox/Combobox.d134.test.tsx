@@ -171,6 +171,8 @@ describe("D134 · aria-expanded follows the listbox", () => {
     expect(listbox()).toHaveAttribute("hidden");
     expect(input()).toHaveAttribute("aria-expanded", "false");
     expect(toggle).toHaveAttribute("aria-expanded", "false");
+    // The chevron still turns: it's keyed on the popup, not on aria-expanded.
+    expect(toggle).toHaveAttribute("data-open");
     await userEvent.clear(input());
     await userEvent.type(input(), "ber");
     expect(input()).toHaveAttribute("aria-expanded", "true");
