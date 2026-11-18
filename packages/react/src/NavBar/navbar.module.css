@@ -47,7 +47,7 @@
 .links a,
 .brand a {
   text-decoration: none;
-  transition: color var(--psi-duration-150) var(--psi-ease-soft);
+  transition: color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .links a {

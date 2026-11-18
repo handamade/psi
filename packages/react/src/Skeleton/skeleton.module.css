@@ -12,6 +12,10 @@
 .skeleton {
   width: 100%;
   box-sizing: border-box;
+  /* The one motion in Psi on the raw scale, not a D141 preset: an infinite
+     alternating pulse, which reduced motion removes outright below rather
+     than zeroes (D86). No other component moves like this. */
+  /* stylelint-disable-next-line psi/motion-presets -- D86: an infinite pulse, not a preset's transition */
   animation: skeleton-pulse var(--psi-duration-600) var(--psi-ease-in-out) infinite alternate;
 }
 

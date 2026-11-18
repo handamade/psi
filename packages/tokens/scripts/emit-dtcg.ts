@@ -4,7 +4,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
-import { durationScale, easings } from "../src/scales/motion.js";
+import { durationScale, easings, motionPresets } from "../src/scales/motion.js";
 import { breakpoints, container } from "../src/scales/layout.js";
 import { focusRing } from "../src/scales/focus-ring.js";
 import { SCALE_SCOPES } from "../src/scopes.js";
@@ -56,6 +56,11 @@ export function emitDTCG(themeName: string, resolved: ResolvedTheme): string {
     easing: Object.fromEntries(
       Object.entries(easings).map(([name, curve]) => [name, { $type: "string", $value: curve }]),
     ),
+    // D141 — presets alias the duration and easing groups above.
+    motion: Object.fromEntries(Object.entries(motionPresets).map(([name, p]) => [name, {
+      duration: { $type: "duration", $value: `{duration.${p.duration}}` },
+      ease: { $type: "string", $value: `{easing.${p.ease}}` },
+    }])),
     cubicBezier: {
       standard: { $type: "cubicBezier", $value: [0.25, 0.1, 0.25, 1] },
       "in-out": { $type: "cubicBezier", $value: [0.42, 0, 0.58, 1] },

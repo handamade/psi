@@ -116,7 +116,7 @@
   flex: none;
   /* D124: with an icon in the row, keep the label beside it and the chevron at the end. With two items, space-between already put it there. */
   margin-inline-start: auto;
-  transition: transform var(--psi-duration-150) var(--psi-ease-standard);
+  transition: transform var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .groupButton[aria-expanded="true"] .chevron {

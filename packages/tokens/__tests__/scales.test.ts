@@ -4,7 +4,7 @@ import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { breakpoints, container, containerQueries, zIndex } from "../src/scales/layout.js";
 import { comboName, WEIGHT_VALUES, typographyCombos } from "../src/scales/typography.js";
-import { durationScale, easings } from "../src/scales/motion.js";
+import { durationScale, easings, motionPresets } from "../src/scales/motion.js";
 import { focusRing } from "../src/scales/focus-ring.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS } from "../scripts/emit-utilities.js";
 
@@ -52,6 +52,36 @@ describe("scales", () => {
       expect(css).toContain("--psi-ease-standard: ease;");
       expect(css).toContain("--psi-ease-in-out: ease-in-out;");
       expect(css).toContain("--psi-ease-soft: cubic-bezier(0.2, 0.6, 0.2, 1);");
+    });
+
+    it("names three presets by intent, each a scale step and a scale easing (D141)", () => {
+      const pairs = Object.fromEntries(
+        Object.entries(motionPresets).map(([name, p]) => [name, { duration: p.duration, ease: p.ease }]),
+      );
+      expect(pairs).toEqual({
+        feedback: { duration: 150, ease: "standard" },
+        move: { duration: 200, ease: "soft" },
+        emphasis: { duration: 350, ease: "standard" },
+      });
+      for (const p of Object.values(motionPresets)) {
+        expect(p.intent.length).toBeGreaterThan(20);
+        expect(durationScale).toContain(p.duration);
+        expect(Object.keys(easings)).toContain(p.ease);
+      }
+    });
+
+    it("emits each preset as two aliases of the scale, after the easings (D141)", () => {
+      const css = emitScaleVarsCSS();
+      const block = [
+        "    --psi-motion-feedback-duration: var(--psi-duration-150);",
+        "    --psi-motion-feedback-ease: var(--psi-ease-standard);",
+        "    --psi-motion-move-duration: var(--psi-duration-200);",
+        "    --psi-motion-move-ease: var(--psi-ease-soft);",
+        "    --psi-motion-emphasis-duration: var(--psi-duration-350);",
+        "    --psi-motion-emphasis-ease: var(--psi-ease-standard);",
+      ].join("\n");
+      expect(css).toContain(block);
+      expect(css.indexOf("--psi-motion-feedback-duration")).toBeGreaterThan(css.indexOf("--psi-ease-soft:"));
     });
 
     it("zeroes durations under prefers-reduced-motion (D30)", () => {

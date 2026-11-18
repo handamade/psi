@@ -324,7 +324,7 @@ describe("text link utility (D119)", () => {
 
   it("emits the rest rule: accent colour, an underline that cannot be turned off, inherited font", () => {
     expect(css).toContain(
-      ".psi-link { color: var(--psi-link-fg); text-decoration-line: underline; text-decoration-thickness: var(--psi-link-underline-thickness); text-decoration-color: currentColor; text-underline-offset: var(--psi-link-underline-offset); transition: color var(--psi-duration-150) var(--psi-ease-standard), text-decoration-thickness var(--psi-duration-150) var(--psi-ease-standard); }",
+      ".psi-link { color: var(--psi-link-fg); text-decoration-line: underline; text-decoration-thickness: var(--psi-link-underline-thickness); text-decoration-color: currentColor; text-underline-offset: var(--psi-link-underline-offset); transition: color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease), text-decoration-thickness var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease); }",
     );
   });
 

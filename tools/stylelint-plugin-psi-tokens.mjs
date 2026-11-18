@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const ruleName = "psi/component-tokens-only";
-const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|z|focus-ring)-/;
+const ALLOWED_GLOBAL = /^--psi-(space|size|radius|text|font|duration|ease|motion|z|focus-ring)-/;
 // componentName derived from filename: button.module.css → button; icon-button → button (declared alias)
 const ALIASES = { "icon-button": "button", "field-stack": "field" };
 
@@ -101,8 +101,35 @@ const focusRule = (enabled) => (root, result) => {
 focusRule.ruleName = focusRuleName;
 focusRule.messages = stylelint.utils.ruleMessages(focusRuleName, {});
 
+const motionRuleName = "psi/motion-presets";
+
+/** D141: a transition or animation in component CSS binds a --psi-motion-*
+ * preset, never the raw --psi-duration-* / --psi-ease-* scale, so a component
+ * picks a motion by intent and retuning a preset retunes every user of it. The
+ * stated exceptions (Skeleton's infinite pulse, D86) disable this rule on
+ * their line with a reason. Custom-property declarations are not bindings: a
+ * component's own motion token may alias the scale (the scope gate holds it). */
+const motionRule = (enabled) => (root, result) => {
+  if (!enabled) return;
+  const file = root.source?.input.file ?? "";
+  if (!/\.module\.css$/.test(file)) return;
+  root.walkDecls((decl) => {
+    if (!/^(transition|animation)/.test(decl.prop)) return;
+    const raw = decl.value.match(/var\((--psi-(?:duration|ease)-[a-z0-9-]+)/);
+    if (raw) {
+      stylelint.utils.report({
+        ruleName: motionRuleName, result, node: decl,
+        message: `${raw[1]} in "${decl.prop}" — bind a --psi-motion-* preset (feedback, move, emphasis), not the raw scale (psi/motion-presets, D141)`,
+      });
+    }
+  });
+};
+motionRule.ruleName = motionRuleName;
+motionRule.messages = stylelint.utils.ruleMessages(motionRuleName, {});
+
 export default [
   stylelint.createPlugin(ruleName, rule),
   stylelint.createPlugin(scopeRuleName, scopeRule),
   stylelint.createPlugin(focusRuleName, focusRule),
+  stylelint.createPlugin(motionRuleName, motionRule),
 ];

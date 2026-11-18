@@ -1,4 +1,5 @@
 import type { ThemeDef } from "./dsl/types.js";
+import { durationScale, motionPresets } from "./scales/motion.js";
 import { PROPERTY_GROUPS, expandScopes, keyGroup } from "./scopes.js";
 import { classifyComponentTokens } from "./emit/component-scope.js";
 
@@ -11,7 +12,7 @@ export interface ScopeViolation {
 }
 
 const VAR_RE = /var\((--psi-[a-z0-9-]+)/g;
-const SCALE_RE = /^--psi-(space|size|radius|text|font|duration|ease|z)-/;
+const SCALE_RE = /^--psi-(space|size|radius|text|font|duration|ease|motion|z)-/;
 const camelToKebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 
 /** Collect the semantic token names (camelCase) a component-token value
@@ -76,6 +77,29 @@ function checkOne(
   return violations;
 }
 
+/** D141: a duration token must be exactly one var() of a duration step or of a
+ * preset's duration, both of which reduced motion zeroes (D30). A literal
+ * (`200ms`) never reads a duration token, so nothing would zero it. Math is
+ * refused too: `calc()` of a step would zero, `max()` with a literal would
+ * not, and telling them apart is more than this needs. A fallback is refused,
+ * since it is what renders whenever the named token is missing. The `-ease`
+ * half is not gated: a curve cannot break reduced motion. */
+const DURATION_VALUE = /^var\(--psi-(?:duration-(\d+)|motion-([a-z]+)-duration)\)$/;
+const isDurationKey = (key: string) => key.split("-").at(-1) === "duration";
+
+function durationViolation(component: string, key: string, value: string): ScopeViolation[] {
+  if (!isDurationKey(key)) return [];
+  const m = DURATION_VALUE.exec(value.trim());
+  const ok = m !== null && (m[1] !== undefined
+    ? (durationScale as readonly number[]).includes(Number(m[1]))
+    : Object.hasOwn(motionPresets, m[2]));
+  if (ok) return [];
+  return [{
+    component, key, group: "duration", token: value,
+    scopes: ["var(--psi-duration-<step>)", "var(--psi-motion-<preset>-duration)"],
+  }];
+}
+
 /** D46 primary gate: every component token whose key declares a property
  * group (-bg/-fg/-border) may only bind semantic tokens scoped to it. */
 export function checkScopes(
@@ -87,6 +111,7 @@ export function checkScopes(
   for (const [component, vars] of Object.entries(componentVars)) {
     for (const [key, value] of Object.entries(vars)) {
       violations.push(...checkOne(component, key, value, componentVars, theme, kebabToName));
+      violations.push(...durationViolation(component, key, value));
     }
   }
   return violations;
@@ -112,8 +137,14 @@ export function checkOverrideScopes(
   const violations: ScopeViolation[] = [];
   for (const [fullKey, value] of Object.entries(overrides)) {
     const component = components.find((c) => fullKey.startsWith(`${c}-`));
-    if (!component) continue;
+    // D141: every -duration override, whether or not Psi knows its component.
+    if (!component) {
+      const [head, ...rest] = fullKey.split("-");
+      violations.push(...durationViolation(head, rest.join("-"), value));
+      continue;
+    }
     const key = fullKey.slice(component.length + 1);
+    violations.push(...durationViolation(component, key, value));
     violations.push(...checkOne(component, key, value, componentVars, theme, kebabToName));
     if (scopes.get(`--psi-${fullKey}`) === "page") {
       for (const token of semanticRefs(component, value, componentVars, kebabToName)) {

@@ -27,7 +27,7 @@
   color: var(--psi-toast-fg);
   font: var(--psi-text-14-20-regular);
 
-  animation: toast-enter var(--psi-duration-200) var(--psi-ease-soft);
+  animation: toast-enter var(--psi-motion-move-duration) var(--psi-motion-move-ease);
 }
 
 @keyframes toast-enter {

@@ -14,8 +14,8 @@
   color: var(--psi-input-fg);
   font-family: var(--psi-font-sans);
   transition:
-    border-color var(--psi-duration-150) var(--psi-ease-standard),
-    outline var(--psi-duration-150) var(--psi-ease-standard);
+    border-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease),
+    outline var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .input::placeholder {

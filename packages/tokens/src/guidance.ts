@@ -1,3 +1,4 @@
+import { motionPresets } from "./scales/motion.js";
 export const guidance = {
   variants: [
     { variant: "accent", intent: "Primary action, draws attention", typicalUse: "Submit, CTA, main action in a group" },
@@ -39,7 +40,15 @@ export const guidance = {
   motion: {
     durations: [150, 200, 350, 450, 600],
     easings: { standard: "ease", "in-out": "ease-in-out", soft: "cubic-bezier(0.2, 0.6, 0.2, 1)" },
-    reducedMotion: "All --psi-duration-* zero under prefers-reduced-motion (D30). Always drive transitions/animations with duration tokens; never hardcode times.",
+    // D141 — pick a preset by intent; both halves alias the scale above.
+    presets: Object.fromEntries(Object.entries(motionPresets).map(([name, p]) => [name, {
+      duration: `var(--psi-motion-${name}-duration)`,
+      ease: `var(--psi-motion-${name}-ease)`,
+      aliases: `--psi-duration-${p.duration} / --psi-ease-${p.ease}`,
+      intent: p.intent,
+    }])),
+    presetRule: "Bind a preset in every transition and animation: transition: color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease). Pick by intent, not by speed. A component's own motion tokens alias a preset's halves (--psi-app-shell-sidebar-duration: var(--psi-motion-move-duration)). The raw scale is for the two exceptions: Skeleton's infinite pulse (D86) and .psi-media-tint (D35).",
+    reducedMotion: "All --psi-duration-* zero under prefers-reduced-motion (D30), and every --psi-motion-* preset with them: a preset aliases the scale, so it resolves to 0.01ms too. Always drive transitions/animations with a preset or a duration token; never hardcode times. A theme's componentOverrides value for a *-duration key must be var(--psi-duration-*) or var(--psi-motion-*-duration), or the build refuses it (D141).",
     recipes: {
       pulseDown: "App-level keyframe (the DS ships none): @keyframes pulse-down { 0%,100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(6px); opacity: 1; } } — drive with var(--psi-ease-in-out).",
     },

@@ -44,8 +44,8 @@
   border-radius: var(--psi-radius-full);
   background: var(--psi-radio-group-circle-bg);
   transition:
-    background-color var(--psi-duration-150) var(--psi-ease-standard),
-    border-color var(--psi-duration-150) var(--psi-ease-standard);
+    background-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease),
+    border-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .input:checked + .circle {
