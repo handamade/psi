@@ -1,62 +1,10 @@
 import React from "react";
 import type { Meta, StoryObj } from "storybook";
-import {
-  IconPlus,
-  IconMinus,
-  IconClose,
-  IconCheck,
-  IconChevronDown,
-  IconChevronRight,
-  IconSearch,
-  IconSettings,
-  IconUser,
-  IconEdit,
-  IconTrash,
-  IconCopy,
-  IconExternalLink,
-  IconEye,
-  IconEyeOff,
-  IconLoader,
-  IconArrowDown,
-  IconArrowUpRight,
-  IconLinkedIn,
-  IconGitHub,
-  IconX,
-  IconInstagram,
-  IconMenu,
-  IconChevronLeft,
-  IconLogOut,
-  IconSimCard,
-} from "./index.js";
+import * as iconModule from "./index.js";
 
-const icons = [
-  { name: "IconPlus", Component: IconPlus },
-  { name: "IconMinus", Component: IconMinus },
-  { name: "IconClose", Component: IconClose },
-  { name: "IconCheck", Component: IconCheck },
-  { name: "IconChevronDown", Component: IconChevronDown },
-  { name: "IconChevronRight", Component: IconChevronRight },
-  { name: "IconSearch", Component: IconSearch },
-  { name: "IconSettings", Component: IconSettings },
-  { name: "IconUser", Component: IconUser },
-  { name: "IconEdit", Component: IconEdit },
-  { name: "IconTrash", Component: IconTrash },
-  { name: "IconCopy", Component: IconCopy },
-  { name: "IconExternalLink", Component: IconExternalLink },
-  { name: "IconEye", Component: IconEye },
-  { name: "IconEyeOff", Component: IconEyeOff },
-  { name: "IconLoader", Component: IconLoader },
-  { name: "IconArrowDown", Component: IconArrowDown },
-  { name: "IconArrowUpRight", Component: IconArrowUpRight },
-  { name: "IconLinkedIn", Component: IconLinkedIn },
-  { name: "IconGitHub", Component: IconGitHub },
-  { name: "IconX", Component: IconX },
-  { name: "IconInstagram", Component: IconInstagram },
-  { name: "IconMenu", Component: IconMenu },
-  { name: "IconChevronLeft", Component: IconChevronLeft },
-  { name: "IconLogOut", Component: IconLogOut },
-  { name: "IconSimCard", Component: IconSimCard },
-];
+// Built from the barrel, not a hand-kept list: the hand-kept one fell four
+// icons behind (D64, D70) before anyone noticed (D137).
+const icons = Object.entries(iconModule).map(([name, Component]) => ({ name, Component }));
 
 const meta: Meta = {
   title: "Icons/Gallery",
