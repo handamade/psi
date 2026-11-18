@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render, screen, within } from "@testing-library/react";
@@ -6,6 +6,7 @@ import { Field } from "./Field.js";
 import { Input } from "../Input/Input.js";
 import { Select } from "../Select/Select.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
+import { Textarea } from "../Textarea/Textarea.js";
 
 describe("Field", () => {
   it("associates the label with the wrapped control", () => {
@@ -342,5 +343,65 @@ describe("controlWidth (D125)", () => {
     expect(start).toBeGreaterThan(text.indexOf('.field[data-label-position="start"] {'));
     expect(start).toBeLessThan(text.indexOf("grid-template-columns: subgrid"));
     expect(start).toBeLessThan(text.indexOf("@container psi-field-stack"));
+  });
+});
+
+describe("the Field's wiring wins (D135)", () => {
+  const controls = {
+    Input: () => <Input id="own" aria-invalid={false} required={false} />,
+    Select: () => (
+      <Select id="own" aria-invalid={false} required={false}>
+        <option>a</option>
+      </Select>
+    ),
+    Textarea: () => <Textarea id="own" aria-invalid={false} required={false} />,
+  };
+  for (const [name, Control] of Object.entries(controls)) {
+    it(`${name} takes the Field's id, aria-invalid and required over the caller's`, () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      render(
+        <Field label="Email" error="Not an address." required>
+          <Control />
+        </Field>,
+      );
+      const el = screen.getByLabelText(/Email/);
+      expect(el.id).not.toBe("own");
+      expect(el).toHaveAttribute("aria-invalid", "true");
+      expect(el).toBeRequired();
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0]![0])).toMatch(new RegExp(`^${name}: .*htmlFor="own"`));
+      warn.mockRestore();
+    });
+  }
+
+  it("keeps a caller's aria-invalid and required while the Field sets neither", () => {
+    render(
+      <Field label="Nick">
+        <Input aria-invalid required />
+      </Field>,
+    );
+    const input = screen.getByLabelText("Nick");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toBeRequired();
+  });
+
+  it("htmlFor names the id, and a matching caller id does not warn", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(
+      <Field label="Email" htmlFor="email">
+        <Input id="email" />
+      </Field>,
+    );
+    expect(screen.getByLabelText("Email").id).toBe("email");
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it("outside a Field the caller's props pass through", () => {
+    render(<Input aria-label="Solo" id="own" aria-invalid={false} required={false} />);
+    const input = screen.getByLabelText("Solo");
+    expect(input.id).toBe("own");
+    expect(input).toHaveAttribute("aria-invalid", "false");
+    expect(input).not.toBeRequired();
   });
 });

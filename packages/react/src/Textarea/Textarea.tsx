@@ -1,6 +1,7 @@
 import { useContext, useId, useState } from "react";
 import type { ChangeEvent, Ref, TextareaHTMLAttributes } from "react";
 import { FieldContext } from "../Field/Field.js";
+import { useFieldWiring } from "../Field/useFieldWiring.js";
 import styles from "./textarea.module.css";
 
 export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -22,7 +23,8 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 
 /** Multi-line text input (D104): the Input recipe on a native `<textarea>`.
  * Inside a Field, id/aria-describedby/aria-invalid/required are wired as for
- * Input (D49). `minLength` and `maxLength` are the native attributes. With
+ * Input (D49), and the Field's win over the caller's (D135). `minLength`
+ * and `maxLength` are the native attributes. With
  * `maxLength`, a counter under the control shows the length; it is not a
  * live region (a count spoken on every keystroke is noise) and joins
  * aria-describedby, so it is read with the field on focus. */
@@ -44,10 +46,7 @@ export function Textarea({
   const length = controlled ? String(rest.value ?? "").length : typed;
   const counter = maxLength !== undefined && showCounter;
 
-  const describedBy =
-    [field?.describedBy, counter ? counterId : undefined, rest["aria-describedby"]]
-      .filter(Boolean)
-      .join(" ") || undefined;
+  const wiring = useFieldWiring("Textarea", rest, { describedBy: counter ? counterId : undefined });
 
   const cls = [styles.textarea, invalid && styles.error, className].filter(Boolean).join(" ");
 
@@ -62,12 +61,9 @@ export function Textarea({
       className={cls}
       rows={rows}
       maxLength={maxLength}
-      id={rest.id ?? field?.id}
-      required={rest.required ?? (field?.required || undefined)}
-      aria-invalid={field?.invalid || undefined}
       {...rest}
+      {...wiring}
       onChange={handleChange}
-      aria-describedby={describedBy}
     />
   );
 

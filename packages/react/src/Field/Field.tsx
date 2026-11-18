@@ -54,7 +54,9 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
    * remounts the group's controls; set it once rather than toggling it.
    * @default false */
   group?: boolean;
-  /** Override the generated control id (pair it with the same id on the control). */
+  /** The control's id, in place of the generated one. The control takes it
+   * and ignores an id of its own (D135), so set a known id here rather than
+   * on the control. */
   htmlFor?: string;
   /** When false, the message line is not a live region: an application that
    * routes every announcement through one announcer of its own sets this and
