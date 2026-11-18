@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-11-18",
     tag: "release",
+    title: "0.37.0 — a sidebar that slides, motion presets, and a nested theme that keeps the page's geometry",
+    body: "AppShell can animate its sidebar: sidebarMotion=\"slide\" opens and closes it over 200ms, instant under reduced motion. The default, \"instant\", keeps today's markup and look. In both modes, a sidebar that closes while it holds focus hands focus to its toggle instead of the page. Motion now has three presets, feedback, move and emphasis, each a duration and an easing named by what the motion is for, and every component transition binds one. A behaviour change for apps that nest a theme: inside an element with its own data-psi-theme, widths, padding, radii and fonts now keep the page's values instead of going back to Psi's default; colours still follow the nested theme. NavTree can draw a guide line down an open group, move the current entry's bar onto it, and colour its icons apart from their text, all through tokens. NavBar brandAlign=\"sidebar\" lines the brand up with the sidebar. Eight new navigation icons come from Lucide, and the package now ships the third-party notices its icons require. 60 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-18",
+    tag: "release",
     title: "0.36.0 — a Field that wires every control, and focus that comes back",
     body: "Inside a Field, the Field's id now wins over the control's own, so a caller's id can no longer disconnect the label; set a known id on the Field with htmlFor. While the Field shows an error the control is aria-invalid, and while it is required the control is required, whatever the caller passes. Checkbox and Switch now take a Field's id, message, aria-invalid and required as Input and Select do, so spreading useFieldControl() onto them is no longer needed. The toolbar's control width now reaches the control of a top-labelled Field, so a labelled filter row is as even as an unlabelled one. A Dialog removed while open now returns focus to its opener, and a toast that held focus passes it to the next toast, then back to where it came from, instead of dropping it to the page. 60 components, 24 patterns.",
   },
