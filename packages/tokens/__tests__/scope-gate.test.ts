@@ -153,3 +153,56 @@ describe("page-scoped overrides bind no theme colour (D139)", () => {
     expect(checkOverrideScopes({ "card-bg": "var(--psi-bg-secondary)" }, await registry(), lightTheme)).toEqual([]);
   });
 });
+
+describe("a duration token reaches reduced motion (D141)", () => {
+  const registry = () => import("../src/components/registry.js").then((m) => m.componentVars);
+
+  it.each([
+    "var(--psi-duration-150)",
+    "var(--psi-duration-600)",
+    "var(--psi-motion-move-duration)",
+    "var(--psi-motion-feedback-duration)",
+  ])("accepts an override of %s", async (value) => {
+    expect(checkOverrideScopes({ "widget-open-duration": value }, { widget: {} }, lightTheme)).toEqual([]);
+    expect(checkOverrideScopes({ "toast-duration": value }, await registry(), lightTheme)).toEqual([]);
+  });
+
+  it.each([
+    "200ms",
+    "0.2s",
+    "calc(var(--psi-duration-150) * 2)",
+    "var(--psi-duration-150, 1s)",
+    "var(--psi-duration-175)",
+    "var(--psi-motion-nope-duration)",
+    "var(--psi-motion-move-ease)",
+    "var(--psi-space-8)",
+  ])("refuses an override of %s", (value) => {
+    const v = checkOverrideScopes({ "widget-open-duration": value }, { widget: {} }, lightTheme);
+    expect(v).toEqual([expect.objectContaining({ component: "widget", key: "open-duration", group: "duration", token: value })]);
+  });
+
+  it("checks a -duration key whose component Psi does not know", () => {
+    const v = checkOverrideScopes({ "my-thing-duration": "120ms" }, { widget: {} }, lightTheme);
+    expect(v).toEqual([expect.objectContaining({ group: "duration", token: "120ms" })]);
+  });
+
+  it("holds Psi's own registry to the same rule", async () => {
+    expect(checkScopes(await registry(), lightTheme).filter((v) => v.group === "duration")).toEqual([]);
+    expect(checkScopes({ widget: { "open-duration": "200ms" } }, lightTheme)).toEqual([
+      expect.objectContaining({ group: "duration", token: "200ms" }),
+    ]);
+  });
+
+  it("leaves the -ease half alone: a literal curve cannot break reduced motion", () => {
+    expect(checkOverrideScopes({ "widget-open-ease": "cubic-bezier(0, 0, 1, 1)" }, { widget: {} }, lightTheme)).toEqual([]);
+  });
+});
+
+describe("gateTheme refuses a theme whose duration would not zero (D141)", () => {
+  it("names the key, the value and the accepted forms", async () => {
+    const { gateTheme } = await import("../src/theme/gate.js");
+    const { defaultPalette, defaultSlots } = await import("../src/palettes/default.js");
+    expect(() => gateTheme("slowpoke", lightTheme, defaultPalette, defaultSlots, { "app-shell-sidebar-duration": "300ms" }))
+      .toThrow(/--psi-app-shell-sidebar-duration is 300ms.*var\(--psi-duration-<step>\).*var\(--psi-motion-<preset>-duration\)/);
+  });
+});

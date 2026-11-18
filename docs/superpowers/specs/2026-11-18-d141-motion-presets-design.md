@@ -1,6 +1,6 @@
 # Named motion presets — a duration and an easing chosen together, by intent (D141)
 
-Date: 2026-11-18. Status: **Accepted**, building on branch `d141-motion-presets`.
+Date: 2026-11-18. Status: **Implemented** on branch `d141-motion-presets`.
 
 Provenance: a consumer's sidebar trial asked for a sidebar that animates open
 and closed (D142). Before `AppShell` gets its own motion tokens, Psi names the
@@ -119,7 +119,7 @@ export const motionPresets = {
 
 Every emitter reads it: `base.css` (the tokens), `resolved/<theme>.json`
 (`scales.motion.presets`), the DTCG file (`motion.<name>.duration` and `.ease`
-as aliases `{duration.150}`, `{ease.standard}`), `guidance.json`
+as aliases `{duration.150}`, `{easing.standard}`), `guidance.json`
 (`motion.presets`, with each preset's intent), and the site's motion page.
 
 **`NavBar`'s 150 + `soft` joins `feedback`.** It is a link changing colour on
@@ -154,10 +154,11 @@ in a `transition*` or `animation*` declaration of component CSS: "bind a
 with its reason (D86). The literal-duration check stays. `motion` joins the
 other scale-family lists: `ALLOWED_GLOBAL` in the stylelint plugin,
 `SCALE_FAMILY_PREFIX` in `src/dsl/validator.ts` (a semantic token named
-`motion-*` would be shadowed by the scale lookup), `SCALE_RE` in
-`src/scope-gate.ts`, and D139's base-value list in
-`src/emit/component-scope.ts`, so a component token aliasing a preset is
-page-scoped like one aliasing a duration.
+`motion-*` would be shadowed by the scale lookup) and `SCALE_RE` in
+`src/scope-gate.ts`. D139's classifier (`src/emit/component-scope.ts`) needs no
+change: it makes a token theme-scoped only when it reaches a semantic token or
+a palette entry, so a component token aliasing a preset is page-scoped already,
+like one aliasing a duration.
 
 **The scope gate refuses a duration a theme could break reduced motion with**
 (`src/scope-gate.ts`, run by `gateTheme` and the build). A component token
@@ -195,12 +196,13 @@ this needs. A theme that wants a different time picks a step or a preset.
 - `packages/tokens/scripts/emit-utilities.ts` — preset tokens in
   `emitScaleVarsCSS`; `.psi-link` binds `feedback`; `.psi-media-tint` keeps the
   scale with a comment.
-- `packages/tokens/scripts/emit-json.ts`, `emit-dtcg.ts`, `emit-types.ts` (if it
-  lists scale tokens) — presets.
+- `packages/tokens/scripts/emit-json.ts`, `emit-dtcg.ts` — presets.
+  (`emit-types.ts` lists no scale tokens.) `packages/docs/src/types.ts` types
+  `scales.motion.presets` for the site.
 - `packages/tokens/src/guidance.ts` — `motion.presets` with intents; the
   reduced-motion line names presets.
-- `packages/tokens/src/dsl/validator.ts`, `src/scope-gate.ts`,
-  `src/emit/component-scope.ts` — `motion` scale family; the duration rule.
+- `packages/tokens/src/dsl/validator.ts`, `src/scope-gate.ts` — `motion` scale
+  family; the duration rule. `src/theme/gate.ts` — its message.
 - `tools/stylelint-plugin-psi-tokens.mjs` — `motion` prefix; the preset check.
 - 16 component stylesheets in `packages/react/src/**` — bind presets.
 - Docs: `packages/tokens/llms.txt` (Motion section), `packages/tokens/README.md`,

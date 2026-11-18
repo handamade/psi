@@ -18,10 +18,15 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 - Foreground utilities (D94): `.psi-fg-<role>` sets `color: var(--psi-fg-<role>)` for every fg token (`psi-fg-primary`, `psi-fg-secondary`, `psi-fg-tertiary`, `psi-fg-on-accent`, `psi-fg-danger`, …). Like every utility it sits in `@layer psi.utilities` and beats a component's own colour.
 - Scoped tokens bind only their declared property groups (D46): fg* → text properties, bg*/fill*/scrim* → surfaces, border* → borders, --psi-space-* → gaps/padding/margin. Cross-family bindings that are design decisions carry both scopes (fgDanger: text+border for error borders; fillAccent: surface+border for selected controls). The token build enforces component bindings; the repo's stylelint rule (psi/token-scopes) enforces first-party consumer CSS (component modules + apps/). External consumers aren't gated automatically — dist/scope-map.json carries the machine-readable scopes to lint against.
 
-## Motion (--psi-duration-*, --psi-ease-*)
-- Durations: 150/200/350/450/600ms. Easings: --psi-ease-standard, --psi-ease-in-out, --psi-ease-soft.
-- Always drive transitions/animations with duration/ease tokens; never hardcode times or curves.
-- Under prefers-reduced-motion, all --psi-duration-* zero out (D30) — no per-component opt-out needed.
+## Motion (--psi-motion-*, --psi-duration-*, --psi-ease-*)
+- Bind a preset, picked by intent (D141). Each is two tokens that alias the scale:
+  - feedback — --psi-motion-feedback-duration / -ease = 150ms, ease. A control answering a pointer or a key: colour, border, outline, a chevron's turn, a toggle's thumb.
+  - move — --psi-motion-move-duration / -ease = 200ms, --psi-ease-soft. Something entering, leaving or changing size: a dialog, a drawer, a toast, a sidebar.
+  - emphasis — --psi-motion-emphasis-duration / -ease = 350ms, ease. A deliberate change that draws the eye, such as Card's hoverLift.
+- Example: transition: color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease). A component's own motion token aliases a preset's half: --psi-app-shell-sidebar-duration: var(--psi-motion-move-duration).
+- The scale underneath: durations 150/200/350/450/600ms; easings --psi-ease-standard, --psi-ease-in-out, --psi-ease-soft. Only Skeleton's infinite pulse (D86) and .psi-media-tint (D35) bind it directly.
+- Never hardcode times or curves. Under prefers-reduced-motion, all --psi-duration-* zero out (D30), and every preset with them — no per-component opt-out needed.
+- A theme's componentOverrides value for a *-duration key must be exactly var(--psi-duration-<step>) or var(--psi-motion-<preset>-duration); the theme gate refuses anything else, so no theme can break reduced motion.
 
 ## Layout (--psi-container-max, --psi-gutter, --psi-z-*)
 - .psi-container: max-width 1312px, gutter 40px stepping to 24px under the md breakpoint.
