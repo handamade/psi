@@ -26,6 +26,7 @@ const sections: Record<TokenPage["slug"], { slug: string; text: string }[]> = {
     { slug: "focus-ring", text: "Focus ring" },
   ],
   motion: [
+    { slug: "presets", text: "Presets" },
     { slug: "durations", text: "Durations" },
     { slug: "easings", text: "Easings" },
   ],
@@ -197,8 +198,35 @@ const layoutSections = [
       <>
         <p>
           Under <code>prefers-reduced-motion: reduce</code>, every <code>--psi-duration-*</code> token resolves to{" "}
-          <code>0.01ms</code>, so anything driven by a duration token effectively stops animating. Drive transitions
-          and animations with duration tokens rather than hardcoded times.
+          <code>0.01ms</code>, so anything driven by a duration token effectively stops animating. The presets alias
+          the durations, so they stop too. Drive transitions and animations with a preset rather than hardcoded
+          times.
+        </p>
+        <HeadingAnchor level={2} id="presets">Presets</HeadingAnchor>
+        <p>
+          A preset is a duration and an easing chosen together, named by what the motion is for (D141). Each is two
+          tokens, so a component's own motion tokens can point at either half. Every transition in Psi's components
+          binds one. Pick by intent, not by speed.
+        </p>
+        <table>
+          <thead>
+            <tr><th>Preset</th><th>Tokens</th><th>Aliases</th><th>Use it when</th></tr>
+          </thead>
+          <tbody>
+            {Object.entries(r.scales.motion.presets).map(([name, p]) => (
+              <tr>
+                <td>{name}</td>
+                <td><code>{p.durationToken}</code><br /><code>{p.easeToken}</code></td>
+                <td><code>--psi-duration-{p.duration}</code><br /><code>--psi-ease-{p.ease}</code></td>
+                <td>{p.intent}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p>
+          Skeleton's infinite pulse (D86) and <code>.psi-media-tint</code> (D35) stay on the scale below. A theme's{" "}
+          <code>componentOverrides</code> value for a <code>*-duration</code> token must be a duration token or a
+          preset's duration, so no theme can opt out of reduced motion.
         </p>
         <HeadingAnchor level={2} id="durations">Durations</HeadingAnchor>
         <p>{r.scales.motion.durations.map((d) => <code class="token-chip">--psi-duration-{d}</code>)}</p>
