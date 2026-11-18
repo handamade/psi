@@ -131,6 +131,18 @@ try {
     note(existsSync(join(dir, "node_modules", pkg, "LICENSE")), `LICENSE present in ${pkg}`);
   }
 
+  // ── D137: the third-party icon notice ships in psi-react. npm packs LICENSE
+  // whatever `files` says, but not this file; a `files` edit that drops it
+  // would publish Lucide's and Feather's work without their notices.
+  // Releases before 0.37.0 predate the notice, so bisecting one skips this.
+  const [maj, min] = installed.version.split(".").map(Number);
+  if (maj > 0 || min >= 37) {
+    note(
+      existsSync(join(dir, "node_modules", REACT_PKG, "THIRD-PARTY-NOTICES.md")),
+      `THIRD-PARTY-NOTICES.md present in ${REACT_PKG}`,
+    );
+  }
+
   // ── Every export target resolves through the published `exports` map ──
   // Resolution goes through `import.meta.resolve`, not `createRequire().resolve`.
   // The require path honours only the `require` condition, so an import-only
