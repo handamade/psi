@@ -40,6 +40,8 @@ const cases: Array<[string, React.ReactElement]> = [
   ["AspectRatio", <AspectRatio ratio={16 / 10}><img alt="demo" src="x.png" /></AspectRatio>],
   ["Input", <label>Name<Input size={32} /></label>],
   ["Input error", <label>Email<Input size={32} error aria-invalid="true" /></label>],
+  ["Checkbox in an invalid, labelled Field (D135)", <Field label="Notifications" error="Choose one." required><Checkbox>Email me weekly</Checkbox></Field>],
+  ["Switch in an invalid, labelled Field (D135)", <Field label="Notifications" error="Choose one."><Switch>Email me weekly</Switch></Field>],
   ["Checkbox group in error", <Field group label="Notify me" error="Pick at least one."><Checkbox>Email</Checkbox><Checkbox>SMS</Checkbox></Field>],
   ["Field with its label beside its control", <Field label="Rows per page" labelPosition="start"><Select size={32}><option>50</option></Select></Field>],
   ["FieldStack with side labels", <FieldStack labelPosition="start"><Field label="Name" required><Input /></Field><Field group label="Status" error="Pick one."><RadioGroup value="a" onValueChange={() => {}}><Radio value="a">Active</Radio><Radio value="b">Blocked</Radio></RadioGroup></Field><Field><Checkbox>Notify the owner</Checkbox></Field></FieldStack>],

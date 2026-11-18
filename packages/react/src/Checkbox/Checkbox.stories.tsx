@@ -64,3 +64,18 @@ export const InvalidGroup: Story = {
     </Field>
   ),
 };
+
+/** D135: in a Field that is not a group, the box is the Field's control. The Field's label
+ * and its own name it, the Field's message describes it, and the Field's error makes it invalid. */
+export const InAField: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 24 }}>
+      <Field label="Notifications" error="Choose how we reach you." required>
+        <Checkbox>Email me weekly</Checkbox>
+      </Field>
+      <Field error="You must accept the terms.">
+        <Checkbox>I accept the terms</Checkbox>
+      </Field>
+    </div>
+  ),
+};

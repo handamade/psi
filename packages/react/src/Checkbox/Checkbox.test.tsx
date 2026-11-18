@@ -157,9 +157,14 @@ describe("Checkbox in error (D108)", () => {
     for (const box of screen.getAllByRole("checkbox")) expect(box).not.toHaveAttribute("aria-invalid");
   });
 
-  it("keeps an aria-invalid the consumer passes", () => {
+  it("the group Field's aria-invalid beats the consumer's false (D135 reverses D108 here)", () => {
     group("Pick at least one.", { "aria-invalid": false });
-    expect(screen.getByRole("checkbox", { name: "Email" })).toHaveAttribute("aria-invalid", "false");
+    expect(screen.getByRole("checkbox", { name: "Email" })).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("keeps the consumer's aria-invalid while the group Field is valid", () => {
+    group(undefined, { "aria-invalid": true });
+    expect(screen.getByRole("checkbox", { name: "Email" })).toHaveAttribute("aria-invalid", "true");
   });
 
   it("draws the error outline on an unchecked, aria-invalid box", () => {
@@ -167,5 +172,41 @@ describe("Checkbox in error (D108)", () => {
     const rule =
       /\.input\[aria-invalid="true"\]:not\(:checked\):not\(:indeterminate\)\s*\+\s*\.indicator\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
     expect(rule).toMatch(/border-color:\s*var\(--psi-checkbox-box-border-error\)/);
+  });
+});
+
+describe("Checkbox in a Field that is not a group (D135)", () => {
+  it("is named by the Field's label and its own, described by the message, invalid and required", () => {
+    render(
+      <Field label="Notifications" error="Choose one." required>
+        <Checkbox>Email me weekly</Checkbox>
+      </Field>,
+    );
+    const box = screen.getByRole("checkbox", { name: /^Notifications.*Email me weekly$/ });
+    expect(box).toHaveAttribute("aria-describedby", screen.getByText("Choose one.").id);
+    expect(box).toHaveAttribute("aria-invalid", "true");
+    expect(box).toBeRequired();
+  });
+
+  it("without a Field label keeps its own name and still takes the message", () => {
+    render(
+      <Field error="You must accept the terms.">
+        <Checkbox>I accept the terms</Checkbox>
+      </Field>,
+    );
+    const box = screen.getByRole("checkbox", { name: "I accept the terms" });
+    expect(box).toHaveAccessibleDescription("You must accept the terms.");
+    expect(box).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("in a valid Field is neither invalid nor required", () => {
+    render(
+      <Field label="Notifications" description="Weekly.">
+        <Checkbox>Email me weekly</Checkbox>
+      </Field>,
+    );
+    const box = screen.getByRole("checkbox");
+    expect(box).not.toHaveAttribute("aria-invalid");
+    expect(box).not.toBeRequired();
   });
 });

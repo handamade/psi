@@ -1,6 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Switch } from "./Switch.js";
+import { Field } from "../Field/Field.js";
 
 const meta: Meta<typeof Switch> = {
   title: "Components/Switch",
@@ -33,6 +34,18 @@ export const States: Story = {
       <Switch defaultChecked>On</Switch>
       <Switch disabled>Disabled off</Switch>
       <Switch disabled defaultChecked>Disabled on</Switch>
+    </div>
+  ),
+};
+
+/** D135: in a Field that is not a group, the switch is the Field's control. The Field's label
+ * and its own name it, the Field's message describes it, and the Field's error makes it invalid. */
+export const InAField: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 24 }}>
+      <Field label="Notifications" error="Choose how we reach you." required>
+        <Switch>Email me weekly</Switch>
+      </Field>
     </div>
   ),
 };
