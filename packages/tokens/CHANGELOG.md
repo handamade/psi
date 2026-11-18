@@ -1,5 +1,25 @@
 # @handamade/psi-tokens
 
+## 0.36.0
+
+### Minor Changes
+
+- 4c99abe: A `Field` wires every control the same way (D135).
+
+  - **Inside a `Field`, the Field's `id` wins over the control's own.** This changes which `id` wins: until now a caller's `id` on an `Input`, `Select` or `Textarea` beat the Field's and silently disconnected the label, so the control had no name. Now the control always takes the id the `<label for>` points at, and the caller's is not used. To give a control a known id, set it on the Field: `<Field htmlFor="email">`. In development the control warns once when a caller's `id` differs.
+  - **While the Field has an error, the control is `aria-invalid`; while it is required, the control is `required`,** whatever the caller passes. A caller's `aria-invalid={false}` no longer hides an error that is on screen. While the Field sets neither, a caller's own `aria-invalid` or `required` still stands. `aria-describedby` is joined, as before.
+  - **This includes a `Checkbox` in a group `Field`:** a caller's `aria-invalid={false}` on one box in an invalid group no longer clears it (it did since D108).
+  - **`Checkbox` and `Switch` take a `Field`'s wiring outside group mode,** as `Input` and `Select` do: its id, its message in `aria-describedby`, `aria-invalid` and `required`. They are named by the Field's label and their own, e.g. "Notifications Email me weekly", and described by the Field's error or description. A Field without a label leaves the box's own name. In a group Field they take `aria-invalid` only, `Switch` now as `Checkbox` does. Spreading `useFieldControl()` onto a box is no longer needed. That spread replaced the box's own name with the Field's label.
+  - **`--psi-toolbar-control-width` reaches the control of a top-labelled `Field`** that is a direct `Toolbar` child (an `Input`, a `Select` or a `Combobox`), as it reaches a bare control. A labelled filter row is now as even as an unlabelled one: the `filter-form` and `date-range-filter` presets' controls go from their content width (about 172, 80 and 141px) to 200px. A Field's `controlWidth` replaces the token. A side-labelled Field (`labelPosition="start"`, such as "Rows per page") keeps its content width. `Field` marks its root with `data-psi-field`.
+
+### Patch Changes
+
+- d2828e6: Focus no longer drops to the page when a `Dialog` or a focused toast goes away (D136).
+
+  - **`Dialog` removed while open.** `{open && <Dialog open />}` removes the dialog on every dismissal, and the platform returns focus to the opener only on `close()`. Unmounting an open `Dialog` now closes it first, so focus returns to the opener as it does for `open={false}`. Nothing is reported through `onClose`.
+  - **A toast that held focus.** When a focused toast leaves, however it leaves (its dismiss button, a timer, eviction past `limit`, `clear()`, `dismiss(id)`, or a stack composed by hand), `ToastRegion` hands focus to the toast now at its position (its dismiss button, else its first control; the new last if it was last). Once the stack is empty, focus goes back to the element focused before focus entered the region, and to the region itself if that element is gone. A mouse click on a dismiss button goes back first, so focus left in the stack never holds the timers paused. Focus the user moved elsewhere is left alone.
+  - `ToastRegion` now has `tabindex="-1"` (focusable by script, never in the Tab order) and shows the focus ring on `:focus-visible`, from a new `--psi-toast-focus-ring` token bound to `--psi-border-focus`. `Toast`'s dismiss button carries `data-psi-toast-dismiss`.
+
 ## 0.35.0
 
 ### Minor Changes
