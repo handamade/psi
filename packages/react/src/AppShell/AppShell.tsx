@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
 import styles from "./app-shell.module.css";
 
@@ -23,8 +24,25 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
    * `aria-expanded` and this to one piece of state. Closed, the sidebar is
    * `hidden`, so it leaves the layout and the accessibility tree, and stays in
    * the DOM so the toggle's `aria-controls` keeps naming an element (D88).
+   * If focus is inside the sidebar when it closes, it moves to the toggle whose
+   * `aria-controls` names the sidebar, or to `main` when there is none (D142).
    * @default true */
   sidebarOpen?: boolean;
+  /** How the sidebar opens and closes (D142). `"instant"` shows and hides it at
+   * once, as before. `"slide"` runs its column to 0 and back, fading it, with
+   * main's corner following, over `--psi-app-shell-sidebar-duration` and
+   * `--psi-app-shell-sidebar-ease`, which alias the `move` motion preset
+   * (200ms, `--psi-ease-soft`); `prefers-reduced-motion` makes it instant. The
+   * prop never takes a time: retime it with those two tokens.
+   *
+   * Closed under `"slide"`, the sidebar is `visibility: hidden` rather than
+   * `hidden`: it leaves the tab order and the accessibility tree when the close
+   * ends, and is reachable as soon as an open starts. Its content sits in one
+   * inner `<div>` that scrolls, held at the sidebar's width so nothing reflows
+   * while the column moves: code that scrolls the sidebar must scroll that
+   * wrapper, not the element with `sidebarId`. With no `sidebar` content it is
+   * the instant frame. @default "instant" */
+  sidebarMotion?: "instant" | "slide";
   /** A theme name for the sidebar alone, such as `"dark"`: sets
    * `data-psi-theme` on the sidebar element, so every token inside re-resolves
    * under that theme while the rest of the page keeps its own (D88). The
@@ -51,6 +69,8 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
  * not a tab stop; focused by the skip link it draws the shared focus ring
  * inside its box. A closed sidebar is `hidden`, not narrowed to icons; there is
  * no responsive drawer and no stored open state, so this is a desktop frame.
+ * `sidebarMotion="slide"` animates the open and close instead: the column runs
+ * to 0 over the `move` motion preset (D142).
  * A page whose document must scroll as a whole does not use `AppShell`. Mount it
  * at the root of the page with no margin or padding around it: it is `100dvh`
  * tall, so anything around it makes the document scroll and slides the frame.
@@ -88,6 +108,7 @@ export function AppShell({
   banner,
   children,
   sidebarOpen = true,
+  sidebarMotion = "instant",
   sidebarTheme,
   sidebarId = "sidebar",
   mainId = "main",
@@ -97,17 +118,49 @@ export function AppShell({
 }: AppShellProps) {
   // No sidebar content is the same layout as a closed one: no empty column.
   const showSidebar = sidebarOpen && sidebar != null;
-  const cls = [styles.appShell, !showSidebar && styles.sidebarClosed, className].filter(Boolean).join(" ");
+  // D142: sliding needs a column to slide; with no content it is the instant frame.
+  const slide = sidebarMotion === "slide" && sidebar != null;
+  const cls = [styles.appShell, slide && styles.slide, !showSidebar && styles.sidebarClosed, className]
+    .filter(Boolean)
+    .join(" ");
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+
+  // D142: a sidebar that closes around focus hands it on, in both modes, before
+  // it is hidden; otherwise the browser drops it to <body>. First choice is the
+  // toggle that names the sidebar with aria-controls (D88 asks for one), else
+  // main, the skip link's target. Content that goes away (sidebar to null)
+  // removes the focused node before any effect runs, as in D136; not handled.
+  useLayoutEffect(() => {
+    if (showSidebar) return;
+    const aside = sidebarRef.current;
+    const doc = aside?.ownerDocument;
+    const active = doc?.activeElement;
+    if (!aside || !active || !aside.contains(active)) return;
+    const toggle = [...doc.querySelectorAll<HTMLElement>("[aria-controls]")].find(
+      (el) =>
+        !aside.contains(el) &&
+        (el.getAttribute("aria-controls") ?? "").split(/\s+/).includes(sidebarId) &&
+        !el.matches(":disabled"),
+    );
+    (toggle ?? mainRef.current)?.focus();
+  }, [showSidebar, sidebarId]);
   // The rounded corner needs both a header and a sidebar beside it (D110).
   const mainCls = [styles.main, (!showSidebar || header == null) && styles.mainSquare].filter(Boolean).join(" ");
   return (
     <div ref={ref} className={cls} {...rest}>
       {skipLink}
       {header != null && <div className={styles.header}>{header}</div>}
-      <div id={sidebarId} className={styles.sidebar} hidden={!showSidebar} data-psi-theme={sidebarTheme}>
-        {sidebar}
+      <div
+        ref={sidebarRef}
+        id={sidebarId}
+        className={styles.sidebar}
+        hidden={slide ? undefined : !showSidebar}
+        data-psi-theme={sidebarTheme}
+      >
+        {slide ? <div className={styles.sidebarInner}>{sidebar}</div> : sidebar}
       </div>
-      <main id={mainId} className={mainCls} tabIndex={-1}>
+      <main ref={mainRef} id={mainId} className={mainCls} tabIndex={-1}>
         {banner != null && <div className={styles.banner}>{banner}</div>}
         {children}
       </main>

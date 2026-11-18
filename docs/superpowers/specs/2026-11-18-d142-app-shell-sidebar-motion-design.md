@@ -1,7 +1,6 @@
 # The `AppShell` sidebar opens and closes with motion, on request (D142)
 
-Date: 2026-11-18. Status: **Accepted**, building after D141 on branch
-`d141-motion-presets` (a second PR).
+Date: 2026-11-18. Status: **Implemented** on branch `d142-sidebar-motion`, after D141.
 
 Provenance: a consumer's sidebar trial asked for a sidebar that animates open
 and closed. A consumer lab measured an approach with its own CSS (`#sidebar`,
@@ -192,8 +191,8 @@ closes at once; `visibility` still flips at the (now immediate) end.
 - `packages/react/src/AppShell/app-shell.module.css` — the slide rules.
 - `packages/react/src/AppShell/AppShell.test.tsx` — markup in both modes, the
   focus move, `sidebar == null`.
-- `packages/react/src/AppShell/AppShell.stories.tsx` — a `Sliding` story with
-  a toggle.
+- `packages/react/src/AppShell/AppShell.stories.tsx` — `Sliding` and
+  `SlidingClosed`, with the Menu toggle.
 - `apps/storybook/vr/app-shell.interaction.spec.ts` — the column mid-close, the
   closed state's visibility and tab order, the focus move, RTL, reduced motion.
 - `packages/tokens/__tests__/app-shell-tokens.test.ts` — the two tokens.
@@ -202,7 +201,7 @@ closes at once; `visibility` still flips at the (now immediate) end.
 ## Verification
 
 - The five gates, `check-docs-drift` and `test:site` included.
-- `vr` in CI: the new `Sliding` story adds baselines. Every existing `AppShell`
+- `vr` in CI: the new `Sliding` and `SlidingClosed` stories add baselines. Every existing `AppShell`
   story is `"instant"` and must not move. Show the user the new renders before
   committing them.
 

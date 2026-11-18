@@ -41,7 +41,13 @@
  *
  * D140 — sidebar-padding insets the sidebar's tree, 8px, which was hardcoded in
  * app-shell.module.css. A token now, so a NavBar's brand column
- * (--psi-navbar-brand-inset) follows it to the sidebar's icon column. */
+ * (--psi-navbar-brand-inset) follows it to the sidebar's icon column.
+ *
+ * D142 — sidebar-duration and sidebar-ease time the sidebar's open and close
+ * under `sidebarMotion="slide"`: the column, the fade, main's corner. They alias
+ * D141's `move` preset (200ms, --psi-ease-soft), so prefers-reduced-motion
+ * zeroes them, and the theme gate holds a theme's duration to a step or a
+ * preset. Page-scoped: a sidebar sub-theme keeps the page's timing. */
 export const appShellVars: Record<string, string> = {
   "sidebar-width": "16rem",
   "sidebar-padding": "var(--psi-space-8)",
@@ -49,6 +55,8 @@ export const appShellVars: Record<string, string> = {
   "sidebar-fg": "var(--psi-fg-primary)",
   "sidebar-border": "var(--psi-border-faint)",
   "sidebar-border-width": "0",
+  "sidebar-duration": "var(--psi-motion-move-duration)",
+  "sidebar-ease": "var(--psi-motion-move-ease)",
   "focus-ring": "var(--psi-border-focus)",
   bg: "transparent",
   "main-bg": "transparent",
