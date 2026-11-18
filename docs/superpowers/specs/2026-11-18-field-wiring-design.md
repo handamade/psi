@@ -207,8 +207,22 @@ tree over CDP, on markup rendered by the real components.
 - **`toolbar-control-width.interaction.spec.ts` (`@interaction`), Chromium:**
   - `filter-toolbar` stays 200 and 200;
   - `filter-form` and `date-range-filter` measure 200 for each control;
-  - the pager presets' page-size `Select` keeps its natural width;
-  - a `controlWidth` Field in a Toolbar row keeps its step.
+  - the pager presets' page-size `Select` keeps its natural width.
+  - A `controlWidth` Field is excluded by name in the rule, which
+    `Toolbar.test.tsx` reads. `field-control-width.interaction.spec.ts`
+    already measures a sized Field in a Toolbar row; no story has a
+    top-labelled sized Field in one.
+
+## As built
+
+- One internal hook, `Field/useFieldWiring.ts`, computes `id`, `required`,
+  `aria-invalid` and `aria-describedby`. Each control spreads it after the
+  caller's props. It is not exported: `useFieldControl` stays the public way
+  for a control Psi did not write.
+- New stories: `Checkbox` "In a Field" (a labelled Field in error, and an
+  unlabelled one) and `Switch` "In a Field".
+- Every `@interaction` spec passes locally in Chromium: 640 checks, the new
+  ones included.
 - **`field-wiring.interaction.spec.ts` (`@interaction`), Chromium:** the new
   `Checkbox` story "In a Field" exposes the box named "Notifications Email me
   weekly", described by the Field's error, and invalid.

@@ -47,7 +47,10 @@ const alignClass: Record<NonNullable<ToolbarProps["align"]>, string | undefined>
  * overflow; zero JS. Deliberately NOT ARIA role="toolbar" — that role
  * contracts roving-tabindex arrow-key navigation, wrong for form controls.
  * With aria-label it announces as role="group"; as a form, as a named form
- * landmark instead (D87). */
+ * landmark instead (D87). A bare Input, Select or Combobox child takes
+ * `--psi-toolbar-control-width` (200px), and so does the control of a
+ * top-labelled Field child without `controlWidth` (D135); a side-labelled
+ * Field keeps its content width. */
 export function Toolbar({ gap = 8, align = "center", as = "div", className, children, ref, ...rest }: ToolbarProps) {
   const cls = [styles.toolbar, gapClass[gap], alignClass[align], className]
     .filter(Boolean)
