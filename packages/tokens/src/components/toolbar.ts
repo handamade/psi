@@ -17,9 +17,10 @@
  * line of a `Toolbar align="start"` row: a Field's control starts one label
  * line and one field gap below the Field's top. It is derived from Field's
  * own tokens rather than restated, so the two cannot drift. The calc()
- * resolves where it is declared, `:where(:root, [data-psi-theme])`: retuning
- * --psi-field-label-height or --psi-field-gap there moves the button too;
- * retuning either on a narrower scope needs this token set on that scope.
+ * resolves where it is declared: at `:root`, being geometry (D139), and in a
+ * theme whose componentOverrides retune --psi-field-label-height or
+ * --psi-field-gap, which declares it again beside them. Retuning either by
+ * hand on a narrower scope needs this token set on that scope.
  * Bound to margin-block-start in toolbar.module.css (Toolbar CSS may read
  * only --psi-toolbar-* and the scales, so it reads Field through this).
  */

@@ -73,10 +73,14 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
  * `max-inline-size` itself: `.psi-container` would add a gutter of its own.
  * The sidebar draws a line on its inline-end edge when
  * `--psi-app-shell-sidebar-border-width` is `1px`; it is `0` by default, and
- * its colour is `--psi-app-shell-sidebar-border` (D114). Under `sidebarTheme`
- * the sidebar re-declares every component token, so set the width in that
- * theme's `componentOverrides`, not on the shell's root, or for a built-in theme
- * in a rule of your own on the sidebar element. */
+ * its colour is `--psi-app-shell-sidebar-border` (D114). Geometry set on the
+ * shell's root, in the page's theme or at `:root` reaches a sidebar or header
+ * under its own theme: a sub-theme declares only colour tokens again (D139).
+ *
+ * `<NavBar brandAlign="sidebar">` in `header` lines its brand up with the
+ * sidebar: the brand spans the sidebar's width and a leading 32px `IconButton`
+ * with a 16px icon puts it on the sidebar's icon column (D140). The sidebar
+ * insets its tree by `--psi-app-shell-sidebar-padding`, 8px. */
 export function AppShell({
   skipLink,
   header,

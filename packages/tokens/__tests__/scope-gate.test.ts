@@ -124,3 +124,32 @@ describe("scope gate (D46)", () => {
     expect(v).toHaveLength(1);
   });
 });
+
+describe("page-scoped overrides bind no theme colour (D139)", () => {
+  // Imported here so this block reads on its own; the registry is the real one.
+  const registry = () => import("../src/components/registry.js").then((m) => m.componentVars);
+
+  it.each([
+    ["app-shell-sidebar-width", "var(--psi-fg-primary)", "fgPrimary"],
+    ["control-radius", "calc(var(--psi-radius-8) + 0px * var(--psi-border-faint))", "borderFaint"],
+    ["media-tint", "drop-shadow(0 0 4px var(--psi-palette-sapphire))", "--psi-palette-sapphire"],
+    ["navbar-blur", "var(--psi-navbar-fg)", "fgPrimary"],
+  ])("refuses %s: %s", async (key, value, token) => {
+    const violations = checkOverrideScopes({ [key]: value }, await registry(), lightTheme);
+    expect(violations).toContainEqual(expect.objectContaining({ group: "page", token }));
+  });
+
+  it.each([
+    ["app-shell-sidebar-width", "18rem"],
+    ["control-radius", "var(--psi-radius-4)"],
+    ["navbar-gutter", "var(--psi-space-16)"],
+    ["button-radius", "var(--psi-control-radius)"],
+    ["media-tint", "grayscale(1)"],
+  ])("accepts %s: %s", async (key, value) => {
+    expect(checkOverrideScopes({ [key]: value }, await registry(), lightTheme)).toEqual([]);
+  });
+
+  it("leaves a colour key to the D46 check: a colour there is the point", async () => {
+    expect(checkOverrideScopes({ "card-bg": "var(--psi-bg-secondary)" }, await registry(), lightTheme)).toEqual([]);
+  });
+});

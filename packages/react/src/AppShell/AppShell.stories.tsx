@@ -5,6 +5,11 @@ import { AppShell } from "./AppShell.js";
 import { SkipLink } from "../SkipLink/SkipLink.js";
 import { NavBar } from "../NavBar/NavBar.js";
 import { Button } from "../Button/Button.js";
+import { IconButton } from "../IconButton/IconButton.js";
+import { IconMenu } from "../icons/IconMenu.js";
+import { IconSettings } from "../icons/IconSettings.js";
+import { IconUser } from "../icons/IconUser.js";
+import { IconSearch } from "../icons/IconSearch.js";
 import { Banner } from "../Banner/Banner.js";
 import { NavTree } from "../NavTree/NavTree.js";
 import { NavGroup } from "../NavTree/NavGroup.js";
@@ -40,6 +45,7 @@ function Demo({
   headerText,
   banner,
   plainSidebar,
+  brandAligned,
 }: {
   initialOpen: boolean;
   shellStyle?: CSSProperties;
@@ -48,6 +54,9 @@ function Demo({
   banner?: ReactNode;
   /** Leave the sidebar on the page's theme, where a line sets it apart (D114). */
   plainSidebar?: boolean;
+  /** D140: an icon Menu toggle and a brand that line up with the sidebar, and
+   * icons on the sidebar's entries. */
+  brandAligned?: boolean;
 }) {
   const [open, setOpen] = useState(initialOpen);
   const [reports, setReports] = useState(true);
@@ -62,8 +71,23 @@ function Demo({
       header={
         <NavBar
           fluid
+          brandAlign={brandAligned ? "sidebar" : undefined}
           {...headerProps}
           brand={
+            brandAligned ? (
+              <>
+                <IconButton
+                  variant="ghost"
+                  aria-label="Menu"
+                  aria-expanded={open}
+                  aria-controls="sidebar"
+                  onClick={() => setOpen((o) => !o)}
+                >
+                  <IconMenu size={16} />
+                </IconButton>
+                <a href="#overview">Acme</a>
+              </>
+            ) : (
             <>
               <Button
                 variant="ghost"
@@ -76,6 +100,7 @@ function Demo({
               </Button>
               <a href="#overview">Acme</a>
             </>
+            )
           }
           actions={
             <>
@@ -89,10 +114,15 @@ function Demo({
       }
       sidebar={
         <NavTree aria-label="Main">
-          <NavItem>
+          <NavItem icon={brandAligned ? <IconSearch /> : undefined}>
             <a href="#overview">Overview</a>
           </NavItem>
-          <NavGroup label="Reports" open={reports} onOpenChange={setReports}>
+          <NavGroup
+            label="Reports"
+            icon={brandAligned ? <IconUser /> : undefined}
+            open={reports}
+            onOpenChange={setReports}
+          >
             <NavItem>
               <a href="#sales" aria-current="page">
                 Sales
@@ -102,7 +132,12 @@ function Demo({
               <a href="#traffic">Traffic</a>
             </NavItem>
           </NavGroup>
-          <NavGroup label="Settings" open={settings} onOpenChange={setSettings}>
+          <NavGroup
+            label="Settings"
+            icon={brandAligned ? <IconSettings /> : undefined}
+            open={settings}
+            onOpenChange={setSettings}
+          >
             <NavItem>
               <a href="#profile">Profile</a>
             </NavItem>
@@ -154,6 +189,16 @@ const frameHeader = {
 export const Frame: Story = {
   render: () => (
     <Demo initialOpen shellStyle={frameStyle} headerProps={frameHeader} headerText="Signed in as Ada" />
+  ),
+};
+
+/** D140 — `brandAlign="sidebar"` on the `NavBar`: the Menu toggle's icon sits
+ * on the sidebar's icon column and the brand spans the sidebar's width, under
+ * the header's own dark theme. The header reads the page's sidebar width
+ * through the sub-theme (D139). */
+export const BrandAligned: Story = {
+  render: () => (
+    <Demo initialOpen brandAligned shellStyle={frameStyle} headerProps={frameHeader} headerText="Signed in as Ada" />
   ),
 };
 

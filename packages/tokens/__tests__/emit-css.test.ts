@@ -89,6 +89,20 @@ describe("emitThemeCSS", () => {
     expect(css).toContain("--psi-button-font: var(--psi-text-mono-15-24-regular);");
   });
 
+  it("re-declares, in the overrides block, the page-scoped aliases an override reaches (D139)", () => {
+    const css = emitThemeCSS("dusk", { bgPrimary: token({ from: slot.canvas }) },
+      { duskCanvas: { l: 0.2, c: 0.01, h: 250 } },
+      { ink: "duskCanvas", canvas: "duskCanvas", accent: "duskCanvas", success: "duskCanvas", warning: "duskCanvas", danger: "duskCanvas" },
+      "dark",
+      { componentOverrides: { "control-radius": "3px" } });
+    const block = css.slice(css.indexOf(`[data-psi-theme="dusk"] {`, css.indexOf("@layer psi.components")));
+    expect(block).toContain("--psi-control-radius: 3px;");
+    expect(block).toContain("--psi-button-radius: var(--psi-control-radius);");
+    expect(block).toContain("--psi-tooltip-radius: min(var(--psi-control-radius), var(--psi-radius-6));");
+    expect(block).not.toContain("--psi-button-24-height");
+    expect(block.indexOf("--psi-control-radius: 3px;")).toBeLessThan(block.indexOf("--psi-button-radius"));
+  });
+
   describe("color-scheme (D116)", () => {
     /** The body of the theme's token block: from its selector to its closing brace. */
     const block = (css: string, selector: string) => {
