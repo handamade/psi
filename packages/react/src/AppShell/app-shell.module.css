@@ -32,8 +32,9 @@
   min-height: 0;
   overflow: auto;
   /* The sidebar is a panel: its tree sits inset, so a current item's surface
-     stops short of the edge instead of running into it. */
-  padding: var(--psi-space-8);
+     stops short of the edge instead of running into it. A token since D140, so
+     a NavBar's brand column follows it. */
+  padding: var(--psi-app-shell-sidebar-padding);
   background: var(--psi-app-shell-sidebar-bg);
   color: var(--psi-app-shell-sidebar-fg);
   /* D114: a line for a sidebar that shares the page's background. Width 0 by

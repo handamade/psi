@@ -23,6 +23,17 @@
 .fluid { padding-inline: var(--psi-navbar-gutter); }
 
 .brand { display: flex; align-items: center; }
+
+/* D140: the brand slot spans an AppShell sidebar's column. It starts at
+ * brand-inset from the bar's edge (the row's gutter is undone, so the margin is
+ * negative when the gutter is the wider), and ends at brand-width, the sidebar's
+ * width. Logical properties, so it mirrors in right-to-left. Nothing clips a
+ * wider brand: it runs into the row's gap, and no focus ring is cut. */
+.brandSidebar .brand {
+  flex: none;
+  margin-inline-start: calc(var(--psi-navbar-brand-inset) - var(--psi-navbar-gutter));
+  inline-size: calc(var(--psi-navbar-brand-width) - var(--psi-navbar-brand-inset));
+}
 .links {
   display: flex;
   align-items: center;

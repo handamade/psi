@@ -443,3 +443,71 @@ test("at width 1px the sidebar draws a faint line on its inline-end edge, which 
   expect(rtl.leftColor).toBe(rtl.faint);
   expect(rtl.right).toBe("0px");
 });
+
+/* D139 — a sub-theme keeps the page's geometry. */
+
+test("a sidebar under its own theme takes a border width set on the shell's root @interaction", async ({ page }) => {
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const root = page.locator("#storybook-root [class*='appShell']").first();
+  await root.evaluate((el: HTMLElement) => el.style.setProperty("--psi-app-shell-sidebar-border-width", "1px"));
+  const sidebar = page.locator("#sidebar");
+  expect(await sidebar.getAttribute("data-psi-theme")).toBe("dark");
+  expect(await sidebar.evaluate((el) => getComputedStyle(el).borderRightWidth)).toBe("1px");
+});
+
+/* D140 — NavBar brandAlign="sidebar". */
+
+const ALIGNED = "components-appshell--brand-aligned";
+
+/** The Menu toggle's icon, the first sidebar entry's icon, the brand slot and
+ * the sidebar, in viewport pixels. */
+const brandColumn = (page: Page) =>
+  page.evaluate(() => {
+    const box = (el: Element | null) => {
+      if (!el) throw new Error("missing element");
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right };
+    };
+    const header = document.querySelector("header")!;
+    const menu = header.querySelector('button[aria-label="Menu"] svg');
+    return {
+      menuIcon: box(menu),
+      sidebarIcon: box(document.querySelector("#sidebar nav svg")),
+      brand: box(menu!.closest("button")!.parentElement),
+      sidebar: box(document.querySelector("#sidebar")),
+      headerTheme: header.getAttribute("data-psi-theme"),
+    };
+  });
+
+test("the Menu icon sits on the sidebar's icon column and the brand ends at the sidebar's edge, in both directions @interaction", async ({ page }) => {
+  await page.goto(story(ALIGNED), { waitUntil: "networkidle" });
+  const ltr = await brandColumn(page);
+  expect(ltr.headerTheme).toBe("dark");
+  expect(ltr.menuIcon.left).toBe(ltr.sidebarIcon.left);
+  expect(ltr.sidebarIcon.left - ltr.sidebar.left).toBe(20);
+  expect(ltr.brand.right).toBe(ltr.sidebar.right);
+
+  await page.evaluate(() => document.documentElement.setAttribute("dir", "rtl"));
+  const rtl = await brandColumn(page);
+  expect(rtl.menuIcon.right).toBe(rtl.sidebarIcon.right);
+  expect(rtl.sidebar.right - rtl.sidebarIcon.right).toBe(20);
+  expect(rtl.brand.left).toBe(rtl.sidebar.left);
+});
+
+test("a header under its own theme follows a sidebar width set at the root @interaction", async ({ page }) => {
+  await page.goto(story(ALIGNED), { waitUntil: "networkidle" });
+  await page.evaluate(() => document.documentElement.style.setProperty("--psi-app-shell-sidebar-width", "20rem"));
+  const c = await brandColumn(page);
+  expect(c.sidebar.right - c.sidebar.left).toBe(320);
+  expect(c.brand.right).toBe(c.sidebar.right);
+  expect(c.menuIcon.left).toBe(c.sidebarIcon.left);
+});
+
+test("the brand keeps its place when the sidebar closes, so the toggle does not move @interaction", async ({ page }) => {
+  await page.goto(story(ALIGNED), { waitUntil: "networkidle" });
+  const button = page.locator('header button[aria-label="Menu"]');
+  const before = await button.boundingBox();
+  await button.click();
+  await expect(page.locator("#sidebar")).toBeHidden();
+  expect(await button.boundingBox()).toEqual(before);
+});

@@ -12,6 +12,7 @@ Top navigation bar with brand, nav-link, and trailing-action slots. Plain text i
 | `children` | `ReactNode` | — | no | Nav links. The `<nav>` renders only when there are children, so a bar with a brand and actions and no links has no empty landmark (D88). |
 | `navLabel` | `string` | — | no | Accessible name of the links' `<nav>` (its `aria-label`). Rest props land on the `<header>`, so this is the only way to label the `<nav>` (D88). |
 | `fluid` | `boolean` | false | no | Lay the row out at full width: it drops `psi-container` (the centred max-width column) and keeps the `--psi-gutter` side padding. For an application header over a full-width frame (D88). |
+| `brandAlign` | `"sidebar"` | — | no | Line the brand slot up with an `AppShell` sidebar (D140). With `"sidebar"` the row is laid out `fluid`, and the brand slot spans the sidebar's width (`--psi-navbar-brand-width`, the sidebar's `--psi-app-shell-sidebar-width`) from `--psi-navbar-brand-inset` (12px), so a leading 32px `IconButton` holding a 16px icon, such as a Menu toggle with `<IconMenu size={16} />`, puts its icon on the column where the sidebar's `NavTree` icons start. The links or actions then start where the page in `main` starts. The brand keeps its width when the sidebar is closed, so the toggle does not move under the pointer. Logical properties: it mirrors in right-to-left. |
 | `ref` | `Ref<HTMLElement>` | — | no | Forwarded ref to the header element. |
 | `className` | `string` | — | no | Additional CSS class name(s) merged onto the component's root element. |
 

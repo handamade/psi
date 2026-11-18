@@ -109,3 +109,31 @@ describe("D111", () => {
     expect(css).toContain("color: var(--psi-navbar-fg);");
   });
 });
+
+describe("D140", () => {
+  it('brandAlign="sidebar" lays the row out fluid and marks the bar', () => {
+    render(
+      <NavBar brandAlign="sidebar" brand={<a href="/">DK</a>}>
+        <a href="#work">Work</a>
+      </NavBar>,
+    );
+    const inner = screen.getByRole("navigation").parentElement;
+    expect(inner).not.toHaveClass("psi-container");
+    expect(inner?.className).toMatch(/fluid/);
+    expect(screen.getByRole("banner").className).toMatch(/brandSidebar/);
+  });
+
+  it("without brandAlign the bar carries no brand column", () => {
+    render(<NavBar fluid brand={<a href="/">DK</a>} />);
+    expect(screen.getByRole("banner").className).not.toMatch(/brandSidebar/);
+  });
+
+  it("sizes the brand from its two tokens with logical properties only", () => {
+    const css = readFileSync(join(import.meta.dirname, "navbar.module.css"), "utf8");
+    const rule = css.slice(css.indexOf(".brandSidebar .brand {"));
+    const body = rule.slice(0, rule.indexOf("}"));
+    expect(body).toContain("margin-inline-start: calc(var(--psi-navbar-brand-inset) - var(--psi-navbar-gutter));");
+    expect(body).toContain("inline-size: calc(var(--psi-navbar-brand-width) - var(--psi-navbar-brand-inset));");
+    expect(body).not.toMatch(/\b(width|margin-left|margin-right|left|right):/);
+  });
+});

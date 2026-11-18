@@ -20,4 +20,15 @@ export const navbarVars: Record<string, string> = {
   // D88 — the side padding of a fluid row; the same gutter .psi-container pads
   // with, reachable from the CSS Module only through a navbar token.
   gutter: "var(--psi-gutter)",
+  // D140 — the brand column of `brandAlign="sidebar"`, measured from the bar's
+  // inline-start edge. The brand ends at the AppShell sidebar's width, and
+  // starts where a 32px IconButton holding an icon the size of the sidebar's
+  // icons puts that icon on the sidebar's icon column: the sidebar's padding
+  // plus a NavTree entry's (space-12, hardcoded in nav-tree.module.css), less
+  // half the square's room around the icon. 8 + 12 - (32 - 16) / 2 = 12px.
+  // Both resolve where they are declared: at :root, or in a theme that
+  // overrides what they read (D139). Set inline on a narrower element, the
+  // sidebar width does not reach them: set brand-width beside it.
+  "brand-width": "var(--psi-app-shell-sidebar-width)",
+  "brand-inset": "calc(var(--psi-app-shell-sidebar-padding) + var(--psi-space-12) - (var(--psi-button-32-height) - var(--psi-nav-tree-icon-size)) / 2)",
 };
