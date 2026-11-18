@@ -35,6 +35,11 @@ export const PROPERTY_GROUPS: Record<string, readonly string[]> = {
     "margin-inline", "margin-block",
     "margin-inline-start", "margin-inline-end", "margin-block-start", "margin-block-end",
     "inset", "top", "right", "bottom", "left",
+    // Logical insets (D138), for the reason the border group carries its
+    // logical longhands: the physical ones were here, and a logical inset is
+    // the one that mirrors in RTL. The NavTree guide line is placed by them.
+    "inset-block", "inset-inline",
+    "inset-block-start", "inset-block-end", "inset-inline-start", "inset-inline-end",
     "scroll-margin", "scroll-padding", "translate",
     // edge-distance uses: icon offsets (background-position) and viewport-inset sizing (max-width in calc) are gap-family intent
     "background-position", "max-width",

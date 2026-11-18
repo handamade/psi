@@ -532,3 +532,70 @@ describe("NavGroup icon (D124)", () => {
     );
   });
 });
+
+describe("Icon colours, guide line and the bar on it (D138)", () => {
+  // jsdom does no layout or cascade, so these read the rules. The pixels (the
+  // line at 19px, the bar on it, RTL) are measured in a browser by
+  // apps/storybook/vr/nav-tree.interaction.spec.ts.
+  const css = navCss;
+  const body = (selector: string) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*");
+    return [...css.matchAll(new RegExp(`(?:^|\\}|\\n)\\s*${escaped}\\s*\\{([^}]*)\\}`, "g"))].map((m) => m[1]).join("\n");
+  };
+
+  it("an entry's icon and a group's icon each bind their own colour token", () => {
+    expect(body(".item .icon")).toMatch(/color:\s*var\(--psi-nav-tree-item-icon-fg\);/);
+    expect(body(".groupButton .icon")).toMatch(/color:\s*var\(--psi-nav-tree-group-icon-fg\);/);
+  });
+
+  it("the current entry's icon, page or parent, follows its text", () => {
+    expect(css).toMatch(
+      /\.item a\[aria-current="page"\] \.icon,\s*\.item a\[aria-current="true"\] \.icon\s*\{\s*color:\s*currentColor;\s*\}/,
+    );
+  });
+
+  it("only a group with an icon draws the guide line, as a border from the guide tokens", () => {
+    const line = body(".withIcon > .groupList::before");
+    expect(line).toMatch(/content:\s*"";/);
+    expect(line).toMatch(/position:\s*absolute;/);
+    expect(line).toMatch(/inset-block:\s*var\(--psi-space-2\);/);
+    expect(line).toMatch(
+      /border-inline-start:\s*var\(--psi-nav-tree-guide-width\) solid var\(--psi-nav-tree-guide-border\);/,
+    );
+    expect(body(".withIcon > .groupList")).toMatch(/position:\s*relative;/);
+    // No line under a group without an icon.
+    expect(css.match(/\.groupList::before/g)).toHaveLength(css.match(/\.withIcon > \.groupList::before/g)!.length);
+  });
+
+  it("the line's column is computed from the button's padding and the icon size, not a token", () => {
+    const line = body(".withIcon > .groupList::before");
+    expect(line).toMatch(
+      /inset-inline-start:\s*calc\(var\(--psi-space-12\) \+ \(var\(--psi-nav-tree-icon-size\) - var\(--psi-nav-tree-guide-width\)\) \/ 2\);/,
+    );
+    expect(css).not.toMatch(/--psi-nav-tree-guide-(column|offset|inset)/);
+  });
+
+  it("the bar reads its width, block inset and radius from tokens", () => {
+    const bar = body('.item a[aria-current="page"]::before');
+    expect(bar).toMatch(/width:\s*var\(--psi-nav-tree-indicator-width\);/);
+    expect(bar).toMatch(/inset-block:\s*var\(--psi-nav-tree-indicator-inset-block\);/);
+    expect(bar).toMatch(/border-radius:\s*var\(--psi-nav-tree-indicator-radius\);/);
+    expect(bar).toMatch(/inset-inline-start:\s*0;/);
+    expect(bar).not.toMatch(/3px/);
+  });
+
+  it("under a guided group, the bar's offset is clamped to 0 by the guide's width, so it moves only when the line draws", () => {
+    const bar = body('.withIcon > .groupList > .item a[aria-current="page"]::before');
+    expect(bar).toMatch(
+      /inset-inline-start:\s*clamp\(\s*calc\(var\(--psi-nav-tree-guide-width\) \* -1000\),[^;]*var\(--psi-nav-tree-indicator-width\)[^;]*calc\(var\(--psi-nav-tree-guide-width\) \* 1000\)\s*\);/,
+    );
+  });
+
+  it("round() is only used behind @supports: Psi's floor (Chrome 119) predates it", () => {
+    const code = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    const supports = /@supports \(inset-inline-start: round\(down, 1\.5px, 1px\)\) \{[\s\S]*?\n\}/.exec(code)?.[0] ?? "";
+    const outside = code.replace(supports, "");
+    expect(supports).toMatch(/round\(down,/);
+    expect(outside).not.toMatch(/round\(/);
+  });
+});
