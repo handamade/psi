@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import * as allIcons from "./index.js";
 import { IconPlus } from "./IconPlus.js";
 import { IconClose } from "./IconClose.js";
 import { IconSearch } from "./IconSearch.js";
@@ -17,6 +20,16 @@ import { IconMenu } from "./IconMenu.js";
 import { IconChevronLeft } from "./IconChevronLeft.js";
 import { IconLogOut } from "./IconLogOut.js";
 import { IconSimCard } from "./IconSimCard.js";
+import {
+  IconShieldCheck,
+  IconBlocks,
+  IconFileCog,
+  IconCrosshair,
+  IconCirclePlay,
+  IconChartColumnBig,
+  IconScrollText,
+  IconActivity,
+} from "./index.js";
 
 describe("Icons", () => {
   it("renders with aria-hidden by default", () => {
@@ -138,5 +151,65 @@ describe("Icons", () => {
     // Three filled dots. row-actions specified an icon trigger before any
     // ellipsis existed; this is the referent for that placeholder.
     expect(svg.querySelectorAll("circle")).toHaveLength(3);
+  });
+
+  // D137 — one glyph per section of a navigation tree, copied from Lucide.
+  const navSection = {
+    IconShieldCheck,
+    IconBlocks,
+    IconFileCog,
+    IconCrosshair,
+    IconCirclePlay,
+    IconChartColumnBig,
+    IconScrollText,
+    IconActivity,
+  };
+
+  it("ships the navigation-section glyphs in Psi's stroke shape, each with its own shape (D137)", () => {
+    const shapes = Object.values(navSection).map((Icon) => {
+      const svg = render(<Icon />).container.querySelector("svg")!;
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg).toHaveAttribute("width", "20");
+      expect(svg).toHaveAttribute("height", "20");
+      expect(svg).toHaveAttribute("viewBox", "0 0 24 24");
+      expect(svg).toHaveAttribute("fill", "none");
+      expect(svg).toHaveAttribute("stroke", "currentColor");
+      expect(svg).toHaveAttribute("stroke-width", "2");
+      expect(svg).toHaveAttribute("stroke-linecap", "round");
+      expect(svg).toHaveAttribute("stroke-linejoin", "round");
+      expect(svg.children.length).toBeGreaterThan(0);
+      return svg.innerHTML;
+    });
+    expect(new Set(shapes).size).toBe(8);
+  });
+
+  it("gives every exported icon a 24-unit grid, aria-hidden and a default size of 20", () => {
+    const entries = Object.entries(allIcons);
+    expect(entries.length).toBe(38);
+    for (const [name, Icon] of entries) {
+      const svg = render(<Icon />).container.querySelector("svg");
+      expect(svg, name).not.toBeNull();
+      expect(svg!.getAttribute("viewBox"), name).toBe("0 0 24 24");
+      expect(svg!.getAttribute("aria-hidden"), name).toBe("true");
+      expect(svg!.getAttribute("width"), name).toBe("20");
+    }
+  });
+
+  // The notice ships in the tarball (package.json `files`). Every third-party
+  // icon must be listed under its source, and every listed icon must exist.
+  it("lists every Lucide icon in THIRD-PARTY-NOTICES.md, and names only icons that exist (D137)", () => {
+    const notice = readFileSync(join(import.meta.dirname, "../../THIRD-PARTY-NOTICES.md"), "utf8");
+    const sections = notice.split(/^## /m).slice(1);
+    const covered = (heading: string) => {
+      const section = sections.find((s) => s.startsWith(heading));
+      expect(section, heading).toBeDefined();
+      return new Set(section!.match(/\bIcon[A-Z]\w*/g) ?? []);
+    };
+    const lucide = covered("Lucide");
+    for (const name of Object.keys(navSection)) expect(lucide.has(name), name).toBe(true);
+    const exported = new Set(Object.keys(allIcons));
+    for (const name of notice.match(/\bIcon[A-Z]\w*/g) ?? []) {
+      expect(exported.has(name), `${name} in the notice`).toBe(true);
+    }
   });
 });
