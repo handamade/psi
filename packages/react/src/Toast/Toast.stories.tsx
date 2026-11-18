@@ -157,3 +157,32 @@ export const RaisedFromDialog: StoryObj<typeof ToastProvider> = {
     </ToastProvider>
   ),
 };
+
+/** D136 — dismissing the toast that holds focus. Drives
+ * apps/storybook/vr/toast-focus.interaction.spec.ts: focus moves to the toast
+ * now at the dismissed one's position, and once the stack is empty, back to
+ * the element that had focus before the region. Durations are effectively
+ * infinite so nothing leaves on a timer; the camera sees the button alone. */
+function DismissFocusedDemo() {
+  const toast = useToast();
+  const [count, setCount] = useState(0);
+  return (
+    <Button
+      onClick={() => {
+        const n = count + 1;
+        setCount(n);
+        toast.show({ message: `Draft ${n} saved.` });
+      }}
+    >
+      Save draft
+    </Button>
+  );
+}
+
+export const DismissFocused: StoryObj<typeof ToastProvider> = {
+  render: () => (
+    <ToastProvider duration={600000} actionDuration={600000}>
+      <DismissFocusedDemo />
+    </ToastProvider>
+  ),
+};

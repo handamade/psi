@@ -90,6 +90,9 @@ export function Toast({
           size={32}
           aria-label={dismissLabel}
           onClick={onDismiss}
+          // D136: where ToastRegion sends focus when a neighbouring toast that
+          // held it goes away.
+          data-psi-toast-dismiss=""
         >
           <IconClose aria-hidden="true" />
         </IconButton>
