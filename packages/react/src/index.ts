@@ -163,4 +163,12 @@ export {
   IconMenu,
   IconLogOut,
   IconSimCard,
+  IconShieldCheck,
+  IconBlocks,
+  IconFileCog,
+  IconCrosshair,
+  IconCirclePlay,
+  IconChartColumnBig,
+  IconScrollText,
+  IconActivity,
 } from "./icons/index.js";
