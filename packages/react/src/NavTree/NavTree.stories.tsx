@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { Meta, StoryObj } from "storybook";
 import { NavTree } from "./NavTree.js";
 import { NavGroup } from "./NavGroup.js";
@@ -9,6 +9,7 @@ import { IconSimCard } from "../icons/IconSimCard.js";
 import { IconUser } from "../icons/IconUser.js";
 import { IconSettings } from "../icons/IconSettings.js";
 import { IconSearch } from "../icons/IconSearch.js";
+import { IconInfo } from "../icons/IconInfo.js";
 import "./NavTree.stories.css";
 
 const meta: Meta<typeof NavTree> = { title: "Components/NavTree", component: NavTree };
@@ -156,5 +157,54 @@ export const WithCounts: Story = {
         </NavItem>
       </NavTree>
     </Frame>
+  ),
+};
+
+/** D138: the look a theme's `componentOverrides` set, written here on the
+ * sidebar's own element, which is where a sub-theme's overrides land too. No
+ * CSS reaches into the tree. */
+const guidedLook = {
+  "--psi-nav-tree-group-icon-fg": "var(--psi-fg-primary)",
+  "--psi-nav-tree-item-fg": "var(--psi-fg-primary)",
+  "--psi-nav-tree-item-icon-fg": "var(--psi-fg-secondary)",
+  "--psi-nav-tree-item-fg-current": "var(--psi-fg-accent)",
+  "--psi-nav-tree-item-bg-current": "transparent",
+  "--psi-nav-tree-guide-width": "1px",
+  "--psi-nav-tree-guide-border": "var(--psi-border-strong)",
+  "--psi-nav-tree-indicator-width": "1px",
+  "--psi-nav-tree-indicator-inset-block": "var(--psi-space-6)",
+  "--psi-nav-tree-indicator-radius": "0",
+} as CSSProperties;
+
+/** D138: a guide line runs down an open group's entries from under the
+ * group's icon, and the current entry's bar is a 1px segment of it. A group's
+ * icon is louder than its label, an entry's icon quieter than its text, and
+ * the current entry is accent text with no surface. A dark sidebar in a light
+ * page, set through tokens only. */
+export const GuideLine: Story = {
+  render: () => (
+    <div data-psi-theme="dark" className="psi-story-dark-sidebar" style={guidedLook}>
+      <NavTree aria-label="Main">
+        <NavItem href="#search" icon={<IconSearch />}>
+          Search
+        </NavItem>
+        <NavGroup label="Cards" icon={<IconSimCard />} open onOpenChange={() => {}}>
+          <NavItem href="#active">Active</NavItem>
+          <NavItem href="#suspended" current>
+            Suspended
+          </NavItem>
+          <NavItem href="#archived">Archived</NavItem>
+        </NavGroup>
+        <NavGroup label="Settings" icon={<IconSettings />} open={false} onOpenChange={() => {}}>
+          <NavItem href="#profile">Profile</NavItem>
+        </NavGroup>
+        <NavItem href="#account" icon={<IconUser />}>
+          Account
+        </NavItem>
+        <NavItem href="#help" icon={<IconInfo />}>
+          Help
+        </NavItem>
+      </NavTree>
+    </div>
   ),
 };
