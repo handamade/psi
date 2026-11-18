@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import type { Meta, StoryObj } from "storybook";
 import { Dialog } from "./Dialog.js";
 import { Button } from "../Button/Button.js";
@@ -152,4 +152,38 @@ export const DrawerLongContent: Story = {
       ))}
     </Dialog>
   ),
+};
+
+/** D136 — a Dialog rendered as `{open && <Dialog open />}`. Every dismissal
+ * here removes the dialog rather than closing it, and focus must still return
+ * to the button that opened it. Drives
+ * apps/storybook/vr/dialog-focus.interaction.spec.ts; the camera sees the
+ * opener alone. */
+function RemovedWhileOpenDemo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Edit profile</Button>
+      {open && (
+        <Dialog
+          open
+          onClose={() => setOpen(false)}
+          title="Edit profile"
+          footer={
+            <Button variant="accent" size={40} onClick={() => setOpen(false)}>
+              Save
+            </Button>
+          }
+        >
+          <Field label="Name">
+            <Input size={40} defaultValue="Ada Lovelace" />
+          </Field>
+        </Dialog>
+      )}
+    </>
+  );
+}
+
+export const RemovedWhileOpen: Story = {
+  render: () => <RemovedWhileOpenDemo />,
 };

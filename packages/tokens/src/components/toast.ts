@@ -25,4 +25,7 @@ export const toastVars: Record<string, string> = {
   "icon-fg-success": "var(--psi-fg-success)",
   "icon-fg-warning": "var(--psi-fg-warning)",
   "icon-fg-danger": "var(--psi-fg-danger)",
+  // D136 — the ring on the region, the last place a removed toast's focus
+  // goes. The same binding as Menu's ring (D82), so no new contrast pair.
+  "focus-ring": "var(--psi-border-focus)",
 };
