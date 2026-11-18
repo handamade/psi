@@ -1,5 +1,57 @@
 # @handamade/psi-react
 
+## 0.35.0
+
+### Minor Changes
+
+- dca1099: Combobox follow-up (D134): Escape that keeps a value, `aria-expanded` that matches what shows, and three new props.
+
+  **Behaviour changes in single-select.** Code may rely on the old behaviour:
+
+  - **Escape no longer clears the text.**
+    - It restores the picked label and closes the list if the list is open.
+    - Closed, with unedited text, it does nothing and reaches a surrounding
+      `Dialog`.
+    - It never clears a value. Before, two Escapes and a blur deleted a picked
+      value.
+    - To clear a value, empty the text and leave the field, or use
+      `clearable`.
+  - **Enter with edited text no longer submits the form.**
+    - When nothing is highlighted, Enter settles the text as blur does: emptied
+      text clears the value, and other edited text goes back to the picked
+      label.
+    - With the list open, it also closes the list.
+    - Unedited text still submits natively.
+
+  Multi-select's Escape and Enter are unchanged.
+
+  **Accessibility.**
+  - `aria-expanded` is true only while a listbox with options shows. A "No
+    matches" or loading line on its own leaves it false.
+  - While a "No matches", loading or "more" line shows, it is in the input's
+    `aria-describedby`.
+
+  **New props.**
+  - `announce={false}` removes the Combobox's own live region, for an app
+    that speaks through one announcer of its own, as `Field announce={false}`
+    does.
+  - `valueLabel` (single-select) names a picked value the options don't hold,
+    such as a preset id past the first page of a server-read list.
+  - `open` and `onOpenChange`. The list's open state can now be held by the
+    caller, for example closed while a read has failed. Leave `open` unset and
+    nothing changes.
+
+- e0e9f94: A segmented control: `SegmentedControl` and `Segment` (D132).
+
+  - **One pill, two jobs.** A row of 2–4 text segments with one selected, shown by the accent tint, the accent label and a 1px inset ring, so never by colour alone. With `value` and `onValueChange` it is a radio group for a setting that applies at once, wherever it sits: `<SegmentedControl aria-label="Color scheme" value={v} onValueChange={setV}>`. Without them, inside `<Tabs>` it is the tab list, in place of `TabList`, and its segments switch the `TabPanel` of the same value; `Tabs` owns the value. Controlled only.
+  - **Keyboard.** One tab stop; the arrows move and select, wrapping (both axes as a radio group, Left/Right as a tab list); Home and End. A `disabled` segment uses `aria-disabled` and is skipped.
+  - **Sizes** `24 | 32 | 40` (default 32), the height of a Button of the same size. The control never wraps: it is as wide as its labels and truncates them in a narrower container; `fill` stretches it and shares the width equally. Four one-word segments fit a 320px phone at size 32.
+  - **Tokens** `--psi-segmented-*`, on the semantic layer and the control ramp. The shape is a pill (`--psi-radius-full`) whatever the theme's control radius. No new contrast pair.
+  - **Tabs** shares its tab-stop rule (D93) and keyboard with it, and `Tabs`' body slot accepts `SegmentedControl`. Two changes to `Tabs`:
+    - **A `TabPanel` hides its `Tabs` from its content**: children render under an empty `TabsContext`. A `Tab` or `TabList` stranded in a panel now throws instead of joining the outer tab set, and code of your own that reads the exported `TabsContext` inside a panel now gets `null`.
+    - **Fix:** since 0.34.0 the arrow keys reach a disabled tab (D131), and a click on another tab after that left two tab stops. Each tab now re-takes its own when the stop moves.
+  - **MCP `search`**: a query's results now fill to the response budget, best first, as the overview's already do. `Segment` made `button` match one component more and pushed that answer past 6,000 characters.
+
 ## 0.34.0
 
 ### Minor Changes
