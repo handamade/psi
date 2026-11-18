@@ -70,7 +70,7 @@ export const HoverLift: Story = {
       <>
         <h3 style={{ margin: 0 }}>Hover me</h3>
         <p style={{ margin: 0 }}>
-          Lifts on hover: translateY(-6px) over --psi-duration-350.
+          Lifts on hover: translateY(-6px) over the emphasis motion preset (D141).
         </p>
       </>
     ),

@@ -48,7 +48,7 @@
   font: var(--psi-text-14-20-medium);
   color: var(--psi-tabs-fg);
 
-  transition: color var(--psi-duration-150) var(--psi-ease-standard);
+  transition: color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .tab:hover:not([aria-disabled="true"]) {

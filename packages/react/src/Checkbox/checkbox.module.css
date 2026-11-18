@@ -34,8 +34,8 @@
   border-radius: var(--psi-checkbox-box-radius);
   background: var(--psi-checkbox-box-bg);
   transition:
-    background-color var(--psi-duration-150) var(--psi-ease-standard),
-    border-color var(--psi-duration-150) var(--psi-ease-standard);
+    background-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease),
+    border-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 /* Checked state */

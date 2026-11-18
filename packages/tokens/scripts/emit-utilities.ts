@@ -2,7 +2,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, comboFontVar, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
-import { durationScale, easings } from "../src/scales/motion.js";
+import { durationScale, easings, motionPresets } from "../src/scales/motion.js";
 import { breakpoints, container, zIndex } from "../src/scales/layout.js";
 import { focusRing } from "../src/scales/focus-ring.js";
 import { lightTheme } from "../src/themes/light.js";
@@ -63,6 +63,11 @@ export function emitScaleVarsCSS(): string {
   // Motion (WS3) — durations + named easing curves; see guidance.ts for reduced-motion policy
   for (const ms of durationScale) lines.push(`    --psi-duration-${ms}: ${ms}ms;`);
   for (const [name, curve] of Object.entries(easings)) lines.push(`    --psi-ease-${name}: ${curve};`);
+  // Motion presets (D141) — aliases of the scale, so reduced motion reaches them.
+  for (const [name, p] of Object.entries(motionPresets)) {
+    lines.push(`    --psi-motion-${name}-duration: var(--psi-duration-${p.duration});`);
+    lines.push(`    --psi-motion-${name}-ease: var(--psi-ease-${p.ease});`);
+  }
 
   lines.push("");
   lines.push(`    --psi-container-max: ${pxToRem(container.max)};`);
@@ -188,6 +193,8 @@ export function emitUtilitiesCSS(): string {
   lines.push(`  }`);
 
   lines.push("");
+  // D141: on the raw scale, not a preset. A brand's filter fading to true
+  // colour over a long, ambient time; no component shares it (D35).
   lines.push(`  .psi-media-tint { filter: var(--psi-media-tint); transition: filter var(--psi-duration-450) var(--psi-ease-soft); }`);
   lines.push(`  .psi-media-tint:hover, .psi-media-tint:focus-visible { filter: none; }`);
   lines.push("");
@@ -195,7 +202,7 @@ export function emitUtilitiesCSS(): string {
   lines.push("     this class. Underlined at rest, always: the accent is ~2:1 against");
   lines.push("     body text, so colour alone cannot mark a link (WCAG 1.4.1). The");
   lines.push("     current-page rule comes last so it also wins on hover. */");
-  lines.push(`  .psi-link { color: var(--psi-link-fg); text-decoration-line: underline; text-decoration-thickness: var(--psi-link-underline-thickness); text-decoration-color: currentColor; text-underline-offset: var(--psi-link-underline-offset); transition: color var(--psi-duration-150) var(--psi-ease-standard), text-decoration-thickness var(--psi-duration-150) var(--psi-ease-standard); }`);
+  lines.push(`  .psi-link { color: var(--psi-link-fg); text-decoration-line: underline; text-decoration-thickness: var(--psi-link-underline-thickness); text-decoration-color: currentColor; text-underline-offset: var(--psi-link-underline-offset); transition: color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease), text-decoration-thickness var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease); }`);
   lines.push(`  .psi-link:hover { color: var(--psi-link-fg-hover); text-decoration-thickness: var(--psi-link-underline-thickness-hover); }`);
   lines.push(`  .psi-link:focus-visible { outline: var(--psi-focus-ring-width) solid var(--psi-link-focus-ring); outline-offset: var(--psi-focus-ring-offset); border-radius: var(--psi-link-radius); }`);
   lines.push(`  .psi-link[aria-current="page"] { color: var(--psi-link-fg-current); font-weight: var(--psi-link-font-weight-current); text-decoration-line: none; }`);

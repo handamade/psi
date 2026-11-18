@@ -8,7 +8,7 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: "stacked" | "featured";
   /** Media slot rendered edge-to-edge (img, AspectRatio, …). */
   media?: ReactNode;
-  /** Lift on hover: translateY(-6px) over --psi-duration-350. @default false */
+  /** Lift on hover: translateY(-6px) over the `emphasis` motion preset, --psi-motion-emphasis-duration (350ms) and -ease (D141). @default false */
   hoverLift?: boolean;
   /** Forwarded ref to the root element. */
   ref?: Ref<HTMLDivElement>;

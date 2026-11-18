@@ -96,6 +96,17 @@ describe("emitDTCG", () => {
     expect(Object.keys(parsed.easing)).toEqual(Object.keys(easings));
   });
 
+  it("emits each motion preset as aliases of the duration and easing scales (D141)", () => {
+    const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
+    const parsed = JSON.parse(emitDTCG("light", resolved));
+
+    expect(parsed.motion.move).toEqual({
+      duration: { $type: "duration", $value: "{duration.200}" },
+      ease: { $type: "string", $value: "{easing.soft}" },
+    });
+    expect(Object.keys(parsed.motion)).toEqual(["feedback", "move", "emphasis"]);
+  });
+
   it("scoped tokens carry $extensions.psi.scopes (D46)", () => {
     const resolved = resolve(lightTheme, defaultPalette, defaultSlots);
     const json = emitDTCG("light", resolved);

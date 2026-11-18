@@ -60,8 +60,8 @@
   color: var(--psi-segmented-fg);
   cursor: pointer;
   transition:
-    color var(--psi-duration-150) var(--psi-ease-standard),
-    background-color var(--psi-duration-150) var(--psi-ease-standard);
+    color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease),
+    background-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .fill .segment {

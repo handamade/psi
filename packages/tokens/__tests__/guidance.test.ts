@@ -3,6 +3,16 @@ import { guidance } from "../src/guidance.js";
 import { controlVars } from "../src/components/control.js";
 
 describe("guidance", () => {
+  it("names the motion presets, their tokens and intent, and keeps reduced motion on the scale (D141)", () => {
+    expect(Object.keys(guidance.motion.presets)).toEqual(["feedback", "move", "emphasis"]);
+    expect(guidance.motion.presets.feedback).toMatchObject({
+      duration: "var(--psi-motion-feedback-duration)",
+      ease: "var(--psi-motion-feedback-ease)",
+      aliases: "--psi-duration-150 / --psi-ease-standard",
+    });
+    expect(guidance.motion.reducedMotion).toContain("--psi-motion-");
+  });
+
   it("has 9 variant entries", () => {
     expect(guidance.variants).toHaveLength(9);
   });

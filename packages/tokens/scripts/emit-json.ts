@@ -4,7 +4,7 @@ import { spacingScale } from "../src/scales/spacing.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { radiusScale } from "../src/scales/radius.js";
 import { typographyCombos, comboName, WEIGHT_VALUES, displayCombos, displayName } from "../src/scales/typography.js";
-import { durationScale, easings } from "../src/scales/motion.js";
+import { durationScale, easings, motionPresets } from "../src/scales/motion.js";
 import { breakpoints, container, zIndex } from "../src/scales/layout.js";
 import { focusRing } from "../src/scales/focus-ring.js";
 import { SCALE_SCOPES } from "../src/scopes.js";
@@ -29,7 +29,16 @@ export function emitResolvedJSON(
         space: [...spacingScale],
         size: [...sizeScale],
         radius: [...radiusScale],
-        motion: { durations: [...durationScale], easings },
+        motion: {
+          durations: [...durationScale],
+          easings,
+          // D141 — named pairs of the two scales above.
+          presets: Object.fromEntries(Object.entries(motionPresets).map(([name, p]) => [name, {
+            ...p,
+            durationToken: `--psi-motion-${name}-duration`,
+            easeToken: `--psi-motion-${name}-ease`,
+          }])),
+        },
         layout: { breakpoints, container, zIndex },
         focusRing,
         scopes: SCALE_SCOPES,

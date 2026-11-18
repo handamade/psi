@@ -23,7 +23,7 @@
 }
 
 .dialog[open]::backdrop {
-  animation: backdrop-enter var(--psi-duration-200) var(--psi-ease-soft);
+  animation: backdrop-enter var(--psi-motion-move-duration) var(--psi-motion-move-ease);
 }
 
 @keyframes backdrop-enter {
@@ -40,7 +40,7 @@
    560px inline-end drawer probes at x:440 (flush right), height 800. */
 
 .center[open] {
-  animation: dialog-enter var(--psi-duration-200) var(--psi-ease-soft);
+  animation: dialog-enter var(--psi-motion-move-duration) var(--psi-motion-move-ease);
 }
 
 @keyframes dialog-enter {
@@ -79,11 +79,11 @@
 }
 
 .inlineEnd[open] {
-  animation: drawer-enter-end var(--psi-duration-200) var(--psi-ease-soft);
+  animation: drawer-enter-end var(--psi-motion-move-duration) var(--psi-motion-move-ease);
 }
 
 .inlineStart[open] {
-  animation: drawer-enter-start var(--psi-duration-200) var(--psi-ease-soft);
+  animation: drawer-enter-start var(--psi-motion-move-duration) var(--psi-motion-move-ease);
 }
 
 /* Physical translate on purpose: CSS cannot express a direction-relative
