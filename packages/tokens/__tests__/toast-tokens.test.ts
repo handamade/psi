@@ -14,6 +14,8 @@ describe("toast tokens", () => {
       "icon-fg-success": "var(--psi-fg-success)",
       "icon-fg-warning": "var(--psi-fg-warning)",
       "icon-fg-danger": "var(--psi-fg-danger)",
+      // D136: the ring on the region when it takes a removed toast's focus.
+      "focus-ring": "var(--psi-border-focus)",
     });
   });
 

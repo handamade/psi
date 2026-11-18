@@ -82,6 +82,15 @@
   max-width: 100%;
 }
 
+/* D136: the region takes focus only as the last resort for a removed toast's
+   focus (tabindex=-1, never in the Tab order). Keyboard focus there gets the
+   same ring as a focused Menu (D131), so a sighted keyboard user sees where
+   focus went. */
+.region:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-toast-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
 .region[data-placement="top-start"]    { top: 0; left: 0; align-items: flex-start; }
 .region[data-placement="top-end"]      { top: 0; right: 0; align-items: flex-end; }
 .region[data-placement="bottom-start"] { bottom: 0; left: 0; align-items: flex-start; }

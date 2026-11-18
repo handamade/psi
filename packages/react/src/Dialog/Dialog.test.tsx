@@ -227,3 +227,61 @@ describe("Dialog initial focus, Escape and the close label (D101)", () => {
     expect(onClose).toHaveBeenCalledWith("close-button");
   });
 });
+
+// D136: the platform restores focus to the opener on close() only. A Dialog
+// removed while open, as `{open && <Dialog open />}` does on every dismissal,
+// must close itself before its element leaves the document.
+describe("Dialog: removed while open (D136)", () => {
+  it("calls close() on unmount while its element is still connected", () => {
+    const seen: boolean[] = [];
+    const close = vi
+      .spyOn(HTMLDialogElement.prototype, "close")
+      .mockImplementation(function (this: HTMLDialogElement) {
+        seen.push(this.isConnected);
+        this.removeAttribute("open");
+      });
+    const { unmount } = render(<Dialog open onClose={() => {}} title="T">Body</Dialog>);
+    unmount();
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(seen).toEqual([true]);
+    close.mockRestore();
+  });
+
+  it("calls close() when a wrapper around it is removed", () => {
+    const seen: boolean[] = [];
+    const close = vi
+      .spyOn(HTMLDialogElement.prototype, "close")
+      .mockImplementation(function (this: HTMLDialogElement) {
+        seen.push(this.isConnected);
+        this.removeAttribute("open");
+      });
+    const Page = ({ show }: { show: boolean }) => (
+      <div>
+        {show && (
+          <section>
+            <Dialog open onClose={() => {}} title="T">Body</Dialog>
+          </section>
+        )}
+      </div>
+    );
+    const { rerender } = render(<Page show />);
+    rerender(<Page show={false} />);
+    expect(seen).toEqual([true]);
+    close.mockRestore();
+  });
+
+  it("does nothing on unmount when it is already closed", () => {
+    const close = vi.spyOn(HTMLDialogElement.prototype, "close");
+    const { unmount } = render(<Dialog open={false} onClose={() => {}} title="T">Body</Dialog>);
+    unmount();
+    expect(close).not.toHaveBeenCalled();
+    close.mockRestore();
+  });
+
+  it("does not report the removal through onClose", () => {
+    const onClose = vi.fn();
+    const { unmount } = render(<Dialog open onClose={onClose} title="T">Body</Dialog>);
+    unmount();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+});

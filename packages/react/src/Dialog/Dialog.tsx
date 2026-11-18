@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useLayoutEffect, useRef } from "react";
 import type { DialogHTMLAttributes, MouseEvent, ReactNode, Ref, RefObject, SyntheticEvent } from "react";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -67,6 +67,10 @@ const placementClass: Record<DialogPlacement, string> = {
  * focus restore come from the platform; title/footer slots, Esc/backdrop/
  * close-button dismissal via onClose(reason) (D50).
  *
+ * Focus returns to the opener whether the dialog closes (`open={false}`) or is
+ * removed while open (`{open && <Dialog open />}`): unmounting closes it first
+ * (D136).
+ *
  * `placement` moves the panel and nothing else (D66): an `inline-start` /
  * `inline-end` Dialog is a drawer, pinned full-height to that edge, with the
  * same modality, focus trap, focus restore and dismissal reasons as a centered
@@ -108,6 +112,20 @@ export function Dialog({
     // Deliberately keyed on `open` alone: initialFocus is a ref, read once per
     // open, so a new ref object on a re-render never refocuses an open dialog.
   }, [open]);
+
+  // D136: the platform returns focus to the opener on close(), and only on
+  // close(). A dialog removed while open — `{open && <Dialog open />}` removes
+  // on every dismissal — would leave focus on <body>. React runs a component's
+  // layout cleanups before it removes the component's host nodes, so this
+  // close() reaches a dialog that is still connected, and the platform's own
+  // restore runs, exactly as on the controlled close. Nothing is reported
+  // through onClose: the consumer removed it.
+  useLayoutEffect(() => {
+    const el = innerRef.current;
+    return () => {
+      if (el?.open) el.close();
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
