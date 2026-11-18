@@ -17,6 +17,12 @@ export const UPDATES: UpdateEntry[] = [
   {
     date: "2026-11-18",
     tag: "release",
+    title: "0.36.0 — a Field that wires every control, and focus that comes back",
+    body: "Inside a Field, the Field's id now wins over the control's own, so a caller's id can no longer disconnect the label; set a known id on the Field with htmlFor. While the Field shows an error the control is aria-invalid, and while it is required the control is required, whatever the caller passes. Checkbox and Switch now take a Field's id, message, aria-invalid and required as Input and Select do, so spreading useFieldControl() onto them is no longer needed. The toolbar's control width now reaches the control of a top-labelled Field, so a labelled filter row is as even as an unlabelled one. A Dialog removed while open now returns focus to its opener, and a toast that held focus passes it to the next toast, then back to where it came from, instead of dropping it to the page. 60 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-18",
+    tag: "release",
     title: "0.35.0 — a segmented control, and a Combobox that keeps its value",
     body: "SegmentedControl is new: a row of two to four text segments with one selected, shown by tint, label colour and a ring, never by colour alone. With value and onValueChange it is a radio group for a setting that applies at once; inside Tabs it takes the place of TabList and switches the panels. One tab stop, arrows that move and select, sizes 24 to 40, and four one-word segments fit a 320px phone. A TabPanel now hides its Tabs from its content. Combobox keeps a picked value: in single-select, Escape restores the picked label instead of clearing the text, and Enter with edited text settles it as a blur does instead of submitting the form. aria-expanded is true only while a list of options shows, and a No matches or loading line is in the input's description. Three new props: announce={false} for an app that speaks through its own announcer, valueLabel for a picked value the loaded options don't hold, and open with onOpenChange for a caller that keeps the list closed, such as after a failed read. 60 components, 24 patterns.",
   },
