@@ -1,5 +1,44 @@
 # @handamade/psi-tokens
 
+## 0.37.0
+
+### Minor Changes
+
+- 7625788: `AppShell` can animate its sidebar (D142). `sidebarMotion="slide"` runs the sidebar's column to 0 and back, fading the sidebar, while its content holds still at the open width; main's rounded corner (D110) follows, and the edge line (D114) rides the moving edge. The default, `"instant"`, keeps today's markup and look.
+
+  Timing comes from two new tokens, never a prop: `--psi-app-shell-sidebar-duration` and `--psi-app-shell-sidebar-ease`. They alias the `move` motion preset (200ms, `--psi-ease-soft`, D141), so `prefers-reduced-motion` makes the sidebar instant, and the theme gate holds a theme's duration to a step or a preset.
+
+  Closed under `"slide"`, the sidebar is `visibility: hidden` instead of `hidden`. It leaves the tab order and the accessibility tree when the close ends. Its content sits in one inner `<div>` that scrolls, so code that scrolls the sidebar must scroll that wrapper. Right-to-left mirrors with no extra setup. With no `sidebar` content, `"slide"` is the instant frame.
+
+  In both modes, a sidebar that closes while it holds focus now hands focus to the toggle whose `aria-controls` names it, or to `main` when there is none. Before, focus fell to `<body>`.
+
+- 4a23c86: Motion presets (D141): a duration and an easing chosen together, named by what the motion is for. Each preset is two tokens that alias the scale, so reduced motion reaches them and a component's own motion tokens can point at either half:
+
+  - `feedback`, `--psi-motion-feedback-duration` / `-ease`: 150ms, `ease`. A control answering a pointer or a key.
+  - `move`, `--psi-motion-move-duration` / `-ease`: 200ms, `--psi-ease-soft`. Something entering, leaving or changing size.
+  - `emphasis`, `--psi-motion-emphasis-duration` / `-ease`: 350ms, `ease`. A deliberate change that draws the eye.
+
+  Every transition and animation in Psi's component CSS now binds one, with the same timing as before. The one change you could notice: `NavBar` links change colour on the `feedback` curve (`ease`) instead of `--psi-ease-soft`, like every other control. `Skeleton`'s pulse and `.psi-media-tint` stay on the raw scale.
+
+  The presets appear in `resolved/<theme>.json` (`scales.motion.presets`), the DTCG file (`motion.<name>.duration` and `.ease`, as aliases), and `guidance.json` (`motion.presets`, with each preset's intent).
+
+  The theme gate now refuses a `componentOverrides` value for a `*-duration` key that is not exactly `var(--psi-duration-<step>)` or `var(--psi-motion-<preset>-duration)`. A literal such as `200ms` never reads a duration token, so reduced motion could not zero it. The stylelint plugin gains `psi/motion-presets`, which reports a raw `--psi-duration-*` or `--psi-ease-*` in a component stylesheet's transition or animation.
+
+- 3a90a75: `NavTree` can draw a guide line and colour its icons apart from their text, through tokens alone (D138).
+
+  - **A guide line down an open group's entries.** `--psi-nav-tree-guide-width` (default `0px`, so nothing is drawn) and `--psi-nav-tree-guide-border` (default `--psi-border-strong`) draw a line centred under the group's icon. Psi places it from the group's own geometry (19px from the group's start at the default 16px icon and a 1px line), so you set no column. Only a group with an icon draws it, and it mirrors in RTL. Write the width with a unit.
+  - **The current entry's bar becomes a segment of that line.** The bar is now `--psi-nav-tree-indicator-width` (`3px`), `--psi-nav-tree-indicator-inset-block` (`0`) and `--psi-nav-tree-indicator-radius` (the tree's radius). While a group draws its guide line, the current entry's bar in that group moves onto it.
+  - **Icon colours of their own.** `--psi-nav-tree-item-icon-fg` and `--psi-nav-tree-group-icon-fg` colour an entry's and a group's icon (default `currentColor`, the text's). The current entry's icon follows its text.
+  - **What changes for you:** nothing until you set them. Every default draws today's pixels. A sidebar that reached into the tree's markup with CSS for this look can drop that CSS and set these tokens in its theme's `componentOverrides` instead.
+
+- f96adda: A nested theme keeps the page's geometry (D139), and a `NavBar` brand lines up with the `AppShell` sidebar (D140).
+
+  - **Behaviour change for every app that nests a theme.** Inside an element with its own `data-psi-theme` (a dark sidebar, a dark header, a themed panel), geometry, type and motion tokens now keep the value of the page around them instead of going back to Psi's default. That covers widths, padding, radii, gutters, heights, fonts and similar tokens: `--psi-app-shell-sidebar-width`, `--psi-control-radius`, `--psi-navbar-gutter`, `--psi-card-radius`, `--psi-button-radius`. The value can come from the page theme's `componentOverrides`, from `:root` or from any ancestor. Until now every component token was declared again on each `data-psi-theme` element, so a page theme's `card-radius: 0` (ember's, for one) turned back into 0.5rem inside a dark region, and a header under a dark theme read a 16rem sidebar whatever the page set. **Colour tokens do not change:** they are still declared on every theme and resolve against the nested theme's palette, and a page theme's colour overrides stay in the page theme.
+  - **A dial set by hand on a nested theme's element no longer reaches its aliases.** `<div data-psi-theme="dark" style="--psi-control-radius: 3px">` changes `--psi-control-radius` there, but `--psi-button-radius`, `--psi-input-radius` and the other tokens that read it keep the page's value. Put the dial in that theme's `componentOverrides` instead, where it reaches them: a theme that overrides a token now declares the geometry tokens that read it again in its own block. Or set the aliases beside the dial.
+  - **`components.css` declares each component's tokens in two rules:** `:where(:root)` for geometry, type and motion, and `:where(:root, [data-psi-theme])` for colour. Both have zero specificity, so a theme's `componentOverrides` still win regardless of import order.
+  - **The theme gate refuses a geometry override that binds a colour** (`ThemeGateError`, scope violation group `"page"`). Such a value would carry the page's resolved colour into every nested theme, unchecked against its contrast. No shipped theme does this.
+  - **`NavBar brandAlign="sidebar"`** sizes the brand slot to the `AppShell` sidebar, so a leading `<IconButton aria-label="Menu"><IconMenu size={16} /></IconButton>` puts its icon on the column where the sidebar's `NavTree` icons start, and the links or actions start where the page starts. The row is laid out fluid. It mirrors in right-to-left, keeps its place when the sidebar closes, and works under a header with its own `data-psi-theme`. New tokens: `--psi-navbar-brand-width` (the sidebar's width), `--psi-navbar-brand-inset` (12px) and `--psi-app-shell-sidebar-padding` (8px, the sidebar's inset, which was fixed until now).
+
 ## 0.36.0
 
 ### Minor Changes
