@@ -300,3 +300,67 @@ describe("ThemeConsole — the generation guard", () => {
     unmount();
   });
 });
+
+function transcriptLines(container: HTMLElement) {
+  return [...container.querySelectorAll(".console-transcript p")].map(
+    (p) => p.textContent ?? "",
+  );
+}
+
+describe("ThemeConsole — the transcript", () => {
+  it("starts each derive with a fresh transcript", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ status: 204 }));
+    const { container, unmount } = mount(createElement(ThemeConsole));
+
+    await act(async () => {
+      submit(container, PROMPT);
+      await flush();
+    });
+    const first = transcriptLines(container);
+    expect(first.length).toBeGreaterThan(0);
+
+    await act(async () => {
+      submit(container, PROMPT);
+      await flush();
+    });
+
+    // The same brief derives the same theme, so the second run's lines are
+    // the first run's: shown once, not appended below them.
+    expect(transcriptLines(container)).toEqual(first);
+
+    unmount();
+  });
+
+  it("says the art director is off when the server has no key (204)", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ status: 204 }));
+    const { container, unmount } = mount(createElement(ThemeConsole));
+
+    await act(async () => {
+      submit(container, PROMPT);
+      await flush();
+    });
+
+    const last = transcriptLines(container).at(-1);
+    expect(last).toMatch(/art director off/);
+    expect(last).not.toMatch(/unreachable/);
+
+    unmount();
+  });
+
+  it.each([
+    ["a 502", () => vi.fn().mockResolvedValue({ status: 502 })],
+    ["a network failure", () => vi.fn().mockRejectedValue(new Error("offline"))],
+  ])("says the art director is unreachable after %s", async (_name, makeFetch) => {
+    vi.stubGlobal("fetch", makeFetch());
+    const { container, unmount } = mount(createElement(ThemeConsole));
+
+    await act(async () => {
+      submit(container, PROMPT);
+      await flush();
+    });
+
+    expect(transcriptLines(container).at(-1)).toMatch(/art director unreachable/);
+
+    unmount();
+  });
+});
