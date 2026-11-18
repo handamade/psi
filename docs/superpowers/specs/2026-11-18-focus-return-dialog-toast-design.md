@@ -69,7 +69,7 @@ fail first.
 
 ### D136 — A Dialog removed while open closes first, so focus returns to its opener; a toast that held focus hands it to the toast at its position, then back to where it came from
 
-**Dialog (P114's defect)**
+**Dialog**
 - Unmounting a `Dialog` whose `<dialog>` is open calls `close()` on it from a
   layout-effect cleanup. React runs a component's layout cleanups before it
   removes that component's host nodes, so `close()` runs on a connected
@@ -87,7 +87,7 @@ fail first.
 - **Nothing else changes.** `open={false}` still closes in the open effect;
   `initialFocus` (D101) still wins after `showModal()`.
 
-**Toast (P151's defect)**
+**Toast**
 - `ToastRegion` owns the rule, because both routes run through it: the
   `ToastProvider` queue (dismiss, timer, eviction, `clear()`, `dismiss(id)`)
   and a stack composed by hand. It watches its own subtree with a
@@ -140,12 +140,12 @@ fail first.
   went.
 
 **What this does not change**
-- The provider's pause and resume (P153's defect: one flag for pointer and
-  focus) are untouched. With this rule, focus that leaves a toast either
+- The provider's pause and resume (one flag for pointer and
+  focus, a separate defect) are untouched. With this rule, focus that leaves a toast either
   lands in another toast (still paused, correctly) or leaves the region as
   the stack empties, so no timer is left paused by it in Chromium. In Firefox,
   which fires no `focusout` on removal, the provider's flag can still stay
-  set; that belongs to P153.
+  set; that belongs to the pause-flag follow-up below.
 - Toast order, politeness routing (D83), announcements (D91) and the top
   layer (D64) are unchanged.
 
@@ -174,9 +174,9 @@ fail first.
 
 ## What this changes
 
-- **P114**: `{open && <Dialog open />}` returns focus to the opener on every
+- **Dialog**: `{open && <Dialog open />}` returns focus to the opener on every
   dismissal. The consumer's own restore ("Removed while open") can go.
-- **P151**: a dismissed, evicted or timed-out toast that held focus hands it
+- **Toast**: a dismissed, evicted or timed-out toast that held focus hands it
   to the next toast, then back to where the user was. The consumer's move to
   the page's `h1` ("A removed toast") can go; focus now lands on the opener
   instead, or on the region when the opener is gone.
@@ -186,8 +186,8 @@ fail first.
 
 ## Follow-ups
 
-1. **P153**, unchanged here: the provider's single pause flag; Firefox's
+1. **The toast provider's pause flag**, unchanged here: the provider's single pause flag; Firefox's
    missing `focusout` on removal can leave it set.
-2. **P165**, `Tag`'s dismiss: the same question of where focus goes, with
+2. **`Tag`'s dismiss**: the same question of where focus goes, with
    the same answer available (the next tag, then where the user came from).
 3. **`Banner`'s dismiss** may drop focus the same way; not measured here.

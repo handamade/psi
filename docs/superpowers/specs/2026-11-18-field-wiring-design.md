@@ -241,6 +241,6 @@ tree over CDP, on markup rendered by the real components.
   valid, which the other controls keep.
 - `RadioGroup` in a non-group `Field` takes no name: the Field's `<label for>`
   points at nothing, because a `radiogroup` div is not labelable. It needs
-  `aria-labelledby` and the message, as P137 did for the boxes.
+  `aria-labelledby` and the message, as this decision does for `Checkbox` and `Switch`.
 - `Switch` draws no error state, so a `Switch` in error shows it on the
   message line only.
