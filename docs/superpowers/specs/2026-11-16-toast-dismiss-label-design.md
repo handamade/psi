@@ -73,7 +73,7 @@ allocated by the coordinating session. Re-check the number when the PR opens.
     lines.
   - **Changeset:** minor on `@handamade/psi-react`, with the lockstep packages.
 
-- **P61 — no decision number.** `eslint.config.js` adds `.claude/**` and
+- **ESLint skips agent folders — no decision number.** `eslint.config.js` adds `.claude/**` and
   `.cursor/**` to `ignores` beside `.worktrees/**`. Verified by putting a file with
   a lint error under `.claude/worktrees/probe/`, running `pnpm lint` before and
   after: before, it reports; after, it does not. No changeset: tooling only.

@@ -20,7 +20,7 @@
 
 ---
 
-### Task 1: A constant slot count in `paginationRange` (P77)
+### Task 1: A constant slot count in `paginationRange`
 
 **Files:**
 - Modify: `packages/react/src/Pagination/Pagination.tsx` (`paginationRange`)
@@ -67,7 +67,7 @@ export function paginationRange(page: number, pageCount: number, siblingCount: n
 - [ ] **Step 4: Run** the same command — PASS.
 - [ ] **Step 5: Commit** `feat(pagination): a constant slot count (D127)`.
 
-### Task 2: One slot width, a compact form, arrow names (P77, P79, P80)
+### Task 2: One slot width, a compact form, arrow names
 
 **Files:**
 - Modify: `packages/react/src/Pagination/Pagination.tsx`, `pagination.module.css`
@@ -110,7 +110,7 @@ export type PagerItem =
 - [ ] **Step 4: Run** — PASS. `pnpm lint` on the CSS.
 - [ ] **Step 5: Commit** `feat(pagination): one slot width, a compact form, arrow names (D127)`.
 
-### Task 3: Focus stays in the pager (P78)
+### Task 3: Focus stays in the pager
 
 **Files:**
 - Modify: `Pagination.tsx`, `packages/react/src/CursorPagination/CursorPagination.tsx`
@@ -124,7 +124,7 @@ export type PagerItem =
 - [ ] **Step 4: Run** — PASS.
 - [ ] **Step 5: Commit** `fix(pagination): focus stays in the pager when an arrow disables itself (D127)`.
 
-### Task 4: Presets render (P81, and P78's focus target)
+### Task 4: Presets render, and name the focus target
 
 **Files:**
 - Modify: `packages/react/scripts/patterns.ts`, `packages/react/patterns/pattern.schema.json`, `packages/react/patterns/table-pagination.json`, `packages/react/patterns/cursor-pagination.json`

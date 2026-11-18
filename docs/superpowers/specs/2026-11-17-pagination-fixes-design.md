@@ -64,7 +64,7 @@ Next.
   focus. The pagination presets render a working pager and a page-size select
   with options.**
 
-  - **A fixed number of slots (P77).** Once the pages don't all fit,
+  - **A fixed number of slots.** Once the pages don't all fit,
     `paginationRange` returns `2 × siblingCount + 5` items on every page:
     first, an ellipsis, `2 × siblingCount + 1` pages around the current one,
     an ellipsis, last. Near an end, the window is filled out on the side away
@@ -81,7 +81,7 @@ Next.
     ellipsis still stands for at least two pages. The sibling sweep test keeps
     its four invariants and gains a fifth: the length is
     `min(pageCount, 2 × siblingCount + 5)` on every page.
-  - **Slots of one width (P77).** Every page button and every ellipsis is a
+  - **Slots of one width.** Every page button and every ellipsis is a
     slot of the same width:
     `max(var(--psi-size-32), digits × 1ch + 2 × var(--psi-space-4))`, where
     `digits` is the number of digits in `pageCount`. The nav sets it as
@@ -103,7 +103,7 @@ Next.
     `siblingCount` becomes a count of slots. It stays a count of siblings: the
     slot count follows from it (`2s + 5`), and renaming it would break every
     consumer for no gain.
-  - **Focus stays in the pager (P78).** When Previous or Next had focus on
+  - **Focus stays in the pager.** When Previous or Next had focus on
     activation and the new page disables it, `Pagination` moves focus to the
     current page's button. That button carries `aria-current="page"`, so a
     screen reader announces where the user landed. `CursorPagination` moves it
@@ -114,19 +114,19 @@ Next.
     tabbed away are left alone. Psi keeps `disabled`, not `aria-disabled`:
     `Button` and `IconButton` have no focusable disabled state for a
     `<button>`, and adding one is a shared-component change no row asks for.
-  - **The presets name a focus target (P78).** `table-pagination`'s intent says
+  - **The presets name a focus target.** `table-pagination`'s intent says
     focus stays in the pager after a page change: on the button pressed, or on
     the current page's button when an arrow disables itself. A numbered pager
     reports where it is through `aria-current`, so the pager is the right place
     for focus. `cursor-pagination` keeps the caption: a cursor pager has no
     position to report, so the caption's range carries it (D85).
-  - **Translatable arrow names (P79).** `Pagination` takes `previousLabel` and
+  - **Translatable arrow names.** `Pagination` takes `previousLabel` and
     `nextLabel`, the same names as `CursorPagination`'s, with defaults
     `"Previous page"` and `"Next page"`. Those are today's names, so nothing
     changes for a consumer that sets neither. Here they are accessible names,
     because `Pagination`'s arrows are icon-only. `CursorPagination`'s are
     visible text. The TSDoc says so.
-  - **A compact form below 560px of viewport (P80).** At or below
+  - **A compact form below 560px of viewport.** At or below
     `breakpoints.sm` (560px, D31: a build-time constant baked into the media
     query), the pager shows the `siblingCount = 0` range, which is five slots
     once the pages don't fit: `1 2 3 … 100`, `1 … 50 … 100`, `1 … 98 99 100`.
@@ -147,7 +147,7 @@ Next.
     - **Limit.** At 1000–9999 pages a compact slot is 44.3px (measured) and
       the pager is 309.5px wide: it fits a 375px screen (343px), not a 320px
       one. The TSDoc says so.
-  - **The presets render (P81).** `table-pagination` gives `Pagination`
+  - **The presets render.** `table-pagination` gives `Pagination`
     `page={1}` and `pageCount={10}`. Both pagination presets give their `Select`
     three options: 10, 50 and 100, the page sizes D85 records.
     - **The pattern language gains one intrinsic element, `option`.** A node
