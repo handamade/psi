@@ -208,21 +208,14 @@ const layoutSections = [
           tokens, so a component's own motion tokens can point at either half. Every transition in Psi's components
           binds one. Pick by intent, not by speed.
         </p>
-        <table>
-          <thead>
-            <tr><th>Preset</th><th>Tokens</th><th>Aliases</th><th>Use it when</th></tr>
-          </thead>
-          <tbody>
-            {Object.entries(r.scales.motion.presets).map(([name, p]) => (
-              <tr>
-                <td>{name}</td>
-                <td><code>{p.durationToken}</code><br /><code>{p.easeToken}</code></td>
-                <td><code>--psi-duration-{p.duration}</code><br /><code>--psi-ease-{p.ease}</code></td>
-                <td>{p.intent}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul>
+          {Object.entries(r.scales.motion.presets).map(([name, p]) => (
+            <li>
+              <strong>{name}</strong>: <code>{p.durationToken}</code> and <code>{p.easeToken}</code>, aliasing{" "}
+              <code>--psi-duration-{p.duration}</code> and <code>--psi-ease-{p.ease}</code>. {p.intent}
+            </li>
+          ))}
+        </ul>
         <p>
           Skeleton's infinite pulse (D86) and <code>.psi-media-tint</code> (D35) stay on the scale below. A theme's{" "}
           <code>componentOverrides</code> value for a <code>*-duration</code> token must be a duration token or a

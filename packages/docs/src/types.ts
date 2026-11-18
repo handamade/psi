@@ -40,7 +40,12 @@ export interface Resolved {
     space: number[];
     size: number[];
     radius: number[];
-    motion: { durations: number[]; easings: Record<string, string> };
+    motion: {
+      durations: number[];
+      easings: Record<string, string>;
+      /** D141 — named pairs of the two scales. */
+      presets: Record<string, { duration: number; ease: string; intent: string; durationToken: string; easeToken: string }>;
+    };
     layout: {
       breakpoints: Record<string, number>;
       container: Record<string, number>;
