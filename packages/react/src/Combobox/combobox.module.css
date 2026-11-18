@@ -117,7 +117,9 @@
   transition: rotate var(--psi-duration-150) var(--psi-ease-standard);
 }
 
-.toggle[aria-expanded="true"] svg {
+/* Keyed on the popup being open, not aria-expanded: a "No matches" line
+   alone leaves aria-expanded false (D134), and the chevron still points up. */
+.toggle[data-open] svg {
   rotate: 180deg;
 }
 

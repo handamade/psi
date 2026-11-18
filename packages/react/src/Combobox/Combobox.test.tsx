@@ -169,10 +169,11 @@ describe("Combobox: keyboard", () => {
     await userEvent.keyboard("{Escape}");
     expect(isOpen()).toBe(false);
     expect(outer).not.toHaveBeenCalled();
-    expect(input()).toHaveValue("a");
+    // D134: Escape cancels the edit; with nothing picked the label is empty.
+    expect(input()).toHaveValue("");
   });
 
-  it("Esc on a closed list clears the text", async () => {
+  it("Esc on a closed list empties edited text when nothing is picked (D134: it restores the empty label)", async () => {
     render(<Combobox options={cities} aria-label="City" />);
     await userEvent.type(input(), "a{Escape}{Escape}");
     expect(input()).toHaveValue("");
