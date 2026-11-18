@@ -1,6 +1,6 @@
 # Combobox follow-up: Escape that keeps a value, honest expanded state, and three caller hooks (D134)
 
-Date: 2026-11-18. Status: **Accepted** for building. Branch
+Date: 2026-11-18. Status: **Accepted**, built. Branch
 `d134-combobox-followup`.
 
 Provenance: a review of `Combobox` (D130, shipped in 0.34.0) against a
@@ -49,17 +49,24 @@ At spec time no local branch, `origin` branch or open PR mentions D134.
 
 ## Measured
 
-- **The defects, in Chromium**, through new `@interaction` specs that ran
-  against the 0.34.0 build before any fix:
-  - "Escape, Escape, Tab" on a single-select showing "Lisbon" left the input
-    empty and the hidden input `""`;
-  - typing "qq" left the input with `aria-expanded="true"` and the listbox
-    `hidden`.
+- **The defects, in Chromium.** These ran against the 0.34.0 build before
+  any fix (`combobox.interaction.spec.ts`).
+  - Single-select showing "Lisbon": type "x", press Escape, Escape, then Tab.
+    - The input read `"Lisbonx"`, then `""`, then `""`.
+    - The blur committed `null`.
+    - The D134 spec failed on the first expectation: "Lisbonx", not
+      "Lisbon".
+  - Type "qq":
+    - the listbox was `hidden`;
+    - the input still read `aria-expanded="true"`;
+    - the spec failed on `aria-expanded`.
 
-  Both specs failed as described, then passed after the fix.
-- **Bundle cost.** `Combobox` re-bundled from `dist/index.js` (esbuild,
-  minified, `gzip -9`, React external). The before and after figures are in
-  "As built".
+  Both specs pass after the fix.
+- **Bundle cost.** `Combobox` and its internal imports re-bundled from
+  source (esbuild 0.28.1, minified, CSS left out, React external, `gzip -9`).
+  - Before (`origin/main`): 11,970 B minified, 4,566 B gzip.
+  - After: 12,500 B minified, 4,798 B gzip.
+  - The cost is **+232 B gzip**.
 
 ## Decisions
 
@@ -261,6 +268,35 @@ so. Only the caller knows that, so the caller needs a way to hold it.
   - `llms.txt`'s Combobox section ("There is **no `open` prop**" changes).
 - **A changeset** that names the two behaviour changes.
 - **All five gates,** then CI's `vr`.
+
+## As built (2026-11-18)
+
+- **The ids.** The status line and the "more" line get stable ids
+  (`psi-combobox-<id>-status`, `-more`). The input names them while the popup
+  is open and the line shows, after the Field's description and any
+  `aria-describedby` the caller passed.
+- **Requests made while a hold is on.** The `ReadFailed` story's first
+  version stored every `onOpenChange(true)` in its own state while the read
+  was failed. When the read recovered, the list opened by itself. The browser
+  spec caught it. The story now drops requests while the read is failed, and
+  `open`'s JSDoc and `llms.txt` say to do the same.
+- **The story's button.** The same spec showed that "Try again" inside a
+  `<form>` needs `type="button"`. `Button` keeps the native default
+  (`submit`), so an implicit submit from Enter clicked it.
+- **One function settles.** Blur, open Enter with nothing highlighted, and
+  closed Enter on edited text all call it. Escape writes the shown label
+  directly.
+- **The stories.**
+  - `PresetLabel`: a caller-owned list of five with item 37 picked, named by
+    `valueLabel`, with a "more" line.
+  - `ReadFailed`: a form with a Field error, `open={false}` while the read
+    is failed, and "Try again".
+
+  Both are closed states, so each adds two `vr` baselines (light and ember).
+  The repo's shared focus-ring and font specs ran on both and passed.
+- **The type fixture** (`scripts/type-fixtures/combobox-select.tsx`):
+  - rejects `valueLabel` with `multiple`;
+  - accepts `open`, `onOpenChange` and `announce` on both.
 
 ## What this changes
 
