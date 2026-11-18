@@ -76,7 +76,9 @@ interface ComboboxBaseProps extends InputAttributes {
    * is true (and the Combobox isn't disabled): typing, the arrow keys and
    * the chevron then ask to open through onOpenChange, and a pick, Esc, Tab,
    * blur and an outside press ask to close, but nothing changes until the
-   * new `open` arrives. Hold it false while a caller-owned read has failed. */
+   * new `open` arrives. Hold it false while a caller-owned read has failed,
+   * and drop the requests made meanwhile: a stored `true` would open the
+   * list by itself the moment the hold ends. */
   open?: boolean;
   /** Called when the list opens or closes, or, with `open` set, when it asks
    * to. Never called for a change made through `open`. */
