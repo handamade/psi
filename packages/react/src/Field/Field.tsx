@@ -114,6 +114,8 @@ export function Field({
   const stack = useContext(FieldStackContext);
   const position: FieldLabelPosition = labelPosition ?? stack?.labelPosition ?? "top";
   const layout = {
+    // D135: a hook for Toolbar's control width, as Combobox's data-psi-combobox is.
+    "data-psi-field": "",
     "data-label-position": position === "start" ? "start" : undefined,
     "data-in-stack": stack ? stack.labelPosition : undefined,
     "data-control-width": controlWidth,

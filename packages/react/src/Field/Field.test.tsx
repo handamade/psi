@@ -405,3 +405,26 @@ describe("the Field's wiring wins (D135)", () => {
     expect(input).not.toBeRequired();
   });
 });
+
+describe("data-psi-field (D135)", () => {
+  it("marks the root in every mode, so a Toolbar can reach the Field's control", () => {
+    const { container, rerender } = render(
+      <Field label="A">
+        <Input />
+      </Field>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-psi-field");
+    rerender(
+      <Field group label="A">
+        <Checkbox>x</Checkbox>
+      </Field>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-psi-field");
+    rerender(
+      <Field group labelPosition="start" label="A">
+        <Checkbox>x</Checkbox>
+      </Field>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-psi-field");
+  });
+});
