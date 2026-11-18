@@ -1,6 +1,6 @@
-import { useContext, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import type { InputHTMLAttributes, Ref } from "react";
-import { FieldContext } from "../Field/Field.js";
+import { useFieldWiring } from "../Field/useFieldWiring.js";
 import styles from "./checkbox.module.css";
 
 export interface CheckboxProps
@@ -25,8 +25,10 @@ export interface CheckboxProps
 }
 
 /** Native checkbox with a built-in label; for independent binary choices.
- * In an invalid group Field it is aria-invalid, and an unchecked box marked
- * aria-invalid outlines in the error colour (D108). */
+ * In a Field it takes the Field's id, message, aria-invalid and required, and
+ * the Field's win over the caller's (D135); it is named by the Field's label
+ * and its own. In a group Field it takes aria-invalid only (D108). An
+ * unchecked box marked aria-invalid outlines in the error colour (D108). */
 export function Checkbox({
   children,
   className,
@@ -35,11 +37,13 @@ export function Checkbox({
   ref,
   ...rest
 }: CheckboxProps) {
-  // D108: in an invalid group Field, every checkbox is aria-invalid, as every
-  // Radio is (D104). Not `required`: on a checkbox that means this box must be
-  // ticked. A consumer's own aria-invalid, in `rest`, still wins.
-  const field = useContext(FieldContext);
-  const fieldInvalid = (field?.group && field.invalid) || undefined;
+  // D135: in a Field that is not a group, the box is the Field's control and
+  // takes its id (so the Field's <label for> names it beside the box's own
+  // label), its message, aria-invalid and required. In a group Field (D108)
+  // every box is aria-invalid while the group is, as every Radio is (D104),
+  // and not `required`: on a checkbox that means this box must be ticked. The
+  // Field's values win over the caller's.
+  const wiring = useFieldWiring("Checkbox", rest, { choice: true });
   const innerRef = useRef<HTMLInputElement | null>(null);
   const setRef = (node: HTMLInputElement | null) => {
     innerRef.current = node;
@@ -68,8 +72,8 @@ export function Checkbox({
         type="checkbox"
         className={`psi-sr-only ${styles.input}`}
         disabled={disabled}
-        aria-invalid={fieldInvalid}
         {...rest}
+        {...wiring}
       />
       <span className={styles.indicator} aria-hidden="true" />
       {children && <span className={styles.text}>{children}</span>}
