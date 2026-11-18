@@ -46,8 +46,11 @@ function Demo({
   banner,
   plainSidebar,
   brandAligned,
+  sidebarMotion,
 }: {
   initialOpen: boolean;
+  /** D142: the sidebar's open and close. */
+  sidebarMotion?: "instant" | "slide";
   shellStyle?: CSSProperties;
   headerProps?: HTMLAttributes<HTMLElement> & { "data-psi-theme"?: string };
   headerText?: string;
@@ -64,6 +67,7 @@ function Demo({
   return (
     <AppShell
       sidebarOpen={open}
+      sidebarMotion={sidebarMotion}
       sidebarTheme={plainSidebar ? undefined : "dark"}
       style={shellStyle}
       banner={banner}
@@ -244,3 +248,13 @@ export const SidebarLine: Story = {
     />
   ),
 };
+
+/** D142 — `sidebarMotion="slide"`: Menu runs the sidebar's column to 0 and
+ * back over `--psi-app-shell-sidebar-duration` and `-ease` (the `move` preset),
+ * fading it, while its content holds still. Open, it looks exactly like
+ * Default. Instant under `prefers-reduced-motion`. */
+export const Sliding: Story = { render: () => <Demo initialOpen sidebarMotion="slide" /> };
+
+/** D142 — the same frame closed: the sidebar's column is 0px and the sidebar
+ * `visibility: hidden`, out of the tab order; `main` takes the width. */
+export const SlidingClosed: Story = { render: () => <Demo initialOpen={false} sidebarMotion="slide" /> };

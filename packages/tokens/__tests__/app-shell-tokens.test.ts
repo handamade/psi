@@ -83,3 +83,25 @@ describe("navbar text colour (D111)", () => {
     expect(violations[0].token).toBe("bgPrimary");
   });
 });
+
+describe("app-shell sidebar motion (D142)", () => {
+  it("times the sidebar's open and close with the move preset (D141)", () => {
+    expect(componentVars["app-shell"]["sidebar-duration"]).toBe("var(--psi-motion-move-duration)");
+    expect(componentVars["app-shell"]["sidebar-ease"]).toBe("var(--psi-motion-move-ease)");
+  });
+
+  it("is page-scoped, so a sidebar sub-theme keeps the page's timing (D139)", async () => {
+    const { classifyComponentTokens } = await import("../src/emit/component-scope.js");
+    const scopes = classifyComponentTokens(componentVars, Object.keys(lightTheme));
+    expect(scopes.get("--psi-app-shell-sidebar-duration")).toBe("page");
+    expect(scopes.get("--psi-app-shell-sidebar-ease")).toBe("page");
+  });
+
+  it("a theme may retime it with another step or preset, never a literal", () => {
+    expect(checkOverrideScopes({ "app-shell-sidebar-duration": "var(--psi-duration-350)" }, componentVars, lightTheme)).toEqual([]);
+    expect(checkOverrideScopes({ "app-shell-sidebar-duration": "var(--psi-motion-emphasis-duration)" }, componentVars, lightTheme)).toEqual([]);
+    expect(checkOverrideScopes({ "app-shell-sidebar-duration": "300ms" }, componentVars, lightTheme)).toEqual([
+      expect.objectContaining({ group: "duration", token: "300ms" }),
+    ]);
+  });
+});
