@@ -7,6 +7,9 @@ import type {
   TokenDef,
 } from "../dsl/types.js";
 import type { BrandFonts } from "../themes/customers/index.js";
+import { componentVars } from "../components/registry.js";
+import { lightTheme } from "../themes/light.js";
+import { classifyComponentTokens, overrideDependents } from "./component-scope.js";
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -163,6 +166,16 @@ export function emitThemeCSS(
     lines.push("@layer psi.components {");
     lines.push(`  [data-psi-theme="${themeName}"] {`);
     for (const [name, value] of Object.entries(opts.componentOverrides)) {
+      lines.push(`    --psi-${name}: ${value};`);
+    }
+    // D139: a page-scoped alias of an overridden token resolves once, at
+    // :root. Declared again here, it follows this theme's value wherever the
+    // theme is applied, on <html> or on a narrower element.
+    // Classified against the semantic vocabulary every theme shares, as
+    // components.css is, whatever subset this definition spells out.
+    const scopes = classifyComponentTokens(componentVars, Object.keys(lightTheme));
+    const dependents = overrideDependents(opts.componentOverrides, componentVars, scopes);
+    for (const [name, value] of Object.entries(dependents)) {
       lines.push(`    --psi-${name}: ${value};`);
     }
     lines.push("  }");

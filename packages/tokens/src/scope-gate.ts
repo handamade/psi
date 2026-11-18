@@ -1,5 +1,6 @@
 import type { ThemeDef } from "./dsl/types.js";
 import { PROPERTY_GROUPS, expandScopes, keyGroup } from "./scopes.js";
+import { classifyComponentTokens } from "./emit/component-scope.js";
 
 export interface ScopeViolation {
   component: string;
@@ -93,7 +94,13 @@ export function checkScopes(
 
 /** Same gate for brand componentOverrides ("button-accent-bg": "..."):
  * component resolved by longest known prefix; unknown prefixes are skipped
- * (non-color overrides like media-tint carry no component token shape). */
+ * (non-color overrides like media-tint carry no component token shape).
+ *
+ * D139: an override of a page-scoped token (geometry, type, motion) may bind
+ * no semantic token at all. A page-scoped token is not declared again under a
+ * sub-theme, so the page's resolved colour would reach into every sub-theme
+ * inside it, unchecked against that theme's contrast. Such a violation carries
+ * the group "page". */
 export function checkOverrideScopes(
   overrides: Record<string, string>,
   componentVars: Record<string, Record<string, string>>,
@@ -101,12 +108,22 @@ export function checkOverrideScopes(
 ): ScopeViolation[] {
   const kebabToName = new Map(Object.keys(theme).map((n) => [camelToKebab(n), n]));
   const components = Object.keys(componentVars).sort((a, b) => b.length - a.length);
+  const scopes = classifyComponentTokens(componentVars, Object.keys(theme));
   const violations: ScopeViolation[] = [];
   for (const [fullKey, value] of Object.entries(overrides)) {
     const component = components.find((c) => fullKey.startsWith(`${c}-`));
     if (!component) continue;
     const key = fullKey.slice(component.length + 1);
     violations.push(...checkOne(component, key, value, componentVars, theme, kebabToName));
+    if (scopes.get(`--psi-${fullKey}`) === "page") {
+      for (const token of semanticRefs(component, value, componentVars, kebabToName)) {
+        // "!" marks a var outside the theme: a scale or layout value, unless it
+        // is a palette entry, which a theme declares.
+        if (token.startsWith("!") && !token.startsWith("!--psi-palette-")) continue;
+        const name = token.startsWith("!") ? token.slice(1) : token;
+        violations.push({ component, key, group: "page", token: name, scopes: theme[name]?.scopes ?? [] });
+      }
+    }
   }
   return violations;
 }

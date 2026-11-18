@@ -23,7 +23,9 @@ export class ThemeGateError extends Error {
     }
     if (scopeViolations.length > 0) {
       parts.push(`${scopeViolations.length} scope violations: ` +
-        scopeViolations.map((v) => `--psi-${v.component}-${v.key} (${v.group}) binds ${v.token}`).join("; "));
+        scopeViolations.map((v) => v.group === "page"
+          ? `--psi-${v.component}-${v.key} is page-scoped (D139) and binds ${v.token}, which a sub-theme would inherit unresolved`
+          : `--psi-${v.component}-${v.key} (${v.group}) binds ${v.token}`).join("; "));
     }
     super(`${theme} theme failed its gates — ${parts.join(" · ")}`);
     this.name = "ThemeGateError";
