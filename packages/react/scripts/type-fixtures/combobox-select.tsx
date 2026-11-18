@@ -29,6 +29,13 @@ const options: ComboboxOption[] = [{ value: "ber", label: "Berlin" }];
 // @ts-expect-error filter takes a function or false
 <Combobox options={options} filter />;
 
+// D134: valueLabel is single-select only; open and announce take booleans.
+<Combobox options={options} value="c-4182" valueLabel="Acme GmbH" />;
+<Combobox options={options} open={false} onOpenChange={(open: boolean) => open} announce={false} />;
+<Combobox multiple options={options} open onOpenChange={(open: boolean) => open} />;
+// @ts-expect-error a multi-select has no single label to show
+<Combobox multiple options={options} value={["c-4182"]} valueLabel="Acme GmbH" />;
+
 // Select loses multiple (D130).
 <Select size={32}><option>One</option></Select>;
 // @ts-expect-error Select has no multiple; use Combobox

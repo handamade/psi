@@ -206,3 +206,43 @@ test("a Combobox inside a Dialog draws its popup above it @interaction", async (
   // The option's accessible name joins its description (jsdom can't compute it).
   await expect(page.getByRole("option", { name: "Berlin Germany" })).toBeVisible();
 });
+
+// ── D134 ────────────────────────────────────────────────────────────
+
+test("D134: two Escapes and a Tab keep a picked value (single-select) @interaction", async ({ page }) => {
+  await page.goto(story("clearable"), { waitUntil: "networkidle" });
+  const input = page.getByRole("combobox", { name: "City" });
+  await expect(input).toHaveValue("Lisbon");
+  await input.click();
+  await page.keyboard.type("x");
+  await expect.poll(() => isOpen(page)).toBe(true);
+  await page.keyboard.press("Escape");
+  // Escape in the open list closes it and restores the picked label.
+  await expect.poll(() => isOpen(page)).toBe(false);
+  await expect(input).toHaveValue("Lisbon");
+  await page.keyboard.press("Escape");
+  await expect(input).toHaveValue("Lisbon");
+  await page.keyboard.press("Tab");
+  await expect(input).toHaveValue("Lisbon");
+  // The value survived the blur: reopening shows Lisbon picked.
+  await input.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("option", { name: "Lisbon" })).toHaveAttribute("aria-selected", "true");
+});
+
+test("D134: with no match, aria-expanded is false and the status line describes the input @interaction", async ({ page }) => {
+  await page.goto(story("default"), { waitUntil: "networkidle" });
+  const input = page.getByRole("combobox");
+  await input.click();
+  await page.keyboard.type("qq");
+  await expect.poll(() => isOpen(page)).toBe(true);
+  await expect(popup(page)).toContainText("No matches");
+  await expect(page.getByRole("listbox", { includeHidden: true })).toBeHidden();
+  await expect(input).toHaveAttribute("aria-expanded", "false");
+  await expect(input).toHaveAccessibleDescription("No matches");
+  // A match brings the listbox back, and the line leaves the description.
+  for (let i = 0; i < 2; i++) await page.keyboard.press("Backspace");
+  await page.keyboard.type("ber");
+  await expect(input).toHaveAttribute("aria-expanded", "true");
+  await expect(input).toHaveAccessibleDescription("");
+});
