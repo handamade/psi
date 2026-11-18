@@ -65,6 +65,24 @@ interface ComboboxBaseProps extends InputAttributes {
   loadingMessage?: ReactNode;
   /** What the live region says after filtering. @default "1 result" / "N results" */
   resultsLabel?: (count: number) => string;
+  /** When false, the Combobox has no live region of its own: an application
+   * that routes every announcement through one announcer sets this and
+   * speaks the count, the loading line and "No matches" itself, as with
+   * Field's announce. The status lines still show and still describe the
+   * input (aria-describedby). @default true (D134) */
+  announce?: boolean;
+  /** The list's open state, controlled (D134). Leave it unset and the list
+   * opens and closes by itself. Set it and the list shows exactly while it
+   * is true (and the Combobox isn't disabled): typing, the arrow keys and
+   * the chevron then ask to open through onOpenChange, and a pick, Esc, Tab,
+   * blur and an outside press ask to close, but nothing changes until the
+   * new `open` arrives. Hold it false while a caller-owned read has failed,
+   * and drop the requests made meanwhile: a stored `true` would open the
+   * list by itself the moment the hold ends. */
+  open?: boolean;
+  /** Called when the list opens or closes, or, with `open` set, when it asks
+   * to. Never called for a change made through `open`. */
+  onOpenChange?: (open: boolean) => void;
   /** Goes on the root element. */
   className?: string;
   /** Forwarded ref to the `<input>`. */
@@ -80,6 +98,12 @@ export interface ComboboxSingleProps extends ComboboxBaseProps {
   defaultValue?: string | null;
   /** Called with the picked value, or null when the text is emptied. */
   onChange?: (value: string | null) => void;
+  /** The picked value's label, for a value the options don't hold: a preset
+   * value past the first page of a server-read list, or a list not loaded
+   * yet (D134). The options win when they hold the value. A new valueLabel
+   * belongs to the value picked when it arrives, and the text follows it
+   * unless the user is editing. */
+  valueLabel?: string;
   /** Height in px. @default 32 */
   size?: 24 | 32 | 40 | 48;
 }
@@ -92,6 +116,8 @@ export interface ComboboxMultipleProps extends ComboboxBaseProps {
   defaultValue?: string[];
   /** Called with every picked value after each change. */
   onChange?: (values: string[]) => void;
+  /** Single-select only (D134). */
+  valueLabel?: never;
   /** Height in px; the control grows from it as Tags wrap. 24 is excluded: a
    * 24px Tag doesn't fit inside a 24px control. @default 32 */
   size?: 32 | 40 | 48;
@@ -133,9 +159,11 @@ function keepFocus(event: MouseEvent) {
  * input; `aria-activedescendant` names the highlighted option. The popup is
  * a manual popover on the top layer, placed under the control and at least
  * as wide as it; it closes on an outside pointerdown, Esc, Tab and blur.
- * The open state is internal: the list opens and closes with typing. Inside
- * a Field, the id, label, description, invalid and required wiring are
- * taken automatically, as Select takes them (D49). */
+ * The list opens and closes by itself; `open` and `onOpenChange` let a
+ * caller hold it (D134). In single-select, Esc restores the picked label and
+ * Enter or blur settle edited text (D134). Inside a Field, the id, label,
+ * description, invalid and required wiring are taken automatically, as
+ * Select takes them (D49). */
 export function Combobox(props: ComboboxProps) {
   const {
     options,
@@ -156,6 +184,10 @@ export function Combobox(props: ComboboxProps) {
     emptyMessage = "No matches",
     loadingMessage = "Loading…",
     resultsLabel = defaultResultsLabel,
+    announce = true,
+    open: openProp,
+    onOpenChange,
+    valueLabel,
     className,
     style,
     ref,
@@ -174,13 +206,13 @@ export function Combobox(props: ComboboxProps) {
   const field = useContext(FieldContext);
   const invalid = error || (field?.invalid ?? false);
   const required = requiredProp ?? field?.required ?? false;
-  const describedBy =
-    [field?.describedBy, rest["aria-describedby"]].filter(Boolean).join(" ") || undefined;
 
   const uid = useId().replace(/:/g, "");
   const inputId = rest.id ?? field?.id ?? `psi-combobox-${uid}`;
   const listboxId = `psi-combobox-${uid}-listbox`;
   const optionId = (index: number) => `psi-combobox-${uid}-option-${index}`;
+  const statusId = `psi-combobox-${uid}-status`;
+  const moreId = `psi-combobox-${uid}-more`;
   const anchorName = `--psi-combobox-${uid}`;
 
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -212,11 +244,20 @@ export function Combobox(props: ComboboxProps) {
 
   // A picked value keeps its label when a caller-owned list no longer holds
   // the option (filter={false}): remember every label seen.
+  // D134: a new valueLabel is the label of the value picked when it
+  // arrives, stored before the options so that the options win; passing the
+  // same string again stores nothing, so it never leaks onto a later pick.
   const labelCache = useRef(new Map<string, string>());
+  const lastValueLabel = useRef<string | undefined>(undefined);
+  if (!multiple && valueLabel !== lastValueLabel.current) {
+    lastValueLabel.current = valueLabel;
+    if (valueLabel !== undefined && values[0] !== undefined) labelCache.current.set(values[0], valueLabel);
+  }
   for (const option of options) labelCache.current.set(option.value, option.label);
   const labelOf = (value: string) => labelCache.current.get(value) ?? value;
 
   // ── The text ──
+  // The shown label: what the input shows when nobody is typing (D134).
   const singleLabel = !multiple && values[0] !== undefined ? labelOf(values[0]) : "";
   const [textState, setTextState] = useState(singleLabel);
   const text = inputValueProp ?? textState;
@@ -224,20 +265,37 @@ export function Combobox(props: ComboboxProps) {
     if (inputValueProp === undefined) setTextState(next);
     if (next !== text) onInputChange?.(next);
   };
+  /** Single-select text that differs from the shown label (D134). */
+  const edited = !multiple && text !== singleLabel;
 
   // A single-select's text follows its value when the value changes: a pick,
-  // a clear, or a controlled value set from outside.
-  const lastValueKey = useRef(values.join("\u0000"));
+  // a clear, or a controlled value set from outside. It also follows the
+  // shown label when that changes under unedited text: a valueLabel or an
+  // options page that arrives after the value (D134).
+  const valueKey = values.join("\u0000");
+  const lastValueKey = useRef(valueKey);
+  const lastLabel = useRef(singleLabel);
   useEffect(() => {
-    const key = values.join("\u0000");
-    if (key === lastValueKey.current) return;
-    lastValueKey.current = key;
-    if (!multiple) writeText(singleLabel);
-    // writeText is recreated each render; the value is the trigger.
-  }, [values.join("\u0000"), multiple]);
+    const previousKey = lastValueKey.current;
+    const previousLabel = lastLabel.current;
+    lastValueKey.current = valueKey;
+    lastLabel.current = singleLabel;
+    if (multiple) return;
+    if (valueKey !== previousKey) writeText(singleLabel);
+    else if (singleLabel !== previousLabel && text === previousLabel) writeText(singleLabel);
+    // writeText is recreated each render; the value and its label are the triggers.
+  }, [valueKey, singleLabel, multiple]);
 
   // ── The list ──
-  const [open, setOpen] = useState(false);
+  // D134: controlled by `open` when it's set; otherwise our own state. Every
+  // open and close goes through requestOpen, which reports it.
+  const [openState, setOpenState] = useState(false);
+  const open = (openProp ?? openState) && !disabled;
+  const requestOpen = (next: boolean) => {
+    if (next === open) return;
+    if (openProp === undefined) setOpenState(next);
+    onOpenChange?.(next);
+  };
   // Opening by key or chevron shows the whole list; typing filters (plan).
   const [filtering, setFiltering] = useState(false);
   const visible = useMemo(() => {
@@ -249,14 +307,14 @@ export function Combobox(props: ComboboxProps) {
   const active = useActiveOption(visible);
   const activeIndex = active.active === null ? -1 : visible.findIndex((o) => o.value === active.active);
 
-  const close = useCallback(() => setOpen(false), []);
+  const close = () => requestOpen(false);
   /** Open the list unfiltered. "picked-first" / "picked-last": highlight the
    * picked option, else the first / last (Down / Up). "picked": the picked
    * option, else nothing (the chevron). "none": nothing (Alt + Down). */
   const openWith = (highlight: "picked-first" | "picked-last" | "picked" | "none") => {
     if (disabled) return;
     setFiltering(false);
-    setOpen(true);
+    requestOpen(true);
     if (highlight === "none") {
       active.clear();
       return;
@@ -269,7 +327,9 @@ export function Combobox(props: ComboboxProps) {
   };
 
   usePopupPlacement({ popoverRef: popupRef, anchorRef: rootRef, open, placement: "bottom-start", anchorName, matchWidth: true });
-  const popupProps = useAnchoredPopup({ popoverRef: popupRef, anchorRef: rootRef, open, mode: "manual", onDismiss: close });
+  // close() reads open, openProp and onOpenChange; nothing else changes it.
+  const dismiss = useCallback(() => close(), [open, openProp, onOpenChange]);
+  const popupProps = useAnchoredPopup({ popoverRef: popupRef, anchorRef: rootRef, open, mode: "manual", onDismiss: dismiss });
 
   // Keep the highlighted option in view as it moves.
   useEffect(() => {
@@ -300,6 +360,18 @@ export function Combobox(props: ComboboxProps) {
   const removeValue = (value: string) => {
     commit(values.filter((v) => v !== value));
     inputRef.current?.focus();
+  };
+
+  /** Leave an edit: emptied text clears the value; other edited text goes
+   * back to the shown label. Blur does this, and Enter with nothing
+   * highlighted (D134). */
+  const settle = () => {
+    if (text === "") {
+      if (values.length > 0) commit([]);
+    } else if (text !== singleLabel) {
+      writeText(singleLabel);
+    }
+    setFiltering(false);
   };
 
   const clearAll = () => {
@@ -349,23 +421,46 @@ export function Combobox(props: ComboboxProps) {
       active.page(key === "PageDown" ? 1 : -1);
       return;
     }
-    if (key === "Enter" && open) {
-      // The key belongs to the list while it's open: never submit.
-      event.preventDefault();
-      const option = activeIndex >= 0 ? visible[activeIndex] : undefined;
-      if (option) pick(option);
+    if (key === "Enter") {
+      if (open) {
+        // The key belongs to the list while it's open: never submit.
+        event.preventDefault();
+        const option = activeIndex >= 0 ? visible[activeIndex] : undefined;
+        if (option) pick(option);
+        else if (!multiple) {
+          // D134: nothing highlighted settles the text, as leaving does.
+          settle();
+          close();
+        }
+      } else if (edited) {
+        // D134: edited text never submits an old value.
+        event.preventDefault();
+        settle();
+      }
       return;
     }
     if (key === "Escape") {
-      if (open) {
+      if (multiple) {
+        if (open) {
+          event.preventDefault();
+          event.stopPropagation();
+          close();
+        } else if (text !== "") {
+          event.preventDefault();
+          event.stopPropagation();
+          writeText("");
+          setFiltering(false);
+        }
+      } else if (open || edited) {
+        // D134: Esc cancels the edit. It restores the shown label and never
+        // clears a value; unedited and closed, it reaches a parent Dialog.
         event.preventDefault();
         event.stopPropagation();
-        close();
-      } else if (text !== "") {
-        event.preventDefault();
-        event.stopPropagation();
-        writeText("");
-        setFiltering(false);
+        if (open) close();
+        if (edited) {
+          writeText(singleLabel);
+          setFiltering(false);
+        }
       }
       return;
     }
@@ -383,19 +478,14 @@ export function Combobox(props: ComboboxProps) {
     writeText(event.target.value);
     setFiltering(true);
     active.follow();
-    if (!open && !disabled) setOpen(true);
+    if (!open && !disabled) requestOpen(true);
   };
 
   const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
     onBlurProp?.(event);
     close();
     if (multiple) return;
-    if (text === "") {
-      if (values.length > 0) commit([]);
-    } else if (text !== singleLabel) {
-      writeText(singleLabel);
-    }
-    setFiltering(false);
+    settle();
   };
 
   // A pointerdown anywhere on the control that isn't the input keeps focus
@@ -416,6 +506,20 @@ export function Combobox(props: ComboboxProps) {
   const count = visible.length;
   const empty = count === 0;
   const announcement = !open ? "" : loading ? loadingMessage : empty ? emptyMessage : resultsLabel(count);
+  // D134: expanded only while a listbox shows; a status line alone isn't one.
+  const expanded = open && !empty;
+  const showStatus = loading || empty;
+  // The lines outside the listbox describe the input while they show (a
+  // hidden element still lends its text when named, so name it only then).
+  const describedBy =
+    [
+      field?.describedBy,
+      rest["aria-describedby"],
+      open && showStatus && statusId,
+      open && moreMessage && moreId,
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined;
   const listboxName = field?.labelId
     ? { "aria-labelledby": field.labelId }
     : rest["aria-labelledby"]
@@ -471,7 +575,7 @@ export function Combobox(props: ComboboxProps) {
           disabled={disabled}
           autoComplete="off"
           aria-autocomplete="list"
-          aria-expanded={open}
+          aria-expanded={expanded}
           aria-controls={listboxId}
           aria-activedescendant={open && activeIndex >= 0 ? optionId(activeIndex) : undefined}
           aria-invalid={invalid || undefined}
@@ -504,10 +608,11 @@ export function Combobox(props: ComboboxProps) {
           tabIndex={-1}
           className={[styles.button, styles.toggle].join(" ")}
           aria-label={toggleLabel}
-          aria-expanded={open}
+          aria-expanded={expanded}
           aria-controls={listboxId}
+          data-open={open || undefined}
           disabled={disabled}
-            onMouseDown={keepFocus}
+          onMouseDown={keepFocus}
           onClick={() => {
             if (open) close();
             else openWith("picked");
@@ -533,8 +638,8 @@ export function Combobox(props: ComboboxProps) {
         data-psi-combobox-popup
         onMouseDown={keepFocus}
       >
-        {(loading || empty) && (
-          <div className={styles.status} data-psi-combobox-status>
+        {showStatus && (
+          <div id={statusId} className={styles.status} data-psi-combobox-status>
             {loading ? loadingMessage : emptyMessage}
           </div>
         )}
@@ -585,14 +690,16 @@ export function Combobox(props: ComboboxProps) {
           })}
         </div>
         {moreMessage && (
-          <div className={styles.status} data-psi-combobox-more>
+          <div id={moreId} className={styles.status} data-psi-combobox-more>
             {moreMessage}
           </div>
         )}
       </div>
-      <div className="psi-sr-only" aria-live="polite" aria-atomic="true">
-        {announcement}
-      </div>
+      {announce && (
+        <div className="psi-sr-only" aria-live="polite" aria-atomic="true">
+          {announcement}
+        </div>
+      )}
     </div>
   );
 }
