@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-11-19",
+    tag: "release",
+    title: "0.38.0 — an MCP that knows the icons, and pattern presets that pass its own check",
+    body: "The MCP server now indexes Psi's 38 icons: search finds one by name or by what it shows, get returns its props, and check validates them instead of skipping them. useToast() and useFieldControl() are documented from their source, with a table of what each returns. When check meets a prop it doesn't know, its hint now offers the component's own prop first: onValueChange on Combobox suggests onChange, not a DOM attribute. Each component page's variant guidance lists only the variants that component takes. Every pattern preset now passes check: a pattern declares the state it owns and the inputs its caller supplies, and its preset renders as a small component that holds that state. The destructive-confirm preset now uses a neutral Cancel and no close button, as the Dialog page recommends for a confirmation that can't be undone. 60 components, 24 patterns.",
+  },
+  {
     date: "2026-11-18",
     tag: "release",
     title: "0.37.0 — a sidebar that slides, motion presets, and a nested theme that keeps the page's geometry",
