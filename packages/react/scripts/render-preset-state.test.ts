@@ -26,7 +26,7 @@ describe("renderPreset: stateful patterns render a component module (D143)", () 
 `import { useState } from "react";
 import { Button, Menu, MenuItem } from "@handamade/psi-react";
 
-export function RowActions({ onEdit }: {
+export function RowActionsPattern({ onEdit }: {
   onEdit: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -53,7 +53,7 @@ export function RowActions({ onEdit }: {
     expect(renderPreset(inputsOnly, [])).toBe(
 `import { Dialog } from "@handamade/psi-react";
 
-export function DestructiveConfirm({ open, onClose }: {
+export function DestructiveConfirmPattern({ open, onClose }: {
   open: boolean;
   onClose: () => void;
 }) {
@@ -72,7 +72,7 @@ export function DestructiveConfirm({ open, onClose }: {
 `import { useState } from "react";
 import { Tabs } from "@handamade/psi-react";
 
-export function TabbedWorkspace() {
+export function TabbedWorkspacePattern() {
   const [value, setValue] = useState("all");
   return (
     <Tabs onValueChange={setValue} value={value}>Panels</Tabs>
@@ -99,6 +99,25 @@ export function TabbedWorkspace() {
     expect(renderPreset(p, [])!.split("\n")[0]).toBe(
       'import { Button, IconMoreHorizontal, Select, Toolbar } from "@handamade/psi-react";',
     );
+  });
+
+  it("throws when a name the module declares is declared twice", () => {
+    // The wrapper against an imported component of the same name.
+    expect(() =>
+      renderPreset(base({ inputs: [{ key: "onEdit", type: "() => void" }], compose: { component: "RowActionsPattern", props: { onClick: "{input:onEdit}" } } }), []),
+    ).toThrow(/pattern "row-actions": "RowActionsPattern" is declared twice/);
+    // An input against a state key's setter.
+    expect(() =>
+      renderPreset(base({
+        state: [{ key: "open", initial: false }],
+        inputs: [{ key: "setOpen", type: "(open: boolean) => void" }],
+        compose: { component: "Menu", props: { open: "{state:open}", onOpenChange: "{input:setOpen}" } },
+      }), []),
+    ).toThrow(/"setOpen" is declared twice/);
+    // An input against the react import.
+    expect(() =>
+      renderPreset(base({ inputs: [{ key: "useState", type: "() => void" }], compose: { component: "Button", props: { onClick: "{input:useState}" } } }), []),
+    ).toThrow(/"useState" is declared twice/);
   });
 
   it("leaves a pattern with neither array a bare element", () => {

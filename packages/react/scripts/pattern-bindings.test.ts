@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bindingExpr, bindingValue, isFunctionType, parseBinding, pascalCase, setterName } from "./pattern-bindings.js";
+import { bindingExpr, bindingValue, isFunctionType, parseBinding, pascalCase, setterName, wrapperName } from "./pattern-bindings.js";
 import { validatePatterns } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
 
@@ -32,6 +32,9 @@ describe("binding helpers", () => {
     expect(setterName("sidebarOpen")).toBe("setSidebarOpen");
     expect(pascalCase("row-actions")).toBe("RowActions");
     expect(pascalCase("app-shell")).toBe("AppShell");
+    // Suffixed, so app-shell's wrapper never collides with the AppShell it imports.
+    expect(wrapperName("app-shell")).toBe("AppShellPattern");
+    expect(wrapperName("row-actions")).toBe("RowActionsPattern");
   });
   it("tells function types apart", () => {
     expect(isFunctionType("() => void")).toBe(true);
@@ -153,6 +156,24 @@ describe("validatePatterns: state and inputs (D143)", () => {
     );
     expect(() => ok(menuPattern({ inputs: [{ key: "onEdit", type: "() => void" }, { key: "label", type: "string" }] }))).toThrow(
       /input "label" needs a story value/,
+    );
+  });
+  it("rejects a key the preset module cannot declare", () => {
+    expect(() => ok(menuPattern({ inputs: [{ key: "onEdit", type: "() => void" }, { key: "useState", type: "() => void" }] }))).toThrow(
+      /input key "useState" is a reserved name/,
+    );
+    for (const word of ["delete", "default", "new", "function"]) {
+      expect(() => ok(menuPattern({ state: [{ key: "open", initial: false }, { key: word, initial: false }] })), word).toThrow(
+        new RegExp(`state key "${word}" is a reserved name`),
+      );
+    }
+  });
+  it("rejects a key that is another key's setter", () => {
+    expect(() =>
+      ok(menuPattern({ inputs: [{ key: "onEdit", type: "() => void" }, { key: "setOpen", type: "(open: boolean) => void" }] })),
+    ).toThrow(/key "setOpen" is the setter of state "open"/);
+    expect(() => ok(menuPattern({ state: [{ key: "open", initial: false }, { key: "setOpen", initial: false }] }))).toThrow(
+      /key "setOpen" is the setter of state "open"/,
     );
   });
   it("rejects an unbound required prop", () => {

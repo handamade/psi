@@ -44,6 +44,22 @@ export const setterName = (key: string): string => `set${key[0].toUpperCase()}${
 export const pascalCase = (id: string): string =>
   id.split("-").map((w) => `${w[0].toUpperCase()}${w.slice(1)}`).join("");
 
+/** The function a stateful preset exports. Always suffixed: a bare
+ * `pascalCase(id)` collides with the component a pattern is named after
+ * (`app-shell` → `AppShell`, which the module imports). */
+export const wrapperName = (id: string): string => `${pascalCase(id)}Pattern`;
+
+/** Names a state or input key cannot take, because the preset module declares
+ * it as a binding: JavaScript's reserved words (strict mode, since a module is
+ * strict), plus the `useState` the module imports. `KEY_RE` admits them all. */
+export const RESERVED_KEYS: ReadonlySet<string> = new Set([
+  "arguments", "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do",
+  "else", "enum", "eval", "export", "extends", "false", "finally", "for", "function", "if", "implements", "import",
+  "in", "instanceof", "interface", "let", "new", "null", "package", "private", "protected", "public", "return",
+  "static", "super", "switch", "this", "throw", "true", "try", "typeof", "var", "void", "while", "with", "yield",
+  "useState",
+]);
+
 /** An input's declared TypeScript type is a function type when it starts
  * with `(`, as in `() => void`. */
 export const isFunctionType = (type: string): boolean => type.trimStart().startsWith("(");

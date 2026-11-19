@@ -64,7 +64,9 @@ components that hold `useState`, and every docs example passes `check` (D129).
   whose `type` is a function type (starts with `(`) gets a no-op in Storybook
   and needs no `story`. Any other input must have one.
 - Keys are camelCase identifiers (`/^[a-z][A-Za-z0-9]*$/`). A key is unique
-  across `state` and `inputs` together.
+  across `state` and `inputs` together. A key is never `useState` or a
+  JavaScript reserved word, and never another state key's setter name (state
+  `open` declares `setOpen`), since the module declares every one of them.
 
 Five placeholders bind a prop to them, beside `{param:}` and `{content:}`.
 They are legal in prop positions only, never in slots or text:
@@ -92,7 +94,7 @@ style:
 import { useState } from "react";
 import { Button, Dialog } from "@handamade/psi-react";
 
-export function DestructiveConfirm({ open, onClose, onConfirm }: {
+export function DestructiveConfirmPattern({ open, onClose, onConfirm }: {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -105,7 +107,10 @@ export function DestructiveConfirm({ open, onClose, onConfirm }: {
 }
 ```
 
-- The function is the pattern id in PascalCase (`row-actions` → `RowActions`).
+- The function is the pattern id in PascalCase plus `Pattern`
+  (`row-actions` → `RowActionsPattern`). The suffix exists because a bare
+  name collides with the component a pattern is named after: `app-shell` →
+  `AppShell`, the component the module imports.
 - The `react` import appears only when there is `state`. The Psi import names
   every component and icon the tree uses (manifest components and D71 icon
   requirements, not intrinsic elements like `option`), sorted.
@@ -196,7 +201,7 @@ Why the split falls where it does:
 - `packages/react/patterns/{row-actions,account-menu,app-shell,cursor-pagination,destructive-confirm,detail-drawer,tabbed-workspace,table-pagination}.json`.
 - `packages/mcp/__tests__/presets.test.ts` (new): every preset in the baked
   index passes `checkMarkdown` with zero findings; every preset with state or
-  inputs exports its PascalCase function.
+  inputs exports its PascalCase function, suffixed `Pattern`.
 - `packages/react/llms.txt`, `packages/mcp/llms.txt`,
   `packages/docs/guides/ai.mdx`: the preset wording.
 - `apps/storybook/vr` baselines for the eight stories, from CI.

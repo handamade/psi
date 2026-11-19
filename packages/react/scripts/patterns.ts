@@ -1,5 +1,5 @@
 import { createElement, useState, type ComponentType, type ReactElement, type ReactNode } from "react";
-import { KEY_RE, bindingExpr, bindingValue, isFunctionType, parseBinding, pascalCase, setterName } from "./pattern-bindings.js";
+import { KEY_RE, RESERVED_KEYS, bindingExpr, bindingValue, isFunctionType, parseBinding, setterName, wrapperName } from "./pattern-bindings.js";
 import type { BindingScope } from "./pattern-bindings.js";
 
 // D48's "scopes entry" class is enforced by the D46 token build (packages/tokens); not duplicated here.
@@ -145,8 +145,15 @@ export function validatePatterns(
       ...(pattern.inputs ?? []).map((i) => ["input", i.key] as const),
     ]) {
       if (!KEY_RE.test(key)) throw new Error(`${prefix}${kind} key "${key}" is not a camelCase identifier`);
+      if (RESERVED_KEYS.has(key)) throw new Error(`${prefix}${kind} key "${key}" is a reserved name in the preset module`);
       if (seenKeys.has(key)) throw new Error(`${prefix}key "${key}" declared twice across state and inputs`);
       seenKeys.add(key);
+    }
+    // Each state key also declares its setter, so no key may take that name.
+    for (const s of pattern.state ?? []) {
+      if (seenKeys.has(setterName(s.key))) {
+        throw new Error(`${prefix}key "${setterName(s.key)}" is the setter of state "${s.key}"`);
+      }
     }
     for (const input of pattern.inputs ?? []) {
       if (!isFunctionType(input.type) && input.story === undefined) {
@@ -658,6 +665,15 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
   };
   collect(pattern.compose);
 
+  // Every name the module declares must be unique: the guard behind
+  // validatePatterns' key checks, and the one that holds the wrapper name.
+  const wrapper = wrapperName(pattern.id);
+  const declared = new Set<string>(["useState", ...imported]);
+  for (const name of [wrapper, ...state.flatMap((s) => [s.key, setterName(s.key)]), ...inputs.map((i) => i.key)]) {
+    if (declared.has(name)) throw new Error(`renderPreset: pattern "${pattern.id}": "${name}" is declared twice in its preset module`);
+    declared.add(name);
+  }
+
   const lines: string[] = [];
   if (state.length > 0) lines.push('import { useState } from "react";');
   lines.push(`import { ${[...imported].sort().join(", ")} } from "@handamade/psi-react";`, "");
@@ -665,11 +681,15 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
     inputs.length > 0
       ? `{ ${inputs.map((i) => i.key).join(", ")} }: {\n${inputs.map((i) => `  ${i.key}: ${i.type};`).join("\n")}\n}`
       : "";
-  lines.push(`export function ${pascalCase(pattern.id)}(${params}) {`);
+  lines.push(`export function ${wrapper}(${params}) {`);
   for (const s of state) lines.push(`  const [${s.key}, ${setterName(s.key)}] = useState(${JSON.stringify(s.initial)});`);
   lines.push("  return (", element.split("\n").map((l) => `    ${l}`).join("\n"), "  );", "}");
   return `${lines.join("\n")}\n`;
 }
+
+/** One stateful component per pattern object, so a re-render keeps its state
+ * (D143). Storybook passes the same pattern object every render. */
+const statefulPresets = new WeakMap<Pattern, ComponentType>();
 
 /**
  * Renders a fully-bound pattern (D77) to a real, mountable React element
@@ -692,10 +712,6 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
  * `components` parameter), even though this rendering only needs the
  * compose tree, parameters, and content.
  */
-/** One stateful component per pattern object, so a re-render keeps its state
- * (D143). Storybook passes the same pattern object every render. */
-const statefulPresets = new WeakMap<Pattern, ComponentType>();
-
 export function renderPresetElement(
   pattern: Pattern,
   components: ManifestComponent[],

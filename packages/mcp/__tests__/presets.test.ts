@@ -17,7 +17,7 @@ describe("every pattern preset passes check (D143)", () => {
     expect(findings).toEqual([]);
   });
 
-  it("renders exactly the eight stateful patterns as components named after their id", () => {
+  it("renders exactly the eight stateful patterns as components named after their id, suffixed Pattern", () => {
     const stateful = presets.filter((p) => (p.state?.length ?? 0) + (p.inputs?.length ?? 0) > 0);
     expect(stateful.map((p) => p.id).sort()).toEqual([
       "account-menu",
@@ -29,6 +29,6 @@ describe("every pattern preset passes check (D143)", () => {
       "tabbed-workspace",
       "table-pagination",
     ]);
-    for (const p of stateful) expect(p.preset).toContain(`export function ${pascal(p.id)}(`);
+    for (const p of stateful) expect(p.preset).toContain(`export function ${pascal(p.id)}Pattern(`);
   });
 });

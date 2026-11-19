@@ -109,6 +109,54 @@ describe("seed patterns against the real manifest", () => {
       expect(messages, `${pattern.id} preset does not parse`).toEqual([]);
     }
   });
+
+  // Parsing is not compiling. D143's first wrapper name, `AppShell` for
+  // app-shell, parsed and passed check while colliding with the `AppShell` it
+  // imports (TS2440; esbuild drops the import and the wrapper recurses). This
+  // type-checks every preset against the built package's declarations.
+  it("every shipped ungapped preset type-checks against the package (D143)", () => {
+    const dir = join(root, ".preset-typecheck");
+    const files = new Map<string, string>();
+    for (const pattern of patterns) {
+      if (pattern.gaps.length > 0) continue;
+      const preset = renderPreset(pattern, manifest.components)!;
+      const source = preset.startsWith("import ")
+        ? preset
+        : `import { ${[...new Set([...preset.matchAll(/<([A-Z][A-Za-z0-9]*)/g)].map((m) => m[1]))].sort().join(", ")} } from "@handamade/psi-react";\nexport const preset = (\n${preset});\n`;
+      files.set(join(dir, `${pattern.id}.tsx`), source);
+    }
+    const options: ts.CompilerOptions = {
+      strict: true,
+      noUnusedLocals: true,
+      jsx: ts.JsxEmit.ReactJSX,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      target: ts.ScriptTarget.ES2022,
+      skipLibCheck: true,
+      noEmit: true,
+      baseUrl: root,
+      paths: { "@handamade/psi-react": ["dist/index.d.ts"] },
+      types: [],
+    };
+    const host = ts.createCompilerHost(options);
+    const { getSourceFile, fileExists, readFile } = host;
+    host.fileExists = (f) => files.has(f) || fileExists.call(host, f);
+    host.readFile = (f) => files.get(f) ?? readFile.call(host, f);
+    host.getSourceFile = (f, lang, ...rest) => {
+      const text = files.get(f);
+      return text !== undefined ? ts.createSourceFile(f, text, lang) : getSourceFile.call(host, f, lang, ...rest);
+    };
+    const program = ts.createProgram([...files.keys()], options, host);
+    const messages = [...files.keys()].flatMap((f) => {
+      const sf = program.getSourceFile(f)!;
+      const id = f.slice(dir.length + 1, -".tsx".length);
+      return [...program.getSyntacticDiagnostics(sf), ...program.getSemanticDiagnostics(sf)].map(
+        (d) => `${id}: ${ts.flattenDiagnosticMessageText(d.messageText, " ")}`,
+      );
+    });
+    expect(files.size).toBeGreaterThanOrEqual(20);
+    expect(messages).toEqual([]);
+  });
 });
 
 describe("declared affordances resolve (D71)", () => {
