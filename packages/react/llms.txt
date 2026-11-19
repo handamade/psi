@@ -4,7 +4,7 @@
 
 ## Machine-readable artifacts
 - dist/manifest.json: full component/prop inventory with types and defaults
-- dist/patterns.json: 24 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated JSX, never hand-written
+- dist/patterns.json: 24 composition patterns (D47) — gap-annotated recipes with clarifying parameters; presets are generated, never hand-written: JSX, or a small typed component when the pattern holds state or takes inputs (D143)
 - docs/{Component}.md: per-component docs (props, theming, variant guidance)
 
 ## Rules for generated code
@@ -14,7 +14,7 @@
 - variant vocabulary: accent | accent-subtle | neutral | neutral-subtle | ghost | danger | danger-subtle | outline.
 - One accent per visual group. danger only for destructive actions.
 - Every focusable part Psi renders draws one focus ring on `:focus-visible` (D82). For your own focusable element, bind the same tokens rather than writing a literal: `outline: var(--psi-focus-ring-width) solid var(--psi-border-focus); outline-offset: var(--psi-focus-ring-offset)` (or `--psi-focus-ring-offset-inset` to draw it inside). Never `outline: none`.
-- Before composing multi-component UI, consult dist/patterns.json (or psi-mcp search) for a matching pattern and honor its clarifying parameters; presets are copy-paste JSX generated from the compose tree.
+- Before composing multi-component UI, consult dist/patterns.json (or psi-mcp search) for a matching pattern and honor its clarifying parameters; presets are copy-paste JSX generated from the compose tree; a pattern with state or inputs renders as a small component that holds its useState and takes its caller's callbacks as props (D143).
 - Pattern `content` text in `[square brackets]` is a placeholder to replace with real copy. Never `<angle brackets>` or `{braces}` — those do not parse as JSX text, so the build rejects them (D48 class 9).
 
 ## Button: href + outline (D33/D34)

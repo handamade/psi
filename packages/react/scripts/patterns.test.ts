@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { attributesByComponent } from "./pattern-bindings.js";
 import { loadPatterns } from "./patterns-loader.js";
 import { parseLiteralUnion, renderPreset, validatePatterns } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
@@ -64,6 +65,31 @@ describe("loadPatterns", () => {
     writeFileSync(join(dir, "pattern.schema.json"), "{}");
     writeFileSync(join(dir, "a.json"), JSON.stringify(base({ id: "a" })));
     expect(loadPatterns(dir)).toHaveLength(1);
+  });
+  it("loads state and inputs, defaulting both to []", () => {
+    const dir = mkdtempSync(join(tmpdir(), "patterns-"));
+    writeFileSync(join(dir, "a.json"), JSON.stringify(base({ id: "a" })));
+    writeFileSync(
+      join(dir, "b.json"),
+      JSON.stringify(base({ id: "b", state: [{ key: "open", initial: false }], inputs: [{ key: "onClose", type: "() => void" }] })),
+    );
+    const [a, b] = loadPatterns(dir);
+    expect(a.state).toEqual([]);
+    expect(a.inputs).toEqual([]);
+    expect(b.state).toEqual([{ key: "open", initial: false }]);
+    expect(b.inputs).toEqual([{ key: "onClose", type: "() => void" }]);
+  });
+  it("throws on a mis-shaped state or input entry", () => {
+    const write = (over: Record<string, unknown>) => {
+      const dir = mkdtempSync(join(tmpdir(), "patterns-"));
+      writeFileSync(join(dir, "x.json"), JSON.stringify({ ...base({ id: "x" }), ...over }));
+      return () => loadPatterns(dir);
+    };
+    expect(write({ state: {} })).toThrow(/x\.json: "state" must be an array/);
+    expect(write({ state: [{ initial: 1 }] })).toThrow(/x\.json: state\[0\]: missing\/invalid "key"/);
+    expect(write({ state: [{ key: "a", initial: {} }] })).toThrow(/state\[0\]: "initial" must be a string, number or boolean/);
+    expect(write({ inputs: [{ key: "a" }] })).toThrow(/x\.json: inputs\[0\]: missing\/invalid "type"/);
+    expect(write({ inputs: [{ key: "a", type: "boolean", story: [] }] })).toThrow(/inputs\[0\]: "story" must be a string, number or boolean/);
   });
 });
 
@@ -186,7 +212,13 @@ describe("real patterns/ + real dist/manifest.json (D62-D63)", () => {
       string[]
     >;
     const patterns = loadPatterns(join(root, "patterns"));
-    validatePatterns(patterns, manifest.components, contracts);
+    const attributes = attributesByComponent(
+      JSON.parse(readFileSync(join(root, "dist", "attributes.json"), "utf8")) as {
+        sets: string[][];
+        components: Record<string, number>;
+      },
+    );
+    validatePatterns(patterns, manifest.components, contracts, [], attributes);
     const builtPatterns = patterns.map((p) => ({
       id: p.id,
       gaps: p.gaps,
@@ -338,8 +370,12 @@ describe("the pagination presets render a pager and page sizes (D127)", () => {
   const patterns = loadPatterns(join(root, "patterns"));
   const preset = (id: string) => renderPreset(patterns.find((p) => p.id === id)!, manifest.components) ?? "";
 
-  it("table-pagination gives Pagination a page and a page count", () => {
-    expect(preset("table-pagination")).toMatch(/<Pagination\s+page=\{1\}\s+pageCount=\{10\}\s*\/>/);
+  it("table-pagination gives Pagination a page, a page count and a handler (D143)", () => {
+    const out = preset("table-pagination");
+    expect(out).toContain("useState(1)");
+    expect(out).toMatch(/<Pagination\b[^>]*\bpage=\{page\}/);
+    expect(out).toMatch(/<Pagination\b[^>]*\bpageCount=\{10\}/);
+    expect(out).toMatch(/<Pagination\b[^>]*\bonPageChange=\{setPage\}/);
   });
 
   for (const id of ["table-pagination", "cursor-pagination"]) {

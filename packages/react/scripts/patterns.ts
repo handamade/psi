@@ -1,4 +1,6 @@
-import { createElement, type ComponentType, type ReactElement, type ReactNode } from "react";
+import { createElement, useState, type ComponentType, type ReactElement, type ReactNode } from "react";
+import { KEY_RE, RESERVED_KEYS, bindingExpr, bindingValue, isFunctionType, parseBinding, setterName, wrapperName } from "./pattern-bindings.js";
+import type { BindingScope } from "./pattern-bindings.js";
 
 // D48's "scopes entry" class is enforced by the D46 token build (packages/tokens); not duplicated here.
 
@@ -28,6 +30,21 @@ export interface PatternRequirement {
   name: string;
 }
 
+/** D143: state a pattern owns; each entry is one `useState` in its preset. */
+export interface PatternState {
+  key: string;
+  initial: string | number | boolean;
+}
+
+/** D143: a value or callback the pattern's caller supplies; each entry is a
+ * typed prop of the preset's wrapper. `story` is what Storybook passes; a
+ * function-typed input gets a no-op there instead. */
+export interface PatternInput {
+  key: string;
+  type: string;
+  story?: string | number | boolean;
+}
+
 /** Authored composition recipe (D47): what to build, from what parts, with
  * what parameters exposed to the consumer, and which named components in
  * `compose` are known gaps (not yet in the manifest). */
@@ -41,6 +58,10 @@ export interface Pattern {
   gaps: string[];
   /** Affordances the content depends on (D71); see PatternRequirement. */
   requires: PatternRequirement[];
+  /** D143; see PatternState. */
+  state?: PatternState[];
+  /** D143; see PatternInput. */
+  inputs?: PatternInput[];
 }
 
 /** Slice of `dist/manifest.json` a pattern is validated against. */
@@ -97,12 +118,15 @@ export const INTRINSIC_ELEMENTS: ReadonlySet<string> = new Set(["option"]);
  * slot contracts (D48 error classes 1-8, plus class 9: fill text must be
  * JSX-safe so `renderPreset` can only emit a parseable preset). Throws on
  * the first violation found; returns the gap map (patternId -> gap component
- * names actually used) when every pattern is clean. */
+ * names actually used) when every pattern is clean. `attributes`: component →
+ * pass-through attribute names from `dist/attributes.json`; a prop the manifest
+ * does not list is accepted when the component forwards it (D143). */
 export function validatePatterns(
   patterns: Pattern[],
   components: ManifestComponent[],
   contracts: Record<string, string[]>,
   icons: string[] = [],
+  attributes: Record<string, string[]> = {},
 ): { gaps: Record<string, string[]> } {
   const byName = new Map(components.map((c) => [c.name, c]));
   const iconNames = new Set(icons);
@@ -111,6 +135,63 @@ export function validatePatterns(
 
   for (const pattern of patterns) {
     const prefix = `pattern "${pattern.id}": `;
+
+    // D143: the pattern's own state and its caller's inputs.
+    const stateByKey = new Map((pattern.state ?? []).map((s) => [s.key, s]));
+    const inputByKey = new Map((pattern.inputs ?? []).map((i) => [i.key, i]));
+    const seenKeys = new Set<string>();
+    for (const [kind, key] of [
+      ...(pattern.state ?? []).map((s) => ["state", s.key] as const),
+      ...(pattern.inputs ?? []).map((i) => ["input", i.key] as const),
+    ]) {
+      if (!KEY_RE.test(key)) throw new Error(`${prefix}${kind} key "${key}" is not a camelCase identifier`);
+      if (RESERVED_KEYS.has(key)) throw new Error(`${prefix}${kind} key "${key}" is a reserved name in the preset module`);
+      if (seenKeys.has(key)) throw new Error(`${prefix}key "${key}" declared twice across state and inputs`);
+      seenKeys.add(key);
+    }
+    // Each state key also declares its setter, so no key may take that name.
+    for (const s of pattern.state ?? []) {
+      if (seenKeys.has(setterName(s.key))) {
+        throw new Error(`${prefix}key "${setterName(s.key)}" is the setter of state "${s.key}"`);
+      }
+    }
+    for (const input of pattern.inputs ?? []) {
+      if (!isFunctionType(input.type) && input.story === undefined) {
+        throw new Error(`${prefix}input "${input.key}" needs a story value: it is not a function type`);
+      }
+    }
+    const usedBindingKeys = new Set<string>();
+
+    /** Validates a binding placeholder in a prop position. Returns true when
+     * `value` was a binding (the caller then skips its literal checks).
+     * `propType` is the manifest type, or null where there is none to
+     * compare (gap nodes, intrinsics, aria-*, pass-through attributes). */
+    const checkBinding = (propName: string, value: unknown, propType: string | null, path: string): boolean => {
+      const binding = parseBinding(value);
+      if (!binding) return false;
+      usedBindingKeys.add(binding.key);
+      let wantsFunction: boolean;
+      if (binding.kind === "input") {
+        const input = inputByKey.get(binding.key);
+        if (!input) throw new Error(`${prefix}input "${binding.key}" referenced but not declared`);
+        wantsFunction = isFunctionType(input.type);
+      } else {
+        const state = stateByKey.get(binding.key);
+        if (!state) throw new Error(`${prefix}state "${binding.key}" referenced but not declared`);
+        if (binding.kind === "toggle" && typeof state.initial !== "boolean") {
+          throw new Error(`${prefix}${path}: {toggle:${binding.key}} needs a boolean state`);
+        }
+        wantsFunction = binding.kind !== "state";
+      }
+      if (propType !== null && propType.includes("=>") !== wantsFunction) {
+        throw new Error(
+          `${prefix}${path}: {${binding.kind}:${binding.key}} on prop "${propName}": ${
+            wantsFunction ? "a callback binding needs a function-typed prop" : "a value binding needs a prop that is not a function"
+          }`,
+        );
+      }
+      return true;
+    };
 
     // A declared gap suppresses prop/slot validation for that node (see the
     // "gap listing always wins" comment below) so the ledger can go stale
@@ -167,6 +248,9 @@ export function validatePatterns(
     // Legal in text positions (slot string fills, node `content`): only
     // {content:key} — {param:key} only binds prop values (D48).
     const trackTextPlaceholder = (value: string) => {
+      if (parseBinding(value)) {
+        throw new Error(`${prefix}binding "${value}" used outside a prop position — bindings bind prop values (D143)`);
+      }
       const paramMatch = PARAM_RE.exec(value);
       if (paramMatch) {
         throw new Error(
@@ -187,7 +271,9 @@ export function validatePatterns(
 
     const walk = (node: PatternNode, path: string) => {
       if (INTRINSIC_ELEMENTS.has(node.component)) {
-        for (const propValue of Object.values(node.props ?? {})) trackPropPlaceholders(propValue);
+        for (const [propName, propValue] of Object.entries(node.props ?? {})) {
+          if (!checkBinding(propName, propValue, null, path)) trackPropPlaceholders(propValue);
+        }
         if (node.content !== undefined) referencedContent.add(node.content);
         for (const [slotName, fills] of Object.entries(node.slots ?? {})) {
           if (slotName !== "body") {
@@ -229,6 +315,7 @@ export function validatePatterns(
       // listing always wins over a coincidental manifest match.
       for (const [propName, propValue] of Object.entries(node.props ?? {})) {
         if (!manifestComponent || isGap) {
+          if (checkBinding(propName, propValue, null, path)) continue;
           trackPropPlaceholders(propValue);
           const paramMatch = typeof propValue === "string" ? PARAM_RE.exec(propValue) : null;
           if (paramMatch) {
@@ -249,16 +336,24 @@ export function validatePatterns(
         // would fix one attribute at a time forever. Unchecked by design:
         // there is no literal union to validate an accessible name against.
         if (ARIA_PROP_RE.test(propName)) {
+          if (checkBinding(propName, propValue, null, path)) continue;
           trackPropPlaceholders(propValue);
           continue;
         }
 
         const propDef = manifestComponent.props.find((p) => p.name === propName);
         if (!propDef) {
+          // D143: a pass-through attribute the component forwards to its DOM
+          // element (dist/attributes.json), such as a trigger's onClick.
+          if (attributes[node.component]?.includes(propName)) {
+            if (!checkBinding(propName, propValue, null, path)) trackPropPlaceholders(propValue);
+            continue;
+          }
           throw new Error(
             `${prefix}${path}: unknown prop "${propName}" on component "${node.component}"`,
           );
         }
+        if (checkBinding(propName, propValue, propDef.type, path)) continue;
         trackPropPlaceholders(propValue);
 
         const paramMatch = typeof propValue === "string" ? PARAM_RE.exec(propValue) : null;
@@ -348,10 +443,29 @@ export function validatePatterns(
         for (const slotDef of manifestComponent.slots) {
           if (!checkedSlots.has(slotDef.name)) checkCardinality(slotDef.name, slotDef, 0);
         }
+        // D143: a required prop must be bound, or the preset fails `check`'s
+        // missing-required. A slot of the same name binds it; `children` is
+        // bound by body fills or a content key.
+        for (const propDef of manifestComponent.props) {
+          if (!propDef.required) continue;
+          if (propDef.name in (node.props ?? {})) continue;
+          if (propDef.name in givenSlots) continue;
+          if (propDef.name === "children" && ((givenSlots.body?.length ?? 0) > 0 || node.content !== undefined)) continue;
+          throw new Error(
+            `${prefix}${path}: required prop "${propDef.name}" on "${node.component}" is not bound — give it a value, a slot fill, or a state or input binding (D143)`,
+          );
+        }
       }
     };
 
     walk(pattern.compose, "compose");
+
+    for (const key of stateByKey.keys()) {
+      if (!usedBindingKeys.has(key)) throw new Error(`${prefix}state "${key}" declared but never referenced`);
+    }
+    for (const key of inputByKey.keys()) {
+      if (!usedBindingKeys.has(key)) throw new Error(`${prefix}input "${key}" declared but never referenced`);
+    }
 
     for (const param of pattern.parameters) {
       if (!referencedParams.has(param.key)) {
@@ -445,6 +559,8 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
   // -> the content string; a literal string/number/boolean renders as-is.
   // String results land in an attribute position, so `"` is escaped.
   const resolvePropValue = (raw: unknown): string => {
+    const binding = parseBinding(raw);
+    if (binding) return `{${bindingExpr(binding)}}`;
     if (typeof raw === "string") {
       const paramMatch = PARAM_RE.exec(raw);
       if (paramMatch) {
@@ -532,8 +648,48 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
     return lines.join("\n");
   };
 
-  return `${renderNode(pattern.compose, 0)}\n`;
+  const element = renderNode(pattern.compose, 0);
+  const state = pattern.state ?? [];
+  const inputs = pattern.inputs ?? [];
+  if (state.length === 0 && inputs.length === 0) return `${element}\n`;
+
+  // D143: a pattern with state or inputs renders as a component module in the
+  // docs examples' style, so a pasted preset opens, closes and switches.
+  const imported = new Set<string>();
+  const collect = (node: PatternNode) => {
+    if (!INTRINSIC_ELEMENTS.has(node.component)) imported.add(node.component);
+    if (node.content !== undefined && iconForContent.has(node.content)) imported.add(iconForContent.get(node.content)!);
+    for (const fills of Object.values(node.slots ?? {})) {
+      for (const fill of fills) if (typeof fill !== "string") collect(fill);
+    }
+  };
+  collect(pattern.compose);
+
+  // Every name the module declares must be unique: the guard behind
+  // validatePatterns' key checks, and the one that holds the wrapper name.
+  const wrapper = wrapperName(pattern.id);
+  const declared = new Set<string>(["useState", ...imported]);
+  for (const name of [wrapper, ...state.flatMap((s) => [s.key, setterName(s.key)]), ...inputs.map((i) => i.key)]) {
+    if (declared.has(name)) throw new Error(`renderPreset: pattern "${pattern.id}": "${name}" is declared twice in its preset module`);
+    declared.add(name);
+  }
+
+  const lines: string[] = [];
+  if (state.length > 0) lines.push('import { useState } from "react";');
+  lines.push(`import { ${[...imported].sort().join(", ")} } from "@handamade/psi-react";`, "");
+  const params =
+    inputs.length > 0
+      ? `{ ${inputs.map((i) => i.key).join(", ")} }: {\n${inputs.map((i) => `  ${i.key}: ${i.type};`).join("\n")}\n}`
+      : "";
+  lines.push(`export function ${wrapper}(${params}) {`);
+  for (const s of state) lines.push(`  const [${s.key}, ${setterName(s.key)}] = useState(${JSON.stringify(s.initial)});`);
+  lines.push("  return (", element.split("\n").map((l) => `    ${l}`).join("\n"), "  );", "}");
+  return `${lines.join("\n")}\n`;
 }
+
+/** One stateful component per pattern object, so a re-render keeps its state
+ * (D143). Storybook passes the same pattern object every render. */
+const statefulPresets = new WeakMap<Pattern, ComponentType>();
 
 /**
  * Renders a fully-bound pattern (D77) to a real, mountable React element
@@ -593,7 +749,9 @@ export function renderPresetElement(
     return iconName ? createElement(componentFor(iconName)) : content[key];
   };
 
-  const resolvePropValue = (raw: unknown): unknown => {
+  const resolvePropValue = (raw: unknown, scope: BindingScope): unknown => {
+    const binding = parseBinding(raw);
+    if (binding) return bindingValue(binding, scope);
     if (typeof raw === "string") {
       const paramMatch = PARAM_RE.exec(raw);
       if (paramMatch) return paramDefaults.get(paramMatch[1]);
@@ -603,26 +761,26 @@ export function renderPresetElement(
   };
 
   let key = 0;
-  const renderNode = (node: PatternNode): ReactElement => {
+  const renderNode = (node: PatternNode, scope: BindingScope): ReactElement => {
     const Component = componentFor(node.component);
     const props: Record<string, unknown> = { key: key++ };
 
     for (const [name, raw] of Object.entries(node.props ?? {})) {
-      props[name] = resolvePropValue(raw);
+      props[name] = resolvePropValue(raw, scope);
     }
 
     for (const [slotName, fills] of Object.entries(node.slots ?? {})) {
       if (slotName === "body") continue;
       props[slotName] =
         fills.length === 1
-          ? (typeof fills[0] === "string" ? resolveText(fills[0]) : renderNode(fills[0]))
-          : fills.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill)));
+          ? (typeof fills[0] === "string" ? resolveText(fills[0]) : renderNode(fills[0], scope))
+          : fills.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill, scope)));
     }
 
     const body = node.slots?.body;
     let children: ReactNode = null;
     if (body && body.length > 0) {
-      children = body.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill)));
+      children = body.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill, scope)));
     } else if (node.content !== undefined) {
       children = resolveChildContent(node.content);
     }
@@ -630,5 +788,26 @@ export function renderPresetElement(
     return createElement(Component, props, children);
   };
 
-  return renderNode(pattern.compose);
+  const state = pattern.state ?? [];
+  const inputs = pattern.inputs ?? [];
+  if (state.length === 0 && inputs.length === 0) return renderNode(pattern.compose, { values: {}, setters: {} });
+
+  let Preset = statefulPresets.get(pattern);
+  if (!Preset) {
+    Preset = function StatefulPreset() {
+      const scope: BindingScope = { values: {}, setters: {} };
+      // A pattern's state list is fixed for the component's lifetime, so the
+      // hook order is stable across renders.
+      for (const s of state) {
+        const [value, setValue] = useState<unknown>(s.initial);
+        scope.values[s.key] = value;
+        scope.setters[s.key] = setValue;
+      }
+      for (const input of inputs) scope.values[input.key] = isFunctionType(input.type) ? () => {} : input.story;
+      key = 0;
+      return renderNode(pattern.compose, scope);
+    };
+    statefulPresets.set(pattern, Preset);
+  }
+  return createElement(Preset);
 }

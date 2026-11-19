@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import ts from "typescript";
+import { attributesByComponent } from "./pattern-bindings.js";
 import { loadPatterns } from "./patterns-loader.js";
 import { renderPreset, validatePatterns, type Pattern } from "./patterns.js";
 
@@ -9,6 +10,8 @@ const root = join(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8"));
 const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf8"));
 const patterns = loadPatterns(join(root, "patterns"));
+// D143: pass-through attributes (D129), so a trigger may carry onClick.
+const attributes = attributesByComponent(JSON.parse(readFileSync(join(root, "dist/attributes.json"), "utf8")));
 // The PUBLIC surface, matching emit-patterns: an icon file that exists but is
 // not re-exported from src/index.ts is unimportable by a consumer, so it must
 // not satisfy a pattern's `requires`.
@@ -19,7 +22,7 @@ const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
 
 describe("seed patterns against the real manifest", () => {
   it("all twenty-four load and validate; the backlog is empty (D67, D99, D104)", () => {
-    const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
+    const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons, attributes);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "account-menu",
       "action-feedback",
@@ -95,7 +98,9 @@ describe("seed patterns against the real manifest", () => {
       if (pattern.gaps.length > 0) continue;
       const preset = renderPreset(pattern, manifest.components);
       expect(preset, `${pattern.id} has no preset`).not.toBeNull();
-      const { diagnostics } = ts.transpileModule(`const _ = (\n${preset});\n`, {
+      // A pattern with state or inputs renders as a whole module (D143).
+      const source = /^import /m.test(preset!) ? preset! : `const _ = (\n${preset});\n`;
+      const { diagnostics } = ts.transpileModule(source, {
         compilerOptions: { jsx: ts.JsxEmit.Preserve, target: ts.ScriptTarget.ESNext },
         fileName: "preset.tsx",
         reportDiagnostics: true,
@@ -103,6 +108,54 @@ describe("seed patterns against the real manifest", () => {
       const messages = (diagnostics ?? []).map((d) => ts.flattenDiagnosticMessageText(d.messageText, " "));
       expect(messages, `${pattern.id} preset does not parse`).toEqual([]);
     }
+  });
+
+  // Parsing is not compiling. D143's first wrapper name, `AppShell` for
+  // app-shell, parsed and passed check while colliding with the `AppShell` it
+  // imports (TS2440; esbuild drops the import and the wrapper recurses). This
+  // type-checks every preset against the built package's declarations.
+  it("every shipped ungapped preset type-checks against the package (D143)", () => {
+    const dir = join(root, ".preset-typecheck");
+    const files = new Map<string, string>();
+    for (const pattern of patterns) {
+      if (pattern.gaps.length > 0) continue;
+      const preset = renderPreset(pattern, manifest.components)!;
+      const source = preset.startsWith("import ")
+        ? preset
+        : `import { ${[...new Set([...preset.matchAll(/<([A-Z][A-Za-z0-9]*)/g)].map((m) => m[1]))].sort().join(", ")} } from "@handamade/psi-react";\nexport const preset = (\n${preset});\n`;
+      files.set(join(dir, `${pattern.id}.tsx`), source);
+    }
+    const options: ts.CompilerOptions = {
+      strict: true,
+      noUnusedLocals: true,
+      jsx: ts.JsxEmit.ReactJSX,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      target: ts.ScriptTarget.ES2022,
+      skipLibCheck: true,
+      noEmit: true,
+      baseUrl: root,
+      paths: { "@handamade/psi-react": ["dist/index.d.ts"] },
+      types: [],
+    };
+    const host = ts.createCompilerHost(options);
+    const { getSourceFile, fileExists, readFile } = host;
+    host.fileExists = (f) => files.has(f) || fileExists.call(host, f);
+    host.readFile = (f) => files.get(f) ?? readFile.call(host, f);
+    host.getSourceFile = (f, lang, ...rest) => {
+      const text = files.get(f);
+      return text !== undefined ? ts.createSourceFile(f, text, lang) : getSourceFile.call(host, f, lang, ...rest);
+    };
+    const program = ts.createProgram([...files.keys()], options, host);
+    const messages = [...files.keys()].flatMap((f) => {
+      const sf = program.getSourceFile(f)!;
+      const id = f.slice(dir.length + 1, -".tsx".length);
+      return [...program.getSyntacticDiagnostics(sf), ...program.getSemanticDiagnostics(sf)].map(
+        (d) => `${id}: ${ts.flattenDiagnosticMessageText(d.messageText, " ")}`,
+      );
+    });
+    expect(files.size).toBeGreaterThanOrEqual(20);
+    expect(messages).toEqual([]);
   });
 });
 
@@ -119,7 +172,7 @@ describe("declared affordances resolve (D71)", () => {
     // The guard, exercised: strip the roster and the pattern must go blocked.
     // Without this the test above only proves the icon is present today.
     const rowActions = patterns.find((p) => p.id === "row-actions")!;
-    const { gaps } = validatePatterns([rowActions], manifest.components, contracts, []);
+    const { gaps } = validatePatterns([rowActions], manifest.components, contracts, [], attributes);
     expect(gaps["row-actions"]).toEqual(["IconMoreHorizontal"]);
   });
 

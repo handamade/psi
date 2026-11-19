@@ -4,11 +4,9 @@
   "match": ["app shell", "application shell", "sidebar layout", "admin layout", "side navigation"],
   "compose": {
     "component": "AppShell",
-    "props": { "sidebarOpen": true, "sidebarTheme": "dark" },
+    "props": { "sidebarOpen": "{state:sidebarOpen}", "sidebarTheme": "dark" },
     "slots": {
-      "skipLink": [
-        { "component": "SkipLink", "props": { "href": "#main" }, "content": "skip-label" }
-      ],
+      "skipLink": [{ "component": "SkipLink", "props": { "href": "#main" }, "content": "skip-label" }],
       "header": [
         {
           "component": "NavBar",
@@ -17,13 +15,23 @@
             "brand": [
               {
                 "component": "Button",
-                "props": { "variant": "ghost", "size": 32, "aria-expanded": true, "aria-controls": "sidebar" },
+                "props": {
+                  "variant": "ghost",
+                  "size": 32,
+                  "aria-expanded": "{state:sidebarOpen}",
+                  "aria-controls": "sidebar",
+                  "onClick": "{toggle:sidebarOpen}"
+                },
                 "content": "menu-label"
               },
               "{content:brand}"
             ],
             "actions": [
-              { "component": "Button", "props": { "variant": "neutral", "size": 32 }, "content": "account-label" }
+              {
+                "component": "Button",
+                "props": { "variant": "neutral", "size": 32 },
+                "content": "account-label"
+              }
             ]
           }
         }
@@ -34,24 +42,52 @@
           "props": { "aria-label": "{content:nav-label}" },
           "slots": {
             "body": [
-              { "component": "NavItem", "props": { "href": "#overview", "current": true }, "content": "overview-label" },
+              {
+                "component": "NavItem",
+                "props": { "href": "#overview", "current": true },
+                "content": "overview-label"
+              },
               {
                 "component": "NavGroup",
-                "props": { "label": "{content:group-1-label}", "open": true },
+                "props": {
+                  "label": "{content:group-1-label}",
+                  "open": "{state:group1Open}",
+                  "onOpenChange": "{setter:group1Open}"
+                },
                 "slots": {
                   "body": [
-                    { "component": "NavItem", "props": { "href": "#group-1-first" }, "content": "group-1-first-label" },
-                    { "component": "NavItem", "props": { "href": "#group-1-second" }, "content": "group-1-second-label" }
+                    {
+                      "component": "NavItem",
+                      "props": { "href": "#group-1-first" },
+                      "content": "group-1-first-label"
+                    },
+                    {
+                      "component": "NavItem",
+                      "props": { "href": "#group-1-second" },
+                      "content": "group-1-second-label"
+                    }
                   ]
                 }
               },
               {
                 "component": "NavGroup",
-                "props": { "label": "{content:group-2-label}", "open": true },
+                "props": {
+                  "label": "{content:group-2-label}",
+                  "open": "{state:group2Open}",
+                  "onOpenChange": "{setter:group2Open}"
+                },
                 "slots": {
                   "body": [
-                    { "component": "NavItem", "props": { "href": "#group-2-first" }, "content": "group-2-first-label" },
-                    { "component": "NavItem", "props": { "href": "#group-2-second" }, "content": "group-2-second-label" }
+                    {
+                      "component": "NavItem",
+                      "props": { "href": "#group-2-first" },
+                      "content": "group-2-first-label"
+                    },
+                    {
+                      "component": "NavItem",
+                      "props": { "href": "#group-2-second" },
+                      "content": "group-2-second-label"
+                    }
                   ]
                 }
               }
@@ -59,10 +95,7 @@
           }
         }
       ],
-      "body": [
-        { "component": "PageHeading", "content": "title" },
-        "{content:page}"
-      ]
+      "body": [{ "component": "PageHeading", "content": "title" }, "{content:page}"]
     }
   },
   "parameters": [],
@@ -82,5 +115,10 @@
     "title": "[page title]",
     "page": "[the page; it scrolls on its own]"
   },
+  "state": [
+    { "key": "sidebarOpen", "initial": true },
+    { "key": "group1Open", "initial": true },
+    { "key": "group2Open", "initial": true }
+  ],
   "gaps": []
 }

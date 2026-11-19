@@ -4,23 +4,35 @@
   "match": ["delete confirmation", "are you sure", "destructive dialog", "confirm delete"],
   "compose": {
     "component": "Dialog",
+    "props": { "open": "{input:open}", "onClose": "{input:onClose}" },
     "slots": {
       "title": ["{content:title}"],
       "body": ["{content:consequence}"],
       "footer": [
-        { "component": "Button", "props": { "variant": "ghost", "size": "{param:size}" }, "content": "cancel-label" },
-        { "component": "Button", "props": { "variant": "danger", "size": "{param:size}" }, "content": "confirm-label" }
+        {
+          "component": "Button",
+          "props": { "variant": "ghost", "size": "{param:size}", "onClick": "{input:onClose}" },
+          "content": "cancel-label"
+        },
+        {
+          "component": "Button",
+          "props": { "variant": "danger", "size": "{param:size}", "onClick": "{input:onConfirm}" },
+          "content": "confirm-label"
+        }
       ]
     }
   },
-  "parameters": [
-    { "key": "size", "ask": "Button size?", "options": [32, 40], "default": 32 }
-  ],
+  "parameters": [{ "key": "size", "ask": "Button size?", "options": [32, 40], "default": 32 }],
   "content": {
     "title": "[Delete the object?]",
     "consequence": "[what is permanently lost]",
     "cancel-label": "Cancel",
     "confirm-label": "[verb the object]"
   },
+  "inputs": [
+    { "key": "open", "type": "boolean", "story": true },
+    { "key": "onClose", "type": "() => void" },
+    { "key": "onConfirm", "type": "() => void" }
+  ],
   "gaps": []
 }
