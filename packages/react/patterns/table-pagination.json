@@ -18,20 +18,36 @@
                 "props": { "size": 32 },
                 "slots": {
                   "body": [
-                    { "component": "option", "props": { "value": "10" }, "slots": { "body": ["10"] } },
-                    { "component": "option", "props": { "value": "50" }, "slots": { "body": ["50"] } },
-                    { "component": "option", "props": { "value": "100" }, "slots": { "body": ["100"] } }
+                    {
+                      "component": "option",
+                      "props": { "value": "10" },
+                      "slots": { "body": ["10"] }
+                    },
+                    {
+                      "component": "option",
+                      "props": { "value": "50" },
+                      "slots": { "body": ["50"] }
+                    },
+                    {
+                      "component": "option",
+                      "props": { "value": "100" },
+                      "slots": { "body": ["100"] }
+                    }
                   ]
                 }
               }
             ]
           }
         },
-        { "component": "Pagination", "props": { "page": 1, "pageCount": 10 } }
+        {
+          "component": "Pagination",
+          "props": { "page": "{state:page}", "pageCount": 10, "onPageChange": "{setter:page}" }
+        }
       ]
     }
   },
   "parameters": [],
   "content": { "page-size-label": "Rows per page" },
+  "state": [{ "key": "page", "initial": 1 }],
   "gaps": []
 }

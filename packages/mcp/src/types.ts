@@ -65,6 +65,10 @@ export interface PatternEntry {
   compose: PatternNode;
   parameters: PatternParameter[];
   content: Record<string, string>;
+  /** D143: state the pattern owns, when it has any. */
+  state?: Array<{ key: string; initial: string | number | boolean }>;
+  /** D143: values and callbacks its caller supplies, when it has any. */
+  inputs?: Array<{ key: string; type: string; story?: string | number | boolean }>;
   gaps: string[];
   blocked: boolean;
   preset: string | null;
