@@ -206,8 +206,8 @@ Why the split falls where it does:
 
 - Unit: `renderPreset` emits the module shape for each placeholder, imports,
   props type and `useState` lines; a stateless pattern's output is unchanged;
-  `renderPresetElement`'s `row-actions` opens on a trigger click and calls its
-  input on item select; `validatePatterns` rejects an unbound required prop, an
+  `renderPresetElement` opens a menu on a trigger click and closes it through
+  a `{set:}` binding, and passes a value input its `story` value; `validatePatterns` rejects an unbound required prop, an
   undeclared key, an unused key, a wrong-kind placeholder and `{toggle:}` on a
   non-boolean.
 - `presets.test.ts`: zero `check` findings across all 24 presets.
