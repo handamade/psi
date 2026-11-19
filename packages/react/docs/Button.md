@@ -40,7 +40,6 @@ Override `--psi-button-*` custom properties at any scope; interactive states der
 - **outline** — Bordered ghost — visible structure, no fill until hover. Marketing CTA, download button; hover fills accent.
 - **danger** — Destructive action. Delete, remove, disconnect.
 - **danger-subtle** — Destructive context, low urgency. Warning badges, soft destructive hints.
-- **success | warning** — Status communication (Tag only). Status badges, labels.
 
 ## Rules
 

@@ -4,14 +4,14 @@
   "match": ["delete confirmation", "are you sure", "destructive dialog", "confirm delete"],
   "compose": {
     "component": "Dialog",
-    "props": { "open": "{input:open}", "onClose": "{input:onClose}" },
+    "props": { "open": "{input:open}", "onClose": "{input:onClose}", "dismissible": false, "closeOnEscape": true },
     "slots": {
       "title": ["{content:title}"],
       "body": ["{content:consequence}"],
       "footer": [
         {
           "component": "Button",
-          "props": { "variant": "ghost", "size": "{param:size}", "onClick": "{input:onClose}" },
+          "props": { "variant": "neutral", "size": "{param:size}", "onClick": "{input:onClose}" },
           "content": "cancel-label"
         },
         {

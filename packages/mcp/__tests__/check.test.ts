@@ -112,9 +112,35 @@ describe("check: the API rules", () => {
   });
 
   it("labels a Psi export with no manifest entry in no-import mode", () => {
-    const md = run("<IconPlus />");
+    const md = run("<ToastContext />");
     expect(md).toContain("a Psi export with no manifest entry");
     expect(md).not.toContain("not a Psi export");
+  });
+
+  it("checks an icon's props like a component's (D145)", () => {
+    const md = run('<IconSearch size={16} strokeWidth={1.5} className="a" style={{}} aria-label="x" data-x="1" foo="y" />');
+    expect(md).toContain("1 Psi element: IconSearch.");
+    expect(md).not.toContain("no manifest entry");
+    expect(lines(md, "unknown-prop")).toHaveLength(1);
+    expect(md).toContain("`IconSearch` has no prop `foo`.");
+  });
+
+  it("checks an imported icon", () => {
+    const md = run(`import { IconTrash } from "@handamade/psi-react";\nexport const A = () => <IconTrash sise={16} />;`);
+    expect(md).toContain("`IconTrash` has no prop `sise`; did you mean `size`?");
+  });
+
+  it("hints the component's own prop before a DOM attribute (D145)", () => {
+    const md = run('<Combobox aria-label="Owner" options={[]} onValueChange={f} />');
+    expect(md).toContain("did you mean `onChange`?");
+    expect(md).not.toContain("onVolumeChange");
+    expect(md).not.toContain("onInputChange");
+    expect(md).toContain("`SegmentedControl`");
+  });
+
+  it("still hints a plain typo of a DOM attribute, and no far one", () => {
+    expect(run("<Button onClik={f}>Go</Button>")).toContain("did you mean `onClick`?");
+    expect(run("<Button foo>Go</Button>")).toContain("`Button` has no prop `foo`.");
   });
 
   it("does not check a component defined in the same file as Psi's", () => {

@@ -36,7 +36,6 @@ This component has no `--psi-copy-button-*` tokens — its styling binds scale t
 - **outline** — Bordered ghost — visible structure, no fill until hover. Marketing CTA, download button; hover fills accent.
 - **danger** — Destructive action. Delete, remove, disconnect.
 - **danger-subtle** — Destructive context, low urgency. Warning badges, soft destructive hints.
-- **success | warning** — Status communication (Tag only). Status badges, labels.
 
 ## Rules
 

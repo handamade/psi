@@ -6,7 +6,7 @@ export const MAX_CODE = 20_000;
 /** Input the tool refuses outright; reported as isError. */
 export class CheckInputError extends Error {}
 
-export type CheckIndex = Pick<PsiIndex, "components" | "contracts" | "attributeSets" | "exports">;
+export type CheckIndex = Pick<PsiIndex, "components" | "contracts" | "attributeSets" | "exports" | "icons">;
 
 function summary(report: Report): string[] {
   const total = [...report.checked.values()].reduce((a, b) => a + b, 0);

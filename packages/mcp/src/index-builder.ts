@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { BaseIndex, ComponentEntry, Oklch, PatternEntry, PropDoc, TokenEntry } from "./types.js";
+import type { BaseIndex, ComponentEntry, HookEntry, Oklch, PatternEntry, PropDoc, TokenEntry } from "./types.js";
 
 const THEMES = ["light", "dark", "acme", "ember"];
 
@@ -70,6 +70,9 @@ async function readJson(path: string): Promise<unknown> {
 export async function buildIndex(inputs: BuildInputs): Promise<BaseIndex> {
   const manifest = (await readJson(join(inputs.reactDist, "manifest.json"))) as {
     components: ManifestComponent[];
+    icons: string[];
+    iconDetails: { props: PropDoc[]; attributes: string | null; keywords: Record<string, string[]> };
+    hooks: HookEntry[];
     contracts: Record<string, string[]>;
   };
   // Fail-fast is deliberate: requires @handamade/psi-react built first — same posture
@@ -80,6 +83,7 @@ export async function buildIndex(inputs: BuildInputs): Promise<BaseIndex> {
   const attributes = (await readJson(join(inputs.reactDist, "attributes.json"))) as {
     sets: string[][];
     components: Record<string, number>;
+    icons?: number;
   };
   // The export surface, as verify-published reads it: every `export { … }`
   // and `export type { … }` in the compiled entry's declarations.
@@ -137,6 +141,14 @@ export async function buildIndex(inputs: BuildInputs): Promise<BaseIndex> {
     attributeSets: attributes.sets,
     contracts: manifest.contracts,
     exports: [...new Set(exportNames)].sort(),
+    icons: {
+      names: manifest.icons,
+      props: manifest.iconDetails.props,
+      attributes: manifest.iconDetails.attributes,
+      attributeSet: attributes.icons ?? null,
+      keywords: manifest.iconDetails.keywords,
+    },
+    hooks: manifest.hooks,
     topics: {
       ...guidance,
       "getting-started": GETTING_STARTED,

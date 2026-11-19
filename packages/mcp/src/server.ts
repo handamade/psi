@@ -12,9 +12,10 @@ export function createPsiServer(store: Store, version: string, index: CheckIndex
     {
       title: "Search the Psi design system",
       description:
-        "Keyword search over Psi components, composition patterns, semantic tokens, and " +
-        "guidance topics. Returns compact briefs with ids for the get tool. Empty query " +
-        "returns an overview.",
+        "Keyword search over Psi components, icons (by name or by what they show), hooks, " +
+        "composition patterns, semantic tokens, and guidance topics. Returns compact briefs " +
+        "with ids for the get tool. Empty query returns an overview: topics, every " +
+        "component by name, the icon count, and the patterns.",
       inputSchema: { query: z.string().max(500).describe("Keywords, e.g. 'button variants' or 'bg token'") },
     },
     async ({ query }) => ({
@@ -31,8 +32,9 @@ export function createPsiServer(store: Store, version: string, index: CheckIndex
         "(examples, props, keyboard, theming, rules — the same text as " +
         "psi.kurkin.de/docs/components/<page>.md), a token page ('tokens:color'), a guide " +
         "('guide:theming'), one token ('token:bgPrimary': formula and value in every theme), " +
-        "a pattern ('pattern:destructive-confirm': recipe and preset), or a topic " +
-        "('topic:variants'). A bare name also works.",
+        "a pattern ('pattern:destructive-confirm': recipe and preset), a topic " +
+        "('topic:variants'), an icon ('icon:IconTrash'; 'icons:all' lists all of them), or " +
+        "a hook ('hook:useToast': the page that tables its API). A bare name also works.",
       inputSchema: { id: z.string().max(200).describe("An id from search results, or a bare name") },
     },
     async ({ id }) => {
@@ -94,7 +96,7 @@ export function createPsiServer(store: Store, version: string, index: CheckIndex
         "Report where a JSX snippet uses Psi wrongly: a name Psi does not export, an unknown " +
         "prop, a value outside a prop's allowed values (size=\"md\", variant=\"primary\"), a " +
         "missing required prop, a child a slot does not accept, or a component without the " +
-        "accessible name it needs. Reports only; never rewrites the code. Spreads and computed " +
+        "accessible name it needs. Icons are checked too. Reports only; never rewrites the code. Spreads and computed " +
         "values are listed as skipped, not guessed.",
       inputSchema: {
         code: z.string().describe("TSX or JSX: a module, or one or more elements. At most 20000 characters."),

@@ -1,4 +1,4 @@
-import { nearest } from "../nearest.js";
+import { hint, nearest } from "../nearest.js";
 import type { ComponentEntry } from "../types.js";
 import type { CheckIndex } from "./index.js";
 import { parseSource, position, tagOf, walk, type AnyNode } from "./parse.js";
@@ -207,7 +207,18 @@ export function runCheck(code: string, index: CheckIndex): Report {
   const find = (n: AnyNode, rule: Rule, message: string) => report.findings.push({ ...at(n), rule, message });
   const where = (n: AnyNode) => `${at(n).line}:${at(n).column}`;
 
-  const components = new Map(index.components.map((c) => [c.name, c]));
+  // D145: an icon is checked like a component whose props every icon shares.
+  const iconEntries: ComponentEntry[] = index.icons.names.map((name) => ({
+    name,
+    description: "",
+    props: index.icons.props,
+    slots: [],
+    attributes: index.icons.attributes,
+    attributeSet: index.icons.attributeSet,
+    accessibleName: null,
+    doc: "",
+  }));
+  const components = new Map([...index.components, ...iconEntries].map((c) => [c.name, c]));
   const exported = new Set(index.exports);
 
   // Imports from Psi: local name → exported name.
@@ -317,8 +328,22 @@ export function runCheck(code: string, index: CheckIndex): Report {
         const allowed =
           ALWAYS_ALLOWED.has(attr.name) || attr.name.startsWith("aria-") || attr.name.startsWith("data-") || passThrough.has(attr.name);
         if (!allowed) {
-          const near = nearest(attr.name, [...declared.keys(), ...passThrough]);
-          find(attr.node, "unknown-prop", `\`${c.name}\` has no prop \`${attr.name}\`${near ? `; did you mean \`${near}\`?` : "."}`);
+          const near = hint(attr.name, [...declared.keys()], [...passThrough]);
+          // D145: say whose word it is when another Psi component has it.
+          const owners = index.components
+            .filter((o) => o.name !== c.name && o.props.some((p) => p.name === attr.name))
+            .map((o) => `\`${o.name}\``);
+          const whose =
+            owners.length === 0
+              ? ""
+              : owners.length === 1
+                ? ` (it is ${owners[0]}'s)`
+                : ` (it is a prop of ${owners.slice(0, 3).join(", ")}${owners.length > 3 ? ", …" : ""})`;
+          find(
+            attr.node,
+            "unknown-prop",
+            `\`${c.name}\` has no prop \`${attr.name}\`${whose}${near ? `; did you mean \`${near}\`?` : "."}`,
+          );
         }
         continue;
       }

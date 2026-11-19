@@ -1,6 +1,7 @@
 import {
   componentPageMd as pageMd,
   guideMd as guideOf,
+  hookMd as hookOf,
   overviewMd as overviewOf,
   tokenPageMd as tokensMd,
   type ComponentPage,
@@ -13,6 +14,8 @@ import { loadDocsInput } from "@handamade/psi-docs/node";
 export const componentPageMd = (page: ComponentPage): string => pageMd(loadDocsInput(), page);
 export const tokenPageMd = (page: TokenPage): string => tokensMd(loadDocsInput(), page);
 export const overviewMd = (): string => overviewOf(loadDocsInput());
+/** D145: a hook's section, as the component page's markdown twin has it. */
+export const hookMd = (name: string): string => hookOf(loadDocsInput(), name);
 
 export function guideMd(id: string): string {
   const input = loadDocsInput();

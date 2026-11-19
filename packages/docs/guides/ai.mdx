@@ -17,7 +17,7 @@ Check your client's documentation for how it takes a server URL or command.
 
 ## The four tools
 
-`search(query)` returns short briefs with ids. An empty query returns an overview.
+`search(query)` returns short briefs with ids. An empty query returns an overview: the guidance topics, every component by name, the icon count and the composition patterns. Icons are found by what they show as well as by name: `search("delete")` finds `IconTrash`.
 
 `get(id)` returns the docs for one id as markdown. For a docs page it is the same text as the page's `.md` version.
 
@@ -29,6 +29,9 @@ Check your client's documentation for how it takes a server URL or command.
 | `token:bgPrimary` | One token's formula and its value in every theme |
 | `topic:variants` | Usage guidance |
 | `pattern:<id>` | A composition recipe: parameters, content, gaps, and a preset to paste: JSX, or a small component when the pattern holds state |
+| `icon:IconTrash` | One icon: its import line, keywords and props |
+| `icons:all` | Every icon with its keywords, and the props they share |
+| `hook:useToast` | The component page that tables the hook's API |
 
 A bare name such as `Button` also resolves, without regard to case.
 

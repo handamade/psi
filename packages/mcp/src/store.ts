@@ -1,5 +1,5 @@
 import { closest } from "./nearest.js";
-import type { ComponentEntry, PatternEntry, PsiIndex } from "./types.js";
+import type { ComponentEntry, HookEntry, PatternEntry, PsiIndex } from "./types.js";
 
 export interface Brief {
   id: string;
@@ -18,7 +18,7 @@ export type OverviewPatternBrief = Omit<Brief, "title">;
  * query, the overview, where pattern rows are `OverviewPatternBrief`. */
 export type SearchBrief = Brief | OverviewPatternBrief;
 
-export type DocKind = "component" | "tokens" | "guide" | "token" | "pattern" | "topic";
+export type DocKind = "component" | "tokens" | "guide" | "token" | "pattern" | "topic" | "icon" | "icons" | "hook";
 
 export interface Page {
   id: string;
@@ -51,14 +51,14 @@ const RESPONSE_BUDGET = 6000;
  *   components — verbose (up to 220 chars each) and the only axis that grows
  *              with every release. Also the axis a keyword query recovers
  *              best: search("menu") finds Menu; no query re-derives a house
- *              rule an agent doesn't know exists. Reserved a floor of
- *              `COMPONENT_FLOOR` items before patterns spend the remainder,
- *              so catalog growth cannot starve them below the floor.
+ *              rule an agent doesn't know exists. One fixed `component:*` row
+ *              names every component and states the total (D145); full
+ *              briefs only fill budget the patterns leave.
  *   patterns — composition recipes; their stored summaries carry match
  *              phrases for keyword ranking and can run long, so the overview
  *              projects a trimmed copy (see overviewBrief) at a *derived*
  *              per-call cap — the largest that lets every pattern fit
- *              alongside topics and the component floor. The stored,
+ *              alongside topics and the fixed index rows. The stored,
  *              untrimmed brief is still what score() ranks against.
  *
  * Previously the overview filled topics, then patterns, then components
@@ -66,7 +66,14 @@ const RESPONSE_BUDGET = 6000;
  * catalog growth — three more patterns was enough to starve components from
  * six down to four (D61). Allocating by kind first means catalog growth
  * shortens pattern summaries instead of evicting items off the tail. */
-const COMPONENT_FLOOR = 8;
+
+/* D145 revises the component floor. The overview used to reserve room for
+ * eight full component briefs (2,289 of 6,000 characters at 0.37.0), which
+ * left 24 patterns an intro cap of 0 — one word each — and never said there
+ * were 60 components. It now carries one `component:*` row naming every
+ * component (about 700 characters, growing ~11 per component) and one
+ * `icons:all` row; patterns take what is left at the derived cap, and full
+ * component briefs fill whatever budget remains after them. */
 
 const TOPIC_SUMMARIES: Record<string, string> = {
   variants: "Variant intent and typical use for all 8 flat variants",
@@ -95,6 +102,14 @@ function componentSummary(c: ComponentEntry): string {
   if (sizes) parts.push(`sizes: ${sizes}`);
   if (!variants && !sizes) parts.push(`props: ${c.props.map((p) => p.name).slice(0, 6).join(", ")}`);
   return parts.join(" — ").slice(0, 220);
+}
+
+function iconSummary(keywords: string[]): string {
+  return `Icon: ${keywords.join(", ")}`;
+}
+
+function hookSummary(h: HookEntry): string {
+  return `Hook returning ${h.returns}: ${h.members.map((m) => `${m.name}()`).join(", ")}. ${h.description}`.slice(0, 220);
 }
 
 function patternSummary(p: PatternEntry): string {
@@ -145,6 +160,14 @@ export function createStore(index: PsiIndex): Store {
   }
   for (const c of index.components) {
     if (!pageOf.has(c.name)) throw new Error(`psi-mcp: export "${c.name}" has no docs page`);
+  }
+  // D145: every exported hook is documented on a component page.
+  const hookPage = new Map<string, string>();
+  for (const [slug, page] of Object.entries(index.docs.components)) {
+    for (const h of page.hooks ?? []) hookPage.set(h, slug);
+  }
+  for (const name of index.exports.filter((e) => /^use[A-Z]/.test(e))) {
+    if (!hookPage.has(name)) throw new Error(`psi-mcp: hook "${name}" is on no docs page`);
   }
 
   const patternsById = new Map(index.patterns.map((p) => [p.id, p]));
@@ -203,6 +226,24 @@ export function createStore(index: PsiIndex): Store {
       title: t.name,
       summary: t.formula,
     })),
+    ...index.icons.names.map((name) => ({
+      id: `icon:${name}`,
+      kind: "icon" as const,
+      title: name,
+      summary: iconSummary(index.icons.keywords[name] ?? []),
+    })),
+    {
+      id: "icons:all",
+      kind: "icons" as const,
+      title: "Icons",
+      summary: `All ${index.icons.names.length} icons with their keywords and shared props.`,
+    },
+    ...index.hooks.map((h) => ({
+      id: `hook:${h.name}`,
+      kind: "hook" as const,
+      title: h.name,
+      summary: hookSummary(h),
+    })),
   ];
 
   function score(brief: Brief, terms: string[]): number {
@@ -220,10 +261,10 @@ export function createStore(index: PsiIndex): Store {
   function search(query: string): SearchBrief[] {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) {
-      // D61: allocate before filling. Topics and the two docs index rows take their full cost, components
-      // are reserved a floor, and patterns take the remainder via a derived
-      // cap — so catalog growth shortens summaries instead of evicting the
-      // tail. Whichever kind was filled last used to absorb all growth;
+      // D61: allocate before filling. Topics and the index rows (guides,
+      // token pages, every component by name, icons — D145) take their full
+      // cost, and patterns take the remainder via a derived cap — so catalog
+      // growth shortens summaries instead of evicting the tail. Whichever kind was filled last used to absorb all growth;
       // that was the bug. (Tokens are omitted; they are discoverable via
       // query.)
       const fixed: Brief[] = [
@@ -240,15 +281,25 @@ export function createStore(index: PsiIndex): Store {
           title: "Token pages",
           summary: `get tokens:<name> — ${Object.keys(index.docs.tokenPages).join(", ")}`,
         },
+        // D145: the totals, and every component by name.
+        {
+          id: "component:*",
+          kind: "component",
+          title: "Components",
+          summary: `${index.components.length} components — get component:<Name>; search a word for variants and sizes: ${index.components.map((c) => c.name).join(", ")}`,
+        },
+        {
+          id: "icons:all",
+          kind: "icons",
+          title: "Icons",
+          summary: `${index.icons.names.length} icons — get icons:all, or search what the icon shows (search "delete" finds IconTrash)`,
+        },
       ];
       const patterns = briefs.filter((b) => b.kind === "pattern");
       const components = briefs.filter((b) => b.kind === "component");
 
-      const reserve = JSON.stringify(components.slice(0, COMPONENT_FLOOR)).length;
       const fits = (limit: number) =>
-        JSON.stringify([...fixed, ...patterns.map((b) => overviewBrief(b, limit))]).length +
-          reserve <=
-        RESPONSE_BUDGET;
+        JSON.stringify([...fixed, ...patterns.map((b) => overviewBrief(b, limit))]).length <= RESPONSE_BUDGET;
 
       let limit = OVERVIEW_PATTERN_INTRO_MAX;
       while (limit > 0 && !fits(limit)) limit -= 10;
@@ -319,6 +370,20 @@ export function createStore(index: PsiIndex): Store {
       const guide = Object.hasOwn(index.docs.guides, name) ? index.docs.guides[name] : undefined;
       if (guide) return { id: `guide:${name}`, kind: "guide", title: guide.title, markdown: guide.markdown };
     }
+    if (want("icon")) {
+      const icon = index.icons.names.find((n) => n.toLowerCase() === name);
+      if (icon) return { id: `icon:${icon}`, kind: "icon", title: icon, markdown: index.docs.icons.byName[icon] };
+    }
+    if ((prefix === "icons" && name === "all") || (prefix === null && name === "icons")) {
+      return { id: "icons:all", kind: "icons", title: "Icons", markdown: index.docs.icons.all };
+    }
+    if (want("hook")) {
+      const hook = index.hooks.find((h) => h.name.toLowerCase() === name);
+      const slug = hook && hookPage.get(hook.name);
+      if (hook && slug) {
+        return { id: `hook:${hook.name}`, kind: "hook", title: hook.name, markdown: index.docs.components[slug].markdown };
+      }
+    }
     return null;
   }
 
@@ -329,6 +394,9 @@ export function createStore(index: PsiIndex): Store {
     ...Object.keys(index.topics).map((k) => `topic:${k}`),
     ...Object.keys(index.docs.tokenPages).map((s) => `tokens:${s}`),
     ...Object.keys(index.docs.guides).map((g) => `guide:${g}`),
+    ...index.icons.names.map((n) => `icon:${n}`),
+    "icons:all",
+    ...index.hooks.map((h) => `hook:${h.name}`),
   ];
 
   // Built once: bare name → every id that shares it (topic:motion and tokens:motion).

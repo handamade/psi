@@ -21,7 +21,7 @@ export const Default: Story = {
       width={400}
       footer={
         <>
-          <Button variant="ghost" size={40}>Cancel</Button>
+          <Button variant="neutral" size={40}>Cancel</Button>
           <Button variant="danger" size={40}>Yes, delete</Button>
         </>
       }

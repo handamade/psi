@@ -1,7 +1,8 @@
 # Icons and hooks in the MCP, a hint in Psi's own words, and component pages that describe their own component (D145)
 
-Date: 2026-11-19. Status: **Designed**; lands after #200 (D143), which
-rewrites the pattern presets this decision also touches.
+Date: 2026-11-19. Status: **Implemented** on branch `d145-mcp-icons-docs`,
+after #200 (D143), which rewrote the pattern presets this decision also
+touches.
 
 Provenance: the 2026-11-18 inspection's generation test. A fresh agent with
 only the four MCP tools built a 599-line screen that compiled and rendered,
@@ -116,25 +117,38 @@ full component briefs fill it, best-known first, as before.
 
 This revises D61's component floor: the floor guaranteed the overview
 "carries components", and a list of all 60 names does that better than 8
-briefs. `measure-overview-envelope.ts` and the store tests change with it;
-the envelope is now bounded by the names row, which grows by about eleven
-characters per component.
+briefs. Measured after the change: 5,927 characters, the shortest pattern
+intro 49 characters ("The signed-in user's menu: account actions, sign
+out, and a read-only…"). `measure-overview-envelope.ts` (which had not run
+since D129 added docs to the index; it now bakes them) reports the shortest
+intro instead of a component count: with long synthetic ids every intro
+keeps 16 characters or more through 34 patterns and falls to a word at 35,
+and every size stays inside the budget with every topic, pattern and index
+row. The names row grows by about eleven characters per component.
 
 #### 3. The hint ranks the component's own words, then Psi's, then the DOM's
 
-`nearest.ts` gains `hint(target, tiers)`: the first tier with a match wins.
+`nearest.ts` gains `hint(target, own, passThrough)`: the first tier with a
+match wins.
 
-1. **The component's own props**, matched by edit distance (today's
-   threshold) **or by camelCase words**: a prop whose words all appear in the
-   target, or the target's in it, sharing at least two (`onChange` ⊂
-   `onValueChange`; `label` vs `dismissLabel` shares one, so no).
-2. **The DOM attributes it passes through**, by edit distance only.
+1. **A close typo of the component's own prop**, at most 2 edits
+   (`onClik` → `onClick`, `sise` → `size`).
+2. **The component's own prop in more or fewer words**: one whose camelCase
+   words all appear in the target, or the target's in it, sharing at least
+   two (`onChange` ⊂ `onValueChange`; `label` and `dismissLabel` share one, so
+   no). This tier sits above looser typos because `Combobox` also has
+   `onInputChange`, 4 edits from `onValueChange` and inside today's threshold.
+3. **A looser typo of its own prop**, today's threshold (`nearest`).
+4. **A DOM attribute it passes through**, within a third of the name's length
+   (at least 1). Today's threshold gave `foo` the hint `fr`.
 
 And when the unknown prop is another Psi component's prop, the message says
 so: Psi's vocabulary is consulted before the DOM's.
 
-> `Combobox` has no prop `onValueChange` (it is `SegmentedControl`'s); did
-> you mean `onChange`?
+> `Combobox` has no prop `onValueChange` (it is a prop of `RadioGroup`,
+> `Tabs`, `SegmentedControl`); did you mean `onChange`?
+
+One owner reads "(it is `X`'s)"; more than three end in an ellipsis.
 
 Done when that probe gets exactly that hint. The same `hint` serves the
 icon props of §1; `unknown-export` keeps `nearest` over exports.
@@ -155,8 +169,9 @@ decision.
 
 #### 5. `useToast()`'s API is generated from `useToast.ts`
 
-`emit-manifest.ts` reads hooks with the TypeScript checker (`HOOKS =
-[{ name: "useToast", file: "Toast/useToast.ts" }]`) and emits `hooks:
+`emit-manifest.ts` reads hooks with the TypeScript checker (`HOOKS`: `useToast`
+in `Toast/useToast.ts` and `useFieldControl` in `Field/useFieldControl.ts`)
+and emits `hooks:
 [{ name, description, returns, members, types }]`: the returned interface's
 members (`show`, `announce`, `dismiss`, `clear`) with signature and TSDoc, and
 the option interfaces they take (`ToastOptions`, `AnnounceOptions`) with each
@@ -168,9 +183,14 @@ and the site's HTML page alike) gets a `## useToast()` section: the hook's
 description, a Method | Signature | Description table and one table per
 options type. A page entry in `pages.ts` lists its hooks (`toast: hooks:
 ["useToast"]`), and `createStore` throws if an exported `use*` name has no
-page, as it does for components. The index has one brief per hook, `kind:
-"hook"`, id `hook:useToast`, whose `get` returns the Toast page, and bare
-`get useToast` resolves.
+page, as it does for components. That guard found the second exported hook
+on its first run: `useFieldControl` (D84), which no page documented, so the
+Field page gets a `## useFieldControl()` section from the same generator. A
+hook returning functions is a Method | Signature table; one returning props
+(`FieldControlProps`) is a Field | Type table. The index has one brief per
+hook, `kind: "hook"`, id `hook:useToast`, whose `get` returns the page that
+documents it, and bare `get useToast` resolves. The site's HTML Toast and
+Field pages render the same section.
 
 #### 6. A destructive confirmation: `neutral` Cancel, `dismissible={false} closeOnEscape`
 
