@@ -65,6 +65,31 @@ describe("loadPatterns", () => {
     writeFileSync(join(dir, "a.json"), JSON.stringify(base({ id: "a" })));
     expect(loadPatterns(dir)).toHaveLength(1);
   });
+  it("loads state and inputs, defaulting both to []", () => {
+    const dir = mkdtempSync(join(tmpdir(), "patterns-"));
+    writeFileSync(join(dir, "a.json"), JSON.stringify(base({ id: "a" })));
+    writeFileSync(
+      join(dir, "b.json"),
+      JSON.stringify(base({ id: "b", state: [{ key: "open", initial: false }], inputs: [{ key: "onClose", type: "() => void" }] })),
+    );
+    const [a, b] = loadPatterns(dir);
+    expect(a.state).toEqual([]);
+    expect(a.inputs).toEqual([]);
+    expect(b.state).toEqual([{ key: "open", initial: false }]);
+    expect(b.inputs).toEqual([{ key: "onClose", type: "() => void" }]);
+  });
+  it("throws on a mis-shaped state or input entry", () => {
+    const write = (over: Record<string, unknown>) => {
+      const dir = mkdtempSync(join(tmpdir(), "patterns-"));
+      writeFileSync(join(dir, "x.json"), JSON.stringify({ ...base({ id: "x" }), ...over }));
+      return () => loadPatterns(dir);
+    };
+    expect(write({ state: {} })).toThrow(/x\.json: "state" must be an array/);
+    expect(write({ state: [{ initial: 1 }] })).toThrow(/x\.json: state\[0\]: missing\/invalid "key"/);
+    expect(write({ state: [{ key: "a", initial: {} }] })).toThrow(/state\[0\]: "initial" must be a string, number or boolean/);
+    expect(write({ inputs: [{ key: "a" }] })).toThrow(/x\.json: inputs\[0\]: missing\/invalid "type"/);
+    expect(write({ inputs: [{ key: "a", type: "boolean", story: [] }] })).toThrow(/inputs\[0\]: "story" must be a string, number or boolean/);
+  });
 });
 
 describe("validatePatterns (one case per D48 error class)", () => {

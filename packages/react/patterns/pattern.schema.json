@@ -23,6 +23,33 @@
       "minItems": 1
     },
     "compose": { "$ref": "#/$defs/patternNode" },
+    "state": {
+      "type": "array",
+      "description": "D143: state the pattern owns; each entry is one useState in its preset, bound with {state:key}, {set:key:value}, {toggle:key} or {setter:key}.",
+      "items": {
+        "type": "object",
+        "required": ["key", "initial"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
+          "initial": { "type": ["string", "number", "boolean"] }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "description": "D143: values and callbacks the caller supplies; each entry is a typed prop of the preset's wrapper, bound with {input:key}. story is what Storybook passes; function types need none.",
+      "items": {
+        "type": "object",
+        "required": ["key", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
+          "type": { "type": "string" },
+          "story": { "type": ["string", "number", "boolean"] }
+        }
+      }
+    },
     "parameters": {
       "type": "array",
       "description": "Consumer-facing knobs that bind `{param:key}` placeholders in `compose` prop positions.",

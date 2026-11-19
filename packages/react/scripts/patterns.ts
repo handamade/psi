@@ -1,4 +1,5 @@
 import { createElement, type ComponentType, type ReactElement, type ReactNode } from "react";
+import { KEY_RE, isFunctionType, parseBinding } from "./pattern-bindings.js";
 
 // D48's "scopes entry" class is enforced by the D46 token build (packages/tokens); not duplicated here.
 
@@ -28,6 +29,21 @@ export interface PatternRequirement {
   name: string;
 }
 
+/** D143: state a pattern owns; each entry is one `useState` in its preset. */
+export interface PatternState {
+  key: string;
+  initial: string | number | boolean;
+}
+
+/** D143: a value or callback the pattern's caller supplies; each entry is a
+ * typed prop of the preset's wrapper. `story` is what Storybook passes; a
+ * function-typed input gets a no-op there instead. */
+export interface PatternInput {
+  key: string;
+  type: string;
+  story?: string | number | boolean;
+}
+
 /** Authored composition recipe (D47): what to build, from what parts, with
  * what parameters exposed to the consumer, and which named components in
  * `compose` are known gaps (not yet in the manifest). */
@@ -41,6 +57,10 @@ export interface Pattern {
   gaps: string[];
   /** Affordances the content depends on (D71); see PatternRequirement. */
   requires: PatternRequirement[];
+  /** D143; see PatternState. */
+  state?: PatternState[];
+  /** D143; see PatternInput. */
+  inputs?: PatternInput[];
 }
 
 /** Slice of `dist/manifest.json` a pattern is validated against. */
@@ -97,12 +117,15 @@ export const INTRINSIC_ELEMENTS: ReadonlySet<string> = new Set(["option"]);
  * slot contracts (D48 error classes 1-8, plus class 9: fill text must be
  * JSX-safe so `renderPreset` can only emit a parseable preset). Throws on
  * the first violation found; returns the gap map (patternId -> gap component
- * names actually used) when every pattern is clean. */
+ * names actually used) when every pattern is clean. `attributes`: component →
+ * pass-through attribute names from `dist/attributes.json`; a prop the manifest
+ * does not list is accepted when the component forwards it (D143). */
 export function validatePatterns(
   patterns: Pattern[],
   components: ManifestComponent[],
   contracts: Record<string, string[]>,
   icons: string[] = [],
+  attributes: Record<string, string[]> = {},
 ): { gaps: Record<string, string[]> } {
   const byName = new Map(components.map((c) => [c.name, c]));
   const iconNames = new Set(icons);
@@ -111,6 +134,56 @@ export function validatePatterns(
 
   for (const pattern of patterns) {
     const prefix = `pattern "${pattern.id}": `;
+
+    // D143: the pattern's own state and its caller's inputs.
+    const stateByKey = new Map((pattern.state ?? []).map((s) => [s.key, s]));
+    const inputByKey = new Map((pattern.inputs ?? []).map((i) => [i.key, i]));
+    const seenKeys = new Set<string>();
+    for (const [kind, key] of [
+      ...(pattern.state ?? []).map((s) => ["state", s.key] as const),
+      ...(pattern.inputs ?? []).map((i) => ["input", i.key] as const),
+    ]) {
+      if (!KEY_RE.test(key)) throw new Error(`${prefix}${kind} key "${key}" is not a camelCase identifier`);
+      if (seenKeys.has(key)) throw new Error(`${prefix}key "${key}" declared twice across state and inputs`);
+      seenKeys.add(key);
+    }
+    for (const input of pattern.inputs ?? []) {
+      if (!isFunctionType(input.type) && input.story === undefined) {
+        throw new Error(`${prefix}input "${input.key}" needs a story value: it is not a function type`);
+      }
+    }
+    const usedBindingKeys = new Set<string>();
+
+    /** Validates a binding placeholder in a prop position. Returns true when
+     * `value` was a binding (the caller then skips its literal checks).
+     * `propType` is the manifest type, or null where there is none to
+     * compare (gap nodes, intrinsics, aria-*, pass-through attributes). */
+    const checkBinding = (propName: string, value: unknown, propType: string | null, path: string): boolean => {
+      const binding = parseBinding(value);
+      if (!binding) return false;
+      usedBindingKeys.add(binding.key);
+      let wantsFunction: boolean;
+      if (binding.kind === "input") {
+        const input = inputByKey.get(binding.key);
+        if (!input) throw new Error(`${prefix}input "${binding.key}" referenced but not declared`);
+        wantsFunction = isFunctionType(input.type);
+      } else {
+        const state = stateByKey.get(binding.key);
+        if (!state) throw new Error(`${prefix}state "${binding.key}" referenced but not declared`);
+        if (binding.kind === "toggle" && typeof state.initial !== "boolean") {
+          throw new Error(`${prefix}${path}: {toggle:${binding.key}} needs a boolean state`);
+        }
+        wantsFunction = binding.kind !== "state";
+      }
+      if (propType !== null && propType.includes("=>") !== wantsFunction) {
+        throw new Error(
+          `${prefix}${path}: {${binding.kind}:${binding.key}} on prop "${propName}": ${
+            wantsFunction ? "a callback binding needs a function-typed prop" : "a value binding needs a prop that is not a function"
+          }`,
+        );
+      }
+      return true;
+    };
 
     // A declared gap suppresses prop/slot validation for that node (see the
     // "gap listing always wins" comment below) so the ledger can go stale
@@ -167,6 +240,9 @@ export function validatePatterns(
     // Legal in text positions (slot string fills, node `content`): only
     // {content:key} — {param:key} only binds prop values (D48).
     const trackTextPlaceholder = (value: string) => {
+      if (parseBinding(value)) {
+        throw new Error(`${prefix}binding "${value}" used outside a prop position — bindings bind prop values (D143)`);
+      }
       const paramMatch = PARAM_RE.exec(value);
       if (paramMatch) {
         throw new Error(
@@ -187,7 +263,9 @@ export function validatePatterns(
 
     const walk = (node: PatternNode, path: string) => {
       if (INTRINSIC_ELEMENTS.has(node.component)) {
-        for (const propValue of Object.values(node.props ?? {})) trackPropPlaceholders(propValue);
+        for (const [propName, propValue] of Object.entries(node.props ?? {})) {
+          if (!checkBinding(propName, propValue, null, path)) trackPropPlaceholders(propValue);
+        }
         if (node.content !== undefined) referencedContent.add(node.content);
         for (const [slotName, fills] of Object.entries(node.slots ?? {})) {
           if (slotName !== "body") {
@@ -229,6 +307,7 @@ export function validatePatterns(
       // listing always wins over a coincidental manifest match.
       for (const [propName, propValue] of Object.entries(node.props ?? {})) {
         if (!manifestComponent || isGap) {
+          if (checkBinding(propName, propValue, null, path)) continue;
           trackPropPlaceholders(propValue);
           const paramMatch = typeof propValue === "string" ? PARAM_RE.exec(propValue) : null;
           if (paramMatch) {
@@ -249,16 +328,24 @@ export function validatePatterns(
         // would fix one attribute at a time forever. Unchecked by design:
         // there is no literal union to validate an accessible name against.
         if (ARIA_PROP_RE.test(propName)) {
+          if (checkBinding(propName, propValue, null, path)) continue;
           trackPropPlaceholders(propValue);
           continue;
         }
 
         const propDef = manifestComponent.props.find((p) => p.name === propName);
         if (!propDef) {
+          // D143: a pass-through attribute the component forwards to its DOM
+          // element (dist/attributes.json), such as a trigger's onClick.
+          if (attributes[node.component]?.includes(propName)) {
+            if (!checkBinding(propName, propValue, null, path)) trackPropPlaceholders(propValue);
+            continue;
+          }
           throw new Error(
             `${prefix}${path}: unknown prop "${propName}" on component "${node.component}"`,
           );
         }
+        if (checkBinding(propName, propValue, propDef.type, path)) continue;
         trackPropPlaceholders(propValue);
 
         const paramMatch = typeof propValue === "string" ? PARAM_RE.exec(propValue) : null;
@@ -352,6 +439,13 @@ export function validatePatterns(
     };
 
     walk(pattern.compose, "compose");
+
+    for (const key of stateByKey.keys()) {
+      if (!usedBindingKeys.has(key)) throw new Error(`${prefix}state "${key}" declared but never referenced`);
+    }
+    for (const key of inputByKey.keys()) {
+      if (!usedBindingKeys.has(key)) throw new Error(`${prefix}input "${key}" declared but never referenced`);
+    }
 
     for (const param of pattern.parameters) {
       if (!referencedParams.has(param.key)) {
