@@ -103,8 +103,22 @@ describe("search", () => {
     const ids = new Set(briefs.map((b) => b.id));
     for (const name of Object.keys(index.topics)) expect(ids.has(`topic:${name}`)).toBe(true);
     for (const p of index.patterns) expect(ids.has(`pattern:${p.id}`)).toBe(true);
-    // And the overview is still worth calling: it carries components too.
-    expect(briefs.filter((b) => b.kind === "component").length).toBeGreaterThan(5);
+    // And the overview is still worth calling: it names every component and
+    // states the totals (D145), where it used to show 8 of 60.
+    const components = briefs.find((b) => b.id === "component:*")!;
+    expect(components.summary).toContain(`${index.components.length} components`);
+    for (const c of index.components) expect(components.summary).toContain(c.name);
+    const icons = briefs.find((b) => b.id === "icons:all")!;
+    expect(icons.summary).toContain(`${index.icons.names.length} icons`);
+  });
+
+  it("gives every pattern row more than one word of its intent (D145)", () => {
+    // At 0.37.0's 24 patterns the D61 component floor left an intro cap of 0:
+    // "The…", "Transient…". The names row costs a third of the 8 briefs.
+    for (const row of store.search("").filter((b) => b.kind === "pattern")) {
+      const intro = row.summary.replace(/, blocked \(gaps: .*\)$/, "");
+      expect(intro.split(" ").length, row.id).toBeGreaterThan(3);
+    }
   });
 
   it("ranks the destructive-confirm pattern first for 'delete confirmation' (D47)", () => {
@@ -132,14 +146,13 @@ describe("search", () => {
     expect(hit).toMatchObject({ id: "pattern:destructive-confirm", title: "destructive-confirm" });
   });
 
-  it("keeps every pattern and the component floor inside the operating envelope (D61, D100)", () => {
-    // 24 real + 3 synthetic = 27. D129 added two fixed index rows to the
-    // overview (guide:* and tokens:*, about 220 characters), so the edge
-    // moved in: the component floor holds through 3 synthetic patterns and
-    // first breaks at 4 (7 components at 4, measured against this store.ts),
-    // where before D129 it held through 5. The synthetic count is what you
-    // lower when the real catalog grows; the 6000-character budget and the
-    // floor of 8 do not move.
+  it("keeps every pattern, the index rows and readable intros inside the operating envelope (D61, D100, D145)", () => {
+    // 24 real + 3 synthetic = 27. D145 replaced the D61 floor of 8 component
+    // briefs with one `component:*` row naming them all, and added
+    // `icons:all`; what growth spends now is the pattern intro. With long
+    // synthetic ids every intro keeps at least 16 characters through 34
+    // patterns and falls to a word at 35 (scripts/measure-overview-envelope.ts).
+    // The synthetic count is what you lower when the real catalog grows.
     //
     // The envelope is a function of per-pattern *cost*, not pattern count:
     // id, kind and the never-capped `blocked (gaps: …)` tail are not
@@ -158,7 +171,11 @@ describe("search", () => {
     for (const p of grown.patterns) {
       expect(briefs.some((b) => b.id === `pattern:${p.id}`)).toBe(true);
     }
-    expect(briefs.filter((b) => b.kind === "component").length).toBeGreaterThanOrEqual(8);
+    expect(briefs.some((b) => b.id === "component:*")).toBe(true);
+    expect(briefs.some((b) => b.id === "icons:all")).toBe(true);
+    for (const row of briefs.filter((b) => b.kind === "pattern")) {
+      expect(row.summary.replace(/, blocked \(gaps: .*\)$/, "").length, row.id).toBeGreaterThanOrEqual(16);
+    }
 
     // The backlog must survive the trim inside the envelope — this is the
     // assertion whose absence let a flat 120-char cap ship a truncated tail.
@@ -168,7 +185,7 @@ describe("search", () => {
     }
   });
 
-  it("degrades by shedding components, not patterns, past the envelope (D61)", () => {
+  it("degrades by shortening pattern intros, never by dropping patterns, past the envelope (D61)", () => {
     // 16 synthetic on top of 24 real = 40 total, past the envelope (the
     // floor holds through 27 patterns since D129's two fixed index rows). At
     // this size the component floor provably cannot hold: 40 patterns'
@@ -189,12 +206,26 @@ describe("search", () => {
     for (const p of grown.patterns) {
       expect(briefs.some((b) => b.id === `pattern:${p.id}`)).toBe(true);
     }
-    expect(briefs.filter((b) => b.kind === "component").length).toBeGreaterThanOrEqual(1);
+    // The names row is fixed: every component stays named however far the
+    // catalog grows (D145).
+    expect(briefs.some((b) => b.id === "component:*")).toBe(true);
 
     for (const p of grown.patterns.filter((x) => x.blocked)) {
       const brief = briefs.find((b) => b.id === `pattern:${p.id}`);
       expect(brief?.summary).toContain("blocked (gaps:");
     }
+  });
+
+  it("finds an icon by its name and by what it shows (D145)", () => {
+    expect(store.search("IconMoreHorizontal")[0].id).toBe("icon:IconMoreHorizontal");
+    expect(store.search("more horizontal")[0].id).toBe("icon:IconMoreHorizontal");
+    expect(store.search("ellipsis").some((b) => b.id === "icon:IconMoreHorizontal")).toBe(true);
+    expect(store.search("delete").some((b) => b.id === "icon:IconTrash")).toBe(true);
+  });
+
+  it("finds a hook by name, first (D145)", () => {
+    expect(store.search("useToast")[0].id).toBe("hook:useToast");
+    expect(store.search("useFieldControl")[0].id).toBe("hook:useFieldControl");
   });
 
   it("finds guides and token pages by keyword", () => {
@@ -217,6 +248,42 @@ describe("get", () => {
     expect(page).toMatchObject({ id: "component:Button", kind: "component", title: "Button" });
     expect(page.markdown).toBe(index.docs.components.button.markdown);
     expect(page.markdown).toContain("## Examples");
+  });
+
+  it("returns an icon's page, by id or bare name (D145)", () => {
+    const page = store.get("icon:IconTrash")!;
+    expect(page).toMatchObject({ id: "icon:IconTrash", kind: "icon", title: "IconTrash" });
+    expect(page.markdown).toBe(index.docs.icons.byName.IconTrash);
+    expect(page.markdown).toContain('import { IconTrash } from "@handamade/psi-react";');
+    expect(store.get("IconTrash")!.id).toBe("icon:IconTrash");
+    expect(store.get("icon:Button")).toBeNull();
+  });
+
+  it("returns the icons page as icons:all or icons (D145)", () => {
+    for (const id of ["icons:all", "icons"]) {
+      const page = store.get(id)!;
+      expect(page).toMatchObject({ id: "icons:all", kind: "icons" });
+      for (const name of index.icons.names) expect(page.markdown).toContain(name);
+    }
+  });
+
+  it("returns the page a hook is documented on (D145)", () => {
+    const page = store.get("hook:useToast")!;
+    expect(page).toMatchObject({ id: "hook:useToast", kind: "hook", title: "useToast" });
+    expect(page.markdown).toBe(index.docs.components.toast.markdown);
+    expect(page.markdown).toContain("## useToast()");
+    expect(store.get("useToast")!.id).toBe("hook:useToast");
+    expect(store.get("useFieldControl")!.markdown).toContain("## useFieldControl()");
+  });
+
+  it("refuses an index whose exported hook is on no page (D145)", () => {
+    const docs = structuredClone(index.docs);
+    docs.components.toast.hooks = [];
+    expect(() => createStore({ ...index, docs })).toThrow(/hook "useToast" is on no docs page/);
+  });
+
+  it("suggests icon ids for a misspelt one (D145)", () => {
+    expect(store.suggest("IconTrsh")).toContain("icon:IconTrash");
   });
 
   it("returns the page that holds a member export", () => {

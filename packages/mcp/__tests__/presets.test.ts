@@ -32,3 +32,21 @@ describe("every pattern preset passes check (D143)", () => {
     for (const p of stateful) expect(p.preset).toContain(`export function ${pascal(p.id)}Pattern(`);
   });
 });
+
+describe("destructive-confirm agrees with the Dialog page (D145)", () => {
+  const preset = index.patterns.find((p) => p.id === "destructive-confirm")!.preset!;
+  const page = index.docs.components.dialog.markdown;
+
+  it("is a consequential confirmation: no close button or backdrop, Escape cancels", () => {
+    expect(preset).toContain("dismissible={false}");
+    expect(preset).toMatch(/closeOnEscape(=\{true\})?\b/);
+    expect(page).toContain("dismissible={false}");
+    expect(page).toMatch(/closeOnEscape\n/);
+  });
+
+  it("gives Cancel the neutral variant, as the page's example does", () => {
+    expect(preset).toMatch(/<Button[^>]*variant="neutral"[^>]*>Cancel<\/Button>/);
+    expect(page).toMatch(/<Button variant="neutral"[^\n]*\n\s*Cancel/);
+    expect(preset).not.toContain('variant="ghost"');
+  });
+});

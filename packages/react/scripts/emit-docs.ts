@@ -114,15 +114,24 @@ for (const c of components) {
     varsCss = null;
   }
 
-  // Check if component has variant prop
-  const hasVariant = c.props.some((p) => p.name === "variant");
+  // D145: the guidance entries for the variants this component takes. The
+  // list in guidance.json is every variant Psi has (Button's), so on its own it
+  // told Tag about ghost and outline and Card about nine variants it rejects.
+  // An entry such as "success | warning" counts when any of its names is a
+  // member; no member at all drops the section.
+  const variantProp = c.props.find((p) => p.name === "variant");
+  const ownVariants = new Set(
+    (variantProp?.type ?? "").split(" | ").map((v) => v.trim().replace(/^"(.*)"$/, "$1")),
+  );
+  const ownGuidance = variantProp
+    ? guidance.variants.filter((v) => v.variant.split(" | ").some((name) => ownVariants.has(name.trim())))
+    : [];
+  const variantGuidanceSection =
+    ownGuidance.length > 0
+      ? `## Variant guidance
 
-  // Build variant guidance section (only if component has variant prop)
-  const variantGuidanceSection = hasVariant
-    ? `## Variant guidance
-
-${guidance.variants.map((v) => `- **${v.variant}** — ${v.intent}. ${v.typicalUse}.`).join("\n")}`
-    : "";
+${ownGuidance.map((v) => `- **${v.variant}** — ${v.intent}. ${v.typicalUse}.`).join("\n")}`
+      : "";
 
   // Build rules section
   const rulesSection = `## Rules

@@ -12,6 +12,8 @@ export default function DialogConfirm() {
         open={open}
         onClose={() => setOpen(false)}
         title="Delete this project?"
+        dismissible={false}
+        closeOnEscape
         footer={
           <>
             <Button variant="neutral" onClick={() => setOpen(false)}>

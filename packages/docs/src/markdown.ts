@@ -6,6 +6,7 @@ import type {
   DocsPages,
   ExportInfo,
   GuideSource,
+  HookMember,
   PatternLike,
   PatternNodeLike,
 } from "./types.js";
@@ -56,7 +57,98 @@ export function componentPageMd(input: DocsInput, page: ComponentPage): string {
       "## Examples",
       ...examples.map((e) => `### ${e.name}\n\n${fence("tsx", e.source)}`),
       ...page.members.map((m) => `## ${m}\n\n${memberBody(input, m)}`),
+      ...(page.hooks ?? []).map((h) => hookMd(input, h)),
       ...(rules ? ["## Rules", rules] : []),
+    ].join("\n\n") + "\n"
+  );
+}
+
+const code = (v: string) => `\`${v.replace(/\s+/g, " ")}\``;
+
+/** D145: a hook's section on its component page, generated from the hook's
+ * source by emit-manifest: what it returns, each member's signature, and the
+ * fields of every options interface those members take. */
+export function hookMd(input: DocsInput, name: string): string {
+  const hook = input.hooks.find((h) => h.name === name);
+  if (!hook) throw new Error(`No hook "${name}" in the docs input`);
+  const fields = (rows: HookMember[]) =>
+    table(
+      ["Field", "Type", "Default", "Required", "Description"],
+      rows.map((f) => [code(f.name), code(f.type), f.default ?? "—", f.required ? "yes" : "no", f.description || "—"]),
+    );
+  return [
+    `## ${hook.name}()`,
+    hook.description,
+    fence("ts", `const ${hook.name.replace(/^use(.)/, (_, c: string) => c.toLowerCase())} = ${hook.name}(); // ${hook.returns}`),
+    `### ${hook.returns}`,
+    // A handle of functions (useToast) is a table of methods; a bag of props
+    // (useFieldControl) is a table of fields.
+    hook.members.every((m) => m.type.includes("=>"))
+      ? table(
+          ["Method", "Signature", "Description"],
+          hook.members.map((m) => [code(m.name), code(m.type), m.description || "—"]),
+        )
+      : fields(hook.members),
+    ...hook.types.flatMap((t) => [`### ${t.name}`, fields(t.fields)]),
+  ].join("\n\n");
+}
+
+const ICON_IMPORT = (name: string) => fence("ts", `import { ${name} } from "@handamade/psi-react";`);
+
+function iconPropsMd(input: DocsInput): string {
+  return [
+    `Every icon takes the same props, and passes any other SVG attribute (\`${input.icons.attributes ?? "SVGAttributes"}\`: \`style\`, \`strokeWidth\`, \`onClick\`, \`aria-*\`, \`data-*\`) to its \`<svg>\`.`,
+    table(
+      ["Prop", "Type", "Default", "Description"],
+      input.icons.props.map((p) => [code(p.name), code(p.type), p.default ?? "—", p.description || "—"]),
+    ),
+  ].join("\n\n");
+}
+
+const ICON_A11Y =
+  'Every icon renders `aria-hidden="true"`: it is decorative, and the control it sits in carries the name. ' +
+  "An IconButton takes `aria-label`; a Button's or a NavItem's text names it. " +
+  "An icon is drawn in `currentColor`, so it takes the colour of the text around it.";
+
+/** D145: every icon, its keywords, and the props they share. */
+export function iconsPageMd(input: DocsInput): string {
+  const { names, keywords } = input.icons;
+  return (
+    [
+      "# Icons",
+      `${names.length} icons, each its own export from \`@handamade/psi-react\`, drawn on a 24-unit grid at 20px by default.`,
+      ICON_IMPORT("IconMoreHorizontal, IconTrash"),
+      "## Props",
+      iconPropsMd(input),
+      "## Accessibility",
+      ICON_A11Y,
+      fence(
+        "tsx",
+        '<IconButton aria-label="More actions" variant="ghost">\n  <IconMoreHorizontal />\n</IconButton>',
+      ),
+      "## Icons",
+      table(
+        ["Icon", "Keywords"],
+        names.map((n) => [code(n), keywords[n].join(", ")]),
+      ),
+    ].join("\n\n") + "\n"
+  );
+}
+
+/** D145: one icon's page. */
+export function iconMd(input: DocsInput, name: string): string {
+  const words = input.icons.keywords[name];
+  if (!words) throw new Error(`No icon "${name}" in the docs input`);
+  return (
+    [
+      `# ${name}`,
+      `Icon. Keywords: ${words.join(", ")}.`,
+      ICON_IMPORT(name),
+      "## Props",
+      iconPropsMd(input),
+      "## Accessibility",
+      ICON_A11Y,
+      `One of ${input.icons.names.length} icons; the icons page lists them all.`,
     ].join("\n\n") + "\n"
   );
 }
@@ -275,7 +367,10 @@ export function buildDocsPages(
   return {
     overview: overviewMd(input),
     components: Object.fromEntries(
-      componentPages.map((p) => [p.slug, { title: p.title, members: p.members, markdown: componentPageMd(input, p) }]),
+      componentPages.map((p) => [
+        p.slug,
+        { title: p.title, members: p.members, hooks: p.hooks ?? [], markdown: componentPageMd(input, p) },
+      ]),
     ),
     tokenPages: Object.fromEntries(
       tokenPages.map((p) => [p.slug, { title: `${p.title} tokens`, markdown: tokenPageMd(input, p) }]),
@@ -286,5 +381,9 @@ export function buildDocsPages(
     tokens: Object.fromEntries(Object.keys(input.resolved.light.tokens).map((n) => [n, tokenMd(input, n)])),
     patterns: Object.fromEntries(extra.patterns.map((p) => [p.id, patternMd(p)])),
     topics: Object.fromEntries(Object.entries(extra.topics).map(([n, c]) => [n, topicMd(n, c)])),
+    icons: {
+      all: iconsPageMd(input),
+      byName: Object.fromEntries(input.icons.names.map((n) => [n, iconMd(input, n)])),
+    },
   };
 }

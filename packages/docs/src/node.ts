@@ -3,7 +3,17 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 
 import { THEMES } from "./data.js";
-import type { DocsInput, ExampleSource, ExportInfo, GuideSource, Guidance, Resolved, ThemeName } from "./types.js";
+import type {
+  DocsInput,
+  ExampleSource,
+  ExportInfo,
+  GuideSource,
+  Guidance,
+  HookInfo,
+  PropInfo,
+  Resolved,
+  ThemeName,
+} from "./types.js";
 
 const require = createRequire(import.meta.url);
 // Resolved through the package, not import.meta.url: a bundler (the site's
@@ -18,7 +28,12 @@ export const reactRoot = join(dirname(manifestPath), "..");
 // @handamade/psi-tokens exports no ./package.json; guidance.json sits in dist/.
 export const tokensRoot = join(dirname(require.resolve("@handamade/psi-tokens/guidance.json")), "..");
 
-const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as { components: ExportInfo[]; icons: string[] };
+const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
+  components: ExportInfo[];
+  icons: string[];
+  iconDetails: { props: PropInfo[]; attributes: string | null; keywords: Record<string, string[]> };
+  hooks: HookInfo[];
+};
 const byName = new Map(manifest.components.map((c) => [c.name, c]));
 
 export function allExportNames(): string[] {
@@ -99,6 +114,8 @@ export function loadDocsInput(): DocsInput {
     componentCount: manifest.components.length,
     iconCount: manifest.icons.length,
     exports: manifest.components.map(({ name, description, props }) => ({ name, description, props })),
+    icons: { names: manifest.icons, ...manifest.iconDetails },
+    hooks: manifest.hooks,
     generatedDocs: Object.fromEntries(manifest.components.map((c) => [c.name, readGeneratedDoc(c.name)])),
     guidance: guidance(),
     resolved: Object.fromEntries(THEMES.map((t) => [t, resolved(t)])) as Record<ThemeName, Resolved>,

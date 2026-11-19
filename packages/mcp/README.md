@@ -7,7 +7,7 @@ MCP server and agent-context generator for the Psi (Ψ) design system. Documents
 - **Hosted (no install):** Streamable HTTP at `https://psi.kurkin.de/mcp`
 - **Local (stdio):** `npx @handamade/psi-mcp`
 
-Tools: `search(query)` → compact briefs with ids · `get(id)` → the docs page as markdown (`component:Button`, `tokens:color`, `guide:theming`, `token:bgPrimary`, `topic:variants`, or a bare name) · `theme({ color })` → an AA-solved light and dark theme as CSS · `check({ code })` → where JSX uses Psi wrongly.
+Tools: `search(query)` → compact briefs with ids · `get(id)` → the docs page as markdown (`component:Button`, `tokens:color`, `guide:theming`, `token:bgPrimary`, `topic:variants`, `icon:IconTrash`, `icons:all`, `hook:useToast`, or a bare name) · `theme({ color })` → an AA-solved light and dark theme as CSS · `check({ code })` → where JSX uses Psi wrongly.
 
 ## Generate agent context (D44)
 

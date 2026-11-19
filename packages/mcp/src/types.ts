@@ -80,7 +80,7 @@ export interface PatternEntry {
 export interface DocsPages {
   overview: string;
   /** By page slug. */
-  components: Record<string, { title: string; members: string[]; markdown: string }>;
+  components: Record<string, { title: string; members: string[]; hooks: string[]; markdown: string }>;
   /** By token page slug; title is e.g. "Color tokens". */
   tokenPages: Record<string, { title: string; markdown: string }>;
   /** By guide id. */
@@ -91,6 +91,34 @@ export interface DocsPages {
   patterns: Record<string, string>;
   /** By topic name. */
   topics: Record<string, string>;
+  /** D145: the roster page, and one page per icon by name. */
+  icons: { all: string; byName: Record<string, string> };
+}
+
+/** D145: every icon takes the same props (manifest.json's `iconDetails`). */
+export interface IconsEntry {
+  /** Every icon export, sorted. */
+  names: string[];
+  props: PropDoc[];
+  /** The React attribute interface the props extend: "SVGAttributes". */
+  attributes: string | null;
+  /** Index into PsiIndex.attributeSets: the SVG attributes an icon passes through. */
+  attributeSet: number | null;
+  /** A few words per icon: what it shows, what it is for. */
+  keywords: Record<string, string[]>;
+}
+
+/** D145: a hook's API, read from its source (manifest.json's `hooks`). */
+export interface HookEntry {
+  name: string;
+  description: string;
+  /** The interface it returns, e.g. "ToastHandle". */
+  returns: string;
+  members: Array<{ name: string; type: string; required: boolean; default: string | null; description: string }>;
+  types: Array<{
+    name: string;
+    fields: Array<{ name: string; type: string; required: boolean; default: string | null; description: string }>;
+  }>;
 }
 
 export interface PsiIndex {
@@ -107,6 +135,10 @@ export interface PsiIndex {
   contracts: Record<string, string[]>;
   /** Every name @handamade/psi-react exports, values and types. */
   exports: string[];
+  /** D145. */
+  icons: IconsEntry;
+  /** D145. */
+  hooks: HookEntry[];
   /** Every docs page and every single-token, pattern and topic page, as
    * markdown, baked from @handamade/psi-docs at publish time (D129). */
   docs: DocsPages;

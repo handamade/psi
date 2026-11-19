@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { componentPages, tokenPages } from "../src/pages";
-import { componentPageMd, guideMd, overviewMd, tokenPageMd } from "../src/markdown";
+import { componentPageMd, guideMd, iconMd, iconsPageMd, overviewMd, tokenPageMd } from "../src/markdown";
 import { loadDocsInput } from "../src/node";
 import type { GuideSource } from "../src/types";
 
@@ -115,6 +115,9 @@ describe("tables in twins are real tables", () => {
   const twins = [
     ...tokenPages.map((p) => [`tokens/${p.slug}`, tokenPageMd(input, p)] as const),
     ...readdirSync(dir).map((f) => [`guide/${f}`, guideMd(input, guide(f))] as const),
+    ["component/toast", componentPageMd(input, componentPages.find((p) => p.slug === "toast")!)] as const,
+    ["icons", iconsPageMd(input)] as const,
+    ["icon/IconTrash", iconMd(input, "IconTrash")] as const,
   ];
   for (const [name, md] of twins) {
     it(`${name}: no blank line between rows, and every row has the header's cell count`, () => {
@@ -124,6 +127,61 @@ describe("tables in twins are real tables", () => {
       }
     });
   }
+});
+
+describe("hooks on component pages (D145)", () => {
+  const toast = componentPageMd(input, componentPages.find((p) => p.slug === "toast")!);
+
+  it("gives the Toast page a useToast() section before the rules", () => {
+    expect(toast).toContain("## useToast()");
+    expect(toast.indexOf("## useToast()")).toBeLessThan(toast.indexOf("## Rules"));
+  });
+
+  it("tables every method of the handle with its signature", () => {
+    for (const row of [
+      "| `show` | `(toast: ToastOptions) => string` |",
+      "| `announce` | `(message: ReactNode, options?: AnnounceOptions) => string` |",
+      "| `dismiss` | `(id: string) => void` |",
+      "| `clear` | `() => void` |",
+    ]) {
+      expect(toast).toContain(row);
+    }
+  });
+
+  it("tables the options the methods take", () => {
+    expect(toast).toContain("### ToastOptions");
+    expect(toast).toContain("| `message` | `ReactNode` | — | yes |");
+    expect(toast).toContain("### AnnounceOptions");
+  });
+
+  it("puts hooks only on the pages that name them", () => {
+    const tabs = componentPageMd(input, componentPages.find((p) => p.slug === "tabs")!);
+    expect(tabs).not.toMatch(/^## use/m);
+    const hooked = componentPages.flatMap((p) => p.hooks ?? []);
+    expect(hooked.sort()).toEqual(input.hooks.map((h) => h.name).sort());
+  });
+});
+
+describe("icon pages (D145)", () => {
+  const all = iconsPageMd(input);
+
+  it("lists every icon with its keywords", () => {
+    for (const name of input.icons.names) expect(all).toContain(`| \`${name}\` | ${input.icons.keywords[name].join(", ")} |`);
+    expect(all).toContain(`${input.icons.names.length} icons`);
+  });
+
+  it("states the shared props and that icons are decorative", () => {
+    expect(all).toContain("| `size` | `number` | 20 |");
+    expect(all).toContain('aria-hidden="true"');
+  });
+
+  it("gives each icon a page with its import line", () => {
+    const trash = iconMd(input, "IconTrash");
+    expect(trash.startsWith("# IconTrash\n")).toBe(true);
+    expect(trash).toContain('import { IconTrash } from "@handamade/psi-react";');
+    expect(trash).toContain("delete");
+    expect(() => iconMd(input, "IconNope")).toThrow(/No icon/);
+  });
 });
 
 describe("loadDocsInput", () => {

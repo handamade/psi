@@ -32,3 +32,45 @@ export function nearest(target: string, candidates: string[]): string | null {
   if (!best) return null;
   return best.d <= Math.max(2, Math.floor(target.length / 3)) ? best.c : null;
 }
+
+/** The lowercase words of a camelCase or kebab-case name: onValueChange → on, value, change. */
+export function words(name: string): string[] {
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .toLowerCase()
+    .split(/[\s_-]+/)
+    .filter(Boolean);
+}
+
+/** Two names say the same thing in more or fewer words: every word of one is
+ * in the other, and they share at least two (onChange ⊂ onValueChange; label
+ * and dismissLabel share one, so no). */
+function sameWords(a: string, b: string): boolean {
+  const wa = words(a);
+  const wb = words(b);
+  const shared = wa.filter((w) => wb.includes(w)).length;
+  return shared >= 2 && (wa.every((w) => wb.includes(w)) || wb.every((w) => wa.includes(w)));
+}
+
+/** D145: the hint for an unknown prop, in Psi's words before the DOM's:
+ * 1. a close typo of the component's own prop (at most 2 edits: onClik → onClick);
+ * 2. the component's own prop that says the same in more or fewer words
+ *    (onValueChange → onChange, ahead of onInputChange at 4 edits);
+ * 3. a looser typo of its own prop (today's threshold, `nearest`);
+ * 4. a typo of a DOM attribute it passes through, within a third of the
+ *    name's length (so `foo` gets nothing rather than `fr`).
+ * A near DOM name never beats the component's own word for the same thing. */
+export function hint(target: string, own: string[], passThrough: string[]): string | null {
+  const t = target.toLowerCase();
+  const byDistance = (list: string[]) => ranked(target, list);
+  const close = byDistance(own)[0];
+  if (close && close.d <= 2) return close.c;
+  const same = own
+    .filter((c) => sameWords(target, c))
+    .sort((x, y) => distance(t, x.toLowerCase()) - distance(t, y.toLowerCase()) || x.localeCompare(y));
+  if (same.length > 0) return same[0];
+  const loose = nearest(target, own);
+  if (loose) return loose;
+  const dom = byDistance(passThrough)[0];
+  return dom && dom.d <= Math.max(1, Math.floor(target.length / 3)) ? dom.c : null;
+}

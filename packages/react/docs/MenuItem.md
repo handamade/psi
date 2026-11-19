@@ -26,15 +26,8 @@ This component has no `--psi-menu-item-*` tokens of its own. Its styling binds t
 
 ## Variant guidance
 
-- **accent** — Primary action, draws attention. Submit, CTA, main action in a group.
-- **accent-subtle** — Accent tone, lower visual weight. Selected state, active filter, soft CTA.
 - **neutral** — Default, structurally present. Secondary actions, toolbar buttons.
-- **neutral-subtle** — Minimal chrome. Inline actions, table row actions.
-- **ghost** — No visible container until hover. Icon-only triggers, compact toolbars.
-- **outline** — Bordered ghost — visible structure, no fill until hover. Marketing CTA, download button; hover fills accent.
 - **danger** — Destructive action. Delete, remove, disconnect.
-- **danger-subtle** — Destructive context, low urgency. Warning badges, soft destructive hints.
-- **success | warning** — Status communication (Tag only). Status badges, labels.
 
 ## Rules
 
