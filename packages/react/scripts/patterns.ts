@@ -1,5 +1,6 @@
-import { createElement, type ComponentType, type ReactElement, type ReactNode } from "react";
-import { KEY_RE, isFunctionType, parseBinding } from "./pattern-bindings.js";
+import { createElement, useState, type ComponentType, type ReactElement, type ReactNode } from "react";
+import { KEY_RE, bindingExpr, bindingValue, isFunctionType, parseBinding, pascalCase, setterName } from "./pattern-bindings.js";
+import type { BindingScope } from "./pattern-bindings.js";
 
 // D48's "scopes entry" class is enforced by the D46 token build (packages/tokens); not duplicated here.
 
@@ -539,6 +540,8 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
   // -> the content string; a literal string/number/boolean renders as-is.
   // String results land in an attribute position, so `"` is escaped.
   const resolvePropValue = (raw: unknown): string => {
+    const binding = parseBinding(raw);
+    if (binding) return `{${bindingExpr(binding)}}`;
     if (typeof raw === "string") {
       const paramMatch = PARAM_RE.exec(raw);
       if (paramMatch) {
@@ -626,7 +629,34 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
     return lines.join("\n");
   };
 
-  return `${renderNode(pattern.compose, 0)}\n`;
+  const element = renderNode(pattern.compose, 0);
+  const state = pattern.state ?? [];
+  const inputs = pattern.inputs ?? [];
+  if (state.length === 0 && inputs.length === 0) return `${element}\n`;
+
+  // D143: a pattern with state or inputs renders as a component module in the
+  // docs examples' style, so a pasted preset opens, closes and switches.
+  const imported = new Set<string>();
+  const collect = (node: PatternNode) => {
+    if (!INTRINSIC_ELEMENTS.has(node.component)) imported.add(node.component);
+    if (node.content !== undefined && iconForContent.has(node.content)) imported.add(iconForContent.get(node.content)!);
+    for (const fills of Object.values(node.slots ?? {})) {
+      for (const fill of fills) if (typeof fill !== "string") collect(fill);
+    }
+  };
+  collect(pattern.compose);
+
+  const lines: string[] = [];
+  if (state.length > 0) lines.push('import { useState } from "react";');
+  lines.push(`import { ${[...imported].sort().join(", ")} } from "@handamade/psi-react";`, "");
+  const params =
+    inputs.length > 0
+      ? `{ ${inputs.map((i) => i.key).join(", ")} }: {\n${inputs.map((i) => `  ${i.key}: ${i.type};`).join("\n")}\n}`
+      : "";
+  lines.push(`export function ${pascalCase(pattern.id)}(${params}) {`);
+  for (const s of state) lines.push(`  const [${s.key}, ${setterName(s.key)}] = useState(${JSON.stringify(s.initial)});`);
+  lines.push("  return (", element.split("\n").map((l) => `    ${l}`).join("\n"), "  );", "}");
+  return `${lines.join("\n")}\n`;
 }
 
 /**
@@ -650,6 +680,10 @@ export function renderPreset(pattern: Pattern, components: ManifestComponent[]):
  * `components` parameter), even though this rendering only needs the
  * compose tree, parameters, and content.
  */
+/** One stateful component per pattern object, so a re-render keeps its state
+ * (D143). Storybook passes the same pattern object every render. */
+const statefulPresets = new WeakMap<Pattern, ComponentType>();
+
 export function renderPresetElement(
   pattern: Pattern,
   components: ManifestComponent[],
@@ -687,7 +721,9 @@ export function renderPresetElement(
     return iconName ? createElement(componentFor(iconName)) : content[key];
   };
 
-  const resolvePropValue = (raw: unknown): unknown => {
+  const resolvePropValue = (raw: unknown, scope: BindingScope): unknown => {
+    const binding = parseBinding(raw);
+    if (binding) return bindingValue(binding, scope);
     if (typeof raw === "string") {
       const paramMatch = PARAM_RE.exec(raw);
       if (paramMatch) return paramDefaults.get(paramMatch[1]);
@@ -697,26 +733,26 @@ export function renderPresetElement(
   };
 
   let key = 0;
-  const renderNode = (node: PatternNode): ReactElement => {
+  const renderNode = (node: PatternNode, scope: BindingScope): ReactElement => {
     const Component = componentFor(node.component);
     const props: Record<string, unknown> = { key: key++ };
 
     for (const [name, raw] of Object.entries(node.props ?? {})) {
-      props[name] = resolvePropValue(raw);
+      props[name] = resolvePropValue(raw, scope);
     }
 
     for (const [slotName, fills] of Object.entries(node.slots ?? {})) {
       if (slotName === "body") continue;
       props[slotName] =
         fills.length === 1
-          ? (typeof fills[0] === "string" ? resolveText(fills[0]) : renderNode(fills[0]))
-          : fills.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill)));
+          ? (typeof fills[0] === "string" ? resolveText(fills[0]) : renderNode(fills[0], scope))
+          : fills.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill, scope)));
     }
 
     const body = node.slots?.body;
     let children: ReactNode = null;
     if (body && body.length > 0) {
-      children = body.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill)));
+      children = body.map((fill) => (typeof fill === "string" ? resolveText(fill) : renderNode(fill, scope)));
     } else if (node.content !== undefined) {
       children = resolveChildContent(node.content);
     }
@@ -724,5 +760,26 @@ export function renderPresetElement(
     return createElement(Component, props, children);
   };
 
-  return renderNode(pattern.compose);
+  const state = pattern.state ?? [];
+  const inputs = pattern.inputs ?? [];
+  if (state.length === 0 && inputs.length === 0) return renderNode(pattern.compose, { values: {}, setters: {} });
+
+  let Preset = statefulPresets.get(pattern);
+  if (!Preset) {
+    Preset = function StatefulPreset() {
+      const scope: BindingScope = { values: {}, setters: {} };
+      // A pattern's state list is fixed for the component's lifetime, so the
+      // hook order is stable across renders.
+      for (const s of state) {
+        const [value, setValue] = useState<unknown>(s.initial);
+        scope.values[s.key] = value;
+        scope.setters[s.key] = setValue;
+      }
+      for (const input of inputs) scope.values[input.key] = isFunctionType(input.type) ? () => {} : input.story;
+      key = 0;
+      return renderNode(pattern.compose, scope);
+    };
+    statefulPresets.set(pattern, Preset);
+  }
+  return createElement(Preset);
 }

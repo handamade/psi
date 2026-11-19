@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { renderPresetElement } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
 
@@ -169,5 +169,65 @@ describe("renderPresetElement", () => {
     const { container } = render(<select>{renderPresetElement(pattern, components, registry)}</select>);
     const opts = container.querySelectorAll("option");
     expect([...opts].map((o) => [o.value, o.textContent])).toEqual([["10", "10"], ["50", "50"]]);
+  });
+});
+
+describe("renderPresetElement: stateful patterns mount working state (D143)", () => {
+  function Trigger({ onClick, "aria-expanded": expanded, children }: { onClick?: () => void; "aria-expanded"?: boolean; children?: React.ReactNode }) {
+    return <button aria-expanded={expanded} onClick={onClick}>{children}</button>;
+  }
+  function Menu({ open, trigger, children }: { open: boolean; trigger: React.ReactNode; children?: React.ReactNode }) {
+    return <div>{trigger}{open ? <ul role="menu">{children}</ul> : null}</div>;
+  }
+  function MenuItem({ onSelect, children }: { onSelect: () => void; children?: React.ReactNode }) {
+    return <li role="menuitem" onClick={onSelect}>{children}</li>;
+  }
+  function Panel({ open, onClose, children }: { open: boolean; onClose: () => void; children?: React.ReactNode }) {
+    return open ? <section role="dialog"><button onClick={onClose}>Close</button>{children}</section> : null;
+  }
+  const registry = { Trigger, Menu, MenuItem, Panel };
+  const base = (over: Partial<Pattern>): Pattern => ({
+    id: "p", intent: "i", match: ["m"], parameters: [], content: {}, gaps: [], requires: [],
+    compose: { component: "Trigger" }, ...over,
+  });
+
+  it("toggles a pattern's own state, and a set binding closes it", () => {
+    const p = base({
+      content: { trigger: "Actions", edit: "Edit" },
+      state: [{ key: "open", initial: false }],
+      compose: {
+        component: "Menu",
+        props: { open: "{state:open}" },
+        slots: {
+          trigger: [{ component: "Trigger", props: { onClick: "{toggle:open}", "aria-expanded": "{state:open}" }, content: "trigger" }],
+          body: [{ component: "MenuItem", props: { onSelect: "{set:open:false}" }, content: "edit" }],
+        },
+      },
+    });
+    render(renderPresetElement(p, [], registry)!);
+    const trigger = screen.getByRole("button", { name: "Actions" });
+    expect(screen.queryByRole("menu")).toBeNull();
+    fireEvent.click(trigger);
+    expect(screen.getByRole("menu")).toBeTruthy();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.click(screen.getByRole("menuitem", { name: "Edit" }));
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("passes a value input its story value and a function input a no-op", () => {
+    const p = base({
+      content: { body: "Details" },
+      inputs: [{ key: "open", type: "boolean", story: true }, { key: "onClose", type: "() => void" }],
+      compose: { component: "Panel", props: { open: "{input:open}", onClose: "{input:onClose}" }, content: "body" },
+    });
+    render(renderPresetElement(p, [], registry)!);
+    expect(screen.getByRole("dialog").textContent).toContain("Details");
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.getByRole("dialog")).toBeTruthy();
+  });
+
+  it("returns the same component type for the same pattern, so state survives a re-render", () => {
+    const p = base({ content: { t: "T" }, state: [{ key: "open", initial: false }], compose: { component: "Trigger", props: { onClick: "{toggle:open}" }, content: "t" } });
+    expect(renderPresetElement(p, [], registry)!.type).toBe(renderPresetElement(p, [], registry)!.type);
   });
 });
