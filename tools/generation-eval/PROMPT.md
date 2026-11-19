@@ -6,6 +6,8 @@ paraphrase or add repo context beyond what it grants.
 
 Run cadence: after any recipe/doc change, and before promoting any new component's docs.
 Log the result as `runs/<date>.md` (see `RUBRIC.md` for how to score it).
+`tools/release-guard.mjs` enforces the cadence (D144): it refuses a release once 5 or more
+releases have been tagged since the newest file in `runs/`.
 
 The primary task is a **ledger screen** (D69). It replaced a settings form, which only ever
 exercised components that already existed and so could measure documentation quality but never
