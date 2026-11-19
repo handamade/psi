@@ -49,8 +49,8 @@ Vercel from this repo:
 
 ## Documentation
 
-- [**Design spec**](docs/superpowers/specs/2026-06-12-design-system-design.md) — Principles, architecture, decisions
-- [**Implementation plan**](docs/superpowers/plans/2026-07-06-remediation-and-ai-readability-plan.md) — Active roadmap
+- [**Specs**](docs/superpowers/specs/) — one per change, with its numbered decisions; the founding one is [2026-06-12-design-system-design.md](docs/superpowers/specs/2026-06-12-design-system-design.md)
+- [**Plans**](docs/superpowers/plans/) — the implementation plan for each spec
 - [**@handamade/psi-tokens README**](packages/tokens/README.md) — Token usage and theming
 - [**@handamade/psi-react README**](packages/react/README.md) — Component usage and API
 
