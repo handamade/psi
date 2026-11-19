@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import ts from "typescript";
+import { attributesByComponent } from "./pattern-bindings.js";
 import { loadPatterns } from "./patterns-loader.js";
 import { renderPreset, validatePatterns, type Pattern } from "./patterns.js";
 
@@ -9,6 +10,8 @@ const root = join(import.meta.dirname, "..");
 const manifest = JSON.parse(readFileSync(join(root, "dist/manifest.json"), "utf8"));
 const contracts = JSON.parse(readFileSync(join(root, "src/contracts.json"), "utf8"));
 const patterns = loadPatterns(join(root, "patterns"));
+// D143: pass-through attributes (D129), so a trigger may carry onClick.
+const attributes = attributesByComponent(JSON.parse(readFileSync(join(root, "dist/attributes.json"), "utf8")));
 // The PUBLIC surface, matching emit-patterns: an icon file that exists but is
 // not re-exported from src/index.ts is unimportable by a consumer, so it must
 // not satisfy a pattern's `requires`.
@@ -19,7 +22,7 @@ const icons = [...publicExports.matchAll(/\b(Icon[A-Za-z0-9]+)\b/g)]
 
 describe("seed patterns against the real manifest", () => {
   it("all twenty-four load and validate; the backlog is empty (D67, D99, D104)", () => {
-    const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
+    const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons, attributes);
     expect(patterns.map((p) => p.id).sort()).toEqual([
       "account-menu",
       "action-feedback",
@@ -95,7 +98,9 @@ describe("seed patterns against the real manifest", () => {
       if (pattern.gaps.length > 0) continue;
       const preset = renderPreset(pattern, manifest.components);
       expect(preset, `${pattern.id} has no preset`).not.toBeNull();
-      const { diagnostics } = ts.transpileModule(`const _ = (\n${preset});\n`, {
+      // A pattern with state or inputs renders as a whole module (D143).
+      const source = /^import /m.test(preset!) ? preset! : `const _ = (\n${preset});\n`;
+      const { diagnostics } = ts.transpileModule(source, {
         compilerOptions: { jsx: ts.JsxEmit.Preserve, target: ts.ScriptTarget.ESNext },
         fileName: "preset.tsx",
         reportDiagnostics: true,
@@ -119,7 +124,7 @@ describe("declared affordances resolve (D71)", () => {
     // The guard, exercised: strip the roster and the pattern must go blocked.
     // Without this the test above only proves the icon is present today.
     const rowActions = patterns.find((p) => p.id === "row-actions")!;
-    const { gaps } = validatePatterns([rowActions], manifest.components, contracts, []);
+    const { gaps } = validatePatterns([rowActions], manifest.components, contracts, [], attributes);
     expect(gaps["row-actions"]).toEqual(["IconMoreHorizontal"]);
   });
 

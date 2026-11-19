@@ -11,7 +11,9 @@
   "compose": {
     "component": "Dialog",
     "props": {
-      "placement": "{param:placement}"
+      "placement": "{param:placement}",
+      "open": "{input:open}",
+      "onClose": "{input:onClose}"
     },
     "slots": {
       "title": [
@@ -47,14 +49,16 @@
         {
           "component": "Button",
           "props": {
-            "variant": "accent"
+            "variant": "accent",
+            "onClick": "{input:onSave}"
           },
           "content": "primary-label"
         },
         {
           "component": "Button",
           "props": {
-            "variant": "neutral"
+            "variant": "neutral",
+            "onClick": "{input:onClose}"
           },
           "content": "dismiss-label"
         }
@@ -81,5 +85,20 @@
     "field-2-term": "Amount",
     "field-2-value": "[one DescriptionItem per field you want to show]"
   },
+  "inputs": [
+    {
+      "key": "open",
+      "type": "boolean",
+      "story": true
+    },
+    {
+      "key": "onClose",
+      "type": "() => void"
+    },
+    {
+      "key": "onSave",
+      "type": "() => void"
+    }
+  ],
   "gaps": []
 }

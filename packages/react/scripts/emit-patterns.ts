@@ -1,6 +1,7 @@
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { attributesByComponent } from "./pattern-bindings.js";
 import { loadPatterns } from "./patterns-loader.js";
 import { validatePatterns, renderPreset } from "./patterns.js";
 import type { ManifestComponent } from "./patterns.js";
@@ -31,7 +32,15 @@ export function emitPatterns(rootDir: string): void {
     .map((m) => m[1])
     .filter((name) => existsSync(join(rootDir, "src", "icons", `${name}.tsx`)));
 
-  const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons);
+  // D143: pass-through attributes (D129), so a trigger may carry onClick.
+  const attributes = attributesByComponent(
+    JSON.parse(readFileSync(join(rootDir, "dist", "attributes.json"), "utf8")) as {
+      sets: string[][];
+      components: Record<string, number>;
+    },
+  );
+
+  const { gaps } = validatePatterns(patterns, manifest.components, contracts, icons, attributes);
 
   for (const id of Object.keys(gaps).sort()) {
     console.log(`  pattern gaps (backlog): ${id} → ${gaps[id].join(", ")}`);
@@ -63,6 +72,8 @@ export function emitPatterns(rootDir: string): void {
         compose: pattern.compose,
         parameters: pattern.parameters,
         content: pattern.content,
+        ...(pattern.state?.length ? { state: pattern.state } : {}),
+        ...(pattern.inputs?.length ? { inputs: pattern.inputs } : {}),
         gaps: patternGaps,
         blocked,
         preset: blocked ? null : renderPreset(pattern, manifest.components),

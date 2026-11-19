@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { attributesByComponent } from "./pattern-bindings.js";
 import { loadPatterns } from "./patterns-loader.js";
 import { parseLiteralUnion, renderPreset, validatePatterns } from "./patterns.js";
 import type { ManifestComponent, Pattern } from "./patterns.js";
@@ -211,7 +212,13 @@ describe("real patterns/ + real dist/manifest.json (D62-D63)", () => {
       string[]
     >;
     const patterns = loadPatterns(join(root, "patterns"));
-    validatePatterns(patterns, manifest.components, contracts);
+    const attributes = attributesByComponent(
+      JSON.parse(readFileSync(join(root, "dist", "attributes.json"), "utf8")) as {
+        sets: string[][];
+        components: Record<string, number>;
+      },
+    );
+    validatePatterns(patterns, manifest.components, contracts, [], attributes);
     const builtPatterns = patterns.map((p) => ({
       id: p.id,
       gaps: p.gaps,
@@ -363,8 +370,12 @@ describe("the pagination presets render a pager and page sizes (D127)", () => {
   const patterns = loadPatterns(join(root, "patterns"));
   const preset = (id: string) => renderPreset(patterns.find((p) => p.id === id)!, manifest.components) ?? "";
 
-  it("table-pagination gives Pagination a page and a page count", () => {
-    expect(preset("table-pagination")).toMatch(/<Pagination\s+page=\{1\}\s+pageCount=\{10\}\s*\/>/);
+  it("table-pagination gives Pagination a page, a page count and a handler (D143)", () => {
+    const out = preset("table-pagination");
+    expect(out).toContain("useState(1)");
+    expect(out).toMatch(/<Pagination\b[^>]*\bpage=\{page\}/);
+    expect(out).toMatch(/<Pagination\b[^>]*\bpageCount=\{10\}/);
+    expect(out).toMatch(/<Pagination\b[^>]*\bonPageChange=\{setPage\}/);
   });
 
   for (const id of ["table-pagination", "cursor-pagination"]) {

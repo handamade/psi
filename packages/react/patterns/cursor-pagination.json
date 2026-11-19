@@ -1,7 +1,15 @@
 {
   "id": "cursor-pagination",
   "intent": "Page-size selector and previous/next control beneath a list that pages by opaque token — no page count, no page numbers; pair with a TableCaption whose detail states the range and takes focus after a page change. The page-size label sits beside its select (D115).",
-  "match": ["cursor pagination", "token pagination", "next page token", "previous next", "load more", "keyset pagination", "page size"],
+  "match": [
+    "cursor pagination",
+    "token pagination",
+    "next page token",
+    "previous next",
+    "load more",
+    "keyset pagination",
+    "page size"
+  ],
   "compose": {
     "component": "Toolbar",
     "props": { "gap": 12 },
@@ -18,20 +26,46 @@
                 "props": { "size": 32 },
                 "slots": {
                   "body": [
-                    { "component": "option", "props": { "value": "10" }, "slots": { "body": ["10"] } },
-                    { "component": "option", "props": { "value": "50" }, "slots": { "body": ["50"] } },
-                    { "component": "option", "props": { "value": "100" }, "slots": { "body": ["100"] } }
+                    {
+                      "component": "option",
+                      "props": { "value": "10" },
+                      "slots": { "body": ["10"] }
+                    },
+                    {
+                      "component": "option",
+                      "props": { "value": "50" },
+                      "slots": { "body": ["50"] }
+                    },
+                    {
+                      "component": "option",
+                      "props": { "value": "100" },
+                      "slots": { "body": ["100"] }
+                    }
                   ]
                 }
               }
             ]
           }
         },
-        { "component": "CursorPagination", "props": { "hasPrevious": true, "hasNext": true } }
+        {
+          "component": "CursorPagination",
+          "props": {
+            "hasPrevious": "{input:hasPrevious}",
+            "hasNext": "{input:hasNext}",
+            "onPrevious": "{input:onPrevious}",
+            "onNext": "{input:onNext}"
+          }
+        }
       ]
     }
   },
   "parameters": [],
   "content": { "page-size-label": "Rows per page" },
+  "inputs": [
+    { "key": "hasPrevious", "type": "boolean", "story": true },
+    { "key": "hasNext", "type": "boolean", "story": true },
+    { "key": "onPrevious", "type": "() => void" },
+    { "key": "onNext", "type": "() => void" }
+  ],
   "gaps": []
 }
