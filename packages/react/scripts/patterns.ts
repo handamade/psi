@@ -436,6 +436,18 @@ export function validatePatterns(
         for (const slotDef of manifestComponent.slots) {
           if (!checkedSlots.has(slotDef.name)) checkCardinality(slotDef.name, slotDef, 0);
         }
+        // D143: a required prop must be bound, or the preset fails `check`'s
+        // missing-required. A slot of the same name binds it; `children` is
+        // bound by body fills or a content key.
+        for (const propDef of manifestComponent.props) {
+          if (!propDef.required) continue;
+          if (propDef.name in (node.props ?? {})) continue;
+          if (propDef.name in givenSlots) continue;
+          if (propDef.name === "children" && ((givenSlots.body?.length ?? 0) > 0 || node.content !== undefined)) continue;
+          throw new Error(
+            `${prefix}${path}: required prop "${propDef.name}" on "${node.component}" is not bound — give it a value, a slot fill, or a state or input binding (D143)`,
+          );
+        }
       }
     };
 

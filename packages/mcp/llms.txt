@@ -2,11 +2,11 @@
 
 Four tools over a baked index of the generated artifacts. Each returns text; none writes files or calls a model (D43, D129):
 - search(query): briefs {id, kind, title, summary}; empty query = overview, where pattern rows are {id, kind, summary} (the id names the pattern, D100) and guides and token pages get one row each (guide:*, tokens:*)
-- get(id): markdown. component → its whole docs page, identical to psi.kurkin.de/docs/components/<page>.md (examples, props, keyboard, theming, rules) | tokens:<page> → a token page | guide:<id> → a guide | token → formula + OKLCH/hex per theme | topic → guidance | pattern → compose tree, parameters, content, gaps/blocked, preset JSX
+- get(id): markdown. component → its whole docs page, identical to psi.kurkin.de/docs/components/<page>.md (examples, props, keyboard, theming, rules) | tokens:<page> → a token page | guide:<id> → a guide | token → formula + OKLCH/hex per theme | topic → guidance | pattern → compose tree, parameters, content, gaps/blocked, preset (JSX, or a component when the pattern holds state, D143)
 - theme({color | hue, chroma?, radius?, name?}): CSS for an AA-solved light and dark theme ([data-psi-theme="<name>"] and "<name>-dark"), install lines, contrast table
 - check({code}): findings on a JSX snippet: unknown-export, unknown-prop, invalid-value, missing-required, slot, accessible-name; spreads and computed values are skipped, never guessed
 Ids: component:<Name>, tokens:<page>, guide:<id>, token:<name>, topic:<key>, pattern:<id>; bare names resolve case-insensitively.
 
 Connect: https://psi.kurkin.de/mcp (Streamable HTTP) or `npx @handamade/psi-mcp` (stdio).
 Agent context: `npx @handamade/psi-mcp init [--claude]` writes a marker-delimited block into AGENTS.md/CLAUDE.md (D44).
-The index bakes packages/react/dist/{manifest.json,patterns.json} (patterns.json: 24 composition patterns with clarifying parameters, blocked/gaps flags, preset JSX) + packages/tokens/dist/{guidance.json,resolved/*.json} + every docs page's markdown, rendered by the same builders as the docs site (D129) at publish; lockstep versioning keeps it truthful (D43).
+The index bakes packages/react/dist/{manifest.json,patterns.json} (patterns.json: 24 composition patterns with clarifying parameters, blocked/gaps flags, preset JSX or components) + packages/tokens/dist/{guidance.json,resolved/*.json} + every docs page's markdown, rendered by the same builders as the docs site (D129) at publish; lockstep versioning keeps it truthful (D43).

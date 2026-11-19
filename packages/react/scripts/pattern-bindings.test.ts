@@ -155,4 +155,20 @@ describe("validatePatterns: state and inputs (D143)", () => {
       /input "label" needs a story value/,
     );
   });
+  it("rejects an unbound required prop", () => {
+    expect(() => ok(withCompose((c) => { delete c.props!.onClose; }))).toThrow(
+      /compose: required prop "onClose" on "Menu" is not bound/,
+    );
+    expect(() =>
+      ok(withCompose((c) => { delete (c.slots!.body[0] as { props?: Record<string, unknown> }).props; })),
+    ).toThrow(/compose\.body\[0\]: required prop "onSelect" on "MenuItem" is not bound/);
+  });
+  it("counts a slot fill as binding its prop, and body or content as binding children", () => {
+    // `trigger` is bound by the trigger slot; Menu's `children` by its body
+    // fills; MenuItem's `children` by its `content` key.
+    expect(() => ok(menuPattern())).not.toThrow();
+    expect(() => ok(withCompose((c) => { delete (c.slots!.body[0] as { content?: string }).content; }))).toThrow(
+      /required prop "children" on "MenuItem" is not bound/,
+    );
+  });
 });

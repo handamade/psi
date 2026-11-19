@@ -1,6 +1,6 @@
 # Pattern presets hold the state they need and pass `check` (D143)
 
-Date: 2026-11-19. Status: **Designed**, on branch `d143-preset-state`.
+Date: 2026-11-19. Status: **Implemented** on branch `d143-preset-state`.
 
 Provenance: D129's `check` tool reports `missing-required` on eight of the 24
 pattern presets, so the MCP's own recipes fail the MCP's own check. D129's PR
