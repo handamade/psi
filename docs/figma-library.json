@@ -1,5 +1,5 @@
 {
   "$comment": "D144: the Psi version the Figma library reflects. The library is built by hand through the Figma MCP, not generated, so whoever updates the file updates this stamp in the same change. tools/release-guard.mjs warns when it is more than one minor behind the release.",
   "file": "MvbVttmGaFBmEqydtLJ0JN",
-  "reflects": "0.27.0"
+  "reflects": "0.37.0"
 }
