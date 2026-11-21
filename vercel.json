@@ -4,5 +4,18 @@
   "outputDirectory": "site-dist",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
-  "rewrites": [{ "source": "/mcp", "destination": "/api/mcp" }]
+  "rewrites": [
+    {
+      "source": "/mcp",
+      "destination": "/api/mcp"
+    }
+  ],
+  "functions": {
+    "api/mcp.ts": {
+      "maxDuration": 30
+    },
+    "api/theme.ts": {
+      "maxDuration": 30
+    }
+  }
 }

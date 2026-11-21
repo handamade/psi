@@ -86,4 +86,22 @@ describe("streamable HTTP handler (stateless)", () => {
     const body = await res.json();
     expect(body.result.content[0].text).toContain("invalid-value");
   });
+
+  // A stateless server sends nothing of its own, so it offers no standalone
+  // event stream. Accepting the GET held it open until the host killed it:
+  // on Vercel, every client's stream ran the full 300s timeout and kept an
+  // instance alive around the clock. The spec lets such a server answer 405,
+  // and clients then carry on with POST alone.
+  it.each(["GET", "DELETE"])("answers %s with 405 at once instead of holding a stream open", async (method) => {
+    const res = await fetch(url, {
+      method,
+      headers: { accept: "text/event-stream" },
+      // A handler that holds the stream open fails here instead of hanging the suite.
+      signal: AbortSignal.timeout(2_000),
+    });
+    expect(res.status).toBe(405);
+    expect(res.headers.get("allow")).toBe("POST");
+    const body = await res.json();
+    expect(body).toMatchObject({ jsonrpc: "2.0", error: { code: -32000 }, id: null });
+  });
 });
