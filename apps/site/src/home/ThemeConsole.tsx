@@ -21,6 +21,10 @@ import { applyCustomProperties, readStoredBrand, useBrand, useModePref } from ".
 // see `log` below — so this is the only place the delay is named.
 const STAGGER_MS = 90;
 
+// What the art-director request resolves to when the server answers 204:
+// it has no API key, so only the local derivation runs.
+const OFF = Symbol("art director off");
+
 export function ThemeConsole() {
   // Paints a mode without persisting it, and tells the site chrome's mode
   // control to follow. `mode` is read so the member swap below tracks it.
@@ -77,6 +81,9 @@ export function ThemeConsole() {
     async (prompt: string) => {
       const myGeneration = ++generation.current;
       setPending(true);
+      // Each brief gets its own transcript. Appending made a resubmit of the
+      // same brief, which derives the same theme, read as a stuck loop.
+      setTranscript([]);
       try {
         // 1. Local derivation renders immediately — this is the floor, not
         //    a fallback. With no API key the console is fully functional.
@@ -85,14 +92,17 @@ export function ThemeConsole() {
 
         // 2. Consult the art director concurrently — don't wait on the
         //    local transcript's typewriter delay before leaving for the
-        //    network. Failure is silent and expected.
-        const remotePromise = fetch("/api/theme", {
+        //    network. A 204 is the server saying it has no API key, which
+        //    is a setting, not a failure; anything else that isn't a 200 is.
+        const remotePromise: Promise<unknown> = fetch("/api/theme", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ prompt }),
           signal: AbortSignal.timeout(15_000),
         })
-          .then((res) => (res.status === 200 ? res.json() : null))
+          .then((res) =>
+            res.status === 200 ? res.json() : res.status === 204 ? OFF : null,
+          )
           .catch(() => null);
 
         await localApplied;
@@ -103,6 +113,7 @@ export function ThemeConsole() {
         if (myGeneration !== generation.current) return;
 
         if (isBrandVector(remote)) await applyVector(remote, "claude");
+        else if (remote === OFF) await log("// art director off on this server — the local derivation stands.");
         else await log("// art director unreachable — the local derivation stands.");
       } finally {
         // Don't let a stale request's cleanup re-enable the button after a
