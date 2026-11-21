@@ -12,7 +12,9 @@
     "component": "Menu",
     "props": {
       "placement": "{param:placement}",
-      "aria-label": "{content:trigger-label}"
+      "aria-label": "{content:trigger-label}",
+      "open": "{state:open}",
+      "onClose": "{set:open:false}"
     },
     "slots": {
       "trigger": [
@@ -20,7 +22,9 @@
           "component": "IconButton",
           "props": {
             "variant": "ghost",
-            "aria-label": "{content:trigger-label}"
+            "aria-label": "{content:trigger-label}",
+            "onClick": "{toggle:open}",
+            "aria-expanded": "{state:open}"
           },
           "content": "trigger-icon"
         }
@@ -28,11 +32,17 @@
       "body": [
         {
           "component": "MenuItem",
-          "content": "edit-label"
+          "content": "edit-label",
+          "props": {
+            "onSelect": "{input:onEdit}"
+          }
         },
         {
           "component": "MenuItem",
-          "content": "duplicate-label"
+          "content": "duplicate-label",
+          "props": {
+            "onSelect": "{input:onDuplicate}"
+          }
         },
         {
           "component": "MenuSeparator"
@@ -40,7 +50,8 @@
         {
           "component": "MenuItem",
           "props": {
-            "variant": "danger"
+            "variant": "danger",
+            "onSelect": "{input:onDelete}"
           },
           "content": "delete-label"
         }
@@ -65,6 +76,26 @@
     "duplicate-label": "Duplicate",
     "delete-label": "Delete"
   },
+  "state": [
+    {
+      "key": "open",
+      "initial": false
+    }
+  ],
+  "inputs": [
+    {
+      "key": "onEdit",
+      "type": "() => void"
+    },
+    {
+      "key": "onDuplicate",
+      "type": "() => void"
+    },
+    {
+      "key": "onDelete",
+      "type": "() => void"
+    }
+  ],
   "gaps": [],
   "requires": [
     {

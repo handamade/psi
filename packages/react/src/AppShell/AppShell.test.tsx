@@ -195,3 +195,91 @@ describe("AppShell's sidebar line (D114)", () => {
     );
   });
 });
+
+describe("AppShell's sliding sidebar (D142)", () => {
+  it("instant by default: no slide class, no inner wrapper, a closed sidebar is hidden", () => {
+    const { container } = render(<Shell sidebarOpen={false} />);
+    const root = container.firstElementChild!;
+    expect(root.className).not.toMatch(/slide/);
+    expect(document.getElementById("sidebar")).toHaveAttribute("hidden");
+    expect(document.getElementById("sidebar")!.firstElementChild!.tagName).toBe("NAV");
+  });
+
+  it('sidebarMotion="slide" wraps the content once and keeps a closed sidebar out of `hidden`', () => {
+    const { container, rerender } = render(<Shell sidebarMotion="slide" />);
+    const root = container.firstElementChild!;
+    const sidebar = document.getElementById("sidebar")!;
+    expect(root.className).toMatch(/slide/);
+    expect(root.className).not.toMatch(/sidebarClosed/);
+    expect(sidebar.children).toHaveLength(1);
+    expect(sidebar.firstElementChild!.className).toMatch(/sidebarInner/);
+    expect(sidebar.firstElementChild!.firstElementChild!.tagName).toBe("NAV");
+
+    rerender(<Shell sidebarMotion="slide" sidebarOpen={false} />);
+    expect(root.className).toMatch(/sidebarClosed/);
+    expect(sidebar).not.toHaveAttribute("hidden");
+    expect(screen.getByRole("main").className).toMatch(/mainSquare/);
+  });
+
+  it('"slide" with no sidebar content is the instant frame', () => {
+    const { container } = render(<Shell sidebarMotion="slide" sidebar={undefined} />);
+    expect(container.firstElementChild!.className).not.toMatch(/slide/);
+    expect(container.firstElementChild!.className).toMatch(/sidebarClosed/);
+    expect(document.getElementById("sidebar")).toHaveAttribute("hidden");
+    expect(document.getElementById("sidebar")!.children).toHaveLength(0);
+  });
+
+  it("the CSS runs the column to 0 through the sidebar's tokens", () => {
+    expect(rule(".slide")).toContain(
+      "transition: grid-template-columns var(--psi-app-shell-sidebar-duration) var(--psi-app-shell-sidebar-ease);",
+    );
+    expect(rule(".slide.sidebarClosed")).toContain("grid-template-columns: 0px minmax(0, 1fr);");
+    expect(rule(".slide.sidebarClosed .sidebar")).toContain("visibility: hidden;");
+    expect(rule(".slide .sidebar")).toContain("--psi-app-shell-sidebar-width: inherit;");
+    expect(rule(".sidebarInner")).toContain("inline-size: var(--psi-app-shell-sidebar-width);");
+    expect(rule(".sidebarInner")).toContain(
+      "border-inline-end: var(--psi-app-shell-sidebar-border-width) solid transparent;",
+    );
+  });
+});
+
+describe("AppShell: focus inside a closing sidebar (D142)", () => {
+  function Toggled({ open, motion, toggle = true, disabled = false }: { open: boolean; motion?: "instant" | "slide"; toggle?: boolean; disabled?: boolean }) {
+    return (
+      <AppShell
+        sidebarOpen={open}
+        sidebarMotion={motion}
+        header={toggle ? <button aria-controls="other sidebar" disabled={disabled}>Menu</button> : <span>Header</span>}
+        sidebar={<nav aria-label="Main"><a href="#a">Inside</a></nav>}
+      >
+        <a href="#b">Outside</a>
+      </AppShell>
+    );
+  }
+
+  for (const motion of ["instant", "slide"] as const) {
+    it(`${motion}: moves focus from the sidebar to the toggle that names it`, () => {
+      const { rerender } = render(<Toggled open motion={motion} />);
+      screen.getByText("Inside").focus();
+      rerender(<Toggled open={false} motion={motion} />);
+      expect(screen.getByRole("button", { name: "Menu" })).toHaveFocus();
+    });
+
+    it(`${motion}: with no toggle, or a disabled one, moves it to main`, () => {
+      for (const props of [{ toggle: false }, { disabled: true }]) {
+        const { rerender, unmount } = render(<Toggled open motion={motion} {...props} />);
+        screen.getByText("Inside").focus();
+        rerender(<Toggled open={false} motion={motion} {...props} />);
+        expect(document.getElementById("main")).toHaveFocus();
+        unmount();
+      }
+    });
+  }
+
+  it("leaves focus outside the sidebar alone", () => {
+    const { rerender } = render(<Toggled open motion="slide" />);
+    screen.getByText("Outside").focus();
+    rerender(<Toggled open={false} motion="slide" />);
+    expect(screen.getByText("Outside")).toHaveFocus();
+  });
+});

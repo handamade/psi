@@ -206,3 +206,112 @@ test("a Combobox inside a Dialog draws its popup above it @interaction", async (
   // The option's accessible name joins its description (jsdom can't compute it).
   await expect(page.getByRole("option", { name: "Berlin Germany" })).toBeVisible();
 });
+
+// ── D134 ────────────────────────────────────────────────────────────
+
+test("D134: two Escapes and a Tab keep a picked value (single-select) @interaction", async ({ page }) => {
+  await page.goto(story("clearable"), { waitUntil: "networkidle" });
+  const input = page.getByRole("combobox", { name: "City" });
+  await expect(input).toHaveValue("Lisbon");
+  await input.click();
+  await page.keyboard.type("x");
+  await expect.poll(() => isOpen(page)).toBe(true);
+  await page.keyboard.press("Escape");
+  // Escape in the open list closes it and restores the picked label.
+  await expect.poll(() => isOpen(page)).toBe(false);
+  await expect(input).toHaveValue("Lisbon");
+  await page.keyboard.press("Escape");
+  await expect(input).toHaveValue("Lisbon");
+  await page.keyboard.press("Tab");
+  await expect(input).toHaveValue("Lisbon");
+  // The value survived the blur: reopening shows Lisbon picked.
+  await input.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("option", { name: "Lisbon" })).toHaveAttribute("aria-selected", "true");
+});
+
+test("D134: with no match, aria-expanded is false and the status line describes the input @interaction", async ({ page }) => {
+  await page.goto(story("default"), { waitUntil: "networkidle" });
+  const input = page.getByRole("combobox");
+  await input.click();
+  await page.keyboard.type("qq");
+  await expect.poll(() => isOpen(page)).toBe(true);
+  await expect(popup(page)).toContainText("No matches");
+  await expect(page.getByRole("listbox", { includeHidden: true })).toBeHidden();
+  await expect(input).toHaveAttribute("aria-expanded", "false");
+  await expect(input).toHaveAccessibleDescription("No matches");
+  // A match brings the listbox back, and the line leaves the description.
+  for (let i = 0; i < 2; i++) await page.keyboard.press("Backspace");
+  await page.keyboard.type("ber");
+  await expect(input).toHaveAttribute("aria-expanded", "true");
+  await expect(input).toHaveAccessibleDescription("");
+});
+
+test("D134: Esc in a Dialog restores a picked value and keeps the Dialog open @interaction", async ({ page }) => {
+  await page.goto(story("open-in-dialog"), { waitUntil: "networkidle" });
+  const dialog = page.locator("dialog[open]");
+  await expect(dialog).toBeVisible();
+  const input = page.getByRole("combobox", { name: "City" });
+  await input.focus();
+  await page.keyboard.type("ber");
+  await page.keyboard.press("Enter");
+  await expect(input).toHaveValue("Berlin");
+  await page.keyboard.type("x");
+  await expect.poll(() => isOpen(page)).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(input).toHaveValue("Berlin");
+  await expect.poll(() => isOpen(page)).toBe(false);
+  await expect(dialog).toBeVisible();
+  await expect(page.getByTestId("dialog-close")).toHaveText("none");
+  // Unedited and closed, the next Esc reaches the Dialog.
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("dialog-close")).toHaveText("esc");
+});
+
+test("D134: a caller holds the list closed after a failed read; Enter settles without submitting @interaction", async ({ page }) => {
+  await page.goto(story("read-failed"), { waitUntil: "networkidle" });
+  const input = page.getByRole("combobox", { name: "City" });
+  await expect(input).toHaveValue("Berlin");
+  await expect(input).toHaveAttribute("aria-invalid", "true");
+  await input.click();
+  await page.keyboard.type("x");
+  await page.keyboard.press("ArrowDown");
+  await page.getByRole("button", { name: "Show options" }).click();
+  await expect(input).toBeFocused();
+  expect(await isOpen(page)).toBe(false);
+  await expect(input).toHaveAttribute("aria-expanded", "false");
+  await expect(input).toHaveValue("Berlinx");
+
+  await page.keyboard.press("Enter");
+  await expect(input).toHaveValue("Berlin");
+  await expect(page.getByTestId("submits")).toHaveText("0");
+  await expect(page.locator('input[type="hidden"][name="city"]')).toHaveValue("ber");
+  // Unedited, Enter is native again.
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("submits")).toHaveText("1");
+
+  // The caller hands the list back.
+  await page.getByRole("button", { name: "Try again" }).click();
+  await input.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect.poll(() => isOpen(page)).toBe(true);
+  await expect(input).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("option", { name: "Berlin" })).toHaveAttribute("aria-selected", "true");
+});
+
+test("D134: valueLabel shows a preset value the first page doesn't hold @interaction", async ({ page }) => {
+  await page.goto(story("preset-label"), { waitUntil: "networkidle" });
+  const input = page.getByRole("combobox", { name: "Item" });
+  await expect(input).toHaveValue("Item 37");
+  await input.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect.poll(() => isOpen(page)).toBe(true);
+  await expect(page.getByRole("option")).toHaveCount(5);
+  await expect(input).toHaveAccessibleDescription("Showing 5 of 40. Keep typing to narrow it.");
+  await page.keyboard.type("z");
+  await page.keyboard.press("Escape");
+  await expect(input).toHaveValue("Item 37");
+  await page.keyboard.press("Tab");
+  await expect(input).toHaveValue("Item 37");
+  await expect(page.locator('input[type="hidden"][name="item"]')).toHaveValue("item-37");
+});

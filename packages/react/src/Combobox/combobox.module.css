@@ -19,8 +19,8 @@
   font-family: var(--psi-font-sans);
   cursor: text;
   transition:
-    border-color var(--psi-duration-150) var(--psi-ease-standard),
-    outline var(--psi-duration-150) var(--psi-ease-standard);
+    border-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease),
+    outline var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .combobox:hover:not(.disabled):not(:has(.input:focus-visible)) {
@@ -114,10 +114,12 @@
 }
 
 .toggle svg {
-  transition: rotate var(--psi-duration-150) var(--psi-ease-standard);
+  transition: rotate var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
-.toggle[aria-expanded="true"] svg {
+/* Keyed on the popup being open, not aria-expanded: a "No matches" line
+   alone leaves aria-expanded false (D134), and the chevron still points up. */
+.toggle[data-open] svg {
   rotate: 180deg;
 }
 

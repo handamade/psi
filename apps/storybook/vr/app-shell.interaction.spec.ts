@@ -443,3 +443,173 @@ test("at width 1px the sidebar draws a faint line on its inline-end edge, which 
   expect(rtl.leftColor).toBe(rtl.faint);
   expect(rtl.right).toBe("0px");
 });
+
+/* D139 — a sub-theme keeps the page's geometry. */
+
+test("a sidebar under its own theme takes a border width set on the shell's root @interaction", async ({ page }) => {
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const root = page.locator("#storybook-root [class*='appShell']").first();
+  await root.evaluate((el: HTMLElement) => el.style.setProperty("--psi-app-shell-sidebar-border-width", "1px"));
+  const sidebar = page.locator("#sidebar");
+  expect(await sidebar.getAttribute("data-psi-theme")).toBe("dark");
+  expect(await sidebar.evaluate((el) => getComputedStyle(el).borderRightWidth)).toBe("1px");
+});
+
+/* D140 — NavBar brandAlign="sidebar". */
+
+const ALIGNED = "components-appshell--brand-aligned";
+
+/** The Menu toggle's icon, the first sidebar entry's icon, the brand slot and
+ * the sidebar, in viewport pixels. */
+const brandColumn = (page: Page) =>
+  page.evaluate(() => {
+    const box = (el: Element | null) => {
+      if (!el) throw new Error("missing element");
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right };
+    };
+    const header = document.querySelector("header")!;
+    const menu = header.querySelector('button[aria-label="Menu"] svg');
+    return {
+      menuIcon: box(menu),
+      sidebarIcon: box(document.querySelector("#sidebar nav svg")),
+      brand: box(menu!.closest("button")!.parentElement),
+      sidebar: box(document.querySelector("#sidebar")),
+      headerTheme: header.getAttribute("data-psi-theme"),
+    };
+  });
+
+test("the Menu icon sits on the sidebar's icon column and the brand ends at the sidebar's edge, in both directions @interaction", async ({ page }) => {
+  await page.goto(story(ALIGNED), { waitUntil: "networkidle" });
+  const ltr = await brandColumn(page);
+  expect(ltr.headerTheme).toBe("dark");
+  expect(ltr.menuIcon.left).toBe(ltr.sidebarIcon.left);
+  expect(ltr.sidebarIcon.left - ltr.sidebar.left).toBe(20);
+  expect(ltr.brand.right).toBe(ltr.sidebar.right);
+
+  await page.evaluate(() => document.documentElement.setAttribute("dir", "rtl"));
+  const rtl = await brandColumn(page);
+  expect(rtl.menuIcon.right).toBe(rtl.sidebarIcon.right);
+  expect(rtl.sidebar.right - rtl.sidebarIcon.right).toBe(20);
+  expect(rtl.brand.left).toBe(rtl.sidebar.left);
+});
+
+test("a header under its own theme follows a sidebar width set at the root @interaction", async ({ page }) => {
+  await page.goto(story(ALIGNED), { waitUntil: "networkidle" });
+  await page.evaluate(() => document.documentElement.style.setProperty("--psi-app-shell-sidebar-width", "20rem"));
+  const c = await brandColumn(page);
+  expect(c.sidebar.right - c.sidebar.left).toBe(320);
+  expect(c.brand.right).toBe(c.sidebar.right);
+  expect(c.menuIcon.left).toBe(c.sidebarIcon.left);
+});
+
+test("the brand keeps its place when the sidebar closes, so the toggle does not move @interaction", async ({ page }) => {
+  await page.goto(story(ALIGNED), { waitUntil: "networkidle" });
+  const button = page.locator('header button[aria-label="Menu"]');
+  const before = await button.boundingBox();
+  await button.click();
+  await expect(page.locator("#sidebar")).toBeHidden();
+  expect(await button.boundingBox()).toEqual(before);
+});
+
+/* D142 — sidebarMotion="slide": the column runs to 0 and back. */
+
+const SLIDING = "components-appshell--sliding";
+
+/** Columns, the sidebar's box, its first link's box, and its visibility. */
+const slideState = (page: Page) =>
+  page.evaluate(() => {
+    const root = document.getElementById("sidebar")!.parentElement!;
+    const sidebar = document.getElementById("sidebar")!;
+    const link = sidebar.querySelector("a")!;
+    const box = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return { left: Math.round(r.left * 10) / 10, width: Math.round(r.width * 10) / 10 };
+    };
+    return {
+      first: parseFloat(getComputedStyle(root).gridTemplateColumns),
+      sidebar: box(sidebar),
+      link: box(link),
+      visibility: getComputedStyle(sidebar).visibility,
+    };
+  });
+
+/** Wait until every transition on the frame has ended. */
+const settled = (page: Page) =>
+  page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== "running"));
+
+test("open, the sliding sidebar measures exactly as the instant one @interaction", async ({ page }) => {
+  await page.goto(story(SHELL), { waitUntil: "networkidle" });
+  const instant = await slideState(page);
+  await page.goto(story(SLIDING), { waitUntil: "networkidle" });
+  const slide = await slideState(page);
+  expect(slide).toEqual(instant);
+});
+
+test("closing runs the column to 0 while the content holds still, then hides the sidebar @interaction", async ({ page }) => {
+  await page.goto(story(SLIDING), { waitUntil: "networkidle" });
+  const open = await slideState(page);
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.waitForTimeout(60);
+  const mid = await slideState(page);
+  expect(mid.first).toBeGreaterThan(0);
+  expect(mid.first).toBeLessThan(open.first);
+  expect(mid.link).toEqual(open.link);
+  expect(mid.visibility).toBe("visible");
+
+  await settled(page);
+  const closed = await slideState(page);
+  expect(closed.first).toBe(0);
+  expect(closed.visibility).toBe("hidden");
+  expect(closed.link).toEqual(open.link);
+
+  // Out of the tab order: from Menu, Tab goes on to the header, never into the sidebar.
+  await page.getByRole("button", { name: "Menu" }).focus();
+  await page.keyboard.press("Tab");
+  expect(await page.evaluate(() => document.getElementById("sidebar")!.contains(document.activeElement))).toBe(false);
+
+  // Opening shows it from its first frame, while the column is still on its way back.
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const opening = await slideState(page);
+  expect(opening.visibility).toBe("visible");
+  expect(opening.first).toBeLessThan(open.first);
+  await settled(page);
+  expect(await slideState(page)).toEqual(open);
+});
+
+test("the sliding sidebar mirrors in right-to-left: its edge runs right and the content holds @interaction", async ({ page }) => {
+  await page.goto(story(SLIDING), { waitUntil: "networkidle" });
+  await page.evaluate(() => document.documentElement.setAttribute("dir", "rtl"));
+  const open = await slideState(page);
+  expect(open.sidebar.left + open.sidebar.width).toBe(1000);
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.waitForTimeout(60);
+  const mid = await slideState(page);
+  expect(mid.sidebar.left).toBeGreaterThan(open.sidebar.left);
+  expect(mid.sidebar.left + mid.sidebar.width).toBe(1000);
+  expect(mid.link).toEqual(open.link);
+});
+
+test("under reduced motion the sliding sidebar closes at once @interaction", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(story(SLIDING), { waitUntil: "networkidle" });
+  const menu = page.getByRole("button", { name: "Menu" });
+  await menu.click();
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const closed = await slideState(page);
+  expect(closed.first).toBe(0);
+  expect(closed.visibility).toBe("hidden");
+});
+
+for (const [name, id] of [["instant", SHELL], ["slide", SLIDING]] as const) {
+  test(`${name}: a sidebar closed around focus hands it to its toggle, not to the page @interaction`, async ({ page }) => {
+    await page.goto(story(id), { waitUntil: "networkidle" });
+    await page.locator("#sidebar a").first().focus();
+    // click() from script moves no focus: as if closed by a shortcut while in the tree.
+    await page.getByRole("button", { name: "Menu" }).evaluate((el: HTMLElement) => el.click());
+    await settled(page);
+    await expect(page.getByRole("button", { name: "Menu" })).toBeFocused();
+  });
+}

@@ -32,8 +32,9 @@
   min-height: 0;
   overflow: auto;
   /* The sidebar is a panel: its tree sits inset, so a current item's surface
-     stops short of the edge instead of running into it. */
-  padding: var(--psi-space-8);
+     stops short of the edge instead of running into it. A token since D140, so
+     a NavBar's brand column follows it. */
+  padding: var(--psi-app-shell-sidebar-padding);
   background: var(--psi-app-shell-sidebar-bg);
   color: var(--psi-app-shell-sidebar-fg);
   /* D114: a line for a sidebar that shares the page's background. Width 0 by
@@ -94,4 +95,59 @@
 .main:focus-visible {
   outline: var(--psi-focus-ring-width) solid var(--psi-app-shell-focus-ring);
   outline-offset: var(--psi-focus-ring-offset-inset);
+}
+
+/* D142 — sidebarMotion="slide". Every rule below sits under .slide, which
+   AppShell sets only when the prop asks for it and there is sidebar content,
+   so the instant frame above is untouched. The column runs to 0 and back: two
+   tracks always, the first one interpolated. Timing is the sidebar's two
+   tokens, which alias the `move` preset (D141), so reduced motion zeroes it. */
+.slide {
+  transition: grid-template-columns var(--psi-app-shell-sidebar-duration) var(--psi-app-shell-sidebar-ease);
+}
+
+.slide.sidebarClosed {
+  grid-template-columns: 0px minmax(0, 1fr);
+}
+
+/* The sidebar clips; .sidebarInner scrolls. The visible D114 line stays here,
+   on the box whose edge moves, so it rides the edge as the column narrows.
+   overflow: clip, not hidden: it never scrolls, so focus inside cannot shift
+   the content sideways mid-close. min-inline-size: 0, so the fixed-width
+   wrapper never props the box open. The width is the root's, the one the
+   column has, even under a sidebarTheme whose own overrides set one. */
+.slide .sidebar {
+  --psi-app-shell-sidebar-width: inherit;
+  overflow: clip;
+  min-inline-size: 0;
+  padding: 0;
+  transition:
+    visibility var(--psi-app-shell-sidebar-duration) var(--psi-app-shell-sidebar-ease),
+    opacity var(--psi-app-shell-sidebar-duration) var(--psi-app-shell-sidebar-ease);
+}
+
+/* Hidden by visibility, which interpolates discretely: visible until the end
+   of a close, visible from the start of an open. Closed, it leaves the tab
+   order and the accessibility tree, and paints nothing, line included. */
+.slide.sidebarClosed .sidebar {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* The open sidebar's own box, one level in: its width, its padding, its
+   scrollbar in the same place. The transparent border makes its content box
+   the instant sidebar's exactly (width - 2 x padding - line) with no calc(),
+   and the clip above removes exactly that border's width. */
+.sidebarInner {
+  box-sizing: border-box;
+  inline-size: var(--psi-app-shell-sidebar-width);
+  block-size: 100%;
+  overflow: auto;
+  padding: var(--psi-app-shell-sidebar-padding);
+  border-inline-end: var(--psi-app-shell-sidebar-border-width) solid transparent;
+}
+
+/* D110's corner arrives and leaves with the column. */
+.slide .main {
+  transition: border-start-start-radius var(--psi-app-shell-sidebar-duration) var(--psi-app-shell-sidebar-ease);
 }

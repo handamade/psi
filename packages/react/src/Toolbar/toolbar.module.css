@@ -25,3 +25,14 @@
 .toolbar > [data-psi-combobox] {
   width: var(--psi-toolbar-control-width);
 }
+
+/* D135: the control of a top-labelled Field takes the same width, so a row of
+   labelled filters (filter-form, date-range-filter) is as even as an
+   unlabelled one. A Field's controlWidth (D125) replaces it. A side-labelled
+   Field keeps its content width: in a toolbar it is a label-and-value pair,
+   such as "Rows per page" beside a pager (D115). The same three controls as
+   the bare rule, so a Checkbox, a Switch, a group or a Textarea in a Field is
+   untouched, as it is bare. */
+.toolbar > [data-psi-field]:not([data-control-width]):not([data-label-position]) > :is(input, select, [data-psi-combobox]) {
+  width: var(--psi-toolbar-control-width);
+}

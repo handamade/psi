@@ -220,6 +220,65 @@ export const InForm: Story = {
   },
 };
 
+/** `valueLabel` (D134) names a preset value the caller-owned list doesn't
+ * hold yet: here item 37, past the first page of five. Opening the list
+ * shows the first page; Esc and blur keep "Item 37". */
+export const PresetLabel: Story = {
+  render: () =>
+    column(
+      320,
+      <Field label="Item">
+        <Combobox
+          options={many.slice(0, 5)}
+          filter={false}
+          defaultValue="item-37"
+          valueLabel="Item 37"
+          name="item"
+          moreMessage="Showing 5 of 40. Keep typing to narrow it."
+        />
+      </Field>,
+    ),
+};
+
+/** A caller-held open state (D134): while the read has failed, the caller
+ * passes `open={false}` and shows the error in the Field, so typing, the
+ * arrow keys and the chevron open nothing. Esc restores the picked label and
+ * Enter settles the text without submitting. "Try again" hands the list
+ * back. */
+export const ReadFailed: Story = {
+  render: function ReadFailedStory() {
+    const [failed, setFailed] = useState(true);
+    const [open, setOpen] = useState(false);
+    const [submits, setSubmits] = useState(0);
+    return (
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmits((n) => n + 1);
+        }}
+        style={{ display: "grid", gap: "var(--psi-space-16)", inlineSize: 320, justifyItems: "start" }}
+      >
+        <Field label="City" error={failed ? "Couldn't load the cities." : undefined}>
+          <Combobox
+            options={failed ? [] : plain}
+            defaultValue="ber"
+            valueLabel="Berlin"
+            name="city"
+            open={failed ? false : open}
+            // Drop the requests made while the read is failed: stored, they
+            // would open the list by itself the moment the hold ends.
+            onOpenChange={(next) => {
+              if (!failed) setOpen(next);
+            }}
+          />
+        </Field>
+        <Button size={32} type="button" onClick={() => setFailed(false)}>Try again</Button>
+        <output data-testid="submits" hidden>{submits}</output>
+      </form>
+    );
+  },
+};
+
 // ── Open states (opened under vr) ──────────────────────────────────
 
 export const OpenSingle: Story = {

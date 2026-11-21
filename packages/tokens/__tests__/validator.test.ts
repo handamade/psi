@@ -104,6 +104,7 @@ describe("scope validation (D46)", () => {
     expect(() => validateNoScalePrefixShadow(["space-hero"])).toThrow(ValidationError);
     expect(() => validateNoScalePrefixShadow(["z-banner"])).toThrow(ValidationError);
     expect(() => validateNoScalePrefixShadow(["focus-ring-accent"])).toThrow(ValidationError);
+    expect(() => validateNoScalePrefixShadow(["motion-hero"])).toThrow(ValidationError); // D141 presets
     expect(() => validateNoScalePrefixShadow(["fg-primary", "spacing-x", "texture-1"])).not.toThrow();
   });
 });

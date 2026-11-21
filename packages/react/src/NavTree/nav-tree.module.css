@@ -48,7 +48,10 @@
 /* The current page is set three ways, never by colour alone: weight, a
    raised surface, and a bar at the inline start. The bar is a logical
    pseudo-element rather than an inset shadow, so it follows the writing
-   direction; non-current items draw none, so their text never shifts. */
+   direction; non-current items draw none, so their text never shifts. D138:
+   the bar's width, block inset and radius are tokens (3px, 0 and the tree's
+   radius by default), and under a group that draws a guide line it moves onto
+   the line (see "Guide line" below). */
 .item a[aria-current="page"] {
   background: var(--psi-nav-tree-item-bg-current);
   color: var(--psi-nav-tree-item-fg-current);
@@ -58,10 +61,10 @@
 .item a[aria-current="page"]::before {
   content: "";
   position: absolute;
-  inset-block: 0;
+  inset-block: var(--psi-nav-tree-indicator-inset-block);
   inset-inline-start: 0;
-  width: 3px;
-  border-radius: var(--psi-nav-tree-radius);
+  width: var(--psi-nav-tree-indicator-width);
+  border-radius: var(--psi-nav-tree-indicator-radius);
   background: var(--psi-nav-tree-indicator);
 }
 
@@ -113,7 +116,7 @@
   flex: none;
   /* D124: with an icon in the row, keep the label beside it and the chevron at the end. With two items, space-between already put it there. */
   margin-inline-start: auto;
-  transition: transform var(--psi-duration-150) var(--psi-ease-standard);
+  transition: transform var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .groupButton[aria-expanded="true"] .chevron {
@@ -131,17 +134,80 @@
 }
 
 /* D124: under a group with an icon, the items start where the label's text
-   starts: after the icon and the button's own gap (space-8, .groupButton). */
+   starts: after the icon and the button's own gap (space-8, .groupButton).
+   D138: the list is the guide line's containing block. */
 .withIcon > .groupList {
+  position: relative;
   padding-inline-start: calc(var(--psi-nav-tree-icon-size) + var(--psi-space-8));
+}
+
+/* ── Guide line (D138) ────────────────────────────────────────── */
+
+/* A line along an open group's entries, centred under the group's icon. Its
+   column comes from the same values that place the icon, the button's inline
+   padding (space-12, .groupButton) and icon-size, so it follows them: at 16px
+   and 1px it starts at 19.5px, 19px once rounded (the @supports block below).
+   Only a group with an icon draws it: without one there is no column. A
+   closed list is display: none, so it draws nothing. guide-width is 0px by
+   default, which paints no pixel. A border, not a background, so the colour
+   binds a border property and the scope gate checks it as -border. */
+.withIcon > .groupList::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--psi-space-2);
+  inset-inline-start: calc(var(--psi-space-12) + (var(--psi-nav-tree-icon-size) - var(--psi-nav-tree-guide-width)) / 2);
+  border-inline-start: var(--psi-nav-tree-guide-width) solid var(--psi-nav-tree-guide-border);
+  pointer-events: none;
+}
+
+/* The current page's bar moves onto the line when the line draws. The middle
+   term is the bar centred on the line's column, less where the link starts
+   (icon-size + space-8): -4.5px at 1px, -5px once rounded. clamp() is the
+   switch: with guide-width 0px both bounds are 0px and the bar stays at the
+   link's edge, as without a line. */
+.withIcon > .groupList > .item a[aria-current="page"]::before {
+  inset-inline-start: clamp(
+    calc(var(--psi-nav-tree-guide-width) * -1000),
+    calc(
+      var(--psi-space-12) + (var(--psi-nav-tree-icon-size) - var(--psi-nav-tree-indicator-width)) / 2 -
+        var(--psi-nav-tree-icon-size) - var(--psi-space-8)
+    ),
+    calc(var(--psi-nav-tree-guide-width) * 1000)
+  );
+}
+
+/* Whole pixels where round() exists. Psi's floor is Chrome 119 and round()
+   came in 125; a declaration holding var() can't be dropped at parse time, so
+   without this guard an older engine would compute it invalid and fall to
+   auto. Without round(), line and bar share the same half pixel. */
+@supports (inset-inline-start: round(down, 1.5px, 1px)) {
+  .withIcon > .groupList::before {
+    inset-inline-start: round(
+      down,
+      calc(var(--psi-space-12) + (var(--psi-nav-tree-icon-size) - var(--psi-nav-tree-guide-width)) / 2),
+      1px
+    );
+  }
+
+  .withIcon > .groupList > .item a[aria-current="page"]::before {
+    inset-inline-start: clamp(
+      calc(var(--psi-nav-tree-guide-width) * -1000),
+      calc(
+        round(down, calc(var(--psi-space-12) + (var(--psi-nav-tree-icon-size) - var(--psi-nav-tree-indicator-width)) / 2), 1px) -
+          var(--psi-nav-tree-icon-size) - var(--psi-space-8)
+      ),
+      calc(var(--psi-nav-tree-guide-width) * 1000)
+    );
+  }
 }
 
 /* ── Icon and count (D124) ────────────────────────────────────── */
 
-/* Decorative, coloured by currentColor so it follows the link's or the
-   button's state: item-fg at rest and on hover, item-fg-current for the page
-   and its parent (D96), group-fg in a group's button. The CSS size beats the
-   width and height attributes an icon writes, as in a Button (D97). */
+/* Decorative. Its colour is item-icon-fg in an entry and group-icon-fg in a
+   group's button (D138), both currentColor by default: item-fg at rest and on
+   hover, item-fg-current for the page and its parent (D96), group-fg in a
+   group's button. The CSS size beats the width and height attributes an icon
+   writes, as in a Button (D97). */
 .icon {
   display: flex;
   flex: none;
@@ -153,9 +219,23 @@
 }
 
 /* In an entry, the icon is followed by the label. The group's button has its
-   own gap. */
+   own gap. D138: an icon's colour is its own token, currentColor (the text's)
+   by default, so a look can set an entry's icon quieter than its text and a
+   group's louder than its label. */
 .item .icon {
   margin-inline-end: var(--psi-nav-tree-icon-gap);
+  color: var(--psi-nav-tree-item-icon-fg);
+}
+
+.groupButton .icon {
+  color: var(--psi-nav-tree-group-icon-fg);
+}
+
+/* The current entry's icon, the page's and its parent's (D96), follows the
+   current text colour, so the mark reads as one colour. */
+.item a[aria-current="page"] .icon,
+.item a[aria-current="true"] .icon {
+  color: currentColor;
 }
 
 /* A long label wraps, and the count keeps the row's inline end. */

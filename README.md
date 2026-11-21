@@ -17,7 +17,7 @@ OKLCH-based design system for web applications, built on four core principles:
 ## Workspace
 
 - **packages/tokens** — Formula DSL, token definitions, codegen, CSS + JSON artifacts
-- **packages/react** — 60 React 19 components (Button, IconButton, Card, Panel, Stack, Text, PageHeading, Toolbar, NavBar, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell, AspectRatio, Input, Select, Combobox, Field, FieldStack, Dialog, Checkbox, Switch, Textarea, RadioGroup, Radio, Tag, Tooltip, Menu, MenuItem, MenuSeparator, MenuText, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, TableContainer, Pagination, CursorPagination, Toast, ToastRegion, ToastProvider, Announcement, Tabs, TabList, Tab, TabPanel, SegmentedControl, Segment, DescriptionList, DescriptionItem, Banner, InlineAlert, Skeleton, CopyButton, Count) + 30 icons
+- **packages/react** — 60 React 19 components (Button, IconButton, Card, Panel, Stack, Text, PageHeading, Toolbar, NavBar, SkipLink, Link, NavTree, NavGroup, NavItem, AppShell, AspectRatio, Input, Select, Combobox, Field, FieldStack, Dialog, Checkbox, Switch, Textarea, RadioGroup, Radio, Tag, Tooltip, Menu, MenuItem, MenuSeparator, MenuText, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableCaption, TableContainer, Pagination, CursorPagination, Toast, ToastRegion, ToastProvider, Announcement, Tabs, TabList, Tab, TabPanel, SegmentedControl, Segment, DescriptionList, DescriptionItem, Banner, InlineAlert, Skeleton, CopyButton, Count) + 38 icons
 - **packages/figma-plugin** — In-repo Figma plugin syncing resolved tokens
 - **apps/storybook** — Workbench and generated component documentation
 - **apps/site** — Public website: the homepage (the theme console, the surfaces trace and the Canopy showcase), the changelog at `/docs/changelog/`, and the docs at `/docs/` (guides, a page per component, token pages), built with Psi itself
@@ -49,8 +49,8 @@ Vercel from this repo:
 
 ## Documentation
 
-- [**Design spec**](docs/superpowers/specs/2026-06-12-design-system-design.md) — Principles, architecture, decisions
-- [**Implementation plan**](docs/superpowers/plans/2026-07-06-remediation-and-ai-readability-plan.md) — Active roadmap
+- [**Specs**](docs/superpowers/specs/) — one per change, with its numbered decisions; the founding one is [2026-06-12-design-system-design.md](docs/superpowers/specs/2026-06-12-design-system-design.md)
+- [**Plans**](docs/superpowers/plans/) — the implementation plan for each spec
 - [**@handamade/psi-tokens README**](packages/tokens/README.md) — Token usage and theming
 - [**@handamade/psi-react README**](packages/react/README.md) — Component usage and API
 

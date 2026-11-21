@@ -6,20 +6,35 @@
     "component": "Menu",
     "props": {
       "placement": "bottom-end",
-      "aria-label": "{content:menu-label}"
+      "aria-label": "{content:menu-label}",
+      "open": "{state:open}",
+      "onClose": "{set:open:false}"
     },
     "slots": {
       "trigger": [
         {
           "component": "Button",
-          "props": { "variant": "ghost", "size": 32 },
+          "props": {
+            "variant": "ghost",
+            "size": 32,
+            "onClick": "{toggle:open}",
+            "aria-expanded": "{state:open}"
+          },
           "content": "user-name"
         }
       ],
       "body": [
-        { "component": "MenuItem", "content": "profile-label" },
+        {
+          "component": "MenuItem",
+          "content": "profile-label",
+          "props": { "onSelect": "{input:onProfile}" }
+        },
         { "component": "MenuSeparator" },
-        { "component": "MenuItem", "content": "sign-out-label" },
+        {
+          "component": "MenuItem",
+          "content": "sign-out-label",
+          "props": { "onSelect": "{input:onSignOut}" }
+        },
         { "component": "MenuSeparator" },
         { "component": "MenuText", "content": "build-line" }
       ]
@@ -33,5 +48,7 @@
     "sign-out-label": "Sign out",
     "build-line": "[read-only information, such as the build identifier]"
   },
+  "state": [{ "key": "open", "initial": false }],
+  "inputs": [{ "key": "onProfile", "type": "() => void" }, { "key": "onSignOut", "type": "() => void" }],
   "gaps": []
 }

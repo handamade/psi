@@ -2,9 +2,12 @@
  * Measures the D61 operating envelope for the empty-query overview.
  *
  * The envelope is the range of catalog sizes over which `search("")` keeps
- * all three guarantees: every topic present, every pattern present, and at
- * least COMPONENT_FLOOR (8) components. This script sweeps pattern count and
- * reports where the component floor first breaks.
+ * its guarantees: every topic present, every pattern present, the fixed index
+ * rows (D145: `component:*` naming every component, `icons:all`), and the
+ * 6000-character budget. Since D145 there is no component floor; what a
+ * growing catalog spends instead is the pattern intro, so this script sweeps
+ * pattern count and reports the shortest pattern row and where the intros
+ * fall to one word (the state D145 found at 24 real patterns).
  *
  * The headline finding this script exists to make reproducible: **the
  * envelope is a function of per-pattern cost, not pattern count.** An
@@ -29,14 +32,15 @@
  */
 import { fileURLToPath } from "node:url";
 import { buildIndex } from "../src/index-builder.js";
+import { withDocs } from "./bake-docs.js";
 import { createStore } from "../src/store.js";
 import type { PsiIndex } from "../src/types.js";
 
 const pkgs = fileURLToPath(new URL("../..", import.meta.url));
 
-/** Matches store.ts's COMPONENT_FLOOR. Duplicated rather than exported so a
- * change to the constant shows up here as a moved edge, not a silent shift. */
-const COMPONENT_FLOOR = 8;
+/** A pattern row whose intro is shorter than this has been cut to a word or
+ * two ("The…"), which is what the overview showed before D145. */
+const ONE_WORD = 16;
 const RESPONSE_BUDGET = 6000;
 
 /** The two id shapes whose disagreement is the whole point of this sweep.
@@ -66,7 +70,8 @@ function synthesize(index: PsiIndex, total: number, style: IdStyle): PsiIndex {
 
 interface Measurement {
   total: number;
-  components: number;
+  /** The shortest pattern intro in the overview, in characters. */
+  shortestIntro: number;
   bytes: number;
   allPatterns: boolean;
   allTopics: boolean;
@@ -79,10 +84,17 @@ function measure(index: PsiIndex, total: number, style: IdStyle): Measurement {
   const ids = new Set(briefs.map((b) => b.id));
   return {
     total: grown.patterns.length,
-    components: briefs.filter((b) => b.kind === "component").length,
+    shortestIntro: Math.min(
+      ...briefs
+        .filter((b) => b.kind === "pattern")
+        .map((b) => b.summary.replace(/, blocked \(gaps: .*\)$/, "").length),
+    ),
     bytes: JSON.stringify(briefs).length,
     allPatterns: grown.patterns.every((p) => ids.has(`pattern:${p.id}`)),
-    allTopics: Object.keys(grown.topics).every((name) => ids.has(`topic:${name}`)),
+    allTopics:
+      Object.keys(grown.topics).every((name) => ids.has(`topic:${name}`)) &&
+      ids.has("component:*") &&
+      ids.has("icons:all"),
     gapsDisclosed: grown.patterns
       .filter((p) => p.blocked)
       .every((p) =>
@@ -91,12 +103,14 @@ function measure(index: PsiIndex, total: number, style: IdStyle): Measurement {
   };
 }
 
-const index = await buildIndex({
-  tokensDist: `${pkgs}tokens/dist`,
-  reactDist: `${pkgs}react/dist`,
-  reactDocs: `${pkgs}react/docs`,
-  version: "0.0.0-measure",
-});
+const index = withDocs(
+  await buildIndex({
+    tokensDist: `${pkgs}tokens/dist`,
+    reactDist: `${pkgs}react/dist`,
+    reactDocs: `${pkgs}react/docs`,
+    version: "0.0.0-measure",
+  }),
+);
 
 const baseline = index.patterns.length;
 const realIdLengths = index.patterns.map((p) => p.id.length);
@@ -118,7 +132,7 @@ console.log(
 const sizes = Array.from({ length: 39 - baseline + 1 }, (_, i) => baseline + i);
 const styles = Object.keys(ID_STYLES) as IdStyle[];
 
-console.log("| total patterns | short ids (components/bytes) | realistic ids (components/bytes) |");
+console.log("| total patterns | short ids (shortest intro/bytes) | realistic ids (shortest intro/bytes) |");
 console.log("|---|---|---|");
 
 const edge: Partial<Record<IdStyle, number>> = {};
@@ -127,7 +141,7 @@ let anyGuaranteeLost = false;
 for (const size of sizes) {
   const cells = styles.map((style) => {
     const m = measure(index, size, style);
-    if (m.components < COMPONENT_FLOOR && edge[style] === undefined) edge[style] = size;
+    if (m.shortestIntro < ONE_WORD && edge[style] === undefined) edge[style] = size;
     // Patterns, topics and the gaps tail are guaranteed at EVERY size — they
     // are what degrades gracefully. A false here is a real regression, not an
     // envelope boundary, so it is called out rather than tabulated away.
@@ -142,22 +156,22 @@ for (const size of sizes) {
       anyGuaranteeLost = true;
       console.error(`!! ${style} @ ${size}: ${m.bytes} bytes exceeds the ${RESPONSE_BUDGET} budget`);
     }
-    const floor = m.components >= COMPONENT_FLOOR ? "**" : "";
-    return `${floor}${m.components}${floor} / ${m.bytes}`;
+    const ok = m.shortestIntro >= ONE_WORD ? "**" : "";
+    return `${ok}${m.shortestIntro}${ok} / ${m.bytes}`;
   });
   console.log(`| ${size} | ${cells[0]} | ${cells[1]} |`);
 }
 
 console.log(
-  `\nfloor (>= ${COMPONENT_FLOOR} components) first breaks at: ` +
+  `\npattern intros first fall below ${ONE_WORD} characters at: ` +
     styles.map((s) => `${s} ids = ${edge[s] ?? "never in range"}`).join(", "),
 );
 console.log(
-  `last size holding the floor: ` +
+  `last size with every intro readable: ` +
     styles.map((s) => `${s} = ${(edge[s] ?? sizes.at(-1)! + 1) - 1}`).join(", "),
 );
 console.log(
   anyGuaranteeLost
     ? "\nWARNING: a pattern/topic/gaps/budget guarantee failed above — that is a regression."
-    : "\nAll sizes kept every topic, every pattern, every gaps tail, and the byte budget.",
+    : "\nAll sizes kept every topic, every pattern, the index rows, every gaps tail, and the byte budget.",
 );

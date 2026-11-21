@@ -7,7 +7,7 @@ import { ExampleTabs } from "../../../components/ExampleTabs";
 import { componentPages, type ComponentPage } from "../../../content/component-pages";
 import { docSection, getExport, readGeneratedDoc, summary } from "../../../lib/components";
 import { examplesFor } from "../../../examples/registry";
-import { componentPageMd } from "../../../lib/markdown";
+import { componentPageMd, hookMd } from "../../../lib/markdown";
 import { highlight } from "../../../lib/highlight";
 import { mdToHtml } from "../../../lib/render-md";
 import { storybookDocs } from "../../../lib/storybook";
@@ -30,12 +30,19 @@ const keyboard = page.members
   .filter((k): k is { name: string; md: string } => k.md !== null && k.md.length > 0);
 const theming = docSection(readGeneratedDoc(page.members[0]), "Theming");
 const storyTitle = storyTitles[page.members[0]];
+// D145: a hook's section without its "## name()" line, which HeadingAnchor draws.
+const hooks = (page.hooks ?? []).map((name) => ({
+  name,
+  id: name.toLowerCase(),
+  md: hookMd(name).replace(/^## [^\n]*\n+/, ""),
+}));
 
 const headings = [
   { depth: 2, slug: "examples", text: "Examples" },
   { depth: 2, slug: "props", text: "Props" },
   ...(keyboard.length ? [{ depth: 2, slug: "keyboard", text: "Keyboard and assistive tech" }] : []),
   ...(theming ? [{ depth: 2, slug: "theming", text: "Theming" }] : []),
+  ...hooks.map((h) => ({ depth: 2, slug: h.id, text: `${h.name}()` })),
 ];
 ---
 
@@ -76,6 +83,15 @@ const headings = [
         <Fragment set:html={mdToHtml(theming, `${page.title} theming table`)} />
       </>
     )
+  }
+
+  {
+    hooks.map((h) => (
+      <>
+        <HeadingAnchor level={2} id={h.id}>{h.name}()</HeadingAnchor>
+        <Fragment set:html={mdToHtml(h.md, `${h.name} table`)} />
+      </>
+    ))
   }
 
   {storyTitle && <p><a href={storybookDocs(storyTitle)}>Open {page.title} in Storybook</a></p>}

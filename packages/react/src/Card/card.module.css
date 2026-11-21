@@ -28,5 +28,5 @@
   padding: var(--psi-card-gap);
 }
 
-.hoverLift { transition: transform var(--psi-duration-350) var(--psi-ease-standard); }
+.hoverLift { transition: transform var(--psi-motion-emphasis-duration) var(--psi-motion-emphasis-ease); }
 .hoverLift:hover { transform: translateY(-6px); }

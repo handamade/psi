@@ -29,7 +29,23 @@ Then set the theme on your root element:
 
 All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, `--psi-space-12`, etc. Each theme also declares `color-scheme` (`light` or `dark`, from its base), so date pickers, select lists and scrollbars match it; an unlayered `color-scheme` rule of your own, one in a layer declared after `psi.theme`, or an inline style overrides it; one in `@layer psi.base` does not (D116).
 
-**utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*`, `.psi-fg-*` (D94) utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30) — required for NavBar rendering and accessibility compliance.
+**utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*`, `.psi-fg-*` (D94) utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30), which reaches the motion presets too — required for NavBar rendering and accessibility compliance.
+
+## Motion
+
+Bind a motion preset, not two loose scale steps (D141). Each preset is a pair of tokens that alias the scale:
+
+| preset | tokens | value | for |
+|---|---|---|---|
+| `feedback` | `--psi-motion-feedback-duration`, `--psi-motion-feedback-ease` | 150ms, `ease` | a control answering a pointer or a key |
+| `move` | `--psi-motion-move-duration`, `--psi-motion-move-ease` | 200ms, `--psi-ease-soft` | something entering, leaving or changing size |
+| `emphasis` | `--psi-motion-emphasis-duration`, `--psi-motion-emphasis-ease` | 350ms, `ease` | a deliberate change that draws the eye |
+
+```css
+.thing { transition: background-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease); }
+```
+
+Under `prefers-reduced-motion: reduce` every `--psi-duration-*`, and so every preset, is `0.01ms`. A theme's `componentOverrides` value for a `*-duration` key must be `var(--psi-duration-*)` or `var(--psi-motion-*-duration)`; the build refuses anything else.
 
 ## Creating a custom theme
 

@@ -3,6 +3,8 @@ export interface ComponentPage {
   title: string;
   /** members[0] is the page's main export, named after its folder. */
   members: string[];
+  /** D145: hooks documented on this page, e.g. useToast on Toast's. */
+  hooks?: string[];
 }
 
 export const componentPages: ComponentPage[] = [
@@ -18,7 +20,7 @@ export const componentPages: ComponentPage[] = [
   { slug: "cursor-pagination", title: "CursorPagination", members: ["CursorPagination"] },
   { slug: "description-list", title: "DescriptionList", members: ["DescriptionList", "DescriptionItem"] },
   { slug: "dialog", title: "Dialog", members: ["Dialog"] },
-  { slug: "field", title: "Field", members: ["Field"] },
+  { slug: "field", title: "Field", members: ["Field"], hooks: ["useFieldControl"] },
   { slug: "field-stack", title: "FieldStack", members: ["FieldStack"] },
   { slug: "icon-button", title: "IconButton", members: ["IconButton"] },
   { slug: "inline-alert", title: "InlineAlert", members: ["InlineAlert"] },
@@ -42,7 +44,7 @@ export const componentPages: ComponentPage[] = [
   { slug: "tag", title: "Tag", members: ["Tag"] },
   { slug: "text", title: "Text", members: ["Text"] },
   { slug: "textarea", title: "Textarea", members: ["Textarea"] },
-  { slug: "toast", title: "Toast", members: ["Toast", "ToastRegion", "ToastProvider", "Announcement"] },
+  { slug: "toast", title: "Toast", members: ["Toast", "ToastRegion", "ToastProvider", "Announcement"], hooks: ["useToast"] },
   { slug: "toolbar", title: "Toolbar", members: ["Toolbar"] },
   { slug: "tooltip", title: "Tooltip", members: ["Tooltip"] },
 ];

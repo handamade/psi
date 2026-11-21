@@ -27,7 +27,7 @@
   color: var(--psi-toast-fg);
   font: var(--psi-text-14-20-regular);
 
-  animation: toast-enter var(--psi-duration-200) var(--psi-ease-soft);
+  animation: toast-enter var(--psi-motion-move-duration) var(--psi-motion-move-ease);
 }
 
 @keyframes toast-enter {
@@ -80,6 +80,15 @@
   gap: var(--psi-space-8);
   width: max-content;
   max-width: 100%;
+}
+
+/* D136: the region takes focus only as the last resort for a removed toast's
+   focus (tabindex=-1, never in the Tab order). Keyboard focus there gets the
+   same ring as a focused Menu (D131), so a sighted keyboard user sees where
+   focus went. */
+.region:focus-visible {
+  outline: var(--psi-focus-ring-width) solid var(--psi-toast-focus-ring);
+  outline-offset: var(--psi-focus-ring-offset-inset);
 }
 
 .region[data-placement="top-start"]    { top: 0; left: 0; align-items: flex-start; }

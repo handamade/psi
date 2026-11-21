@@ -15,6 +15,30 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-11-19",
+    tag: "release",
+    title: "0.38.0 — an MCP that knows the icons, and pattern presets that pass its own check",
+    body: "The MCP server now indexes Psi's 38 icons: search finds one by name or by what it shows, get returns its props, and check validates them instead of skipping them. useToast() and useFieldControl() are documented from their source, with a table of what each returns. When check meets a prop it doesn't know, its hint now offers the component's own prop first: onValueChange on Combobox suggests onChange, not a DOM attribute. Each component page's variant guidance lists only the variants that component takes. Every pattern preset now passes check: a pattern declares the state it owns and the inputs its caller supplies, and its preset renders as a small component that holds that state. The destructive-confirm preset now uses a neutral Cancel and no close button, as the Dialog page recommends for a confirmation that can't be undone. 60 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-18",
+    tag: "release",
+    title: "0.37.0 — a sidebar that slides, motion presets, and a nested theme that keeps the page's geometry",
+    body: "AppShell can animate its sidebar: sidebarMotion=\"slide\" opens and closes it over 200ms, instant under reduced motion. The default, \"instant\", keeps today's markup and look. In both modes, a sidebar that closes while it holds focus hands focus to its toggle instead of the page. Motion now has three presets, feedback, move and emphasis, each a duration and an easing named by what the motion is for, and every component transition binds one. A behaviour change for apps that nest a theme: inside an element with its own data-psi-theme, widths, padding, radii and fonts now keep the page's values instead of going back to Psi's default; colours still follow the nested theme. NavTree can draw a guide line down an open group, move the current entry's bar onto it, and colour its icons apart from their text, all through tokens. NavBar brandAlign=\"sidebar\" lines the brand up with the sidebar. Eight new navigation icons come from Lucide, and the package now ships the third-party notices its icons require. 60 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-18",
+    tag: "release",
+    title: "0.36.0 — a Field that wires every control, and focus that comes back",
+    body: "Inside a Field, the Field's id now wins over the control's own, so a caller's id can no longer disconnect the label; set a known id on the Field with htmlFor. While the Field shows an error the control is aria-invalid, and while it is required the control is required, whatever the caller passes. Checkbox and Switch now take a Field's id, message, aria-invalid and required as Input and Select do, so spreading useFieldControl() onto them is no longer needed. The toolbar's control width now reaches the control of a top-labelled Field, so a labelled filter row is as even as an unlabelled one. A Dialog removed while open now returns focus to its opener, and a toast that held focus passes it to the next toast, then back to where it came from, instead of dropping it to the page. 60 components, 24 patterns.",
+  },
+  {
+    date: "2026-11-18",
+    tag: "release",
+    title: "0.35.0 — a segmented control, and a Combobox that keeps its value",
+    body: "SegmentedControl is new: a row of two to four text segments with one selected, shown by tint, label colour and a ring, never by colour alone. With value and onValueChange it is a radio group for a setting that applies at once; inside Tabs it takes the place of TabList and switches the panels. One tab stop, arrows that move and select, sizes 24 to 40, and four one-word segments fit a 320px phone. A TabPanel now hides its Tabs from its content. Combobox keeps a picked value: in single-select, Escape restores the picked label instead of clearing the text, and Enter with edited text settles it as a blur does instead of submitting the form. aria-expanded is true only while a list of options shows, and a No matches or loading line is in the input's description. Three new props: announce={false} for an app that speaks through its own announcer, valueLabel for a picked value the loaded options don't hold, and open with onOpenChange for a caller that keeps the list closed, such as after a failed read. 60 components, 24 patterns.",
+  },
+  {
     date: "2026-11-17",
     tag: "release",
     title: "0.34.0 — a Combobox, a Menu that scrolls, and an MCP that answers like the docs",

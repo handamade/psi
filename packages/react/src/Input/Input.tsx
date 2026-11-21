@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import type { InputHTMLAttributes, Ref } from "react";
 import { FieldContext } from "../Field/Field.js";
+import { useFieldWiring } from "../Field/useFieldWiring.js";
 import styles from "./input.module.css";
 
 type Size = 24 | 32 | 40 | 48;
@@ -38,12 +39,12 @@ const sizeClass: Record<Size, string> = {
 
 /** Single-line text input with pixel-true heights (24–48) and an error state.
  * Inside a Field, id/aria-describedby/aria-invalid/required are wired
- * automatically (D49). */
+ * automatically (D49), and the Field's win over the caller's (D135): set a
+ * known id with the Field's `htmlFor`. */
 export function Input({ size = 32, error = false, type = "text", className, ref, ...rest }: InputProps) {
   const field = useContext(FieldContext);
+  const wiring = useFieldWiring("Input", rest);
   const invalid = error || (field?.invalid ?? false);
-  const describedBy =
-    [field?.describedBy, rest["aria-describedby"]].filter(Boolean).join(" ") || undefined;
 
   const cls = [styles.input, sizeClass[size], invalid && styles.error, className]
     .filter(Boolean)
@@ -53,12 +54,9 @@ export function Input({ size = 32, error = false, type = "text", className, ref,
     <input
       ref={ref}
       className={cls}
-      id={rest.id ?? field?.id}
-      required={rest.required ?? (field?.required || undefined)}
-      aria-invalid={field?.invalid || undefined}
       type={type}
       {...rest}
-      aria-describedby={describedBy}
+      {...wiring}
     />
   );
 }

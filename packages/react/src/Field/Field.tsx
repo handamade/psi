@@ -4,7 +4,9 @@ import { FieldStackContext } from "../FieldStack/FieldStackContext.js";
 import type { FieldLabelPosition } from "../FieldStack/FieldStackContext.js";
 import styles from "./field.module.css";
 
-/** Wiring a Field provides to its control (Input/Select consume it; D49). */
+/** Wiring a Field provides to its control (D49): Input, Select, Textarea,
+ * Checkbox and Switch consume it through useFieldWiring, where the Field's
+ * values win over the caller's (D135). */
 export interface FieldContextValue {
   /** Generated (or htmlFor-overridden) id the label points at. */
   id: string;
@@ -36,7 +38,7 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
   /** Helper line under the control; replaced by error when error is set. */
   description?: ReactNode;
   /** Error content; when truthy it replaces the description and switches the
-   * field (and a wrapped Input/Select) into error state. */
+   * field (and the control it wraps) into error state. */
   error?: ReactNode;
   /** Renders the required marker and flows `required` to the control. @default false */
   required?: boolean;
@@ -54,7 +56,9 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
    * remounts the group's controls; set it once rather than toggling it.
    * @default false */
   group?: boolean;
-  /** Override the generated control id (pair it with the same id on the control). */
+  /** The control's id, in place of the generated one. The control takes it
+   * and ignores an id of its own (D135), so set a known id here rather than
+   * on the control. */
   htmlFor?: string;
   /** When false, the message line is not a live region: an application that
    * routes every announcement through one announcer of its own sets this and
@@ -86,7 +90,9 @@ export interface FieldProps extends HTMLAttributes<HTMLElement> {
 
 /** Labeled form-row wrapper: label above, or beside with `labelPosition` (D115), control, one message line below —
  * description normally, error when set (aria-live unless `announce={false}`).
- * Auto-wires id/aria-describedby/aria-invalid into Input and Select (D49).
+ * Auto-wires id/aria-describedby/aria-invalid/required into Input, Select,
+ * Textarea, Checkbox and Switch (D49, D135); the Field's values win over the
+ * control's own props (D135).
  * Overriding `--psi-field-gap` or `--psi-field-label-height` on a narrower
  * scope than the theme root, inside a `Toolbar align="start"` row, also needs
  * `--psi-toolbar-action-offset` set on that same scope, or the row's button
@@ -112,6 +118,8 @@ export function Field({
   const stack = useContext(FieldStackContext);
   const position: FieldLabelPosition = labelPosition ?? stack?.labelPosition ?? "top";
   const layout = {
+    // D135: a hook for Toolbar's control width, as Combobox's data-psi-combobox is.
+    "data-psi-field": "",
     "data-label-position": position === "start" ? "start" : undefined,
     "data-in-stack": stack ? stack.labelPosition : undefined,
     "data-control-width": controlWidth,

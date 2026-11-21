@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import type { SelectHTMLAttributes, Ref, ReactNode } from "react";
 import { FieldContext } from "../Field/Field.js";
+import { useFieldWiring } from "../Field/useFieldWiring.js";
 import styles from "./select.module.css";
 
 type Size = 24 | 32 | 40 | 48;
@@ -38,7 +39,8 @@ const sizeClass: Record<Size, string> = {
  * One value from a short fixed list; for a list long enough to search, or
  * several values, use Combobox (D130).
  * Inside a Field, id/aria-describedby/aria-invalid/required are wired
- * automatically (D49). */
+ * automatically (D49), and the Field's win over the caller's (D135): set a
+ * known id with the Field's `htmlFor`. */
 export function Select({
   size = 32,
   error = false,
@@ -48,9 +50,8 @@ export function Select({
   ...rest
 }: SelectProps) {
   const field = useContext(FieldContext);
+  const wiring = useFieldWiring("Select", rest);
   const invalid = error || (field?.invalid ?? false);
-  const describedBy =
-    [field?.describedBy, rest["aria-describedby"]].filter(Boolean).join(" ") || undefined;
 
   const cls = [
     styles.select,
@@ -65,11 +66,8 @@ export function Select({
     <select
       ref={ref}
       className={cls}
-      id={rest.id ?? field?.id}
-      required={rest.required ?? (field?.required || undefined)}
-      aria-invalid={field?.invalid || undefined}
       {...rest}
-      aria-describedby={describedBy}
+      {...wiring}
     >
       {children}
     </select>

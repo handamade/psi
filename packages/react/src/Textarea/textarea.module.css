@@ -23,8 +23,8 @@
   font-family: var(--psi-font-sans);
   resize: vertical;
   transition:
-    border-color var(--psi-duration-150) var(--psi-ease-standard),
-    outline var(--psi-duration-150) var(--psi-ease-standard);
+    border-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease),
+    outline var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .textarea::placeholder {

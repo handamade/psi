@@ -89,6 +89,18 @@ describe("align start (D92)", () => {
   it("aligns items to the top of the row", () => {
     expect(rule(".alignStart")).toMatch(/align-items:\s*flex-start;/);
   });
+  it("gives the toolbar width to a top-labelled Field's control without controlWidth (D135)", () => {
+    expect(
+      rule(
+        ".toolbar > [data-psi-field]:not([data-control-width]):not([data-label-position]) > :is(input, select, [data-psi-combobox])",
+      ),
+    ).toMatch(/width:\s*var\(--psi-toolbar-control-width\);/);
+  });
+  it("keeps the bare-control rule, a bare Combobox included (D130)", () => {
+    expect(rule(".toolbar > input, .toolbar > select, .toolbar > [data-psi-combobox]")).toMatch(
+      /width:\s*var\(--psi-toolbar-control-width\);/,
+    );
+  });
   it("drops an unlabelled button or link onto the control line by the action offset", () => {
     expect(rule(".alignStart > :is(button, a)")).toMatch(
       /margin-block-start:\s*var\(--psi-toolbar-action-offset\);/,

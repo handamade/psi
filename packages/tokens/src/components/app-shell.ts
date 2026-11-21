@@ -7,9 +7,11 @@
  * --psi-navbar-height: the NavBar owns it.
  *
  * sidebar-bg, sidebar-fg and focus-ring alias the semantic layer, so under a
- * `data-psi-theme="dark"` sidebar inside a light page they re-resolve dark
- * (component tokens are declared under `:where(:root, [data-psi-theme])`).
- * The theme paints no background of its own: the sidebar paints sidebar-bg.
+ * `data-psi-theme="dark"` sidebar inside a light page they re-resolve dark:
+ * colour tokens are declared under `:where(:root, [data-psi-theme])`. The
+ * geometry here (width, padding, radius, border width) is declared at `:root`
+ * alone, so a themed sidebar or header keeps the page's value (D139). The
+ * theme paints no background of its own: the sidebar paints sidebar-bg.
  *
  * No contrast pair added: fgPrimary on bgPrimary is already gated in every
  * theme, dark included, and the pinned pair count does not move.
@@ -35,13 +37,26 @@
  * inline-end edge, the same pair as navbar's. Width 0 by default: no line and
  * no pixel. A transparent colour would have kept the pixel (D110 found that on
  * NavBar). The colour resolves under the sidebar's theme. No contrast pair: the
- * line separates two regions and identifies no control. */
+ * line separates two regions and identifies no control.
+ *
+ * D140 — sidebar-padding insets the sidebar's tree, 8px, which was hardcoded in
+ * app-shell.module.css. A token now, so a NavBar's brand column
+ * (--psi-navbar-brand-inset) follows it to the sidebar's icon column.
+ *
+ * D142 — sidebar-duration and sidebar-ease time the sidebar's open and close
+ * under `sidebarMotion="slide"`: the column, the fade, main's corner. They alias
+ * D141's `move` preset (200ms, --psi-ease-soft), so prefers-reduced-motion
+ * zeroes them, and the theme gate holds a theme's duration to a step or a
+ * preset. Page-scoped: a sidebar sub-theme keeps the page's timing. */
 export const appShellVars: Record<string, string> = {
   "sidebar-width": "16rem",
+  "sidebar-padding": "var(--psi-space-8)",
   "sidebar-bg": "var(--psi-bg-primary)",
   "sidebar-fg": "var(--psi-fg-primary)",
   "sidebar-border": "var(--psi-border-faint)",
   "sidebar-border-width": "0",
+  "sidebar-duration": "var(--psi-motion-move-duration)",
+  "sidebar-ease": "var(--psi-motion-move-ease)",
   "focus-ring": "var(--psi-border-focus)",
   bg: "transparent",
   "main-bg": "transparent",

@@ -1,5 +1,135 @@
 # @handamade/psi-react
 
+## 0.38.0
+
+### Minor Changes
+
+- f5390e6: The MCP knows icons and hooks, hints in Psi's own words, and component pages describe their own component (D145).
+
+  - **Icons in the MCP.** `manifest.json` gains `iconDetails` (the props every icon shares, `SVGAttributes`, and keywords per icon from `src/icons/keywords.json`) and `attributes.json` the icons' SVG attribute set. The MCP serves `icon:<Name>` and `icons:all` pages, `search` finds an icon by name or by what it shows (`search "delete"` → `IconTrash`), and `check` validates an icon's props instead of skipping it.
+  - **The overview names every component.** The empty-query overview carries one `component:*` row with the total and every component's name, and an `icons:all` row, in place of eight component briefs; pattern rows get the start of their intent instead of one word.
+  - **`check`'s hint ranks the component's own props first**: a close typo, then a prop that says the same in fewer words (`onValueChange` on `Combobox` → `onChange`, not the DOM's `onVolumeChange`), then a DOM attribute. The message names the Psi components the unknown prop belongs to.
+  - **Hooks are documented from their source.** `manifest.json` gains `hooks`; the Toast page tables `useToast()` (`show`, `announce`, `dismiss`, `clear` and their options) and the Field page `useFieldControl()`. `search "useToast"` finds `hook:useToast`.
+  - **Variant guidance is the component's own.** A generated doc lists only the variants its component takes (Tag: accent, neutral, danger, success | warning) and drops the section when none has guidance (Card, Skeleton). The `success | warning` entry no longer says "Tag only".
+  - **A destructive confirmation is `neutral` Cancel, `dismissible={false} closeOnEscape`.** The `destructive-confirm` preset and the Dialog page's confirm example now match the Dialog's own guidance (D101).
+
+- 4b13e29: Every pattern preset now passes the MCP's `check` (D143). A pattern can declare the `state` it owns and the `inputs` its caller supplies, and its preset then renders as a small typed component that holds its `useState`: `row-actions` and `account-menu` open and close, `tabbed-workspace` switches, `table-pagination` pages, `app-shell`'s sidebar and groups toggle, and `destructive-confirm`, `detail-drawer` and `cursor-pagination` take `open`, `onClose` and their actions as props. `patterns.json` gains optional `state` and `inputs`; the other sixteen presets are unchanged. The build now rejects a pattern that leaves a required prop unbound.
+
+## 0.37.0
+
+### Minor Changes
+
+- 7625788: `AppShell` can animate its sidebar (D142). `sidebarMotion="slide"` runs the sidebar's column to 0 and back, fading the sidebar, while its content holds still at the open width; main's rounded corner (D110) follows, and the edge line (D114) rides the moving edge. The default, `"instant"`, keeps today's markup and look.
+
+  Timing comes from two new tokens, never a prop: `--psi-app-shell-sidebar-duration` and `--psi-app-shell-sidebar-ease`. They alias the `move` motion preset (200ms, `--psi-ease-soft`, D141), so `prefers-reduced-motion` makes the sidebar instant, and the theme gate holds a theme's duration to a step or a preset.
+
+  Closed under `"slide"`, the sidebar is `visibility: hidden` instead of `hidden`. It leaves the tab order and the accessibility tree when the close ends. Its content sits in one inner `<div>` that scrolls, so code that scrolls the sidebar must scroll that wrapper. Right-to-left mirrors with no extra setup. With no `sidebar` content, `"slide"` is the instant frame.
+
+  In both modes, a sidebar that closes while it holds focus now hands focus to the toggle whose `aria-controls` names it, or to `main` when there is none. Before, focus fell to `<body>`.
+
+- 4a23c86: Motion presets (D141): a duration and an easing chosen together, named by what the motion is for. Each preset is two tokens that alias the scale, so reduced motion reaches them and a component's own motion tokens can point at either half:
+
+  - `feedback`, `--psi-motion-feedback-duration` / `-ease`: 150ms, `ease`. A control answering a pointer or a key.
+  - `move`, `--psi-motion-move-duration` / `-ease`: 200ms, `--psi-ease-soft`. Something entering, leaving or changing size.
+  - `emphasis`, `--psi-motion-emphasis-duration` / `-ease`: 350ms, `ease`. A deliberate change that draws the eye.
+
+  Every transition and animation in Psi's component CSS now binds one, with the same timing as before. The one change you could notice: `NavBar` links change colour on the `feedback` curve (`ease`) instead of `--psi-ease-soft`, like every other control. `Skeleton`'s pulse and `.psi-media-tint` stay on the raw scale.
+
+  The presets appear in `resolved/<theme>.json` (`scales.motion.presets`), the DTCG file (`motion.<name>.duration` and `.ease`, as aliases), and `guidance.json` (`motion.presets`, with each preset's intent).
+
+  The theme gate now refuses a `componentOverrides` value for a `*-duration` key that is not exactly `var(--psi-duration-<step>)` or `var(--psi-motion-<preset>-duration)`. A literal such as `200ms` never reads a duration token, so reduced motion could not zero it. The stylelint plugin gains `psi/motion-presets`, which reports a raw `--psi-duration-*` or `--psi-ease-*` in a component stylesheet's transition or animation.
+
+- 037034c: Eight icons for the sections of a navigation tree (D137), for the `icon` slot of `NavItem` and `NavGroup`: `IconShieldCheck`, `IconBlocks`, `IconFileCog`, `IconCrosshair`, `IconCirclePlay`, `IconChartColumnBig`, `IconScrollText` and `IconActivity`. Each is Lucide's glyph of the same name, copied from lucide-static 1.75.0, and has the shape of every other Psi icon: a 24-unit grid, a 2px round stroke in `currentColor`, `size` defaulting to 20, and `aria-hidden="true"`.
+
+  The package now ships `THIRD-PARTY-NOTICES.md`. It carries Lucide's ISC licence and Feather's MIT licence, which their icons require in every copy, and lists which Psi icons come from each. 24 of Psi's earlier icons are Feather's, and the package had never carried Feather's notice; it does now. The three brand marks come from Simple Icons (CC0).
+
+- 3a90a75: `NavTree` can draw a guide line and colour its icons apart from their text, through tokens alone (D138).
+
+  - **A guide line down an open group's entries.** `--psi-nav-tree-guide-width` (default `0px`, so nothing is drawn) and `--psi-nav-tree-guide-border` (default `--psi-border-strong`) draw a line centred under the group's icon. Psi places it from the group's own geometry (19px from the group's start at the default 16px icon and a 1px line), so you set no column. Only a group with an icon draws it, and it mirrors in RTL. Write the width with a unit.
+  - **The current entry's bar becomes a segment of that line.** The bar is now `--psi-nav-tree-indicator-width` (`3px`), `--psi-nav-tree-indicator-inset-block` (`0`) and `--psi-nav-tree-indicator-radius` (the tree's radius). While a group draws its guide line, the current entry's bar in that group moves onto it.
+  - **Icon colours of their own.** `--psi-nav-tree-item-icon-fg` and `--psi-nav-tree-group-icon-fg` colour an entry's and a group's icon (default `currentColor`, the text's). The current entry's icon follows its text.
+  - **What changes for you:** nothing until you set them. Every default draws today's pixels. A sidebar that reached into the tree's markup with CSS for this look can drop that CSS and set these tokens in its theme's `componentOverrides` instead.
+
+- f96adda: A nested theme keeps the page's geometry (D139), and a `NavBar` brand lines up with the `AppShell` sidebar (D140).
+
+  - **Behaviour change for every app that nests a theme.** Inside an element with its own `data-psi-theme` (a dark sidebar, a dark header, a themed panel), geometry, type and motion tokens now keep the value of the page around them instead of going back to Psi's default. That covers widths, padding, radii, gutters, heights, fonts and similar tokens: `--psi-app-shell-sidebar-width`, `--psi-control-radius`, `--psi-navbar-gutter`, `--psi-card-radius`, `--psi-button-radius`. The value can come from the page theme's `componentOverrides`, from `:root` or from any ancestor. Until now every component token was declared again on each `data-psi-theme` element, so a page theme's `card-radius: 0` (ember's, for one) turned back into 0.5rem inside a dark region, and a header under a dark theme read a 16rem sidebar whatever the page set. **Colour tokens do not change:** they are still declared on every theme and resolve against the nested theme's palette, and a page theme's colour overrides stay in the page theme.
+  - **A dial set by hand on a nested theme's element no longer reaches its aliases.** `<div data-psi-theme="dark" style="--psi-control-radius: 3px">` changes `--psi-control-radius` there, but `--psi-button-radius`, `--psi-input-radius` and the other tokens that read it keep the page's value. Put the dial in that theme's `componentOverrides` instead, where it reaches them: a theme that overrides a token now declares the geometry tokens that read it again in its own block. Or set the aliases beside the dial.
+  - **`components.css` declares each component's tokens in two rules:** `:where(:root)` for geometry, type and motion, and `:where(:root, [data-psi-theme])` for colour. Both have zero specificity, so a theme's `componentOverrides` still win regardless of import order.
+  - **The theme gate refuses a geometry override that binds a colour** (`ThemeGateError`, scope violation group `"page"`). Such a value would carry the page's resolved colour into every nested theme, unchecked against its contrast. No shipped theme does this.
+  - **`NavBar brandAlign="sidebar"`** sizes the brand slot to the `AppShell` sidebar, so a leading `<IconButton aria-label="Menu"><IconMenu size={16} /></IconButton>` puts its icon on the column where the sidebar's `NavTree` icons start, and the links or actions start where the page starts. The row is laid out fluid. It mirrors in right-to-left, keeps its place when the sidebar closes, and works under a header with its own `data-psi-theme`. New tokens: `--psi-navbar-brand-width` (the sidebar's width), `--psi-navbar-brand-inset` (12px) and `--psi-app-shell-sidebar-padding` (8px, the sidebar's inset, which was fixed until now).
+
+## 0.36.0
+
+### Minor Changes
+
+- 4c99abe: A `Field` wires every control the same way (D135).
+
+  - **Inside a `Field`, the Field's `id` wins over the control's own.** This changes which `id` wins: until now a caller's `id` on an `Input`, `Select` or `Textarea` beat the Field's and silently disconnected the label, so the control had no name. Now the control always takes the id the `<label for>` points at, and the caller's is not used. To give a control a known id, set it on the Field: `<Field htmlFor="email">`. In development the control warns once when a caller's `id` differs.
+  - **While the Field has an error, the control is `aria-invalid`; while it is required, the control is `required`,** whatever the caller passes. A caller's `aria-invalid={false}` no longer hides an error that is on screen. While the Field sets neither, a caller's own `aria-invalid` or `required` still stands. `aria-describedby` is joined, as before.
+  - **This includes a `Checkbox` in a group `Field`:** a caller's `aria-invalid={false}` on one box in an invalid group no longer clears it (it did since D108).
+  - **`Checkbox` and `Switch` take a `Field`'s wiring outside group mode,** as `Input` and `Select` do: its id, its message in `aria-describedby`, `aria-invalid` and `required`. They are named by the Field's label and their own, e.g. "Notifications Email me weekly", and described by the Field's error or description. A Field without a label leaves the box's own name. In a group Field they take `aria-invalid` only, `Switch` now as `Checkbox` does. Spreading `useFieldControl()` onto a box is no longer needed. That spread replaced the box's own name with the Field's label.
+  - **`--psi-toolbar-control-width` reaches the control of a top-labelled `Field`** that is a direct `Toolbar` child (an `Input`, a `Select` or a `Combobox`), as it reaches a bare control. A labelled filter row is now as even as an unlabelled one: the `filter-form` and `date-range-filter` presets' controls go from their content width (about 172, 80 and 141px) to 200px. A Field's `controlWidth` replaces the token. A side-labelled Field (`labelPosition="start"`, such as "Rows per page") keeps its content width. `Field` marks its root with `data-psi-field`.
+
+### Patch Changes
+
+- d2828e6: Focus no longer drops to the page when a `Dialog` or a focused toast goes away (D136).
+
+  - **`Dialog` removed while open.** `{open && <Dialog open />}` removes the dialog on every dismissal, and the platform returns focus to the opener only on `close()`. Unmounting an open `Dialog` now closes it first, so focus returns to the opener as it does for `open={false}`. Nothing is reported through `onClose`.
+  - **A toast that held focus.** When a focused toast leaves, however it leaves (its dismiss button, a timer, eviction past `limit`, `clear()`, `dismiss(id)`, or a stack composed by hand), `ToastRegion` hands focus to the toast now at its position (its dismiss button, else its first control; the new last if it was last). Once the stack is empty, focus goes back to the element focused before focus entered the region, and to the region itself if that element is gone. A mouse click on a dismiss button goes back first, so focus left in the stack never holds the timers paused. Focus the user moved elsewhere is left alone.
+  - `ToastRegion` now has `tabindex="-1"` (focusable by script, never in the Tab order) and shows the focus ring on `:focus-visible`, from a new `--psi-toast-focus-ring` token bound to `--psi-border-focus`. `Toast`'s dismiss button carries `data-psi-toast-dismiss`.
+
+## 0.35.0
+
+### Minor Changes
+
+- dca1099: Combobox follow-up (D134): Escape that keeps a value, `aria-expanded` that matches what shows, and three new props.
+
+  **Behaviour changes in single-select.** Code may rely on the old behaviour:
+
+  - **Escape no longer clears the text.**
+    - It restores the picked label and closes the list if the list is open.
+    - Closed, with unedited text, it does nothing and reaches a surrounding
+      `Dialog`.
+    - It never clears a value. Before, two Escapes and a blur deleted a picked
+      value.
+    - To clear a value, empty the text and leave the field, or use
+      `clearable`.
+  - **Enter with edited text no longer submits the form.**
+    - When nothing is highlighted, Enter settles the text as blur does: emptied
+      text clears the value, and other edited text goes back to the picked
+      label.
+    - With the list open, it also closes the list.
+    - Unedited text still submits natively.
+
+  Multi-select's Escape and Enter are unchanged.
+
+  **Accessibility.**
+  - `aria-expanded` is true only while a listbox with options shows. A "No
+    matches" or loading line on its own leaves it false.
+  - While a "No matches", loading or "more" line shows, it is in the input's
+    `aria-describedby`.
+
+  **New props.**
+  - `announce={false}` removes the Combobox's own live region, for an app
+    that speaks through one announcer of its own, as `Field announce={false}`
+    does.
+  - `valueLabel` (single-select) names a picked value the options don't hold,
+    such as a preset id past the first page of a server-read list.
+  - `open` and `onOpenChange`. The list's open state can now be held by the
+    caller, for example closed while a read has failed. Leave `open` unset and
+    nothing changes.
+
+- e0e9f94: A segmented control: `SegmentedControl` and `Segment` (D132).
+
+  - **One pill, two jobs.** A row of 2–4 text segments with one selected, shown by the accent tint, the accent label and a 1px inset ring, so never by colour alone. With `value` and `onValueChange` it is a radio group for a setting that applies at once, wherever it sits: `<SegmentedControl aria-label="Color scheme" value={v} onValueChange={setV}>`. Without them, inside `<Tabs>` it is the tab list, in place of `TabList`, and its segments switch the `TabPanel` of the same value; `Tabs` owns the value. Controlled only.
+  - **Keyboard.** One tab stop; the arrows move and select, wrapping (both axes as a radio group, Left/Right as a tab list); Home and End. A `disabled` segment uses `aria-disabled` and is skipped.
+  - **Sizes** `24 | 32 | 40` (default 32), the height of a Button of the same size. The control never wraps: it is as wide as its labels and truncates them in a narrower container; `fill` stretches it and shares the width equally. Four one-word segments fit a 320px phone at size 32.
+  - **Tokens** `--psi-segmented-*`, on the semantic layer and the control ramp. The shape is a pill (`--psi-radius-full`) whatever the theme's control radius. No new contrast pair.
+  - **Tabs** shares its tab-stop rule (D93) and keyboard with it, and `Tabs`' body slot accepts `SegmentedControl`. Two changes to `Tabs`:
+    - **A `TabPanel` hides its `Tabs` from its content**: children render under an empty `TabsContext`. A `Tab` or `TabList` stranded in a panel now throws instead of joining the outer tab set, and code of your own that reads the exported `TabsContext` inside a panel now gets `null`.
+    - **Fix:** since 0.34.0 the arrow keys reach a disabled tab (D131), and a click on another tab after that left two tab stops. Each tab now re-takes its own when the stop moves.
+  - **MCP `search`**: a query's results now fill to the response budget, best first, as the overview's already do. `Segment` made `button` match one component more and pushed that answer past 6,000 characters.
+
 ## 0.34.0
 
 ### Minor Changes

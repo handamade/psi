@@ -17,6 +17,7 @@ import { emitResolvedJSON } from "./emit-json.js";
 import { emitTokenTypes } from "./emit-types.js";
 import { emitScaleVarsCSS, emitUtilitiesCSS, emitUtilitiesRoster } from "./emit-utilities.js";
 import { emitComponentVarsCSS } from "./emit-components.js";
+import { classifyComponentTokens } from "../src/emit/component-scope.js";
 import { emitDTCG } from "./emit-dtcg.js";
 import { BUTTON_VARIANTS } from "../src/components/button.js";
 import { sizeScale } from "../src/scales/sizes.js";
@@ -150,8 +151,10 @@ function build(): void {
   const componentsDir = join(distDir, "components");
   mkdirSync(componentsDir, { recursive: true });
   const aggregate: string[] = [];
+  // D139: page-scoped tokens at :root alone, theme-scoped ones on every theme.
+  const tokenScopes = classifyComponentTokens(componentVars, Object.keys(themes.light.theme));
   for (const [name, vars] of Object.entries(componentVars)) {
-    const css = emitComponentVarsCSS(name, vars);
+    const css = emitComponentVarsCSS(name, vars, tokenScopes);
     writeFileSync(join(componentsDir, `${name}.vars.css`), css);
     aggregate.push(css);
     console.log(`  wrote dist/components/${name}.vars.css`);

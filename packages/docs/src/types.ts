@@ -8,6 +8,36 @@ export interface PropInfo {
   description: string;
 }
 
+/** D145: one member of a hook's returned interface, or one field of an
+ * options interface it takes, as emit-manifest reads them from the source. */
+export interface HookMember {
+  name: string;
+  type: string;
+  required: boolean;
+  default: string | null;
+  description: string;
+}
+
+/** D145: a hook's API, from manifest.json's `hooks`. */
+export interface HookInfo {
+  name: string;
+  description: string;
+  /** The interface the hook returns, e.g. "ToastHandle". */
+  returns: string;
+  members: HookMember[];
+  /** The interfaces the members take, e.g. ToastOptions. */
+  types: Array<{ name: string; fields: HookMember[] }>;
+}
+
+/** D145: every icon takes the same props; manifest.json's `icons` and `iconDetails`. */
+export interface IconsInfo {
+  names: string[];
+  props: PropInfo[];
+  /** The React attribute interface the props extend: "SVGAttributes". */
+  attributes: string | null;
+  keywords: Record<string, string[]>;
+}
+
 export interface ExportInfo {
   name: string;
   description: string;
@@ -40,7 +70,12 @@ export interface Resolved {
     space: number[];
     size: number[];
     radius: number[];
-    motion: { durations: number[]; easings: Record<string, string> };
+    motion: {
+      durations: number[];
+      easings: Record<string, string>;
+      /** D141 — named pairs of the two scales. */
+      presets: Record<string, { duration: number; ease: string; intent: string; durationToken: string; easeToken: string }>;
+    };
     layout: {
       breakpoints: Record<string, number>;
       container: Record<string, number>;
@@ -90,6 +125,10 @@ export interface DocsInput {
   componentCount: number;
   iconCount: number;
   exports: ExportInfo[];
+  /** D145. */
+  icons: IconsInfo;
+  /** D145. */
+  hooks: HookInfo[];
   /** packages/react/docs/<Export>.md, without its leading comment line. */
   generatedDocs: Record<string, string>;
   guidance: Guidance;
@@ -121,7 +160,7 @@ export interface PatternLike {
 export interface DocsPages {
   overview: string;
   /** By page slug. */
-  components: Record<string, { title: string; members: string[]; markdown: string }>;
+  components: Record<string, { title: string; members: string[]; hooks: string[]; markdown: string }>;
   /** By token page slug; title is e.g. "Color tokens". */
   tokenPages: Record<string, { title: string; markdown: string }>;
   /** By guide id. */
@@ -132,4 +171,6 @@ export interface DocsPages {
   patterns: Record<string, string>;
   /** By topic name. */
   topics: Record<string, string>;
+  /** D145: the roster page, and one page per icon by name. */
+  icons: { all: string; byName: Record<string, string> };
 }

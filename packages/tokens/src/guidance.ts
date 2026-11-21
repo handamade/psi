@@ -1,3 +1,4 @@
+import { motionPresets } from "./scales/motion.js";
 export const guidance = {
   variants: [
     { variant: "accent", intent: "Primary action, draws attention", typicalUse: "Submit, CTA, main action in a group" },
@@ -8,7 +9,7 @@ export const guidance = {
     { variant: "outline", intent: "Bordered ghost — visible structure, no fill until hover", typicalUse: "Marketing CTA, download button; hover fills accent" },
     { variant: "danger", intent: "Destructive action", typicalUse: "Delete, remove, disconnect" },
     { variant: "danger-subtle", intent: "Destructive context, low urgency", typicalUse: "Warning badges, soft destructive hints" },
-    { variant: "success | warning", intent: "Status communication (Tag only)", typicalUse: "Status badges, labels" },
+    { variant: "success | warning", intent: "Status communication", typicalUse: "Status badges, labels" },
   ],
   rules: [
     "One accent per visual group; everything else neutral or ghost.",
@@ -20,7 +21,7 @@ export const guidance = {
     "Wrap labeled form controls in Field — label association, description/error line, aria-describedby and aria-invalid come wired; don't hand-roll label+message rows.",
     "Field is for a control with a *visible* label. A toolbar filter control named by aria-label or placeholder takes neither a Field nor a hand-rolled label row — compare filter-toolbar (no labels) with table-pagination (\"Rows per page\" visible, so Field). Filters with visible labels submitted together by a Find button are filter-form: a Toolbar as=\"form\" align=\"start\" of Fields with one-line labels, where a field's error line is the Field's own and hangs below its control (D87, D92).",
     "Label beside its control: <Field labelPosition=\"start\"> for one field in a toolbar or pager (keep Toolbar align=\"center\"); <FieldStack labelPosition=\"start\"> for a form whose labels share one column, as wide as the longest label up to --psi-field-label-max-width, stacking below 480px of the form's width. A theme sets --psi-field-label-align: end to put labels against their controls (D115).",
-    "Width of a control: <Field controlWidth={80|120|160|240|320|480}> sizes the control it wraps in px and lets it shrink in a narrower column; the label and message keep the Field's width. Pick the step from the value: at size 32 an Input fits about 7/12/17/26/36/55 digits (an ICCID's 20 digits → 240; a page-size Select → 80). Without it the control fills the Field. A FieldStack stops at --psi-field-stack-max-width (640px); filter-form controls keep their natural width unless a Field sets controlWidth (D125).",
+    "Width of a control: <Field controlWidth={80|120|160|240|320|480}> sizes the control it wraps in px and lets it shrink in a narrower column; the label and message keep the Field's width. Pick the step from the value: at size 32 an Input fits about 7/12/17/26/36/55 digits (an ICCID's 20 digits → 240; a page-size Select → 80). Without it the control fills the Field. A FieldStack stops at --psi-field-stack-max-width (640px). In a Toolbar, the control of a top-labelled Field without controlWidth takes --psi-toolbar-control-width (200px), as a bare control does, so filter-form and date-range-filter rows are even; controlWidth replaces it, and a side-labelled Field (Rows per page) keeps its content width (D135).",
     "A popup's maximum height is --psi-popup-max-height (320px), shared by every popup through its own alias (--psi-menu-max-height, --psi-combobox-popup-max-height); past it the popup scrolls. Override the alias for one component, the shared token for all (D131).",
     "Select for a short fixed list; Combobox when the list is long enough to search, or more than one value is picked (D130). Combobox takes options as data ({value, label, description?, disabled?}), filters as the user types, and with multiple shows the picked values as Tags. Select has no multiple.",
     "Use Dialog for blocking modal flows — title/footer slots, dismissible gate; danger stays on the footer Buttons, one accent per group.",
@@ -39,7 +40,15 @@ export const guidance = {
   motion: {
     durations: [150, 200, 350, 450, 600],
     easings: { standard: "ease", "in-out": "ease-in-out", soft: "cubic-bezier(0.2, 0.6, 0.2, 1)" },
-    reducedMotion: "All --psi-duration-* zero under prefers-reduced-motion (D30). Always drive transitions/animations with duration tokens; never hardcode times.",
+    // D141 — pick a preset by intent; both halves alias the scale above.
+    presets: Object.fromEntries(Object.entries(motionPresets).map(([name, p]) => [name, {
+      duration: `var(--psi-motion-${name}-duration)`,
+      ease: `var(--psi-motion-${name}-ease)`,
+      aliases: `--psi-duration-${p.duration} / --psi-ease-${p.ease}`,
+      intent: p.intent,
+    }])),
+    presetRule: "Bind a preset in every transition and animation: transition: color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease). Pick by intent, not by speed. A component's own motion tokens alias a preset's halves (--psi-app-shell-sidebar-duration: var(--psi-motion-move-duration)). The raw scale is for the two exceptions: Skeleton's infinite pulse (D86) and .psi-media-tint (D35).",
+    reducedMotion: "All --psi-duration-* zero under prefers-reduced-motion (D30), and every --psi-motion-* preset with them: a preset aliases the scale, so it resolves to 0.01ms too. Always drive transitions/animations with a preset or a duration token; never hardcode times. A theme's componentOverrides value for a *-duration key must be var(--psi-duration-*) or var(--psi-motion-*-duration), or the build refuses it (D141).",
     recipes: {
       pulseDown: "App-level keyframe (the DS ships none): @keyframes pulse-down { 0%,100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(6px); opacity: 1; } } — drive with var(--psi-ease-in-out).",
     },

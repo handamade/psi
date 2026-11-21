@@ -69,6 +69,16 @@ describe("scopes vocabulary", () => {
     );
   });
 
+  it("gap includes the logical insets alongside the physical ones (D138)", () => {
+    expect(PROPERTY_GROUPS.gap).toEqual(
+      expect.arrayContaining([
+        "inset", "top", "left",
+        "inset-block", "inset-inline",
+        "inset-block-start", "inset-block-end", "inset-inline-start", "inset-inline-end",
+      ]),
+    );
+  });
+
   it("gap covers edge-distance uses (icon offsets, viewport-inset sizing)", () => {
     expect(PROPERTY_GROUPS.gap).toContain("background-position");
     expect(PROPERTY_GROUPS.gap).toContain("max-width");

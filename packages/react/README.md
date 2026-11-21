@@ -83,3 +83,9 @@ or declare your own layer first:
 - [Per-component documentation](./docs/) — Props, theming, examples
 - [manifest.json](dist/manifest.json) — Full prop inventory and defaults (for tooling)
 - [llms.txt](./llms.txt) — Machine-readable component inventory and rules
+
+## Licence
+
+MIT (see [LICENSE](./LICENSE)). Some icons are copied from Lucide (ISC) and
+Feather (MIT); their notices and the icons they cover are in
+[THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md).

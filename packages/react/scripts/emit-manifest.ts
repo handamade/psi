@@ -1,6 +1,7 @@
 import { writeFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
 import { withCustomConfig } from "react-docgen-typescript";
 import { a11yMeta } from "../src/a11y-meta.js";
 import { loadSlotContracts } from "./slots.js";
@@ -162,6 +163,78 @@ function attributesOf(name: string): string | null {
   return parents.includes("HTMLAttributes") ? "HTMLAttributes" : parents.sort()[0];
 }
 
+const ICON_PROP_DESCRIPTIONS: Record<string, string> = {
+  size: "Width and height of the glyph, in px.",
+};
+
+/** D145: hooks whose API the manifest states, read from their source. */
+const HOOKS = [
+  { name: "useToast", file: "Toast/useToast.ts" },
+  { name: "useFieldControl", file: "Field/useFieldControl.ts" },
+];
+
+interface HookMember {
+  name: string;
+  type: string;
+  required: boolean;
+  default: string | null;
+  description: string;
+}
+
+/** A hook's description, the interface it returns with each member's
+ * signature and TSDoc, and every interface those members take, read with the
+ * TypeScript checker so the docs cannot drift from the source. */
+function hookDoc(name: string, file: string) {
+  const program = ts.createProgram([file], { strict: true, jsx: ts.JsxEmit.ReactJSX, skipLibCheck: true });
+  const checker = program.getTypeChecker();
+  const source = program.getSourceFile(file);
+  if (!source) throw new Error(`emit-manifest: cannot read ${file}`);
+  const text = (symbol: ts.Symbol) => ts.displayPartsToString(symbol.getDocumentationComment(checker)).replace(/\s+/g, " ").trim();
+  const defaultOf = (symbol: ts.Symbol) => {
+    const tag = symbol.getJsDocTags(checker).find((t) => t.name === "default");
+    return tag ? ts.displayPartsToString(tag.text).trim() : null;
+  };
+  const interfaces = new Map<string, ts.InterfaceDeclaration>();
+  let hook: ts.FunctionDeclaration | undefined;
+  source.forEachChild((n) => {
+    if (ts.isInterfaceDeclaration(n)) interfaces.set(n.name.text, n);
+    if (ts.isFunctionDeclaration(n) && n.name?.text === name) hook = n;
+  });
+  if (!hook?.name || !hook.type) throw new Error(`emit-manifest: no exported function ${name} with a return type in ${file}`);
+  const returns = hook.type.getText(source);
+  const membersOf = (decl: ts.InterfaceDeclaration): HookMember[] =>
+    decl.members.map((m) => {
+      const symbol = checker.getSymbolAtLocation(m.name!)!;
+      return {
+        name: symbol.name,
+        type: ts.isPropertySignature(m) && m.type ? m.type.getText(source).replace(/\s+/g, " ") : checker.typeToString(checker.getTypeAtLocation(m)),
+        required: !m.questionToken,
+        default: defaultOf(symbol),
+        description: text(symbol),
+      };
+    });
+  const returned = interfaces.get(returns);
+  if (!returned) throw new Error(`emit-manifest: ${name} returns ${returns}, which ${file} does not declare`);
+  const members = membersOf(returned);
+  // The interfaces the returned members mention, in order of first mention.
+  const types = [...interfaces.keys()]
+    .filter((k) => k !== returns && members.some((m) => new RegExp(`\\b${k}\\b`).test(m.type)))
+    .sort((a, b) => members.findIndex((m) => m.type.includes(a)) - members.findIndex((m) => m.type.includes(b)))
+    .map((k) => ({ name: k, fields: membersOf(interfaces.get(k)!) }));
+  // The hook's own comment keeps its line breaks: it may hold an indented
+  // usage example, which markdown renders as code.
+  const description = ts
+    .displayPartsToString(checker.getSymbolAtLocation(hook.name)!.getDocumentationComment(checker))
+    .trim()
+    // An indented example (TSDoc loses one space of its indent) becomes a fence.
+    .replace(/(?:^ {2,}\S.*(?:\n|$))+/gm, (block) => {
+      const lines = block.replace(/\n$/, "").split("\n");
+      const indent = Math.min(...lines.map((l) => l.match(/^ */)![0].length));
+      return "```tsx\n" + lines.map((l) => l.slice(indent)).join("\n") + "\n```\n";
+    });
+  return { name, description, returns, members, types };
+}
+
 const slotsByComponent = loadSlotContracts(join(root, "src"), COMPONENTS, COMPONENT_DIR);
 
 const manifest = COMPONENTS.map((name) => {
@@ -216,12 +289,54 @@ const icons = readdirSync(join(root, "src", "icons"))
   .map((f) => f.replace(/\.tsx$/, ""))
   .sort();
 
+// D145: an icon's props and meaning, so the MCP can index, search and check
+// icons. Every icon declares the same IconProps; parse them all in one program
+// and refuse to emit one shared table if any differs.
+const iconDocs = parser.parse(icons.map((name) => join(root, "src", "icons", `${name}.tsx`)));
+const iconProps = icons.map((name) => {
+  const doc = iconDocs.find((d) => d.displayName === name);
+  if (!doc) throw new Error(`emit-manifest: no export named "${name}" in icons/${name}.tsx`);
+  return Object.values(doc.props ?? {}).map((p) => ({
+    name: p.name,
+    type: typeToString(p),
+    required: p.required,
+    default: p.defaultValue?.value ?? null,
+    description: p.description || "",
+  }));
+});
+const sharedIconProps = JSON.stringify(iconProps[0]);
+icons.forEach((name, i) => {
+  if (JSON.stringify(iconProps[i]) !== sharedIconProps) {
+    throw new Error(`emit-manifest: ${name}'s props differ from ${icons[0]}'s; the manifest states one icon prop table`);
+  }
+});
+const keywords = JSON.parse(readFileSync(join(root, "src", "icons", "keywords.json"), "utf8")) as Record<string, string[]>;
+const keywordKeys = Object.keys(keywords).sort();
+if (JSON.stringify(keywordKeys) !== JSON.stringify(icons)) {
+  const missing = icons.filter((n) => !keywords[n]);
+  const extra = keywordKeys.filter((n) => !icons.includes(n));
+  throw new Error(`emit-manifest: src/icons/keywords.json must list every icon once (missing: ${missing.join(", ") || "none"}; unknown: ${extra.join(", ") || "none"})`);
+}
+for (const name of icons) {
+  if (keywords[name].length === 0) throw new Error(`emit-manifest: ${name} has no keywords in src/icons/keywords.json`);
+}
+const iconDetails = {
+  props: iconProps[0].map((p) => ({
+    ...p,
+    description: p.description || ICON_PROP_DESCRIPTIONS[p.name] || PASSTHROUGH_DESCRIPTIONS[p.name] || "",
+  })),
+  attributes: inherited[icons[0]]?.parents.has("SVGAttributes") ? "SVGAttributes" : attributesOf(icons[0]),
+  keywords: Object.fromEntries(icons.map((n) => [n, keywords[n]])),
+};
+
 const contracts = JSON.parse(readFileSync(join(root, "src", "contracts.json"), "utf8")) as Record<string, string[]>;
+
+const hooks = HOOKS.map((h) => hookDoc(h.name, join(root, "src", h.file)));
 
 mkdirSync(join(root, "dist"), { recursive: true });
 writeFileSync(
   join(root, "dist", "manifest.json"),
-  JSON.stringify({ components: manifest, icons, contracts }, null, 2) + "\n",
+  JSON.stringify({ components: manifest, icons, iconDetails, hooks, contracts }, null, 2) + "\n",
 );
 
 // The names themselves go in a separate file: ~250 per component would
@@ -241,7 +356,17 @@ for (const name of COMPONENTS) {
   }
   attributeSetOf[name] = i;
 }
-writeFileSync(join(root, "dist", "attributes.json"), JSON.stringify({ sets, components: attributeSetOf }) + "\n");
+// D145: the SVG attributes every icon passes to its <svg>, one set for all.
+const iconNames = [...(inherited[icons[0]]?.names ?? [])].sort();
+let iconSet = setIndex.get(iconNames.join(","));
+if (iconSet === undefined) {
+  iconSet = sets.length;
+  sets.push(iconNames);
+}
+writeFileSync(
+  join(root, "dist", "attributes.json"),
+  JSON.stringify({ sets, components: attributeSetOf, icons: iconSet }) + "\n",
+);
 console.log(
   `[react] wrote dist/manifest.json (${manifest.length} components, ${icons.length} icons, ${sets.length} attribute sets)`,
 );

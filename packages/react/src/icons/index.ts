@@ -28,3 +28,12 @@ export { IconMoreHorizontal } from "./IconMoreHorizontal.js";
 export { IconMenu } from "./IconMenu.js";
 export { IconLogOut } from "./IconLogOut.js";
 export { IconSimCard } from "./IconSimCard.js";
+// D137 — navigation-section glyphs from Lucide; see THIRD-PARTY-NOTICES.md.
+export { IconShieldCheck } from "./IconShieldCheck.js";
+export { IconBlocks } from "./IconBlocks.js";
+export { IconFileCog } from "./IconFileCog.js";
+export { IconCrosshair } from "./IconCrosshair.js";
+export { IconCirclePlay } from "./IconCirclePlay.js";
+export { IconChartColumnBig } from "./IconChartColumnBig.js";
+export { IconScrollText } from "./IconScrollText.js";
+export { IconActivity } from "./IconActivity.js";

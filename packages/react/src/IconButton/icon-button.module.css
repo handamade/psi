@@ -11,8 +11,8 @@
   text-decoration: none;
   user-select: none;
   transition:
-    background-color var(--psi-duration-150) var(--psi-ease-standard),
-    color var(--psi-duration-150) var(--psi-ease-standard);
+    background-color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease),
+    color var(--psi-motion-feedback-duration) var(--psi-motion-feedback-ease);
 }
 
 .iconButton:focus-visible {
