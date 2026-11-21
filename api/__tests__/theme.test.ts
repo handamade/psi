@@ -64,10 +64,10 @@ function stubFetch(impl: typeof fetch): void {
  * The REAL Messages API response shape: `content` is a list of typed blocks.
  * The old stub here was `{ content: [{ text }] }` — no `type`, always exactly
  * one block — which is why the suite stayed green while every live call
- * returned 502. On Sonnet 5, omitting `thinking` runs adaptive thinking by
- * default, so `content[0]` was a `thinking` block, `content[0].text` was
- * `undefined`, and `JSON.parse("")` threw straight into
- * `502 {"error":"unparseable"}`.
+ * returned 502. On Sonnet 5 (and on Haiku 5.5, the model now), omitting
+ * `thinking` runs adaptive thinking by default, so `content[0]` was a
+ * `thinking` block, `content[0].text` was `undefined`, and `JSON.parse("")`
+ * threw straight into `502 {"error":"unparseable"}`.
  */
 function upstreamOk(text: string): Response {
   return {
@@ -174,10 +174,12 @@ describe("POST /api/theme", () => {
       expect(JSON.parse(res.body)).toMatchObject({ hue: 200, chroma: "vivid" });
     });
 
-    it("disables thinking and leaves room for the JSON object", async () => {
-      // Belt to the braces above: the request that cannot produce a leading
-      // thinking block in the first place. `max_tokens` bounds thinking and
-      // response text together, so both halves of the fix are asserted here.
+    it("asks Haiku 5.5 at low effort and leaves room for thinking and the JSON object", async () => {
+      // Haiku 5.5 thinks by default; low effort lets it skip thinking on a
+      // request this small, which is the lever its guidance names instead of
+      // disabling thinking. A thinking block can still lead the reply (the
+      // test above covers that), and `max_tokens` bounds thinking and text
+      // together, so the cap must leave room for both.
       const fetchSpy = vi.fn(async () => upstreamOk(VALID_VECTOR));
       globalThis.fetch = fetchSpy as unknown as typeof fetch;
 
@@ -187,9 +189,10 @@ describe("POST /api/theme", () => {
       expect(res.statusCode).toBe(200);
       const [, init] = fetchSpy.mock.calls[0] as unknown as [string, RequestInit];
       const sent = JSON.parse(init.body as string) as Record<string, unknown>;
-      expect(sent.thinking).toEqual({ type: "disabled" });
-      expect(sent.max_tokens).toBeGreaterThanOrEqual(512);
-      expect(sent.model).toBe("claude-sonnet-5");
+      expect(sent.model).toBe("claude-haiku-5-5");
+      expect(sent.output_config).toEqual({ effort: "low" });
+      expect(sent).not.toHaveProperty("thinking");
+      expect(sent.max_tokens).toBeGreaterThanOrEqual(1024);
     });
 
     it("strips extra keys the model invents — only BrandVector fields reach the 200 body", async () => {

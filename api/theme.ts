@@ -5,21 +5,25 @@ import {
   type BrandVector,
 } from "@handamade/psi-tokens/generate";
 
-const MODEL = "claude-sonnet-5";
+/**
+ * Haiku, not Sonnet: the reply is one five-field object drawn from closed
+ * sets, which is the classification-and-extraction work Haiku is built for,
+ * at about a twentieth of Sonnet 5's price per call. The AA solver runs on
+ * whatever comes back, so a weaker pick can never ship an inaccessible theme.
+ */
+const MODEL = "claude-haiku-5-5";
 const TIMEOUT_MS = 12_000;
 /**
- * Adaptive thinking runs BY DEFAULT on Sonnet 5 when `thinking` is omitted.
- * That is what made every real call here return 502: the first content block
- * came back as `{ type: "thinking" }`, `content[0].text` read `undefined`,
- * `JSON.parse("")` threw, and the handler answered `{"error":"unparseable"}` —
- * after paying for the upstream call. This endpoint wants one small JSON
- * object, so thinking is disabled outright rather than tuned.
+ * Haiku 5.5 runs adaptive thinking by default. Low effort, rather than
+ * disabling thinking, is the lever its guidance names: on a request this small
+ * it can skip thinking entirely. A reply may still open with a `thinking`
+ * block, which is why the parser below scans for the `text` block (reading
+ * `content[0]` once made every real call return 502).
  */
-const THINKING = { type: "disabled" } as const;
-// `max_tokens` bounds thinking AND response text together. 256 was tight even
-// for the bare vector; 512 is ample for the object the system prompt asks for
-// and still bounds a runaway reply.
-const MAX_TOKENS = 512;
+const OUTPUT_CONFIG = { effort: "low" } as const;
+// `max_tokens` bounds thinking AND response text together, so it leaves room
+// for some thinking ahead of the object and still bounds a runaway reply.
+const MAX_TOKENS = 1024;
 // This is a public, unauthenticated endpoint that makes a billed upstream
 // call per request — both bounds exist to stop someone from forcing that
 // call with an unbounded body. MAX_BODY_BYTES caps the raw bytes read off
@@ -125,7 +129,7 @@ export default async function handler(
       body: JSON.stringify({
         model: MODEL,
         max_tokens: MAX_TOKENS,
-        thinking: THINKING,
+        output_config: OUTPUT_CONFIG,
         system: SYSTEM,
         messages: [{ role: "user", content: prompt }],
       }),
