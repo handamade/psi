@@ -15,8 +15,8 @@ const EXPECTED = [
 ];
 
 describe("UI SDK ring rules (D146)", () => {
-  it("is pinned at 0.1.0-beta.18", () => {
-    expect(uiSdkVersion()).toBe("0.1.0-beta.18");
+  it("is pinned at 0.1.0-beta.17", () => {
+    expect(uiSdkVersion()).toBe("0.1.0-beta.17");
   });
 
   it("finds the nine ring rules of the pinned web.css, nested selectors resolved", () => {
