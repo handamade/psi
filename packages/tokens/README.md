@@ -36,7 +36,7 @@ All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, 
 To theme UI SDK's default look (`@ui-sdk/core/web.css`) with Psi tokens, import the bridge after it, behind this layer line:
 
 ```css
-@layer ui-sdk, psi.base, psi.theme, psi.components, psi.utilities, psi.ui-sdk;
+@layer ui-sdk, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities;
 @import "@handamade/psi-tokens/base.css";
 @import "@handamade/psi-tokens/light.css";
 @import "@handamade/psi-tokens/components.css";
@@ -44,6 +44,8 @@ To theme UI SDK's default look (`@ui-sdk/core/web.css`) with Psi tokens, import 
 @import "@ui-sdk/core/web.css";
 @import "@handamade/psi-tokens/ui-sdk.css";
 ```
+
+Brands retune it through Psi tokens, never through `--ui-*` directly: set the Psi token at a theme root (`:root` or a `[data-psi-theme]` element), where the map resolves.
 
 See the guide at `/docs/get-started/ui-sdk/`.
 

@@ -87,6 +87,9 @@ it, and Psi's React components never use UI SDK.
 @import "@handamade/psi-tokens/ui-sdk.css";
 ```
 
+(Superseded by the final-review amendment below: `psi.ui-sdk` moved to the
+first Psi layer, and the two lines in this section are stale.)
+
 The first line is the contract. `web.css` layers itself (fact 6), so it is
 imported plain. UI SDK's layer comes first and loses to everything.
 `psi.theme` then decides `color-scheme`, and `psi.ui-sdk` comes last among
@@ -289,8 +292,8 @@ border), and the role test in §5 holds that true.
   comparison's second recommendation and gets its own spec.
 - **Psi components built on `@ui-sdk/core`.** Revisit at UI SDK 1.0 or when
   Psi starts Popover, Date Picker, Slider or Tree.
-- **MCP.** `theme` and `search` do not mention the bridge in this change. If
-  the guide proves useful, a later change can index it like any other guide.
+- **MCP.** Superseded by the 2026-11-27 final-review amendment: the MCP
+  indexes the guide automatically.
 - **`--ui-shadow` from Psi.** This depends on Psi ever adding elevation
   tokens.
 - **Figma.** The library has nothing to reflect: no new Psi token or
@@ -320,6 +323,21 @@ border), and the role test in §5 holds that true.
   6.45 to 8.24 on `bgSecondary` across the four themes. §4's stop condition does
   not trigger. The gate is shared with consumer themes (D81), so a consumer theme
   whose focus colour is under 3:1 now fails its build. The changeset says so.
+
+- **Final review, 2026-11-27: `psi.ui-sdk` is the first Psi layer, not the
+  last.** §1's two layer lines are superseded by
+  `@layer ui-sdk, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities;`
+  and, with Tailwind,
+  `@layer theme, base, components, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities, utilities;`.
+  With the bridge last it beat Psi's own component rules on the same elements:
+  its `:is(a, summary):focus-visible` offset overrode NavTree's inset offset
+  (D82) and the sidebar scroller clipped the outer ring. The bridge only has
+  to beat `ui-sdk`, and no Psi layer declares `--ui-*`. The fixture gained a
+  case for the inset offset.
+- **Final review, 2026-11-27: the MCP indexes the guide.** `@handamade/psi-mcp`
+  bakes `@handamade/psi-docs` at publish, so adding `ui-sdk` to `GUIDE_ORDER`
+  ships `guide:ui-sdk` in `get` and `search`. The `./generate` contrast report
+  now covers 49 pairs, not 47. The changeset says both.
 
 ## Verification
 

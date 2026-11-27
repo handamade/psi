@@ -2,9 +2,9 @@
  * scripts/emit-bridges.ts into dist/ui-sdk.css, in @layer psi.ui-sdk. */
 
 export const UI_SDK_LAYER_LINE =
-  "@layer ui-sdk, psi.base, psi.theme, psi.components, psi.utilities, psi.ui-sdk;";
+  "@layer ui-sdk, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities;";
 export const UI_SDK_TAILWIND_LAYER_LINE =
-  "@layer theme, base, components, psi.base, psi.theme, psi.components, psi.utilities, psi.ui-sdk, utilities;";
+  "@layer theme, base, components, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities, utilities;";
 
 export const uiSdkTokenMap: Record<string, string> = {
   background: "var(--psi-bg-primary)",

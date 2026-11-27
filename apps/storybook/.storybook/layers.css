@@ -1,4 +1,5 @@
 /* D146: the consumer's layer line (spec §1), declared before base.css so that
- * UI SDK's layer ranks first and the bridge last. Empty for every story but
- * Integrations/UI SDK, so no other story renders differently. */
-@layer ui-sdk, psi.base, psi.theme, psi.components, psi.utilities, psi.ui-sdk;
+ * UI SDK's layer ranks first and the bridge right after it, before Psi's own
+ * layers. Empty for every story but Integrations/UI SDK, so no other story
+ * renders differently. */
+@layer ui-sdk, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities;

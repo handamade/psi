@@ -93,7 +93,7 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 
 ## UI SDK bridge (D146)
 ```css
-@layer ui-sdk, psi.base, psi.theme, psi.components, psi.utilities, psi.ui-sdk;
+@layer ui-sdk, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities;
 @import "@handamade/psi-tokens/base.css";
 @import "@handamade/psi-tokens/light.css";
 @import "@handamade/psi-tokens/components.css";
@@ -102,6 +102,6 @@ OKLCH formula-based design tokens. Code is the source of truth; all artifacts ge
 @import "@handamade/psi-tokens/ui-sdk.css";
 ```
 - `ui-sdk.css` only matters together with `@ui-sdk/core/web.css`; it is optional and nothing in Psi imports it.
-- Brands retune it through Psi tokens, never through `--ui-*` directly. The map is in `@handamade/psi-tokens/ui-sdk.json`.
+- Brands retune it through Psi tokens, never through `--ui-*` directly: set the Psi token at a theme root (`:root` or a `[data-psi-theme]` element), because the map resolves there. The map is in `@handamade/psi-tokens/ui-sdk.json`.
 
 Live MCP access to this data: see packages/mcp/llms.txt (hosted: https://psi.kurkin.de/mcp).
