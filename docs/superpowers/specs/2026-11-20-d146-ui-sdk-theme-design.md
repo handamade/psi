@@ -214,12 +214,12 @@ border), and the role test in §5 holds that true.
   `uiSdkLeftAlone: string[]` list from §2, and a `uiSdkColourRoles` record
   that tags each colour key with its role (`text`, `text-on-accent`,
   `surface`, `accent-fill`, `control-border`, `focus`, `scrim`,
-  `decorative`).
+  `decorative`, and `danger-text` for `destructive`, which aliases `fgDanger`).
 - **Emit.** `scripts/emit-bridges.ts`, called from `scripts/build.ts`, writes
   `dist/ui-sdk.css`: the layer block, the map, then the ring rules from §3.
   It reads `node_modules/@ui-sdk/core/web.css`.
 - **Pin.** `@ui-sdk/core` is an exact-version **devDependency** of
-  `@handamade/psi-tokens` (`0.1.0-beta.13`). It is never a dependency or
+  `@handamade/psi-tokens` (`0.1.0-beta.18`; see the amendment below). It is never a dependency or
   peerDependency. The published `ui-sdk.css` has no import of it. The guide
   states the UI SDK version the bridge was built against.
 - **Coverage test** (`packages/tokens`, vitest). It parses every
@@ -228,7 +228,7 @@ border), and the role test in §5 holds that true.
   hold too, so the map names nothing UI SDK does not declare. A UI SDK bump
   that adds a token fails here with the token's name.
 - **Ring test.** It runs the §3 extraction on the pinned `web.css` and asserts
-  the exact list of nine resolved selectors at beta.13 (eight `outline`, one
+  the exact list of nine resolved selectors at the pin (eight `outline`, one
   `box-shadow`). A parsing regression that finds fewer, or a bump that changes
   one, fails with the difference.
 - **Role test.** For each colour key, it checks that its value is one
@@ -256,8 +256,9 @@ border), and the role test in §5 holds that true.
   UI SDK's React Switch, Checkbox, Slider, Select (open) and Calendar with
   `web.css` and the bridge, once per Psi theme. `@ui-sdk/react` is pinned
   next to `@ui-sdk/core` as a devDependency of the Storybook app only.
-  `.storybook/preview.css` gains `@layer ui-sdk;` as its first statement, an
-  empty layer, so the preview's order matches §1. `web.css` sets global
+  a new `.storybook/layers.css`, imported by `preview.ts` before `base.css`,
+  holds §1's plain layer line, so the preview's order matches §1 (see the
+  amendment below). `web.css` sets global
   element rules (`a`, `hr`, `code`, `kbd`), so only this story file imports
   it. The 0-pixel `vr` gate (D89) confirms no other baseline moved. The new
   baselines come from CI's `vr-baselines` artifact (D89, D112).
@@ -268,7 +269,8 @@ border), and the role test in §5 holds that true.
   `GUIDE_ORDER` and labelled "UI SDK". It covers what the bridge is (a theme
   for UI SDK's default look, not a set of Psi components), the six imports
   and the layer line from §1, the Tailwind variant, what is mapped and what is
-  left alone (the tables of §2, rendered from the source map so they cannot
+  left alone (the tables of §2, rendered from `@handamade/psi-tokens/ui-sdk.json`,
+  which the build emits from the source map, so they cannot
   drift), the focus ring, and the UI SDK version it was built against.
 - **`packages/tokens/llms.txt`**: one section with the import block, a
   statement that the file only matters with `@ui-sdk/core/web.css`, and a
@@ -293,6 +295,30 @@ border), and the role test in §5 holds that true.
   tokens.
 - **Figma.** The library has nothing to reflect: no new Psi token or
   component.
+
+## Amendments, 2026-11-27 (planning)
+
+- **Pin `0.1.0-beta.18`, not beta.13.** Five betas shipped between 19 and 26
+  Nov. Measured on both: the same 36 `--ui-*` declarations and the same nine
+  ring rules with the same resolved selectors. The only differences are
+  child-combinator selectors on the combobox and date-picker parts. beta.18 is
+  the version a team installing UI SDK today gets.
+- **The Storybook layer line goes before `base.css`.** `preview.ts` imports
+  `base.css` first, and `base.css` opens with Psi's layer statement, so an
+  `@layer ui-sdk;` in `preview.css` (imported last) would put `ui-sdk` after
+  `psi`, and UI SDK's token block would beat the bridge. A
+  `.storybook/layers.css` imported first fixes the order for every story. Its
+  layers are empty for every story but the UI SDK one, so no baseline moves.
+- **`danger-text` role.** `destructive` aliases `fgDanger`, which the matrix
+  gates on `bgPrimary` and `bgSecondary`; none of §5's roles named it.
+- **`dist/ui-sdk.json`**, exported as `@handamade/psi-tokens/ui-sdk.json`:
+  the map, roles, the left-alone list and the pinned UI SDK version, so the
+  guide renders §2's tables the way `sizes-and-variants.mdx` renders
+  `guidance.json`.
+- **`borderFocus` measured before planning:** 5.91 to 8.76 on `bgPrimary` and
+  6.45 to 8.24 on `bgSecondary` across the four themes. §4's stop condition does
+  not trigger. The gate is shared with consumer themes (D81), so a consumer theme
+  whose focus colour is under 3:1 now fails its build. The changeset says so.
 
 ## Verification
 
