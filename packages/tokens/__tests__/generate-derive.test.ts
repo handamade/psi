@@ -42,8 +42,8 @@ const PROMPTS = [
 ];
 
 describe("deriveTheme", () => {
-  it("gates 47 pairs: the text matrix and the non-text pairs (D106, D120, D122) and D119's link pair", () => {
-    expect(AA_MATRIX).toHaveLength(47);
+  it("gates 49 pairs: the text matrix and the non-text pairs (D106, D120, D122), D119's link pair, and the D146 focus ring on both surfaces", () => {
+    expect(AA_MATRIX).toHaveLength(49);
   });
 
   it("returns both members from one vector", () => {
