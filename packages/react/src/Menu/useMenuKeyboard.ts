@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { KeyboardEvent, RefObject } from "react";
+import { handBackFocus, isFocusLost } from "../internal/focus/focusReturn.js";
+import type { FocusReturnEvent } from "../internal/focus/focusReturn.js";
 
 /** How long consecutive keystrokes accumulate into one typeahead query. */
 const TYPEAHEAD_RESET_MS = 500;
@@ -13,6 +15,8 @@ interface Options {
   onEsc: () => void;
   /** Tab or Shift Tab inside the open menu (D102). */
   onTab?: () => void;
+  /** D147: the consumer's onFocusReturn, kept current by Menu. */
+  onFocusReturnRef?: RefObject<((event: FocusReturnEvent<"close">) => void) | undefined>;
 }
 
 /** Roving-tabindex keyboard navigation for Menu (D53): Up/Down with wrap,
@@ -21,7 +25,7 @@ interface Options {
  * that disabled menu items stay focusable); MenuItem refuses to activate
  * them. Psi's first keyboard-navigation JS — a deliberate departure from D52,
  * which refused role="toolbar" precisely to avoid it. */
-export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc, onTab }: Options) {
+export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc, onTab, onFocusReturnRef }: Options) {
   const queryRef = useRef("");
   const queryAtRef = useRef(0);
 
@@ -41,12 +45,6 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
     },
     [menuItems],
   );
-
-  /** Moves focus back to the trigger's focusable node. */
-  const focusTrigger = useCallback(() => {
-    const triggerEl = triggerRef.current?.querySelector<HTMLElement>("button, a, [tabindex]");
-    triggerEl?.focus();
-  }, [triggerRef]);
 
   // Focus the first item on open; restore focus to the trigger on
   // close — but only if focus is still inside the menu.
@@ -71,10 +69,19 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
     const atLast = openAtRef?.current === "last";
     if (openAtRef) openAtRef.current = "first";
     focusItem(atLast ? items[items.length - 1] : items[0]);
+    // D147: hand focus back only from a menu that still holds it, so a light
+    // dismiss onto another control, or onto the page, is left alone.
     return () => {
-      if (popoverRef.current?.contains(document.activeElement)) focusTrigger();
+      const triggerEl = triggerRef.current?.querySelector<HTMLElement>("button, a, [tabindex]") ?? null;
+      handBackFocus({
+        departing: popoverRef.current,
+        includeNowhere: false,
+        candidates: [triggerEl],
+        reason: "close",
+        onFocusReturn: onFocusReturnRef?.current,
+      });
     };
-  }, [open, popoverRef, openAtRef, menuItems, focusItem, focusTrigger]);
+  }, [open, popoverRef, triggerRef, openAtRef, onFocusReturnRef, menuItems, focusItem]);
 
   // D131: a re-render that removes the focused item must not drop focus to
   // the page, where the menu's keyboard can no longer hear Esc or the arrows.
@@ -94,8 +101,8 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
     };
     const observer = new MutationObserver(() => {
       if (!last || last.el.isConnected) return;
-      const active = document.activeElement;
-      if (active && active !== document.body && !root.contains(active)) return;
+      // D147: the one rule. Focus the user moved out of the menu is left alone.
+      if (!isFocusLost(root)) return;
       const items = menuItems();
       const next = items[Math.min(last.index, items.length - 1)];
       last = null;

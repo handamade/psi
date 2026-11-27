@@ -11,6 +11,8 @@ import type { KeyboardEvent, ReactElement, ReactNode, Ref } from "react";
 import styles from "./menu.module.css";
 import { useMenuKeyboard } from "./useMenuKeyboard.js";
 import { useAnchoredPopup } from "../internal/popup/useAnchoredPopup.js";
+import { useLatestRef } from "../internal/focus/focusReturn.js";
+import type { FocusReturnEvent } from "../internal/focus/focusReturn.js";
 import { usePopupPlacement } from "../internal/popup/usePopupPlacement.js";
 import type { PopupPlacement } from "../internal/popup/usePopupPlacement.js";
 
@@ -19,6 +21,9 @@ export type MenuPlacement = PopupPlacement;
 /** Why Menu reports a dismissal (D50, D102). Annotate a handler with this
  * rather than restating the union, so a new reason reaches it. */
 export type MenuCloseReason = "esc" | "outside" | "item-select" | "tab";
+
+/** Why Menu hands focus back (D147). */
+export type MenuFocusReturnReason = "close";
 
 export interface MenuContextValue {
   close: (reason: "item-select") => void;
@@ -49,6 +54,12 @@ export interface MenuProps {
    * the next control as the browser moves it; the consumer flips `open`.
    */
   onClose: (reason: MenuCloseReason) => void;
+  /** Called when the menu closes while focus is inside it and Psi is about to
+   * return focus to the trigger (D147): `event.target` is the trigger. Focus
+   * your own element in the handler to take over, or call `preventDefault()`
+   * to leave focus where it is. Not called after a light dismiss or Tab moved
+   * focus elsewhere. See the Focus guide. */
+  onFocusReturn?: (event: FocusReturnEvent<MenuFocusReturnReason>) => void;
   /**
    * The trigger element. Must be a single React element that spreads unknown
    * props onto a focusable node (a Psi `Button`, say): Menu clones it to add
@@ -96,6 +107,7 @@ export interface MenuProps {
 export function Menu({
   open,
   onClose,
+  onFocusReturn,
   trigger,
   placement = "bottom-start",
   children,
@@ -113,6 +125,7 @@ export function Menu({
   // D102: which end of the menu an arrow key on the closed trigger asked for;
   // read once by the open effect in useMenuKeyboard.
   const openAtRef = useRef<"first" | "last">("first");
+  const onFocusReturnRef = useLatestRef(onFocusReturn);
 
   // D130: the popup and its placement are internal layers Menu shares with
   // the Combobox. Menu keeps the platform's light dismiss ("auto").
@@ -142,6 +155,7 @@ export function Menu({
     openAtRef,
     onEsc: () => onClose("esc"),
     onTab: () => onClose("tab"),
+    onFocusReturnRef,
   });
 
   // D102: Arrow Down / Arrow Up on the closed trigger open the menu on its

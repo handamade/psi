@@ -3,6 +3,7 @@ import type { CSSProperties, MouseEvent } from "react";
 import styles from "./pagination.module.css";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { isFocusLost } from "../internal/focus/focusReturn.js";
 
 function range(start: number, end: number): number[] {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
@@ -186,8 +187,8 @@ export function Pagination({
     const arrow = pressedArrow.current;
     pressedArrow.current = null;
     if (!(arrow instanceof HTMLButtonElement) || !arrow.disabled) return;
-    const active = document.activeElement;
-    if (active !== arrow && active !== document.body && active !== null) return;
+    // D147: the one rule — focus still on the disabled arrow, or fallen to nowhere.
+    if (!isFocusLost(arrow)) return;
     navRef.current?.querySelector<HTMLElement>('[aria-current="page"]')?.focus();
   }, [effectivePage, pageCount]);
 

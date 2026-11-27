@@ -1,6 +1,11 @@
 import { useLayoutEffect, useRef } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
 import styles from "./app-shell.module.css";
+import { handBackFocus, isFocusLost, useLatestRef } from "../internal/focus/focusReturn.js";
+import type { FocusReturnEvent } from "../internal/focus/focusReturn.js";
+
+/** Why AppShell hands focus back (D147). */
+export type AppShellFocusReturnReason = "sidebar-close";
 
 export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   /** A `SkipLink` (D88), rendered first so it is the first tab stop. Point its
@@ -52,6 +57,11 @@ export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "chi
   /** `id` of the sidebar element, which a toggle names with `aria-controls`
    * (D88). @default "sidebar" */
   sidebarId?: string;
+  /** Called when the sidebar closes while focus is inside it and Psi is about
+   * to move focus to the toggle, or to `main` (D142, D147): `event.target` is
+   * where it is going. Focus your own element in the handler to take over, or
+   * call `preventDefault()` to leave focus where it is. See the Focus guide. */
+  onFocusReturn?: (event: FocusReturnEvent<AppShellFocusReturnReason>) => void;
   /** `id` of `<main>`, which a `SkipLink`'s `href` names (D88). @default "main" */
   mainId?: string;
   className?: string;
@@ -112,6 +122,7 @@ export function AppShell({
   sidebarTheme,
   sidebarId = "sidebar",
   mainId = "main",
+  onFocusReturn,
   className,
   ref,
   ...rest
@@ -125,26 +136,34 @@ export function AppShell({
     .join(" ");
   const sidebarRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const onFocusReturnRef = useLatestRef(onFocusReturn);
 
   // D142: a sidebar that closes around focus hands it on, in both modes, before
   // it is hidden; otherwise the browser drops it to <body>. First choice is the
   // toggle that names the sidebar with aria-controls (D88 asks for one), else
   // main, the skip link's target. Content that goes away (sidebar to null)
   // removes the focused node before any effect runs, as in D136; not handled.
+  // D147: `onFocusReturn` sees the move.
   useLayoutEffect(() => {
     if (showSidebar) return;
     const aside = sidebarRef.current;
     const doc = aside?.ownerDocument;
-    const active = doc?.activeElement;
-    if (!aside || !active || !aside.contains(active)) return;
+    // D147: hand back only from a sidebar that still holds focus.
+    if (!aside || !doc || !isFocusLost(aside, { includeNowhere: false })) return;
     const toggle = [...doc.querySelectorAll<HTMLElement>("[aria-controls]")].find(
       (el) =>
         !aside.contains(el) &&
         (el.getAttribute("aria-controls") ?? "").split(/\s+/).includes(sidebarId) &&
         !el.matches(":disabled"),
     );
-    (toggle ?? mainRef.current)?.focus();
-  }, [showSidebar, sidebarId]);
+    handBackFocus({
+      departing: aside,
+      includeNowhere: false,
+      candidates: [toggle, mainRef.current],
+      reason: "sidebar-close",
+      onFocusReturn: onFocusReturnRef.current,
+    });
+  }, [showSidebar, sidebarId, onFocusReturnRef]);
   // The rounded corner needs both a header and a sidebar beside it (D110).
   const mainCls = [styles.main, (!showSidebar || header == null) && styles.mainSquare].filter(Boolean).join(" ");
   return (

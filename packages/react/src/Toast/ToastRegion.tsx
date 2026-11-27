@@ -3,15 +3,26 @@ import type { HTMLAttributes, ReactNode, Ref } from "react";
 import { Announcement } from "./Announcement.js";
 import { Toast } from "./Toast.js";
 import type { ToastPoliteness, ToastVariant } from "./Toast.js";
+import { handBackFocus, isFocusLost, useLatestRef } from "../internal/focus/focusReturn.js";
+import type { FocusReturnEvent } from "../internal/focus/focusReturn.js";
 import styles from "./toast.module.css";
 
 export type ToastPlacement = "top-start" | "top-end" | "bottom-start" | "bottom-end";
+
+/** Why ToastRegion hands focus back (D147). */
+export type ToastFocusReturnReason = "toast-removed";
 
 /** The region is a `region` landmark (D90), named by `aria-label` — a name on a
  * role-less `div` is prohibited by ARIA — and `role` is not overridable. */
 export interface ToastRegionProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   /** Corner the stack occupies. @default "bottom-end" */
   placement?: ToastPlacement;
+  /** Called when the toast that held focus is removed and Psi is about to hand
+   * focus on (D147): `event.target` is where it is going. Focus your own
+   * element in the handler to take over, or call `preventDefault()` to leave
+   * focus where it is. Not called when focus had already gone elsewhere. See
+   * the Focus guide. */
+  onFocusReturn?: (event: FocusReturnEvent<ToastFocusReturnReason>) => void;
   /** Accessible name for the region landmark. @default "Notifications" */
   "aria-label"?: string;
   /** The stack — `Toast` and `Announcement` elements, each routed to a live
@@ -124,16 +135,19 @@ function nextControl(before: HTMLElement[], now: HTMLElement[], lost: HTMLElemen
  * before focus entered the region, then to the region itself
  * (`tabindex="-1"`). A pointer dismissal goes back first: a mouse user who
  * clicked an X is leaving the stack, and focus left in it would hold the
- * provider's timers paused. Focus the user moved elsewhere is left alone. */
+ * provider's timers paused. Focus the user moved elsewhere is left alone.
+ * `onFocusReturn` sees the move, and can take it over or decline it (D147). */
 export function ToastRegion({
   placement = "bottom-end",
   "aria-label": ariaLabel = "Notifications",
   children,
+  onFocusReturn,
   className,
   ref,
   ...rest
 }: ToastRegionProps) {
   const innerRef = useRef<HTMLDivElement | null>(null);
+  const onFocusReturnRef = useLatestRef(onFocusReturn);
 
   const setRef = (node: HTMLDivElement | null) => {
     innerRef.current = node;
@@ -198,21 +212,27 @@ export function ToastRegion({
       const before = snapshot;
       snapshot = toastsIn(root);
       if (!held || held.isConnected) return;
-      const active = document.activeElement;
-      if (active && active !== document.body && active !== document.documentElement) return;
       const lost = held;
       held = null;
+      // D147: focus went somewhere else first (a consumer moved it during its
+      // own commit). Forget the region's state, so a later toast finds nothing
+      // to hand back and cannot steal focus.
+      if (!isFocusLost(lost)) {
+        cameFrom = null;
+        return;
+      }
       const back = cameFrom?.isConnected ? cameFrom : null;
       const next = byPointer && back ? null : nextControl(before, snapshot, lost);
-      for (const target of [next, back]) {
-        if (!target) continue;
-        target.focus();
-        if (document.activeElement === target) {
-          if (target === back) cameFrom = null;
-          return;
-        }
-      }
-      root.focus();
+      handBackFocus({
+        departing: lost,
+        candidates: [next, back, root],
+        reason: "toast-removed",
+        onFocusReturn: onFocusReturnRef.current ?? undefined,
+      });
+      // The hand-back is over. A consumer's handler may have taken focus out
+      // of the region or prevented the move, so `focused` is not enough: once
+      // focus is not inside the region, forget where it came from.
+      if (!root.contains(root.ownerDocument.activeElement)) cameFrom = null;
     });
 
     root.addEventListener("focusin", onFocusIn);

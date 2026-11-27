@@ -4,7 +4,8 @@ import { Announcement } from "./Announcement.js";
 import { Toast } from "./Toast.js";
 import type { ToastPoliteness, ToastVariant } from "./Toast.js";
 import { ToastRegion } from "./ToastRegion.js";
-import type { ToastPlacement } from "./ToastRegion.js";
+import type { ToastFocusReturnReason, ToastPlacement } from "./ToastRegion.js";
+import type { FocusReturnEvent } from "../internal/focus/focusReturn.js";
 import { ToastContext } from "./useToast.js";
 import type { AnnounceOptions, ToastHandle, ToastOptions } from "./useToast.js";
 
@@ -27,6 +28,9 @@ export interface ToastProviderProps extends Omit<HTMLAttributes<HTMLDivElement>,
   actionDuration?: number;
   /** Corner the stack occupies. @default "bottom-end" */
   placement?: ToastPlacement;
+  /** Forwarded to ToastRegion: called when the toast that held focus is
+   * removed and Psi is about to hand focus on (D147). See the Focus guide. */
+  onFocusReturn?: (event: FocusReturnEvent<ToastFocusReturnReason>) => void;
   /** The dismiss button's accessible name on every queued toast (D117) — pass
    * the translated string. A toast's own `dismissLabel` from `show()` wins.
    * Read at render, so changing it renames toasts already on screen. Unset, the

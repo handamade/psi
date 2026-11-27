@@ -201,6 +201,6 @@ describe("loadDocsInput", () => {
     expect(input.examples.map((e) => `${e.slug}/${e.name}`)).toEqual(
       [...input.examples.map((e) => `${e.slug}/${e.name}`)].sort((a, b) => a.localeCompare(b)),
     );
-    expect(input.guides.map((g) => g.id)).toEqual(["installation", "theming", "dark-mode", "ai", "sizes-and-variants", "ui-sdk"]);
+    expect(input.guides.map((g) => g.id)).toEqual(["installation", "theming", "dark-mode", "ai", "sizes-and-variants", "ui-sdk", "focus"]);
   });
 });
