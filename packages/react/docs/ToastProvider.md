@@ -11,6 +11,7 @@ Owns the toast queue, its auto-dismiss timers, and the single ToastRegion (D65).
 | `duration` | `number` | 5000 | no | Auto-dismiss for toasts with no action, in ms. |
 | `actionDuration` | `number` | 10000 | no | Auto-dismiss for toasts carrying an action, in ms. An affordance that vanishes before it can be reached is not an affordance. |
 | `placement` | `"top-start" \| "top-end" \| "bottom-start" \| "bottom-end"` | bottom-end | no | Corner the stack occupies. |
+| `onFocusReturn` | `((event: FocusReturnEvent<"toast-removed">) => void)` | — | no | Forwarded to ToastRegion: called when the toast that held focus is removed and Psi is about to hand focus on (D147). See the Focus guide. |
 | `dismissLabel` | `string` | "Dismiss notification" | no | The dismiss button's accessible name on every queued toast (D117) — pass the translated string. A toast's own `dismissLabel` from `show()` wins. Read at render, so changing it renames toasts already on screen. Unset, the toast's default applies. |
 | `children` | `ReactNode` | — | yes | The subtree that may call `useToast()`. The region is rendered alongside it. |
 | `aria-label` | `string` | "Notifications" | no | Accessible name for the region landmark, forwarded to ToastRegion. |

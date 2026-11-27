@@ -64,7 +64,7 @@ export const tokenPages: TokenPage[] = [
   { slug: "layout", title: "Layout", covers: ["scales.layout"] },
 ];
 
-export const GUIDE_ORDER = ["installation", "theming", "dark-mode", "ai", "sizes-and-variants", "ui-sdk"] as const;
+export const GUIDE_ORDER = ["installation", "theming", "dark-mode", "ai", "sizes-and-variants", "ui-sdk", "focus"] as const;
 export type GuideId = (typeof GUIDE_ORDER)[number];
 export const GUIDE_LABELS: Record<GuideId, string> = {
   installation: "Installation",
@@ -73,4 +73,5 @@ export const GUIDE_LABELS: Record<GuideId, string> = {
   ai: "Using Psi with AI",
   "sizes-and-variants": "Sizes and variants",
   "ui-sdk": "UI SDK",
+  focus: "Focus",
 };

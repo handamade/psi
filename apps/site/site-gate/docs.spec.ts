@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 import { BASE, runAxe } from "./helpers";
 
 const TOKEN_SLUGS = ["color", "typography", "display", "spacing", "motion", "layout"];
-const GUIDE_IDS = ["installation", "theming", "dark-mode", "ai", "sizes-and-variants", "ui-sdk"];
+const GUIDE_IDS = ["installation", "theming", "dark-mode", "ai", "sizes-and-variants", "ui-sdk", "focus"];
 
 
 test.describe("docs without JavaScript", () => {

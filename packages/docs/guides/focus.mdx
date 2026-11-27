@@ -1,0 +1,70 @@
+---
+title: Focus
+description: When Psi moves focus for you, where it goes, and how to see, decline or redirect the move.
+order: 7
+---
+
+Psi moves focus in two cases: when a part of the page that holds focus closes or goes away, and when the focused part of a widget disappears. It follows one rule for both.
+
+## The rule
+
+**Psi moves focus only when focus is lost.** Focus is lost when the element that held it is leaving, being removed, hidden or disabled, and focus has gone nowhere else. If the user or your code has already put focus somewhere, Psi leaves it there.
+
+A container that is still in the page, such as a closing `Menu`, `Dialog` or sidebar, hands focus back only while focus is inside it. A click on the page that moved focus to `<body>` is the user's move, and stays.
+
+## Hand-backs
+
+| Component | When | Where focus goes | `reason` |
+| --- | --- | --- | --- |
+| `Dialog` | It closes, or is removed while open | The opener, restored by the platform | `"close"`, `"unmount"` |
+| `Menu` | It closes while focus is inside | The trigger | `"close"` |
+| `AppShell` | The sidebar closes while focus is inside | The toggle whose `aria-controls` names the sidebar, else `main` | `"sidebar-close"` |
+| `ToastRegion` | The toast that held focus is removed | The toast now at its position; after a pointer dismissal, or once the stack is empty, the element focused before the region; else the region | `"toast-removed"` |
+
+Each takes `onFocusReturn`. `ToastProvider` passes it to its region.
+
+## Taking part: `onFocusReturn`
+
+```ts
+interface FocusReturnEvent<R extends string> {
+  readonly target: HTMLElement | null; // where Psi is about to put focus
+  readonly reason: R;
+  preventDefault(): void;              // Psi does not move focus
+  readonly defaultPrevented: boolean;
+}
+```
+
+It runs at the moment of the hand-back, and only when focus is lost.
+
+- **Take over:** focus your own element in the handler. Psi sees that focus is no longer lost and does not move it.
+- **Opt out:** call `event.preventDefault()` and focus nothing.
+- **Accept:** do nothing, or read `target` and `reason`.
+
+```tsx
+<Dialog
+  open={open}
+  onClose={() => setOpen(false)}
+  title="Delete row"
+  onFocusReturn={() => nextRowRef.current?.focus()}
+>
+  …
+</Dialog>
+```
+
+After the row is deleted, focus goes to the next row, not to the menu button that opened the dialog and went away with the row.
+
+**`Dialog` reports after the fact.** The browser returns focus to the opener inside the dialog's `close()`, and nothing can stop that. Until it closes, a modal dialog makes the rest of the page inert, so a handler run earlier could not focus anything outside it. `Dialog` therefore calls `onFocusReturn` after the restore. `target` is the opener, which already has focus. Focusing another element in the handler still takes over. `preventDefault()` does nothing.
+
+## Rescues inside a widget
+
+These keep focus inside a Psi widget, so its keyboard keeps working. They follow the same rule and take no handler.
+
+| Component | When | Where focus goes |
+| --- | --- | --- |
+| `Menu` | The focused item is removed | The item now at its position; in an empty menu, the menu |
+| `Pagination` | The arrow you pressed becomes disabled | The current page |
+| `CursorPagination` | The arrow you pressed becomes disabled | The other arrow |
+
+## Not covered
+
+Focus a widget manages for itself (`Combobox`'s input, moving between `Tabs`, a `Menu` or `Dialog` focusing its first control on open) is not a hand-back. An `AppShell` whose `sidebar` content is removed while it holds focus loses that focus before Psi can act: close the sidebar first, with `sidebarOpen={false}`.
