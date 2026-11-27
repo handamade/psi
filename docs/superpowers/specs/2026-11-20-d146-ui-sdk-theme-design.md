@@ -219,7 +219,7 @@ border), and the role test in §5 holds that true.
   `dist/ui-sdk.css`: the layer block, the map, then the ring rules from §3.
   It reads `node_modules/@ui-sdk/core/web.css`.
 - **Pin.** `@ui-sdk/core` is an exact-version **devDependency** of
-  `@handamade/psi-tokens` (`0.1.0-beta.18`; see the amendment below). It is never a dependency or
+  `@handamade/psi-tokens` (`0.1.0-beta.17`; see the amendment below). It is never a dependency or
   peerDependency. The published `ui-sdk.css` has no import of it. The guide
   states the UI SDK version the bridge was built against.
 - **Coverage test** (`packages/tokens`, vitest). It parses every
@@ -298,11 +298,12 @@ border), and the role test in §5 holds that true.
 
 ## Amendments, 2026-11-27 (planning)
 
-- **Pin `0.1.0-beta.18`, not beta.13.** Five betas shipped between 19 and 26
-  Nov. Measured on both: the same 36 `--ui-*` declarations and the same nine
-  ring rules with the same resolved selectors. The only differences are
-  child-combinator selectors on the combobox and date-picker parts. beta.18 is
-  the version a team installing UI SDK today gets.
+- **Pin `0.1.0-beta.17`, not beta.13.** Five betas shipped between 19 and 26
+  Nov. Measured on beta.13, beta.17 and beta.18: the same 36 `--ui-*`
+  declarations and the same nine ring rules with the same resolved selectors.
+  The only differences are child-combinator selectors on the combobox and
+  date-picker parts. beta.18 was a day old, under the workspace's pnpm release
+  age, so the pin is beta.17 with no exemption (user's decision, 27 Nov).
 - **The Storybook layer line goes before `base.css`.** `preview.ts` imports
   `base.css` first, and `base.css` opens with Psi's layer statement, so an
   `@layer ui-sdk;` in `preview.css` (imported last) would put `ui-sdk` after
