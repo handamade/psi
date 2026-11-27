@@ -20,7 +20,8 @@
       "types": "./dist/theme/index.d.ts",
       "import": "./dist/theme/index.js"
     },
-    "./guidance.json": "./dist/guidance.json"
+    "./guidance.json": "./dist/guidance.json",
+    "./ui-sdk.json": "./dist/ui-sdk.json"
   },
   "bin": {
     "psi-theme": "./dist/cli/psi-theme.js"

@@ -23,6 +23,8 @@ import { BUTTON_VARIANTS } from "../src/components/button.js";
 import { sizeScale } from "../src/scales/sizes.js";
 import { breakpoints } from "../src/scales/layout.js";
 import { guidance } from "../src/guidance.js";
+import { emitUiSdkCSS, emitUiSdkJSON } from "./emit-bridges.js";
+import { readUiSdkWebCss, uiSdkVersion } from "../src/bridges/ui-sdk-source.js";
 
 import type { ColorScheme, Palette, SlotMap } from "../src/dsl/types.js";
 
@@ -190,6 +192,12 @@ function build(): void {
     JSON.stringify({ ...guidance, utilities: emitUtilitiesRoster() }, null, 2),
   );
   console.log("  wrote dist/guidance.json");
+
+  // 7. D146: the UI SDK bridge, from the pinned devDependency.
+  writeFileSync(join(distDir, "ui-sdk.css"), emitUiSdkCSS(readUiSdkWebCss(), uiSdkVersion()));
+  console.log("  wrote dist/ui-sdk.css");
+  writeFileSync(join(distDir, "ui-sdk.json"), emitUiSdkJSON(uiSdkVersion()));
+  console.log("  wrote dist/ui-sdk.json");
 
   console.log("[tokens] Build complete.");
 }
