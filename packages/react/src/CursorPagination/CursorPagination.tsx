@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { MouseEvent } from "react";
 import styles from "./cursor-pagination.module.css";
 import { Button } from "../Button/Button.js";
+import { isFocusLost } from "../internal/focus/focusReturn.js";
 import { IconChevronLeft, IconChevronRight } from "../icons/index.js";
 
 export interface CursorPaginationProps {
@@ -65,8 +66,8 @@ export function CursorPagination({
     const [from, to] = which === "previous" ? [previousRef.current, nextRef.current] : [nextRef.current, previousRef.current];
     if (!(from instanceof HTMLButtonElement) || !from.disabled) return;
     if (!(to instanceof HTMLButtonElement) || to.disabled) return;
-    const active = document.activeElement;
-    if (active !== from && active !== document.body && active !== null) return;
+    // D147: the one rule — focus still on the disabled arrow, or fallen to nowhere.
+    if (!isFocusLost(from)) return;
     to.focus();
   }, [hasPrevious, hasNext]);
 

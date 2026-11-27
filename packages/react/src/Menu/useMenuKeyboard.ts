@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { KeyboardEvent, RefObject } from "react";
+import { isFocusLost } from "../internal/focus/focusReturn.js";
 
 /** How long consecutive keystrokes accumulate into one typeahead query. */
 const TYPEAHEAD_RESET_MS = 500;
@@ -94,8 +95,8 @@ export function useMenuKeyboard({ popoverRef, triggerRef, open, openAtRef, onEsc
     };
     const observer = new MutationObserver(() => {
       if (!last || last.el.isConnected) return;
-      const active = document.activeElement;
-      if (active && active !== document.body && !root.contains(active)) return;
+      // D147: the one rule. Focus the user moved out of the menu is left alone.
+      if (!isFocusLost(root)) return;
       const items = menuItems();
       const next = items[Math.min(last.index, items.length - 1)];
       last = null;
