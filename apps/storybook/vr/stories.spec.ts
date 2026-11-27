@@ -32,6 +32,12 @@ for (const s of stories) {
           document.querySelector("[data-psi-combobox-popup]")?.matches(":popover-open"),
         );
       }
+      if (s.id === "integrations-ui-sdk--select-open") {
+        // D146: defaultOpen shows the popup as a popover; wait for it, not the settle.
+        await page.waitForFunction(() =>
+          document.querySelector('[data-slot="select-content"]')?.matches(":popover-open"),
+        );
+      }
       await page.waitForTimeout(250); // fonts/HMR-free settle
       await expect(page).toHaveScreenshot(`${s.id}--${theme}.png`, { fullPage: true });
     });
