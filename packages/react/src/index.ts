@@ -100,7 +100,7 @@ export type { CursorPaginationProps } from "./CursorPagination/CursorPagination.
 export { Toast } from "./Toast/Toast.js";
 export type { ToastProps, ToastVariant, ToastPoliteness } from "./Toast/Toast.js";
 export { ToastRegion } from "./Toast/ToastRegion.js";
-export type { ToastRegionProps, ToastPlacement } from "./Toast/ToastRegion.js";
+export type { ToastRegionProps, ToastPlacement, ToastFocusReturnReason } from "./Toast/ToastRegion.js";
 export { ToastProvider } from "./Toast/ToastProvider.js";
 export type { ToastProviderProps } from "./Toast/ToastProvider.js";
 export { Announcement } from "./Toast/Announcement.js";
