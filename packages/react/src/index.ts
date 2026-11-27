@@ -34,7 +34,7 @@ export type { FieldLabelPosition } from "./FieldStack/FieldStackContext.js";
 export { useFieldControl } from "./Field/useFieldControl.js";
 export type { FieldControlProps } from "./Field/useFieldControl.js";
 export { Dialog } from "./Dialog/Dialog.js";
-export type { DialogProps } from "./Dialog/Dialog.js";
+export type { DialogProps, DialogFocusReturnReason } from "./Dialog/Dialog.js";
 export type { FocusReturnEvent } from "./internal/focus/focusReturn.js";
 export { Input } from "./Input/Input.js";
 export type { InputProps } from "./Input/Input.js";
