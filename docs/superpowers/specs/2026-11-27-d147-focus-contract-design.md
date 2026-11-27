@@ -139,7 +139,7 @@ so there is no event.
   analytics.
 
 The handler runs synchronously, inside the hand-back. That is the moment
-WEB-2140 had to find by hand.
+the consumer had to find by hand.
 
 **`Dialog` is the one exception, because of the platform.** `close()` restores
 focus to the dialog's "previously focused element", and nothing can stop that

@@ -223,13 +223,16 @@ export function ToastRegion({
       }
       const back = cameFrom?.isConnected ? cameFrom : null;
       const next = byPointer && back ? null : nextControl(before, snapshot, lost);
-      const focused = handBackFocus({
+      handBackFocus({
         departing: lost,
         candidates: [next, back, root],
         reason: "toast-removed",
         onFocusReturn: onFocusReturnRef.current ?? undefined,
       });
-      if (focused === back) cameFrom = null;
+      // The hand-back is over. A consumer's handler may have taken focus out
+      // of the region or prevented the move, so `focused` is not enough: once
+      // focus is not inside the region, forget where it came from.
+      if (!root.contains(root.ownerDocument.activeElement)) cameFrom = null;
     });
 
     root.addEventListener("focusin", onFocusIn);

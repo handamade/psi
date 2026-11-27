@@ -2,7 +2,7 @@
 // onFocusReturn, and a removal the consumer already handled leaves no stale
 // state behind. { hidden: true } is not needed: no role queries.
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Toast } from "./Toast.js";
 import { ToastRegion } from "./ToastRegion.js";
 import type { FocusReturnEvent } from "../internal/focus/focusReturn.js";
@@ -93,5 +93,24 @@ describe("ToastRegion: a removal the consumer handled leaves no stale state", ()
     await Promise.resolve();
     await Promise.resolve();
     expect(document.body).toHaveFocus();
+  });
+
+  it("forgets the opener when the handler prevented the hand-back", async () => {
+    const prevent = (e: FocusReturnEvent<"toast-removed">) => e.preventDefault();
+    const { rerender } = render(<Stack ids={["A"]} onFocusReturn={prevent} />);
+    enterFromOpener(dismissOf("A"));
+    rerender(<Stack ids={[]} onFocusReturn={prevent} />);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(document.body).toHaveFocus();
+    // A new toast is entered from the page (no relatedTarget), then dismissed
+    // by pointer: focus must not go to the opener of the earlier toast.
+    rerender(<Stack ids={["B"]} onFocusReturn={prevent} />);
+    fireEvent.pointerDown(dismissOf("B"));
+    dismissOf("B").focus();
+    rerender(<Stack ids={[]} />);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(opener()).not.toHaveFocus();
   });
 });

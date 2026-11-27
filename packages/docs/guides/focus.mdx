@@ -53,7 +53,7 @@ It runs at the moment of the hand-back, and only when focus is lost.
 
 After the row is deleted, focus goes to the next row, not to the menu button that opened the dialog and went away with the row.
 
-**`Dialog` reports after the fact.** The browser returns focus to the opener inside the dialog's `close()`, and nothing can stop that. Until it closes, a modal dialog makes the rest of the page inert, so a handler run earlier could not focus anything outside it. `Dialog` therefore calls `onFocusReturn` after the restore. `target` is the opener, which already has focus. Focusing another element in the handler still takes over. `preventDefault()` does nothing.
+**`Dialog` reports after the fact.** The browser returns focus to the opener inside the dialog's `close()`, and nothing can stop that. Until it closes, a modal dialog makes the rest of the page inert, so a handler run earlier could not focus anything outside it. `Dialog` therefore calls `onFocusReturn` after the restore. `target` is the element the platform focused, usually the opener, or null when the opener is gone. Focusing another element in the handler still takes over. `preventDefault()` does nothing.
 
 ## Rescues inside a widget
 
