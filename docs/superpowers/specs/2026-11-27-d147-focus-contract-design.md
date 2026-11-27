@@ -277,3 +277,36 @@ pnpm build && node tools/check-docs-drift.mjs && pnpm test && pnpm lint && pnpm 
 `vr` runs in CI only and should report 0 differing pixels.
 `check-docs-drift` will catch the guide count. The docs site and the MCP
 gain one guide each.
+
+## Amendments, 2026-11-27 (planning)
+
+- **`isFocusLost` takes `{ includeNowhere }`, default `true`.** Read against
+  the code, three hand-backs guard on containment alone. `Menu`'s close,
+  `AppShell`'s sidebar and `Dialog` act only when the departing container
+  still holds focus. A light dismiss onto a blank part of the page leaves
+  focus on `<body>`, and today `Menu` leaves it there. Counting `<body>` as
+  lost for them would pull focus back to the trigger. So those three call
+  `isFocusLost(el, { includeNowhere: false })`, and the rescues and
+  `ToastRegion`, whose departing element is already gone or disabled, keep
+  the default. The rule reads: Psi hands focus back only from an element that
+  held it. For a container still in the document that means focus is inside
+  it. For an element already gone or disabled, it means focus fell to nowhere
+  or stayed on the element. This is what keeps §1's "behaviour is unchanged"
+  true.
+- **`handBackFocus` takes ordered `candidates`, not `target` and
+  `fallback`.** `ToastRegion` cannot probe whether a candidate accepts focus
+  without moving focus. So the helper takes the list (`ToastRegion`: next
+  control, the element focused before, the region; `AppShell`: toggle,
+  `main`; `Menu`: the trigger). `event.target` is the first non-null
+  candidate. After the handler, the helper focuses the candidates in order
+  until one holds focus, and returns that element, or null. `ToastRegion`
+  uses the return value to forget `cameFrom` once focus has gone back, as it
+  does today.
+- **Latest-handler ref.** `useLatestRef(value)` in `internal/focus/`
+  updates a ref in a layout effect with no dependency list. Each component
+  calls it before the effect that hands focus back, so the handler is never
+  stale.
+- **Exported names.** `FocusReturnEvent`, and one reason alias per
+  component, mirroring `MenuCloseReason`: `DialogFocusReturnReason`,
+  `MenuFocusReturnReason`, `AppShellFocusReturnReason` and
+  `ToastFocusReturnReason`.
