@@ -239,6 +239,13 @@ export function tokenPageMd(input: DocsInput, page: TokenPage): string {
   return out.join("\n\n") + "\n";
 }
 
+function uiSdkTable(input: DocsInput): string {
+  return table(
+    ["UI SDK token", "Psi value", "Role"],
+    input.uiSdk.map.map((m) => [`\`${m.name}\``, `\`${m.value}\``, m.role ?? "size or font"]),
+  );
+}
+
 function variantsTable(input: DocsInput): string {
   return table(
     ["Variant", "Intent", "Typical use"],
@@ -262,7 +269,14 @@ export function guideMd(input: DocsInput, guide: GuideSource): string {
       if (i % 2 === 1) return part; // fenced code stays as written
       return part
         .replace(/^import [^\n]*\n/gm, "")
+        .replace(/<pre tabIndex=\{0\}><code>\{`\$\{bridge\.layerLine\}\n([\s\S]*?)`\}<\/code><\/pre>/, (_, rest: string) =>
+          fence("css", `${input.uiSdk.layerLine}\n${rest}`),
+        )
+        .replace(/<pre tabIndex=\{0\}><code>\{bridge\.tailwindLayerLine\}<\/code><\/pre>/, fence("css", input.uiSdk.tailwindLayerLine))
+        .replace(/<table>(?:(?!<\/table>)[\s\S])*bridge\.map(?:(?!<\/table>)[\s\S])*<\/table>/, uiSdkTable(input))
         .replace(/<table>[\s\S]*?<\/table>/, variantsTable(input))
+        .replace(/\{bridge\.leftAlone\.map\(.*?<\/code><\/>\)\}/, () => input.uiSdk.leftAlone.map((n) => `\`${n}\``).join(", "))
+        .replace(/\{bridge\.uiSdkVersion\}/g, input.uiSdk.uiSdkVersion)
         .replace(/\{(componentCount|iconCount|version)\}/g, (_, k: string) => facts[k]);
     })
     .join("")

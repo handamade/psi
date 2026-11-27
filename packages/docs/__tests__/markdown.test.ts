@@ -83,6 +83,17 @@ describe("guideMd", () => {
     }
   });
 
+  it("renders the UI SDK guide's bridge data into its twin (D146)", () => {
+    const md = guideMd(input, guide("ui-sdk.mdx"));
+    expect(md).toContain(input.uiSdk.layerLine);
+    expect(md).toContain(input.uiSdk.tailwindLayerLine);
+    expect(md).toContain("| UI SDK token | Psi value | Role |");
+    for (const m of input.uiSdk.map) expect(md).toContain(`| \`${m.name}\` |`);
+    for (const n of input.uiSdk.leftAlone) expect(md).toContain(`\`${n}\``);
+    expect(md).toContain(input.uiSdk.uiSdkVersion);
+    expect(md).not.toContain("| Variant |");
+  });
+
   it("keeps fenced code untouched", () => {
     const md = guideMd(input, guide("sizes-and-variants.mdx"));
     expect(md).toContain("<Button size={24}>Compact</Button>");
@@ -190,6 +201,6 @@ describe("loadDocsInput", () => {
     expect(input.examples.map((e) => `${e.slug}/${e.name}`)).toEqual(
       [...input.examples.map((e) => `${e.slug}/${e.name}`)].sort((a, b) => a.localeCompare(b)),
     );
-    expect(input.guides.map((g) => g.id)).toEqual(["installation", "theming", "dark-mode", "ai", "sizes-and-variants"]);
+    expect(input.guides.map((g) => g.id)).toEqual(["installation", "theming", "dark-mode", "ai", "sizes-and-variants", "ui-sdk"]);
   });
 });

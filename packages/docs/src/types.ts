@@ -86,6 +86,15 @@ export interface Resolved {
   };
 }
 
+/** `@handamade/psi-tokens/ui-sdk.json` (D146). */
+export interface UiSdkBridge {
+  uiSdkVersion: string;
+  layerLine: string;
+  tailwindLayerLine: string;
+  map: { name: string; value: string; role: string | null }[];
+  leftAlone: string[];
+}
+
 export interface Guidance {
   variants: { variant: string; intent: string; typicalUse: string }[];
   typographyDefaults: Record<string, string>;
@@ -132,6 +141,7 @@ export interface DocsInput {
   /** packages/react/docs/<Export>.md, without its leading comment line. */
   generatedDocs: Record<string, string>;
   guidance: Guidance;
+  uiSdk: UiSdkBridge;
   resolved: Record<ThemeName, Resolved>;
   examples: ExampleSource[];
   guides: GuideSource[];
