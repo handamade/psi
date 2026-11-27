@@ -42,11 +42,9 @@ function Sample({ theme }: { theme: string }) {
       </Select>
       {/* today is pinned, so the baseline does not move with the date. */}
       <Calendar today="2026-10-16" defaultValue="2026-10-14">
-        <div data-slot="row">
-          <CalendarPrevious data-variant="ghost" aria-label="Previous month"><Chevron d="m15 18-6-6 6-6" /></CalendarPrevious>
-          <CalendarHeading />
-          <CalendarNext data-variant="ghost" aria-label="Next month"><Chevron d="m9 18 6-6-6-6" /></CalendarNext>
-        </div>
+        <CalendarPrevious data-variant="ghost" aria-label="Previous month"><Chevron d="m15 18-6-6 6-6" /></CalendarPrevious>
+        <CalendarHeading />
+        <CalendarNext data-variant="ghost" aria-label="Next month"><Chevron d="m9 18 6-6-6-6" /></CalendarNext>
         <CalendarGrid>
           <CalendarWeekdays>{(i) => <CalendarWeekday index={i} />}</CalendarWeekdays>
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
