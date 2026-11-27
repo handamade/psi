@@ -152,6 +152,8 @@ try {
   // mechanism would have turned this check red on a good package.
   const specs = [...new Set([
     ...STYLESHEETS,
+    `${TOKENS_PKG}/ui-sdk.css`, // D146: optional, resolved only
+    `${TOKENS_PKG}/ui-sdk.json`,
     ...installedSubpaths(REACT_PKG, dir),
     ...installedSubpaths(TOKENS_PKG, dir),
   ])];

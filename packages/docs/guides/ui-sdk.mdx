@@ -1,0 +1,68 @@
+---
+title: UI SDK
+description: Give UI SDK's default look a Psi theme, contrast gate included, with one extra stylesheet.
+order: 6
+---
+
+import bridge from "@handamade/psi-tokens/ui-sdk.json";
+
+[UI SDK](https://ui-sdk.dev) is a headless behavior layer. Its optional default look, `@ui-sdk/core/web.css`, is
+driven by `--ui-*` custom properties. `@handamade/psi-tokens/ui-sdk.css` sets each of them to a Psi token, so a team
+building on UI SDK gets a Psi theme. It is a theme for UI SDK's own components, not a set of Psi components.
+
+## Imports
+
+Import the four token stylesheets, UI SDK's stylesheet, then the bridge. The first line is the contract: UI SDK's
+layer comes first and the bridge right after it, before Psi's own layers, so Psi's components and your own unlayered CSS
+still win.
+
+<pre tabIndex={0}><code>{`${bridge.layerLine}
+@import "@handamade/psi-tokens/base.css";
+@import "@handamade/psi-tokens/light.css";
+@import "@handamade/psi-tokens/components.css";
+@import "@handamade/psi-tokens/utilities.css";
+@import "@ui-sdk/core/web.css";
+@import "@handamade/psi-tokens/ui-sdk.css";`}</code></pre>
+
+If the app also renders Psi components, import `@handamade/psi-react/styles` as well.
+
+### With Tailwind
+
+UI SDK's Tailwind instructions import `web.css` with `layer(components)`. Use this layer line instead, so Psi's
+layers come after Tailwind's `components` and a utility class still wins:
+
+<pre tabIndex={0}><code>{bridge.tailwindLayerLine}</code></pre>
+
+## What is mapped
+
+<table>
+  <thead><tr><th>UI SDK token</th><th>Psi value</th><th>Role</th></tr></thead>
+  <tbody>
+    {bridge.map.map((m) => (
+      <tr><td><code>{m.name}</code></td><td><code>{m.value}</code></td><td>{m.role ?? "size or font"}</td></tr>
+    ))}
+  </tbody>
+</table>
+
+Every colour is one Psi semantic token. The text, accent, control-border, danger and focus colours sit in roles Psi's
+contrast gate checks; the hairline, the surfaces and the scrim carry no contrast duty. To retune UI SDK, retune Psi: set
+the Psi token at a theme root (`:root` or a `[data-psi-theme]` element), where the map resolves, never `--ui-*`
+directly.
+
+## What is left alone
+
+{bridge.leftAlone.map((n, i) => <>{i > 0 && ", "}<code>{n}</code></>)}. The shadow has no Psi token to follow, and
+it follows light and dark through the `color-scheme` each Psi theme sets. The icons are mask shapes, so they take
+their colour from the element.
+
+## The focus ring
+
+UI SDK draws its focus ring as a 4px outline in `--ui-ring`, except the resizable handle, which uses a 3px box-shadow. The bridge maps that colour to `--psi-border-focus`,
+which Psi gates at 3:1 on both surfaces. For each of UI SDK's ring rules it sets the width to
+`--psi-focus-ring-width` and the offset to `--psi-focus-ring-offset`, so a focused UI SDK control looks like a
+focused Psi one.
+
+## Version
+
+The bridge was built against `@ui-sdk/core@{bridge.uiSdkVersion}`. A later UI SDK may add tokens the bridge does not
+map; they keep UI SDK's own values until Psi catches up.

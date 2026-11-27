@@ -20,7 +20,8 @@
       "types": "./dist/theme/index.d.ts",
       "import": "./dist/theme/index.js"
     },
-    "./guidance.json": "./dist/guidance.json"
+    "./guidance.json": "./dist/guidance.json",
+    "./ui-sdk.json": "./dist/ui-sdk.json"
   },
   "bin": {
     "psi-theme": "./dist/cli/psi-theme.js"
@@ -40,6 +41,9 @@
   },
   "devDependencies": {
     "@types/node": "^24.19.0",
+    "@ui-sdk/core": "0.1.0-beta.17",
+    "postcss": "^8.5.15",
+    "postcss-nested": "^7.0.2",
     "tsx": "^4.19.0"
   }
 }

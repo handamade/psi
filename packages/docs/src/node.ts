@@ -9,6 +9,7 @@ import type {
   ExportInfo,
   GuideSource,
   Guidance,
+  UiSdkBridge,
   HookInfo,
   PropInfo,
   Resolved,
@@ -59,6 +60,14 @@ export function resolved(theme: ThemeName = "light"): Resolved {
     cache.set(theme, JSON.parse(readFileSync(path, "utf8")) as Resolved);
   }
   return cache.get(theme)!;
+}
+
+let uiSdkCache: UiSdkBridge | undefined;
+export function uiSdk(): UiSdkBridge {
+  uiSdkCache ??= JSON.parse(
+    readFileSync(require.resolve("@handamade/psi-tokens/ui-sdk.json"), "utf8"),
+  ) as UiSdkBridge;
+  return uiSdkCache;
 }
 
 let guidanceCache: Guidance | undefined;
@@ -118,6 +127,7 @@ export function loadDocsInput(): DocsInput {
     hooks: manifest.hooks,
     generatedDocs: Object.fromEntries(manifest.components.map((c) => [c.name, readGeneratedDoc(c.name)])),
     guidance: guidance(),
+    uiSdk: uiSdk(),
     resolved: Object.fromEntries(THEMES.map((t) => [t, resolved(t)])) as Record<ThemeName, Resolved>,
     examples: loadExamples(),
     guides: loadGuides(),

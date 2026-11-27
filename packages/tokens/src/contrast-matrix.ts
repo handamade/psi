@@ -194,7 +194,9 @@ export const componentLabelPairs: ContrastPair[] = [
  * on (bgPrimary on the canvas, bgSecondary on Panel, Dialog and Menu). An
  * unchecked Switch is identified by its track (D122: fillControl, and
  * fillControlHover on hover) against the surface, and its state by the white
- * thumb against the track; the thumb pairs composite the track onto bgPrimary. */
+ * thumb against the track; the thumb pairs composite the track onto bgPrimary.
+ * The focus ring (D82) is gated against both surfaces too (D146): UI SDK's bridge
+ * routes its whole focus story through `borderFocus`. */
 export const nonTextPairs: ContrastPair[] = [
   { fg: "borderControl", bg: "bgPrimary", minRatio: 3 },
   { fg: "borderControl", bg: "bgSecondary", minRatio: 3 },
@@ -206,4 +208,6 @@ export const nonTextPairs: ContrastPair[] = [
   { fg: "fillControlHover", bg: "bgSecondary", minRatio: 3 },
   { fg: "fillStaticWhite", bg: "fillControl", minRatio: 3 },
   { fg: "fillStaticWhite", bg: "fillControlHover", minRatio: 3 },
+  { fg: "borderFocus", bg: "bgPrimary", minRatio: 3 },   // focus ring, D82 (D146)
+  { fg: "borderFocus", bg: "bgSecondary", minRatio: 3 }, // focus ring on Panel, Dialog, Menu (D146)
 ];

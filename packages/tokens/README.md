@@ -31,6 +31,24 @@ All tokens are CSS custom properties: `--psi-bg-primary`, `--psi-fg-secondary`, 
 
 **utilities.css is required**: it carries `.psi-container`, `.psi-text-*`, `.psi-display-*`, `.psi-fg-*` (D94) utility classes and the `prefers-reduced-motion` zeroing for all duration tokens (D30), which reaches the motion presets too — required for NavBar rendering and accessibility compliance.
 
+### UI SDK
+
+To theme UI SDK's default look (`@ui-sdk/core/web.css`) with Psi tokens, import the bridge after it, behind this layer line:
+
+```css
+@layer ui-sdk, psi.ui-sdk, psi.base, psi.theme, psi.components, psi.utilities;
+@import "@handamade/psi-tokens/base.css";
+@import "@handamade/psi-tokens/light.css";
+@import "@handamade/psi-tokens/components.css";
+@import "@handamade/psi-tokens/utilities.css";
+@import "@ui-sdk/core/web.css";
+@import "@handamade/psi-tokens/ui-sdk.css";
+```
+
+Brands retune it through Psi tokens, never through `--ui-*` directly: set the Psi token at a theme root (`:root` or a `[data-psi-theme]` element), where the map resolves.
+
+See the guide at `/docs/get-started/ui-sdk/`.
+
 ## Motion
 
 Bind a motion preset, not two loose scale steps (D141). Each preset is a pair of tokens that alias the scale:

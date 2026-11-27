@@ -7,7 +7,7 @@ import { GUIDE_ORDER } from "../src/pages";
 const dir = join(__dirname, "..", "guides");
 
 describe("guides", () => {
-  it("are the five v1 guides, one file each", () => {
+  it("are the guides in GUIDE_ORDER, one file each", () => {
     expect(readdirSync(dir).map((f) => f.replace(/\.mdx$/, "")).sort()).toEqual([...GUIDE_ORDER].sort());
   });
 
