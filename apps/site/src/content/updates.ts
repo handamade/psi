@@ -15,6 +15,12 @@ export interface UpdateEntry {
 
 export const UPDATES: UpdateEntry[] = [
   {
+    date: "2026-11-27",
+    tag: "release",
+    title: "0.39.0 — a Psi theme for UI SDK, and a gate that checks the focus colour",
+    body: "@handamade/psi-tokens/ui-sdk.css themes UI SDK's default look with Psi's tokens: every --ui-* colour, size and font token aliases a Psi token, and UI SDK's focus ring is drawn the Psi way. It is optional: import it after UI SDK's web.css, behind the layer line the new UI SDK guide gives. ui-sdk.json lists the map, and the MCP returns the guide as guide:ui-sdk. The contrast gate now also checks the focus colour at 3:1 on both page surfaces. Every Psi theme passes, but a theme you build with @handamade/psi-tokens/theme whose focus colour is too faint now fails its build. The MCP's HTTP endpoint now takes POST only. 60 components, 24 patterns.",
+  },
+  {
     date: "2026-11-19",
     tag: "release",
     title: "0.38.0 — an MCP that knows the icons, and pattern presets that pass its own check",
