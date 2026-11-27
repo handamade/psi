@@ -16,6 +16,8 @@
     "@storybook/addon-a11y": "^10.6.7",
     "@storybook/addon-docs": "^10.6.7",
     "@storybook/react-vite": "^10.6.7",
+    "@ui-sdk/core": "0.1.0-beta.17",
+    "@ui-sdk/react": "0.1.0-beta.17",
     "storybook": "^10.6.7",
     "vite": "^6.0.0"
   }

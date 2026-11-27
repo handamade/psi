@@ -1,6 +1,7 @@
 import type { Preview } from "storybook";
 import { createElement } from "react";
 
+import "./layers.css";
 import "@handamade/psi-tokens/base.css";
 import "@handamade/psi-tokens/light.css";
 import "@handamade/psi-tokens/dark.css";
