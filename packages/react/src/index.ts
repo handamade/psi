@@ -23,7 +23,7 @@ export type { NavGroupProps } from "./NavTree/NavGroup.js";
 export { NavItem } from "./NavTree/NavItem.js";
 export type { NavItemProps } from "./NavTree/NavItem.js";
 export { AppShell } from "./AppShell/AppShell.js";
-export type { AppShellProps } from "./AppShell/AppShell.js";
+export type { AppShellProps, AppShellFocusReturnReason } from "./AppShell/AppShell.js";
 export { AspectRatio } from "./AspectRatio/AspectRatio.js";
 export type { AspectRatioProps } from "./AspectRatio/AspectRatio.js";
 export { Field, FieldContext } from "./Field/Field.js";
