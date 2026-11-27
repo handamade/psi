@@ -48,7 +48,7 @@ or null". `AppShell` reads "the sidebar contains the active element". No
 document states the rule. No component lets a consumer see the hand-back,
 decline it or choose another target.
 
-### The defect (P250)
+### The defect
 
 `ToastRegion`'s observer, `ToastRegion.tsx:197-216`:
 
@@ -192,7 +192,7 @@ probes before calling the helper, and passes the region as `fallback`.
 `Dialog` does not use the helper's focus step: it builds the event itself
 after `close()`, using the same `FocusReturnEvent` type.
 
-### 4. The fix for P250
+### 4. The fix for the stale held toast
 
 In `ToastRegion`'s observer, the early return at `:202` becomes "focus is
 not lost". Before it returns, it clears `held` and `cameFrom`. Under §1 that
@@ -213,7 +213,7 @@ node. A later toast then finds `held === null` and does nothing.
 - **`packages/react/llms.txt`**: one line under focus, naming
   `onFocusReturn` and the guide.
 - **Changeset**: minor. It adds `onFocusReturn` on four components and
-  `FocusReturnEvent` as an exported type, and fixes P250. No existing
+  `FocusReturnEvent` as an exported type, and fixes the stale held toast. No existing
   behaviour changes for a consumer that passes no handler.
 
 ### 6. Testing
@@ -243,7 +243,7 @@ Every new test is written to fail first.
     call.
   - `AppShell`: both `sidebarMotion` modes.
   - `ToastRegion`: dismissal by keyboard and by pointer.
-- **The P250 regression**, `ToastRegion`:
+- **The stale-focus regression**, `ToastRegion`:
   1. Focus a toast's dismiss button.
   2. In the same act, remove that toast and focus a button outside the
      region, as a consumer's commit would.

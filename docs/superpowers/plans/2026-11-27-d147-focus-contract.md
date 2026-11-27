@@ -4,7 +4,7 @@
 
 **Goal:** One written focus rule behind every focus hand-back and rescue in
 Psi, an `onFocusReturn` hook on `Dialog`, `Menu`, `AppShell` and
-`ToastRegion`, and the fix for `ToastRegion`'s stale focus state (P250).
+`ToastRegion`, and the fix for `ToastRegion`'s stale focus state.
 
 **Architecture:** A new internal module, `packages/react/src/internal/focus/`,
 holds four things:
@@ -447,7 +447,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 3: `ToastRegion`: `onFocusReturn`, and the P250 fix
+### Task 3: `ToastRegion`: `onFocusReturn`, and the stale-focus fix
 
 **Files:**
 - Modify: `packages/react/src/Toast/ToastRegion.tsx`: the props at
@@ -471,7 +471,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 // packages/react/src/Toast/ToastFocusReturn.test.tsx
 // D147: ToastRegion's hand-back is seen, declined or redirected through
 // onFocusReturn, and a removal the consumer already handled leaves no stale
-// state behind (P250). { hidden: true } is not needed: no role queries.
+// state behind. { hidden: true } is not needed: no role queries.
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { Toast } from "./Toast.js";
@@ -545,7 +545,7 @@ describe("ToastRegion: onFocusReturn (D147)", () => {
   });
 });
 
-describe("ToastRegion: a removal the consumer handled leaves no stale state (P250)", () => {
+describe("ToastRegion: a removal the consumer handled leaves no stale state", () => {
   it("does not move focus to a later toast", async () => {
     const { rerender } = render(<Stack ids={["A"]} />);
     enterFromOpener(dismissOf("A"));
@@ -572,10 +572,10 @@ Run: `pnpm --filter @handamade/psi-react exec vitest run src/Toast/ToastFocusRet
 Expected: FAIL.
 - The `onFocusReturn` tests fail on the prop's type, or because no handler
   is called.
-- The P250 test fails because focus moves to B's dismiss button. That is the
+- The stale-focus test fails because focus moves to B's dismiss button. That is the
   defect.
 
-If the P250 test passes before the fix, stop and report it. The test then
+If the stale-focus test passes before the fix, stop and report it. The test then
 does not reproduce the defect in jsdom, and it needs the spec's attention.
 
 - [ ] **Step 3: The props.** In `ToastRegion.tsx`, after the `ToastPlacement`
@@ -619,7 +619,7 @@ D136 effect.
       if (!held || held.isConnected) return;
       const lost = held;
       held = null;
-      // D147 / P250: focus went somewhere else first — a consumer moved it
+      // D147, stale focus: focus went somewhere else first — a consumer moved it
       // during its own commit. Forget the region's state, so a later toast
       // finds nothing to hand back and cannot steal focus.
       if (!isFocusLost(lost)) {
@@ -670,7 +670,7 @@ Expected: PASS. `ToastFocus.test.tsx` is unchanged and green.
 
 ```bash
 git add packages/react/src/Toast packages/react/src/index.ts
-git commit -m "feat(react): ToastRegion reports its focus hand-back, and forgets a removal focus already left (D147, P250)
+git commit -m "feat(react): ToastRegion reports its focus hand-back, and forgets a removal focus already left (D147)
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
